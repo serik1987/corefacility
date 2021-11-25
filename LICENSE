@@ -1,11 +1,61 @@
-MIT License
+ЛИЦЕНЗИОННОЕ СОГЛАШЕНИЕ ИВНД И НФ РАН (ДЛЯ РУССКОГОВОРЯЩИХ ПОЛЬЗОВАТЕЛЕЙ)
+IHNA License Agreement (for native Russian speakers)
 
-Copyright (c) 2021 Sergei Kozhukhov
+Copyright (c) 2021-2022 Кожухов Сергей Александрович, к.б.н., н. сотр.
+Лаборатории физиологии сенсорных систем Института высшей нервной деятельности
+и нейрофизиологии РАН
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+Данное лицензионное соглашение является договором публичной оферты, который
+заключается между автором данного и программного обеспечения и его пользователем.
+
+Порядок использования данного программного обеспечения в проектах
+"Вазомоторные колебания", "Онтогенетическое развитие первичной зрительной коры",
+которые выполняются в Лаборатории физиологии сенсорных систем Института высшей
+нервной деятельности и нейрофизиологии в рамках Государственного задания Министерства
+науки и образования Российской Федерации на 2021-2023 г.г. регулируется трудовым
+договором, внутренними распоряжениями Администрации ИВНД и НФ РАН, а также
+устными и письменными распоряжениями руководителей этих проектов.
+
+ВЫШЕУПОМЯНУТЫЕ РАСПОРЯЖЕНИЯ ЯВЛЯЮТСЯ ИСЧЕРПЫВАЮЩИМИ, НЕ ПОДЛЕЖАЩИМИ ОБЖАЛОВАНИЮ ИЛИ
+ПЕРЕСМОТРУ. ПРИ УСЛОВИИ СОБЛЮДЕНИЯ ВЫШЕУПОМЯНУТЫХ УСЛОВИЙ НИЖЕУПОМЯНУТАЯ ЧАСТЬ
+ЛИЦЕНЗИОННОГО СОГЛАШЕНИЯ НЕ ПРИМЕНЯЕТСЯ.
+
+В случае использования данного программного обеспечения при решении иных целей и задач
+пользователь вправе бесплатно и без каких-либо ограничений осуществлять использование,
+копирование, изменение, слияние, публикацию, распространение сублицензирование данного
+программного обеспечения, а также продажу его копий при условии добровольного согласия
+и неукоснительного выполнения всех нижеуказанных условий.
+
+Вышеуказанное сообщение об авторском праве, а также данное лицензионное соглашение
+должно прилагаться к любым копиям данного программного обеспечения вне зависимости
+от того, распространяется ли оно в целом виде, или по частям.
+
+ПРОГРАММНОЕ ОБЕСПЕЧЕНИЕ ПРЕДОСТАВЛЯЕТСЯ «КАК ЕСТЬ», БЕЗ КАКИХ-ЛИБО ГАРАНТИЙ, ЯВНЫХ
+ИЛИ ЯВНЫХ, ВКЛЮЧАЯ, НО НЕ ИСЧЕРПЫВАЯСЬ ГАРАНТИЯМИ КОММЕРЧЕСКОЙ ЦЕННОСТИ,
+ПРИГОДНОСТИ ДЛЯ КОНКРЕТНОЙ ЦЕЛИ ИЛИ НЕДОПУЩЕНИЯ НАРУШЕНИЯ ПРАВ ТРЕТЬИХ ЛИЦ.
+НИ В КОЕМ СЛУЧАЕ АВТОРЫ ИЛИ ДЕРЖАТЕЛИ АВТОРСКИХ ПРАВ НЕСУТ ОТВЕТСТВЕННОСТЬ ЗА ЛЮБЫЕ
+ПРЕТЕНЗИИ, УБЫТКИ, А ТАКЖЕ ЛЮБУЮ ДРУГУЮ ОТВЕТСТВЕННОСТЬ, ВЫЯВЛЯЮЩУЮСЯ ЛИ В РЕЗУЛЬТАТЕ
+ДОГОВОРА, ПРАКТИКИ ИЛИ ИНЫМ ОБРАЗОМ, КАК НЕСВЯЗАННУЮ С ДАННЫМ ПРОГРАММНЫМ ОБЕСПЕЧЕНИЕМ,
+ТАК И В СВЯЗИ С НИМ, ЕГО ИСПОЛЬЗОВАНИЕМ.
+
+
+
+
+
+
+
+
+
+IHNA License Agreement (for anybody who is not native Russian speaker)
+
+Copyright (c) 2021-2022 Dr. Sergei Kozhukhov, scientist in the Institute of
+Higher Nervous Activity and Neurophysiology, RAS
+
+Permission is hereby granted, free of charge, to person excluding native
+Russian speakers obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use, copy, modify,
+merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
 
@@ -13,7 +63,8 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+IMPLIED, INCLUDING BUT NOT LI
+ED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
