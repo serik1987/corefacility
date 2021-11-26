@@ -13,7 +13,9 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+import os
 from django.urls import path
+from django.conf import settings
 from django.conf.urls.static import static
 from core.testviews.config import config
 
@@ -21,4 +23,4 @@ urlpatterns = [
     path('__config__/', config, name="config")
 ]
 
-urlpatterns += static("/favicon.ico", document_root="static/favicon.ico")
+urlpatterns += static("/favicon.ico", document_root=os.path.join(settings.BASE_DIR, "corefacility/static/favicon.ico"))
