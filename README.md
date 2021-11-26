@@ -186,7 +186,7 @@ http://www.i18nguy.com/unicode/language-identifiers.html
 zones is here:
 https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
-## Stage 3.2. SQL configuration
+### Stage 3.2. SQL configuration
 
 The application saves small information in databases while large information is saved to regular files. At this
 stage you need to tell the application in what way it shall interact with database management system. Of course,
@@ -220,7 +220,7 @@ Finally, define another properties in the `sql.env`:
 | DJANGO_SQL_USER     | this option has no effect: don't touch this            | The application will use these credentials gain access to the database |
 | DJANGO_SQL_PASSWORD | this option has no effect: don't touch this            | The application will use these credentials gain access to the database |
 
-## Stage 3.3. E-mail configuration
+### Stage 3.3. E-mail configuration
 
 The application will notify the system administrator about errors in hardware or software as well as notify
 you and all your users about all important steps (e.g., including to the project etc.). E-mails are crucial during
@@ -265,7 +265,7 @@ experiencing problems, see the explicit TLS setting EMAIL_USE_TLS.
 
 Note that EMAIL_USE_TLS/EMAIL_USE_SSL are mutually exclusive, so only set one of those settings to True.
 
-# Stage 3.4. Configuring static files collection
+### Stage 3.4. Configuring static files collection
 
 If you access this application directly (especially, when you use Simple Desktop and Extended Desktop configurations)
 you shall omit this step. However, if the user access it indirectly through NGINX or any other web server you need
@@ -288,7 +288,7 @@ edit `staticfiles.env` configuration settings to tell the corefacility:
 These parameters will be ignored if you will not try to collect all static files for the NGINX web server and
 don't want to use the Web proxy server.
 
-## Stage 3.5. Security settings
+### Stage 3.5. Security settings
 
 Please, skip reading this file and don't touch security.env file if you don't receive SSL certificate and did not try
 working with this application using HTTPS protocol. In this case passwords and any personal data will be compromised.

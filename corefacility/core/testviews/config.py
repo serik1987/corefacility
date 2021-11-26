@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.shortcuts import render
 from django.conf import settings
 
@@ -60,6 +61,8 @@ NO_OPTION_MESSAGE = "No such option exists"
 
 
 def config(request):
+    if not settings.DEBUG:
+        raise Http404("Page not found")
     important_config = {}
     for config_name in DISPLAY_CONFIGURATION_OPTIONS:
         try:

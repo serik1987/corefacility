@@ -18,7 +18,7 @@ from django.conf.urls.static import static
 from core.testviews.config import config
 
 urlpatterns = [
-    path('', config, name="config")
+    path('__config__/', config, name="config")
 ]
 
 urlpatterns += static("/favicon.ico", document_root="static/favicon.ico")
