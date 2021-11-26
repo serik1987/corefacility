@@ -141,7 +141,7 @@ class CorefacilityConfiguration(Configuration):
 
     # Security means
     SECURE_SSL_REDIRECT = values.BooleanValue(False)
-    SECURE_SSL_HOSTNAME = values.Value(None)
+    SECURE_SSL_HOSTNAME = values.Value("")
     SECURE_HSTS_SECONDS = values.IntegerValue(0)
     SECURE_HSTS_INCLUDE_SUBDOMAINS = values.BooleanValue(False)
     SECURE_HSTS_PRELOAD = values.BooleanValue(False)
@@ -153,6 +153,22 @@ class CorefacilityConfiguration(Configuration):
         "/etc/group": os.R_OK | os.W_OK,
         "/home": os.R_OK | os.W_OK | os.X_OK
     }
+
+    # Authorization password validators
+    AUTH_PASSWORD_VALIDATORS = [
+        {
+            'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        },
+        {
+            'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        },
+        {
+            'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        },
+        {
+            'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        },
+    ]
 
     @classmethod
     def pre_setup(cls):
