@@ -270,7 +270,7 @@ class CorefacilityConfiguration(Configuration):
             "default": {
                 "ENGINE": self.SQL_BACKEND,
                 "NAME": self.SQL_NAME,
-                "SERVER": self.SQL_SERVER,
+                "HOST": self.SQL_SERVER,
                 "PORT": self.SQL_PORT,
                 "USER": self.SQL_USER,
                 "PASSWORD": self.SQL_PASSWORD
