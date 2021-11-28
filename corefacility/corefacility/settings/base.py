@@ -178,20 +178,13 @@ class CorefacilityConfiguration(Configuration):
         :return: Nothing
         """
         if cls.DOTENV_LOADED is None:
-            print("We are trying to start the corefacility server")
             base_dir = os.path.join(Path(cls.BASE_DIR).parent, cls.settings_dir)
-            print(base_dir)
+            if not os.listdir(base_dir):
+                os.mkdir(base_dir)
             for filename in os.listdir(base_dir):
                 if filename.endswith(cls.settings_file_extension) and filename != cls.preliminary_settings_file:
-                    print("Loading %s..." % filename, end="")
-                    try:
-                        cls.DOTENV = os.path.join(base_dir, filename)
-                        cls.load_dotenv()
-                    except ImproperlyConfigured as e:
-                        print("FAILED")
-                        raise e
-                    else:
-                        print("OK")
+                    cls.DOTENV = os.path.join(base_dir, filename)
+                    cls.load_dotenv()
 
     @classmethod
     def setup(cls):
