@@ -179,7 +179,7 @@ class CorefacilityConfiguration(Configuration):
         """
         if cls.DOTENV_LOADED is None:
             base_dir = os.path.join(Path(cls.BASE_DIR).parent, cls.settings_dir)
-            if not os.listdir(base_dir):
+            if not os.path.isdir(base_dir):
                 os.mkdir(base_dir)
             for filename in os.listdir(base_dir):
                 if filename.endswith(cls.settings_file_extension) and filename != cls.preliminary_settings_file:

@@ -297,6 +297,13 @@ By default, application allows interaction with the user by means of HTTP protoc
 data are transmitted to the web server in non-encrypted manner and can be listened by the third side (so called 'attack
 at the middle').
 
+To adjust security settings you have to check whether nginx interacts with this application though HTTP or HTTPS.
+You can check this by looking for `proxy_pass` parameter inside your NGINX settings file. If you see `http://`
+inside the value of this parameter you can adjust your security settings in the following way: the user connects
+to NGINX through HTTPS. Next, nginx decrypts the request and send it to this application using HTTP, not HTTPS.
+This is OK for security but you need to refer to your NGINX documentation to adjust the security settings not this
+manual.
+
 If you don't want this to happen, first, you need to implement HTTPS connection to your application. After the
 application main page is loaded through HTTPS perfectly, mind about changing the following properties:
 
