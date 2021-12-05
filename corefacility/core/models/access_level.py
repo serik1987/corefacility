@@ -12,3 +12,9 @@ class AccessLevel(models.Model):
                             help_text="Defines whether this is an application access level or text access level")
     alias = models.SlugField(help_text="short name of the access level to use in the API", editable=False)
     name = models.CharField(max_length=64, help_text="Long name of the access level to use in the UI", editable=False)
+
+    class Meta:
+        unique_together = (
+            ("type", "alias"),
+            ("type", "name")
+        )

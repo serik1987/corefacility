@@ -23,9 +23,9 @@ class User(models.Model):
     is_support = models.BooleanField(help_text="True oif the user is technical support")
     avatar = models.ImageField(null=True,
                                help_text="User photo or another picture")
-    unix_group = models.CharField(max_length=32, null=True, unique=True,
+    unix_group = models.CharField(max_length=32, null=True, unique=True, editable=False,
                                   help_text="The UNIX group belonging to the user")
-    home_dir = models.CharField(max_length=100, null=True, unique=True,
+    home_dir = models.CharField(max_length=100, null=True, unique=True, editable=False,
                                 help_text="The home directory belonging to the user")
     activation_code_hash = models.CharField(max_length=256, null=True, editable=False,
                                             help_text="The activation code hash for password recovery via E-mail or "

@@ -15,3 +15,6 @@ class EntryPoint(models.Model):
                             help_text="The name through which the entry point is visible on the system")
     type = models.CharField(max_length=3, editable=False, default="lst", choices=EntryPointType.choices,
                             help_text="Whether the entry point looks like list or select?")
+
+    class Meta:
+        unique_together = ["alias", "belonging_module"]

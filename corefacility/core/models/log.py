@@ -7,6 +7,8 @@ class Log(models.Model):
 
     API requests only will be logged
     """
+    request_date = models.DateTimeField(editable=False, db_index=True,
+                                        help_text="Date and time when the request has been received")
     log_address = models.CharField(max_length=4096, editable=False,
                                    help_text="Defines a full route to the request")
     request_method = models.CharField(max_length=5, editable=False,
@@ -29,3 +31,6 @@ class Log(models.Model):
                                      help_text="defines the response body")
     output_data = models.TextField(editable=False, null=True,
                                    help_text="Short description of the output data")
+
+    class Meta:
+        ordering = ["-request_date"]

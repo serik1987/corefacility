@@ -19,10 +19,13 @@ class Module(models.Model):
     html_code = models.TextField(null=True, editable=False,
                                  help_text="When the module is visible on the frontend as widget, this field relates"
                                            "to the module HTML code to show")
-    app_class = models.TextField(max_length=1024, editable=False,
+    app_class = models.CharField(max_length=1024, editable=False,
                                  help_text="The python class connected to the module")
     user_settings = models.JSONField(help_text="Settings defined by the user and stored in the JSON format")
     is_application = models.BooleanField(default=True, editable=False,
                                          help_text="True if the module is application")
     is_enabled = models.BooleanField(default=True,
                                      help_text="True if the module has switched on")
+
+    class Meta:
+        unique_together = ["alias", "parent_entry_point"]
