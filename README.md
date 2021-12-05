@@ -26,6 +26,7 @@ packages shall be installed in advance using PIP utility:
 * django-configurations
 * django-restframework
 * python-dotenv
+* pillow
 
 ## Stage 1. Download and install your application
 
