@@ -144,7 +144,7 @@ class Migration(migrations.Migration):
                                       name=_("Imaging processors"), type=EntryPointType.list.value)
         image_processors.save()
         Module(parent_entry_point=image_processors, alias="roi", name=_("ROI definition"), html_code=None,
-               app_class="roi.App", user_settings=dict(), is_application=False, is_enabled=False)
+               app_class="roi.App", user_settings=dict(), is_application=False, is_enabled=False).save()
 
     dependencies = [
         ("core", "0001_initial")

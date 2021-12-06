@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-06 05:25+0300\n"
+"POT-Creation-Date: 2021-12-06 07:33+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -120,12 +120,16 @@ msgstr "Определитель ROI"
 #: core/models/enums/entry_point_type.py:9
 msgid ""
 "As list (the user can enable arbitrary amount of modules in this entry point)"
-msgstr "Список (пользователь может включить произвольное количество модулей для данной точки доступа)"
+msgstr ""
+"Список (пользователь может включить произвольное количество модулей для "
+"данной точки доступа)"
 
 #: core/models/enums/entry_point_type.py:10
 msgid ""
 "As select (the user must choice which module in this entry point to enable)"
-msgstr "Выбор (пользователь может включить только один модуль для данной точки доступа)"
+msgstr ""
+"Выбор (пользователь может включить только один модуль для данной точки "
+"доступа)"
 
 #: core/models/enums/level_type.py:13
 msgid "Project access level"
@@ -154,3 +158,11 @@ msgstr "Ошибка"
 #: core/models/enums/log_level.py:13
 msgid "The system was down"
 msgstr "Сервер экстренно прекратил работу"
+
+#: imaging/models/enums/map_type.py:9
+msgid "Orientation map"
+msgstr "Карта ориентационной настройки"
+
+#: imaging/models/enums/map_type.py:10
+msgid "Direction map"
+msgstr "Карта дирекциональной настройки"

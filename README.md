@@ -45,6 +45,7 @@ The last step in this stage is to define the configuration defaults. Use the fol
 If you complete this stage correctly you will see 'corefacility' folder that contains the following files:
 
 * corefacility - the application files itself
+* lang - contains application translations to appropriate language
 * settings - the application settings. You will see several .env files. You need to edit these files to make your
 application working properly
 * venv - if you want to run this application from a virtual environment you will also see these files
@@ -324,3 +325,52 @@ used to adjust details of this header value: use `DJANGO_SECURE_HSTS_SECONDS` to
 security is provided here:
 https://developer.mozilla.org/ru/docs/Web/HTTP/Headers/Strict-Transport-Security
 
+# Stage 4. Translating the application into your native language
+
+By default Russian and Engish are available. However, if you want to translate your application into another languages
+you need to do the following things:
+
+1. Change the directory to `corefacility`
+
+```commandline
+cd corefacility
+```
+
+2. Make translation messages to your own language
+
+```commandline
+python3 manage.py makemessages -l your_language_code
+```
+
+Here the language code shall be separated from the country code by underscore (_). Example:
+
+```commandline
+python3 manage.py makemessages -l ru_RU
+```
+
+3. Find django.po file corresponding to your language in the lang folder
+
+```commandline
+vi ../lang/your_language_code/LC_MESSAGES/django.po
+```
+
+Edit this file by writing down appropriate translations
+
+4. Compile the language messages:
+
+```commandline
+python3 manage.py compilemessages
+```
+
+If this command is succeeded `django.mo` file will emerge together with `django.po` file
+
+5. Open settings file
+
+```commandline
+vi ../settings/base.env
+```
+
+Make sure that the DJANGO_LANGUAGE_CODE property is valid (this is case sensitive and differed from the
+lang subfolder only by replacement of '_' symbol by '-')
+
+6. Enjoy! Nothing else is required!

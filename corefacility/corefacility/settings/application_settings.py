@@ -4,7 +4,12 @@ INSTALLED_APPS = [
         'django.contrib.staticfiles',
         'django.contrib.messages',
         'core',
-        'authorizations.google'
+        'authorizations.google',
+        'authorizations.mailru',
+        'authorizations.ihna',
+        'authorizations.cookie',
+        'imaging',
+        'roi',
 ]
 
 MIDDLEWARE = [
