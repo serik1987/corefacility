@@ -10,8 +10,10 @@ class AccessLevel(models.Model):
     """
     type = models.CharField(max_length=3, choices=LevelType.choices, default='app', editable=False,
                             help_text="Defines whether this is an application access level or text access level")
-    alias = models.SlugField(help_text="short name of the access level to use in the API", editable=False)
-    name = models.CharField(max_length=64, help_text="Long name of the access level to use in the UI", editable=False)
+    alias = models.SlugField(editable=False,
+                             help_text="short name of the access level to use in the API")
+    name = models.CharField(max_length=64, editable=False,
+                            help_text="Long name of the access level to use in the UI")
 
     class Meta:
         unique_together = (

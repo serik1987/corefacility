@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 class LevelType(models.TextChoices):
@@ -9,5 +10,5 @@ class LevelType(models.TextChoices):
     project_level defines base access levels to the project
     app_level defines additional restrictions that can be applied to a certain application
     """
-    project_level = "prj", "Project access level"
-    app_level = "app", "Application access level"
+    project_level = "prj", _("Project access level")
+    app_level = "app", _("Application access level")
