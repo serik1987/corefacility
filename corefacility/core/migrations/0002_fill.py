@@ -92,20 +92,20 @@ class Migration(migrations.Migration):
         :param EntryPoint: the EntryPoint model object
         :return: nothing
         """
-        core_application = Module(parent_entry_point=None, alias="core", name=_("Basic facility"), html_code=None,
+        core_application = Module(parent_entry_point=None, alias="core", name=_("Core functionality"), html_code=None,
                                   app_class="core.App", user_settings=dict(), is_application=False, is_enabled=True)
         core_application.save()
 
         authorizations = EntryPoint(alias="authorizations", belonging_module=core_application,
-                                    name=_("Authorization modules"), type=EntryPointType.list.value)
+                                    name=_("Authorization methods"), type=EntryPointType.list.value)
         authorizations.save()
         Module(parent_entry_point=authorizations, alias="standard", name=_("Standard authorization"), html_code=None,
-               app_class="core.authorizations.StandardAuthorization", is_application=False, is_enabled=True,
+               app_class="core.authorizations.StandardAuthorization", is_application=False, is_enabled=False,
                user_settings=dict()).save()
         Module(parent_entry_point=authorizations, alias="ihna", name=_("Authorization through IHNA website"),
                html_code="<div class='auth ihna'></div>", app_class="authorizations.ihna.App", user_settings=dict(),
                is_application=False, is_enabled=False).save()
-        Module(parent_entry_point=authorizations, alias="google", name=_("Authorization though Google"),
+        Module(parent_entry_point=authorizations, alias="google", name=_("Authorization through Google"),
                html_code="<div class='auth google'></div>", app_class="authorizations.google.App", user_settings=dict(),
                is_application=False, is_enabled=False).save()
         Module(parent_entry_point=authorizations, alias="mailru", name=_("Authorization through Mail.ru"),
@@ -122,13 +122,13 @@ class Migration(migrations.Migration):
                is_application=False, is_enabled=False).save()
         Module(parent_entry_point=authorizations, alias="auto", name=_("Automatic authorization"),
                html_code=None, app_class="core.authorizations.AutomaticAuthorization", user_settings=dict(),
-               is_application=False, is_enabled=False).save()
+               is_application=False, is_enabled=True).save()
 
         synchronizations = EntryPoint(alias="synchronizations", belonging_module=core_application,
-                                      name=_("Synchronization modules"), type=EntryPointType.select.value)
+                                      name=_("Account synchronization"), type=EntryPointType.select.value)
         synchronizations.save()
         Module(parent_entry_point=synchronizations, alias="ihna_employees",
-               name=_("Synchronization with the IHNA website"), html_code=None,
+               name=_("IHNA RAS account synchronization"), html_code=None,
                app_class="core.synchronizations.IhnaSynchronization", user_settings=dict(), is_application=False,
                is_enabled=False).save()
 
@@ -137,14 +137,17 @@ class Migration(migrations.Migration):
         projects.save()
         imaging = Module(parent_entry_point=projects, alias="imaging",
                          name=_("Basic functional maps processing"), html_code=None, app_class="imaging.App",
-                         user_settings=dict(), is_application=False, is_enabled=False)
+                         user_settings=dict(), is_application=True, is_enabled=True)
         imaging.save()
 
         image_processors = EntryPoint(alias="processors", belonging_module=imaging,
                                       name=_("Imaging processors"), type=EntryPointType.list.value)
         image_processors.save()
         Module(parent_entry_point=image_processors, alias="roi", name=_("ROI definition"), html_code=None,
-               app_class="roi.App", user_settings=dict(), is_application=False, is_enabled=False).save()
+               app_class="roi.App", user_settings=dict(), is_application=True, is_enabled=True).save()
+
+        EntryPoint(alias="settings", belonging_module=core_application, name=_("Other settings"),
+                   type=EntryPointType.list.value).save()
 
     dependencies = [
         ("core", "0001_initial")

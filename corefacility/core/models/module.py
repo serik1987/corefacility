@@ -12,7 +12,7 @@ class Module(models.Model):
     parent_entry_point = models.ForeignKey("EntryPoint", null=True, on_delete=models.RESTRICT,
                                            related_name="modules", editable=False,
                                            help_text="List of all modules connected to this entry point")
-    alias = models.SlugField(editable=False, unique=True,
+    alias = models.SlugField(editable=False,
                              help_text="A short name that can be used to identify the module in the app")
     name = models.CharField(max_length=128, editable=False, db_index=True,
                             help_text="The name through which the module is visible in the system")

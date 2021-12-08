@@ -18,9 +18,12 @@ class User(models.Model):
                               help_text="E-mail that will be used for receiving notifications")
     phone = models.CharField(max_length=20, null=True,
                              help_text="The user phone for connections via What's App etc.")
-    is_locked = models.BooleanField(help_text="True if the user is unable to login in any way")
-    is_superuser = models.BooleanField(help_text="True, if the user has all possible permissions")
-    is_support = models.BooleanField(help_text="True oif the user is technical support")
+    is_locked = models.BooleanField(default=False,
+                                    help_text="True if the user is unable to login in any way")
+    is_superuser = models.BooleanField(default=False,
+                                       help_text="True, if the user has all possible permissions")
+    is_support = models.BooleanField(default=False,
+                                     help_text="True oif the user is technical support")
     avatar = models.ImageField(null=True,
                                help_text="User photo or another picture")
     unix_group = models.CharField(max_length=32, null=True, unique=True, editable=False,

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-06 07:33+0300\n"
+"POT-Creation-Date: 2021-12-08 02:41+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -54,12 +54,12 @@ msgid "Application usage"
 msgstr "Использование приложения"
 
 #: core/migrations/0002_fill.py:95
-msgid "Basic facility"
+msgid "Core functionality"
 msgstr "Базовый функционал"
 
 #: core/migrations/0002_fill.py:100
-msgid "Authorization modules"
-msgstr "Модули авторизации"
+msgid "Authorization methods"
+msgstr "Способы авторизации"
 
 #: core/migrations/0002_fill.py:102
 msgid "Standard authorization"
@@ -70,7 +70,7 @@ msgid "Authorization through IHNA website"
 msgstr "Авторизация через сайт ИВНД и НФ РАН"
 
 #: core/migrations/0002_fill.py:108
-msgid "Authorization though Google"
+msgid "Authorization through Google"
 msgstr "Авторизация через Google"
 
 #: core/migrations/0002_fill.py:111
@@ -79,7 +79,7 @@ msgstr "Авторизация через Mail.ru"
 
 #: core/migrations/0002_fill.py:114
 msgid "Authorization through UNIX account"
-msgstr "Авторизация через учётную запись UNIX"
+msgstr "Авторизация через операционную систему"
 
 #: core/migrations/0002_fill.py:117
 msgid "Authorization through Cookie"
@@ -94,16 +94,16 @@ msgid "Automatic authorization"
 msgstr "Автоматическая авторизация"
 
 #: core/migrations/0002_fill.py:128
-msgid "Synchronization modules"
-msgstr "Модули синхронизации"
+msgid "Account synchronization"
+msgstr "Синхронизация учётных записей"
 
 #: core/migrations/0002_fill.py:131
-msgid "Synchronization with the IHNA website"
+msgid "IHNA RAS account synchronization"
 msgstr "Синхронизация с сайтом ИВНД и НФ РАН"
 
 #: core/migrations/0002_fill.py:135
 msgid "Project applications"
-msgstr "Проекты"
+msgstr "Работа с научными проектами"
 
 #: core/migrations/0002_fill.py:139
 msgid "Basic functional maps processing"
@@ -111,11 +111,15 @@ msgstr "Базовая обработка функциональных карт"
 
 #: core/migrations/0002_fill.py:144
 msgid "Imaging processors"
-msgstr "Обработчики функциональных карт"
+msgstr "Обработка функциональных карт"
 
 #: core/migrations/0002_fill.py:146
 msgid "ROI definition"
-msgstr "Определитель ROI"
+msgstr "Выделение ROI"
+
+#: core/migrations/0002_fill.py:149
+msgid "Other settings"
+msgstr "Прочие настройки"
 
 #: core/models/enums/entry_point_type.py:9
 msgid ""
@@ -137,7 +141,7 @@ msgstr "Уровень доступа к проекту"
 
 #: core/models/enums/level_type.py:14
 msgid "Application access level"
-msgstr "Уровень доступа к проложению"
+msgstr "Уровень доступа к приложению"
 
 #: core/models/enums/log_level.py:9
 msgid "Debugging message"
