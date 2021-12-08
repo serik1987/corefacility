@@ -85,11 +85,23 @@ class TestApplicationProcess(TestCase):
         values = Module.objects.filter(parent_entry_point=entry_point).values("alias", "html_code")
         self.assertEquals(len(values), len(expected_widget_list),
                           "Number of modules attached to this entry point is not the same as expected")
-        for n in range(len(values)):
-            self.assertEquals(expected_widget_list[n][0], values[n]['alias'],
-                              "Alias of the attached module '%s' is not the same as expected" % values[n]['alias'])
-            self.assertEquals(expected_widget_list[n][1], values[n]['html_code'],
-                              "HTML code of the attached module '%s' is not the same as expected" % values[n]['alias'])
+        for value in values:
+            alias = value['alias']
+            html_code = value['html_code']
+            expected_widget_found = False
+            for expected_alias, expected_widget in expected_widget_list:
+                if expected_alias == alias:
+                    expected_widget_found = True
+                    if html_code is not None and expected_widget is None:
+                        self.fail("HTML code for module '%s' does not exist but expected" % alias)
+                    if html_code is None and expected_widget is not None:
+                        self.fail("HTML code for module '%s' exists but not expected" % alias)
+                    if html_code is not None and expected_widget is not None:
+                        self.assertHTMLEqual(html_code, expected_widget,
+                                             "HTML code for module '%s' is not the same as expected" % html_code)
+                    break
+            self.assertTrue(expected_widget_found, "the module '%s' is not within the list of expected modules" %
+                            alias)
 
     @parameterized.expand([
         ("standard", "core.authorizations.StandardAuthorization"),
