@@ -69,6 +69,9 @@ class CorefacilityConfiguration(Configuration):
     # the SQL password
     SQL_PASSWORD = values.Value("")
 
+    # the SQL initial command
+    SQL_INIT_COMMAND = values.Value("")
+
     # Default primary key field type
     # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
@@ -259,7 +262,7 @@ class CorefacilityConfiguration(Configuration):
 
         :return: List of all available databases
         """
-        return {
+        databases = {
             "default": {
                 "ENGINE": self.SQL_BACKEND,
                 "NAME": self.SQL_NAME,
@@ -269,6 +272,11 @@ class CorefacilityConfiguration(Configuration):
                 "PASSWORD": self.SQL_PASSWORD
             }
         }
+        if self.SQL_INIT_COMMAND:
+            databases['default']['OPTIONS'] = {
+                'init_command': self.SQL_INIT_COMMAND
+            }
+        return databases
 
     def SERVER_EMAIL(self):
         """

@@ -214,13 +214,14 @@ set the `DJANGO_SQL_BACKEND` parameter.
 
 Finally, define another properties in the `sql.env`:
 
-| property name       | property value (for SQLite)                            | property value (for MySQL, PostgreSQL)                                 |
-|---------------------|--------------------------------------------------------|------------------------------------------------------------------------|
-| DJANGO_SQL_NAME     | name of a file where all database data will be written | Name of a database where this application write all its tables         |
-| DJANGO_SQL_SERVER   | this option has no effect: don't touch this            | Name of a server where the management system is installed              |
-| DJANGO_SQL_PORT     | this option has no effect: don't touch this            | Port listening by your SQL server                                      |
-| DJANGO_SQL_USER     | this option has no effect: don't touch this            | The application will use these credentials gain access to the database |
-| DJANGO_SQL_PASSWORD | this option has no effect: don't touch this            | The application will use these credentials gain access to the database |
+| property name           | property value (for SQLite)                            | property value (for MySQL, PostgreSQL)                                 |
+|-------------------------|--------------------------------------------------------|------------------------------------------------------------------------|
+| DJANGO_SQL_NAME         | name of a file where all database data will be written | Name of a database where this application write all its tables         |
+| DJANGO_SQL_SERVER       | this option has no effect: don't touch this            | Name of a server where the management system is installed              |
+| DJANGO_SQL_PORT         | this option has no effect: don't touch this            | Port listening by your SQL server                                      |
+| DJANGO_SQL_USER         | this option has no effect: don't touch this            | The application will use these credentials gain access to the database |
+| DJANGO_SQL_PASSWORD     | this option has no effect: don't touch this            | The application will use these credentials gain access to the database |
+| DJANGO_SQL_INIT_COMMAND | execute some SQL command after connection              | execute some SQL command after connection                              | 
 
 ### Stage 3.3. E-mail configuration
 
