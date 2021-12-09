@@ -18,7 +18,7 @@ class TestProject(TestCase):
     def setUpTestData(cls):
         cls.user = User(login=cls.LOGIN)
         cls.user.save()
-        cls.group = Group(name=cls.GROUP_NAME)
+        cls.group = Group(name=cls.GROUP_NAME, id=1000)
         cls.group.save()
         GroupUser(group=cls.group, user=cls.user, is_governor=True).save()
 
@@ -34,7 +34,7 @@ class TestProject(TestCase):
         self.assertFalse(user.is_superuser, "User can't be automatically become a superuser")
         self.assertFalse(user.is_support, "Users can't be added to the technical support")
         self.assertEqual(user.avatar.name, "", "The user must have no avatar")
-        self.assertIsNotNone(user.groups.get(id=self.group.id), "The precondition user must be included into one "
+        self.assertIsNotNone(user.groups.get(group=self.group), "The precondition user must be included into one "
                                                                 "precondition group")
 
     def test_group_precondition(self):
