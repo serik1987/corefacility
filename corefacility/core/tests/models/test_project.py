@@ -40,7 +40,7 @@ class TestProject(TestCase):
     def test_group_precondition(self):
         group = Group.objects.get(name=self.GROUP_NAME)
         self.assertEqual(group.id, self.group.id, "The precondition group must be saved to the database")
-        self.assertIsNotNone(group.users.get(id=self.user.id), "The precondition group must contain at least one user")
+        self.assertIsNotNone(group.users.get(user=self.user), "The precondition group must contain at least one user")
 
     def test_sample_project(self):
         project = Project(alias="vasomotor-oscillations", name="Vasomotor Oscillations",

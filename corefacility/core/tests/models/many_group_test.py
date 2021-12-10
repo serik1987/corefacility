@@ -1,5 +1,5 @@
 from django.test import TestCase
-from core.models import User, Group
+from core.models import User, Group, GroupUser
 
 
 class ManyGroupTest(TestCase):
@@ -26,12 +26,16 @@ class ManyGroupTest(TestCase):
             group.save()
             cls.group_list.append(group)
         for n in range(cls.USER_NUMBER):
-            cls.group_list[0].users.add(cls.user_list[n])
+            cls._add_user_to_group(cls.group_list[0], cls.user_list[n])
             if n % 2 == 0:
-                cls.group_list[1].users.add(cls.user_list[n])
+                cls._add_user_to_group(cls.group_list[1], cls.user_list[n])
             if n % 4 == 0:
-                cls.group_list[2].users.add(cls.user_list[n])
+                cls._add_user_to_group(cls.group_list[2], cls.user_list[n])
             if n % 5 == 0:
-                cls.group_list[3].users.add(cls.user_list[n])
+                cls._add_user_to_group(cls.group_list[3], cls.user_list[n])
             if n % 10 == 0:
-                cls.group_list[4].users.add(cls.user_list[n])
+                cls._add_user_to_group(cls.group_list[4], cls.user_list[n])
+
+    @classmethod
+    def _add_user_to_group(cls, group, user):
+        GroupUser(group=group, user=user, is_governor=False).save()
