@@ -5,7 +5,7 @@ class GroupUser(models.Model):
     """
     A joining class that defines how user participates in different groups
     """
-    group = models.ForeignKey("Group", editable=False, on_delete=models.CASCADE,
+    group = models.ForeignKey("Group", editable=False, on_delete=models.CASCADE, related_name="users",
                               help_text="The group in which the user participates")
     user = models.ForeignKey("User", editable=False, on_delete=models.CASCADE, related_name="groups",
                              help_text="The user which is mentioned")

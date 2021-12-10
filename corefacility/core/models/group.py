@@ -7,8 +7,8 @@ class Group(models.Model):
     """
     name = models.CharField(max_length=256, unique=True, db_index=True,
                             help_text="The name of the user group to print")
-    users = models.ManyToManyField("User", through="GroupUser",
-                                   help_text="Users that has been included to that group")
+    # users = models.ManyToManyField("User", through="GroupUser",
+    #                                help_text="Users that has been included to that group")
 
     class Meta:
         ordering = ["name"]
