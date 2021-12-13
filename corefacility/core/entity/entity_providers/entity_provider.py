@@ -1,3 +1,4 @@
+from django.core.files import File
 from core.entity.entity import Entity
 
 
@@ -111,3 +112,44 @@ class EntityProvider:
         :return: the entity data suitable for that external source
         """
         raise NotImplementedError("EntityProvider.unwrap_entity is not implemented")
+
+    def attach_file(self, name: str, value: File) -> None:
+        """
+        Attaches a file to the entity representation located at external entity source
+
+        :param name: the field name to which the file should be attached
+        :param value: an instance of django.core.files.File object
+        :return: nothing
+        """
+        raise NotImplementedError("EntityProvider.attach_file is not implemented")
+
+    def detach_file(self, name: str) -> None:
+        """
+        Detaches a file from the entity representation located at external entity source
+
+        :param name: the field name from which the file should be detached
+        :return: nothing
+        """
+        raise NotImplementedError("EntityProvider.detach_file is not implemented")
+
+    def attach_entity(self, container: Entity, property_name: str, entity: Entity) -> None:
+        """
+        Attaches entity to the entity container
+
+        :param container: the container entity that is attachable for another entities
+        :param property_name: field name in the container entity
+        :param entity: the entity to attach
+        :return: nothing
+        """
+        raise NotImplementedError("EntityProvider.attach_entity is not implemented")
+
+    def detach_entity(self, container: Entity, property_name: str, entity: Entity) -> None:
+        """
+        Detaches entity from the entity container
+
+        :param container: the container entity that is attachable for another entities
+        :param property_name: the attachable field name
+        :param entity: the entity to detach
+        :return: nothing
+        """
+        raise NotImplementedError("EntityProvider.detach_entity is not implemented")

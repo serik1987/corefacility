@@ -1,10 +1,7 @@
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 
 
 class EntityException(Exception):
-    """
-    The base exception that marks all troubles happened on the level entity
-    """
     pass
 
 
@@ -17,3 +14,19 @@ class EntityFieldInvalid(EntityException):
 
     def __init__(self, entity_name):
         super().__init__(_("%s with such values can't exist") % entity_name)
+
+
+class EntityOperationNotPermitted(EntityException):
+
+    def __init__(self):
+        super().__init__(_("The entity operation is not permitted"))
+
+
+class LogException(EntityException):
+    pass
+
+
+class NoCurrentLog(LogException):
+
+    def __init__(self):
+        super().__init__("No current log was created. Did you include proper 'core' module middleware?")

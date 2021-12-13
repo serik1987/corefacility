@@ -33,9 +33,6 @@ class Entity:
     _id = None
     """ The entity ID or None if the entity is not stored in the database"""
 
-    _alias = None
-    """ The entity alias or None if the entity is not stored in the database """
-
     _entity_set_class = None
     """ The entity set class that allows to quickly move towards the EntitySet """
 
@@ -51,7 +48,7 @@ class Entity:
     Note that this field is completed by only such entity provider that is called by the entity reader.
     """
 
-    _public_fields = {}
+    _public_fields = None
     """
     Public entity fields. The public entity fields can be read by the user and can be set by the user. Each
     set to the public entity field changes the model state.
@@ -69,7 +66,7 @@ class Entity:
     The entity can't be created if some required entity fields were not sent
     """
 
-    _edited_fields = set()
+    _edited_fields = None
     """
     Defines the set of edited fields. Each time you set up the field value number size of this set is increased by
     one and the model state transforms to "changed". However, when the entity transforms to the 'saved' state
@@ -84,6 +81,19 @@ class Entity:
     """
 
     __state = None
+
+    @classmethod
+    def get_entity_set_class(cls):
+        """
+        Defines the class of the EntitySet. The class must be extension of the EntitySet class
+
+        :return: the EntitySet subclass used for managing this particular entity
+        """
+        if cls._entity_set_class is not None:
+            return cls._entity_set_class
+        else:
+            raise NotImplementedError("Entity: please, redefine the _entity_set_class field or get_entity_class() "
+                                      "method")
 
     def __init__(self, **kwargs):
         """
@@ -111,19 +121,6 @@ class Entity:
         :return: The entity ID if the entity has been stored in the database or None otherwise
         """
         return self._id
-
-    @classmethod
-    def get_entity_set_class(cls):
-        """
-        Defines the class of the EntitySet. The class must be extension of the EntitySet class
-
-        :return: the EntitySet subclass used for managing this particular entity
-        """
-        if cls._entity_set_class is not None:
-            return cls._entity_set_class
-        else:
-            raise NotImplementedError("Entity: please, redefine the _entity_set_class field or get_entity_class() "
-                                      "method")
 
     @property
     def state(self):
@@ -165,3 +162,19 @@ class Entity:
         :return: nothing
         """
         raise NotImplementedError("TO-DO: Entity.delete")
+
+    def __str__(self):
+        """
+        Returns a human-readable string representation of an object used for debugging or logging purpose
+
+        :return: the human-readable string representation of an object
+        """
+        raise NotImplementedError("TO-DO:Entity.__str__")
+
+    def __repr__(self):
+        """
+        Returns a short entity representation used for debugging purpose only
+
+        :return: a short entity representation
+        """
+        raise NotImplementedError("TO-DO: Entity.__repr__")

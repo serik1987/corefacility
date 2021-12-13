@@ -1,3 +1,6 @@
+from django.utils.module_loading import import_string
+
+
 class EntitySet:
     """
     The entity set can be treated as container for entities.
@@ -17,7 +20,7 @@ class EntitySet:
     """ A human-readable entity name used for logging """
 
     _entity_class = None
-    """ Defines the entity class """
+    """ Defines the entity class. Pass string value to this field to prevent circular import """
 
     _entity_reader_class = None
     """
@@ -31,6 +34,15 @@ class EntitySet:
     The goal of the entity filter setter is update this dictionary
     """
 
+    _entity_filter_list = {}
+    """
+    Defines the entity filter list. The values are represented in the following form:
+        'filter_name': [filter_type, additional_validator]
+    
+    Additional filter validator is a function that takes the filter value entered by the user and returns another
+    value. Use no if you don't want any additional filter validation
+    """
+
     @classmethod
     def get_entity_class(cls):
         """
@@ -40,6 +52,8 @@ class EntitySet:
         :return: A subclass of the Entity class
         """
         if cls._entity_class is not None:
+            if isinstance(cls._entity_class, str):
+                cls._entity_class = import_string(cls._entity_class)
             return cls._entity_class
         else:
             raise NotImplementedError("You must implement the get_entity_class() class method or change the "
@@ -96,3 +110,31 @@ class EntitySet:
         The EntitySet supports iteration that allows to sequentially process each entity from the set
         """
         raise NotImplementedError("TO-DO: EntitySet.__iter__")
+
+    def __getattr__(self, name):
+        """
+        Returns the current filter value or None if the filter has not been set
+
+        :param name: the filter name
+        :return: the filter value
+        """
+        raise NotImplementedError("TO-DO: EntitySet.__getattr__")
+
+    def __setattr__(self, name, value):
+        """
+        Sets an appropriate filter value
+
+        :param name: filter name to set
+        :param value: filter value
+        :return: nothing
+        """
+        raise NotImplementedError("TO-DO: EntitySet.__setattr__")
+
+    def __delattr__(self, name):
+        """
+        Removes the filter from the filter list
+
+        :param name: the filter name
+        :return: nothing
+        """
+        del self._entity_filters[name]

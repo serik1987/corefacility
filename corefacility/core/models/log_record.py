@@ -12,7 +12,7 @@ class LogRecord(models.Model):
     log = models.ForeignKey("Log", related_name="records", on_delete=models.CASCADE, editable=False,
                             help_text="Log to which this record belongs to")
     record_time = models.DateTimeField(db_index=True, editable=False, auto_now_add=True,
-                                   help_text="Date and time when this record has been created")
+                                       help_text="Date and time when this record has been created")
     level = models.CharField(max_length=3, db_index=True, editable=False, default="DBG",
                              choices=LogLevel.choices,
                              help_text="The importance of this log message")

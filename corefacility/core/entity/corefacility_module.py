@@ -1,4 +1,11 @@
-class CorefacilityModule:
+from .entity import Entity
+from .entity_sets.corefacility_module_set import CorefacilityModuleSet
+from .entity_sets.app_permission_set import AppPermissionSet
+from .entity_fields import EntityField, ReadOnlyField, ManagedEntityField
+from .entity_exceptions import EntityOperationNotPermitted
+
+
+class CorefacilityModule(Entity):
     """
     Base class for all corefacility modules and applications that defines all necessary information used for
     routing and installation
@@ -10,6 +17,29 @@ class CorefacilityModule:
     d) the package where the App class contains must be a valid Django applications
     e) all methods marked here as NotImplementedError must be implemented
     """
+
+    _entity_set_class = CorefacilityModuleSet
+
+    _entity_provider_list = []  # TO-DO: declare the proper corefacility module provider
+
+    _required_fields = []
+
+    _public_field_description = {
+        "uuid": ReadOnlyField(description="UUID", default="xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx"),
+        "parent_entry_point": ReadOnlyField(description="Entry point"),
+        "alias": ReadOnlyField(description="Module alias"),
+        "name": ReadOnlyField(description="Human-readable module name"),
+        "html_code": ReadOnlyField(description="Module HTML code if applicable"),
+        "app_class": ReadOnlyField(description="The module application class"),
+        "user_settings": EntityField(dict,
+                                     description="The user-controlled module settings"),
+        "is_application": ReadOnlyField(description="Is module an application"),
+        "is_enabled": EntityField(dict, description="Is module enabled"),
+        "permissions": ManagedEntityField(AppPermissionSet,
+                                          description="Application permissions")
+    }
+
+    _module_installation = False
 
     def __new__(cls, *args, **kwargs):
         """
@@ -107,3 +137,21 @@ class CorefacilityModule:
         :return: a dictionary where each key is an entry point alias and each value is an EntryPoint instance
         """
         return {}
+
+    def create(self):
+        """
+        You can't create the module, just install it!
+
+        :return: nothing
+        """
+        if not self._module_installation:
+            raise EntityOperationNotPermitted()
+        super().create()
+
+    def install(self):
+        """
+        Adds the module and all its related entry points to the database
+
+        :return: nothing
+        """
+        raise NotImplementedError("TO-DO: CorefacilityModule.install")
