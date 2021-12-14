@@ -1,7 +1,13 @@
+import sys
+
 from django.core.files import File
+from django.utils.module_loading import import_string
 
 from core.entity.entity import Entity
+from core.entity.entity_exceptions import EntityNotFoundException
 from core.entity.entity_providers.entity_provider import EntityProvider
+from core.entity.entity_readers.entity_reader import EntityReader
+from core.entity.entity_sets.project_set import ProjectSet
 from core.entity.group import Group
 from core.entity.project import Project
 from core.entity.user import User
@@ -10,6 +16,8 @@ from core.entity.user import User
 class DumpEntityProvider(EntityProvider):
 
     _entity_field_cache = None
+
+    _class_name = None
 
     @classmethod
     def clear_entity_field_cache(cls):
@@ -60,13 +68,25 @@ class DumpEntityProvider(EntityProvider):
         entity_info = entity._wrapped
         for field_name in entity._edited_fields:
             entity_info[field_name] = getattr(entity, "_" + field_name)
-        print(self._entity_field_cache)
 
     def delete_entity(self, entity: Entity):
-        raise NotImplementedError("TO-DO: DumpEntityProvider.delete_entity")
+        entity_list = self.get_entity_list(entity.__class__.__name__)
+        index = entity.id - 1
+        del entity_list[index]
 
     def wrap_entity(self, external_object):
-        raise NotImplementedError("TO-DO: DumpEntityProvider.wrap_entity")
+        entity_list = self.get_entity_list(self._class_name)
+        kwargs = external_object.copy()
+        kwargs["_src"] = external_object
+        i = 0
+        for obj in entity_list:
+            if obj == external_object:
+                kwargs['id'] = i+1
+                break
+            i += 1
+        module = sys.modules[__name__]
+        entity_class = getattr(module, self._class_name)
+        return entity_class(**kwargs)
 
     def unwrap_entity(self, entity: Entity):
         if entity._wrapped is None:
@@ -81,16 +101,66 @@ class DumpEntityProvider(EntityProvider):
         raise NotImplementedError("TO-DO: DumpEntityProvider.attach_file")
 
     def detach_file(self, name: str) -> None:
-        pass
+        raise NotImplementedError("TO-DO: DumpEntityProvider.detach_file")
 
     def attach_entity(self, container: Entity, property_name: str, entity: Entity) -> None:
-        pass
+        raise NotImplementedError("TO-DO: DumpEntityProvider.attach_entity")
 
     def detach_entity(self, container: Entity, property_name: str, entity: Entity) -> None:
-        pass
+        raise NotImplementedError("TO-DO: DumpEntityProvider.detach_entity")
+
+
+class DumpEntityReader(EntityReader):
+
+    _class_name = None
+
+    @classmethod
+    def get_entity_provider(cls):
+        provider = DumpEntityProvider()
+        provider._class_name = cls._class_name
+        return provider
+
+    def __init__(self, **kwargs):
+        self.__entity_list = DumpEntityProvider.get_entity_list(self._class_name)
+
+    def __iter__(self):
+        raise NotImplementedError("TO-DO: DumpEntityReader.__iter__")
+
+    def __getitem__(self, index):
+        raise NotImplementedError("TO-DO: DumpEntityReader.__getitem__")
+
+    def get(self, **kwargs):
+        if "id" in kwargs:
+            id = kwargs['id']
+            try:
+                return self.__entity_list[id-1]
+            except IndexError:
+                raise EntityNotFoundException()
+        elif "alias" in kwargs:
+            alias = kwargs['alias']
+            for source in self.__entity_list:
+                if 'alias' in source and source['alias'] == alias:
+                    return source
+            raise EntityNotFoundException()
+        else:
+            raise EntityNotFoundException()
+
+
+class DumpProjectEntityReader(DumpEntityReader):
+
+    _class_name = "DumpProject"
+
+
+class DumpProjectSet(ProjectSet):
+
+    _entity_class = "DumpProject"
+
+    _entity_reader_class = DumpProjectEntityReader
 
 
 class DumpProject(Project):
+
+    _entity_set_class = DumpProjectSet
 
     _entity_provider_list = [DumpEntityProvider()]
 

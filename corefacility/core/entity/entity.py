@@ -222,10 +222,15 @@ class Entity:
 
         :return: nothing
         """
-        if self.__state == "creating":
+        if self.__state == "creating" or self.__state == "deleted":
             raise EntityOperationNotPermitted()
         self.check_entity_providers_defined()
-        raise NotImplementedError("TO-DO: Entity.delete")
+        with transaction.atomic():
+            for provider in self._entity_provider_list:
+                provider.delete_entity(self)
+            self._id = None
+            self._edited_fields = set()
+            self.__state = "deleted"
 
     def __str__(self):
         """

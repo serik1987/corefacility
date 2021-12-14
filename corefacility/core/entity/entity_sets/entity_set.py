@@ -76,7 +76,6 @@ class EntitySet:
         """
         Initializes the entity set
         """
-        print("Initialize everything here!")
         self._entity_filters = dict()
 
     def get(self, lookup):
@@ -91,7 +90,15 @@ class EntitySet:
         :param lookup: either entity id or entity alias
         :return: the Entity object or DoesNotExist if such entity have not found in the database
         """
-        raise NotImplementedError("TO-DO: EntitySet.get")
+        reader = self._entity_reader_class(**self._entity_filters)
+        if isinstance(lookup, int):
+            source = reader.get(id=lookup)
+        elif isinstance(lookup, str):
+            source = reader.get(alias=lookup)
+        else:
+            raise ValueError("EntitySet.get: invalid lookup argument")
+        provider = reader.get_entity_provider()
+        return provider.wrap_entity(source)
 
     def __getitem__(self, index):
         """
@@ -130,7 +137,6 @@ class EntitySet:
         :return: nothing
         """
         if name in self._entity_filter_list:
-            print("The field is a filter field")
             filter_type, filter_constraint = self._entity_filter_list[name]
             if isinstance(filter_type, str):
                 filter_type = import_string(filter_type)
