@@ -34,7 +34,8 @@ class EntityProvider:
 
     def create_entity(self, entity: Entity):
         """
-        Creates the entity in a certain entity source
+        Creates the entity in a certain entity source and changes the entity's _id and _wrapped properties
+        according to how the entity changes its status.
 
         :param entity: The entity to be created on this entity source
         :return: nothing but entity provider must fill necessary entity fields

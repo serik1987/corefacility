@@ -49,14 +49,18 @@ class DumpEntityProvider(EntityProvider):
         raise NotImplementedError("TO-DO: DumpEntityProvider.resolve_conflict")
 
     def create_entity(self, entity: Entity):
-        entity_list = self.get_entity_list(Entity.__class__.__name__)
+        entity_list = self.get_entity_list(entity.__class__.__name__)
         entity_info = self.unwrap_entity(entity)
         id = len(entity_list) + 1
         entity._id = id
         entity._wrapped = entity_info
+        entity_list.append(entity_info)
 
     def update_entity(self, entity: Entity):
-        raise NotImplementedError("TO-DO: DumpEntityProvider.update_entity")
+        entity_info = entity._wrapped
+        for field_name in entity._edited_fields:
+            entity_info[field_name] = getattr(entity, "_" + field_name)
+        print(self._entity_field_cache)
 
     def delete_entity(self, entity: Entity):
         raise NotImplementedError("TO-DO: DumpEntityProvider.delete_entity")

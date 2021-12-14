@@ -16,11 +16,8 @@ class ProjectTest(EntityTest):
     user = None
     group = None
 
-    @classmethod
-    def setUpTestData(cls):
-        DumpEntityProvider.clear_entity_field_cache()
-
     def setUp(self):
+        DumpEntityProvider.clear_entity_field_cache()
         self.user = self.related_user(login="test123")
         self.user.create()
         self.group = self.related_group(name="Test group", governor=self.user)
@@ -34,6 +31,9 @@ class ProjectTest(EntityTest):
             root_group=self.group
         )
         return project
+
+    def _update_demo_entity(self, entity):
+        entity.description = "Some useful information appears"
 
 
 del ProjectTest

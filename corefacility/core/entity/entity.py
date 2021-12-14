@@ -135,7 +135,7 @@ class Entity:
         :param kwargs: the fields you want to assign to entity properties
         """
         self._public_fields = {}
-        self._edited_fields = []
+        self._edited_fields = set()
         if "_src" in kwargs:
             self._wrapped = kwargs["_src"]
             for name, value in kwargs.items():
@@ -194,6 +194,7 @@ class Entity:
                     provider.create_entity(self)
                 else:
                     provider.resolve_conflict(self, another_entity)
+            self._edited_fields = set()
             self.__state = "saved"
 
     def update(self):
@@ -207,7 +208,11 @@ class Entity:
         if self.__state != "changed":
             raise EntityOperationNotPermitted()
         self.check_entity_providers_defined()
-        raise NotImplementedError("TO-DO: Entity.update")
+        with transaction.atomic():
+            for provider in self._entity_provider_list:
+                provider.update_entity(self)
+        self._edited_fields = set()
+        self.__state = "saved"
 
     def delete(self):
         """
@@ -301,6 +306,7 @@ class Entity:
             description = self._public_field_description[name]
             raw_value = description.correct(value)
             self._public_fields[name] = raw_value
+            self._edited_fields.add(name)
             if self.__state == "saved" or self.__state == "loaded":
                 self.__state = "changed"
         elif name[0] == '_' and name[1:] in self._public_field_description:
