@@ -32,3 +32,12 @@ class ManagedEntityField(ReadOnlyField):
         :return: the field value manager that the user can use
         """
         return self._field_manager_class(value, self._default)
+
+    @property
+    def default(self):
+        """
+        Returns the default property value
+
+        :return: the default property value and the manager that allows to manage this
+        """
+        return self._field_manager_class(self._default, self._default)

@@ -19,9 +19,9 @@ class EntityProvider:
 
     def load_entity(self, entity: Entity):
         """
-        First, the method checks that the entity has already been loaded from the database.
+        The method checks that the entity has already been loaded from the database.
         EntityProviders shall use the entity 'id' or '_wrapped' properties of the corresponding
-        entity:
+        entity.
 
         The entity 'id' field is a unique entity number given by the database system. The entity
         id doesn't relate to UID, GID or PID values given to entities by the Unix-like operating

@@ -1,3 +1,4 @@
+import re
 from .entity_field import EntityField
 
 
@@ -6,6 +7,8 @@ class EntityAliasField(EntityField):
     Provides additional constraints for setting entity aliases: a string containing only latin letters and digits,
     underscores, dashes or dots
     """
+
+    ENTITY_ALIAS_PATTERN = re.compile(r'^[A-Za-z0-9-_.]+$')
 
     def __init__(self, max_length=None):
         """
@@ -22,4 +25,8 @@ class EntityAliasField(EntityField):
         :param value: the alias value user wants to set
         :return: the alias value that will actually be set
         """
-        raise NotImplementedError("TO-DO: implement EntityAliasField.correct")
+        raw_value = super().correct(value)
+        if self.ENTITY_ALIAS_PATTERN.match(raw_value):
+            return raw_value
+        else:
+            raise ValueError("The alias value is not correct")

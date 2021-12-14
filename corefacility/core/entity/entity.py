@@ -1,3 +1,8 @@
+from django.db import transaction
+from django.utils.module_loading import import_string
+from .entity_exceptions import EntityOperationNotPermitted, EntityProvidersNotDefined, EntityFieldInvalid
+
+
 class Entity:
     """
     Entity is the most common way to represent an object stored on hard disk or at the database.
@@ -95,6 +100,26 @@ class Entity:
             raise NotImplementedError("Entity: please, redefine the _entity_set_class field or get_entity_class() "
                                       "method")
 
+    @classmethod
+    def get_entity_class_name(cls):
+        """
+        Returns a human-readable entity class name
+
+        :return: a human-readable entity class name
+        """
+        if cls._entity_set_class is not None:
+            return cls._entity_set_class._entity_name
+        else:
+            return cls.__name__
+
+    @classmethod
+    def check_entity_providers_defined(cls):
+        """
+        Throws an exception if no entity provider is defined
+        """
+        if cls._entity_provider_list is None or len(cls._entity_provider_list) == 0:
+            raise EntityProvidersNotDefined()
+
     def __init__(self, **kwargs):
         """
         Initializes the entity. The entity can be initialized in the following ways:
@@ -109,7 +134,18 @@ class Entity:
 
         :param kwargs: the fields you want to assign to entity properties
         """
-        raise NotImplementedError("TO-DO: Entity.__init__")
+        self._public_fields = {}
+        self._edited_fields = []
+        if "_src" in kwargs:
+            self._wrapped = kwargs["_src"]
+            for name, value in kwargs.items():
+                if name[0] != "_":
+                    setattr(self, "_" + name, value)
+            self.__state = "loaded"
+        else:
+            self.__state = "creating"
+            for name, value in kwargs.items():
+                setattr(self, name, value)
 
     @property
     def id(self):
@@ -145,22 +181,45 @@ class Entity:
 
         :return: nothing
         """
-        raise NotImplementedError("TO-DO: Entity.create")
+        if self.__state != "creating":
+            raise EntityOperationNotPermitted()
+        self.check_entity_providers_defined()
+        for field in self._required_fields:
+            if field not in self._public_fields:
+                raise EntityFieldInvalid(field)
+        with transaction.atomic():
+            for provider in self._entity_provider_list:
+                another_entity = provider.load_entity(self)
+                if another_entity is None:
+                    provider.create_entity(self)
+                else:
+                    provider.resolve_conflict(self, another_entity)
+            self.__state = "saved"
 
     def update(self):
         """
         Updates the entity to the database and all its auxiliary sources
 
+        The update is not possible when the entity state is not 'changed'
+
         :return: nothing
         """
+        if self.__state != "changed":
+            raise EntityOperationNotPermitted()
+        self.check_entity_providers_defined()
         raise NotImplementedError("TO-DO: Entity.update")
 
     def delete(self):
         """
         Deletes the entity from the database and all its auxiliary sources
 
+        The entity can't be deleted when it still 'creating'
+
         :return: nothing
         """
+        if self.__state == "creating":
+            raise EntityOperationNotPermitted()
+        self.check_entity_providers_defined()
         raise NotImplementedError("TO-DO: Entity.delete")
 
     def __str__(self):
@@ -169,7 +228,14 @@ class Entity:
 
         :return: the human-readable string representation of an object
         """
-        raise NotImplementedError("TO-DO:Entity.__str__")
+        s = repr(self)
+        s += "\n==============================================================================\n"
+        for name, value in self._public_field_description.items():
+            v = getattr(self, name)
+            if isinstance(v, Entity):
+                v = repr(v)
+            s += "%s [%s]: %s\n" % (value.description, name, v)
+        return s
 
     def __repr__(self):
         """
@@ -177,4 +243,68 @@ class Entity:
 
         :return: a short entity representation
         """
-        raise NotImplementedError("TO-DO: Entity.__repr__")
+        s = self.get_entity_class_name()
+        if self.id is not None:
+            s += " (ID = %s) " % self.id
+        else:
+            s += " (ID is not assigned) "
+        s += self.state.upper()
+        return s
+
+    def __getattr__(self, name):
+        """
+        Gets the public field property.
+
+        If such property doesn't exist AttributeError will be thrown
+
+        :param name: property name
+        :return: property value
+        """
+        EntityValueManager = import_string("core.entity.entity_fields.EntityValueManager")
+        if name in self._public_fields:
+            description = self._public_field_description[name]
+            raw_value = self._public_fields[name]
+            value = description.proofread(raw_value)
+            if isinstance(value, EntityValueManager):
+                value.entity = self
+                value.field_name = name
+            return value
+        elif name[0] == '_' and name[1:] in self._public_fields:
+            return self._public_fields[name[1:]]
+        elif name in self._public_field_description:
+            description = self._public_field_description[name]
+            value = description.default
+            if isinstance(value, EntityValueManager):
+                value.entity = self
+                value.field_name = name
+            return value
+        elif name[0] == '_' and name[1:] in self._public_field_description:
+            description = self._public_field_description[name[1:]]
+            value = description.default
+            if isinstance(value, EntityValueManager):
+                value = None
+            return value
+        else:
+            raise AttributeError("'%s' is not a valid public property of the '%s'" % (name, self.__class__.__name__))
+
+    def __setattr__(self, name, value):
+        """
+        Sets the public field property.
+
+        If the property name is not within the public or private fields the function throws AttributeError
+
+        :param name: public, protected or private field name
+        :param value: the field value to set
+        :return: nothing
+        """
+        if name in self._public_field_description:
+            description = self._public_field_description[name]
+            raw_value = description.correct(value)
+            self._public_fields[name] = raw_value
+            if self.__state == "saved" or self.__state == "loaded":
+                self.__state = "changed"
+        elif name[0] == '_' and name[1:] in self._public_field_description:
+            self._public_fields[name[1:]] = value
+        else:
+            super().__getattribute__(name)
+            super().__setattr__(name, value)

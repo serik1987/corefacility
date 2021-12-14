@@ -22,6 +22,12 @@ class EntityOperationNotPermitted(EntityException):
         super().__init__(_("The entity operation is not permitted"))
 
 
+class EntityProvidersNotDefined(EntityException):
+    def __init__(self):
+        super().__init__("To perform create, update or delete operations on the entity you must define "
+                         "at least one entity provider")
+
+
 class LogException(EntityException):
     pass
 

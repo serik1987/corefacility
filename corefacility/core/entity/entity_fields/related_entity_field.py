@@ -1,3 +1,4 @@
+from django.utils.module_loading import import_string
 from .entity_field import EntityField
 
 
@@ -26,4 +27,10 @@ class RelatedEntityField(EntityField):
         :param value: the field value the user wants to assign
         :return: the field value that will actually be assigned
         """
-        raise NotImplementedError("TO-DO: implement RelatedEntityField.correct")
+        if isinstance(self._entity_class, str):
+            self._entity_class = import_string(self._entity_class)
+        if not isinstance(value, self._entity_class):
+            raise ValueError("RelatedEntityField.correct: attempting to assign the incorrect entity type")
+        if value.id is None or value.state == "creating":
+            raise ValueError("RelatedEntityField.correct: the value is not create()'d before assigning")
+        return value

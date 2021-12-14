@@ -76,6 +76,7 @@ class EntitySet:
         """
         Initializes the entity set
         """
+        print("Initialize everything here!")
         self._entity_filters = dict()
 
     def get(self, lookup):
@@ -128,7 +129,18 @@ class EntitySet:
         :param value: filter value
         :return: nothing
         """
-        raise NotImplementedError("TO-DO: EntitySet.__setattr__")
+        if name in self._entity_filter_list:
+            print("The field is a filter field")
+            filter_type, filter_constraint = self._entity_filter_list[name]
+            if isinstance(filter_type, str):
+                filter_type = import_string(filter_type)
+            if not isinstance(value, filter_type):
+                raise ValueError("EntitySet: type of the filter '%s' is not valid" % name)
+            if filter_constraint is not None and not filter_constraint(value):
+                raise ValueError("EntitySet: contraint for '%s' filter fails" % filter_constraint)
+            self._entity_filters[name] = value
+        else:
+            super().__setattr__(name, value)
 
     def __delattr__(self, name):
         """

@@ -15,12 +15,11 @@ class Project(Entity):
 
     _entity_provider_list = []  # TO-DO: Implement entity providers related to: database, POSIX operating system
 
-    _required_fields = ["alias", "name"]
+    _required_fields = ["alias", "name", "root_group"]
 
     _public_field_description = {
         "alias": EntityAliasField(max_length=64),
-        "avatar": ManagedEntityField(PublicFileManager, default="/path/to/some/file",
-                                     description="The project avatar"),
+        "avatar": ManagedEntityField(PublicFileManager, description="The project avatar"),
         "name": EntityField(str, min_length=1, max_length=64, description="Project name"),
         "description": EntityField(str, min_length=0, max_length=1024, description="Project description"),
         "governor": ReadOnlyField(description="Project leader"),

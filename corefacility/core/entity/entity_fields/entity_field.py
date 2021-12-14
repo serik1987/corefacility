@@ -83,7 +83,7 @@ class EntityField:
         :param value: the value stored in the entity as defined by one of the entity providers
         :return: the value given to the user
         """
-        raise NotImplementedError("TO-DO: EntityField.proofread")
+        return value
 
     def correct(self, value):
         """
@@ -92,4 +92,20 @@ class EntityField:
         :param value: the value that user wants to set
         :return: Actual value set to the entity
         """
-        raise NotImplementedError("TO-DO: EntityField.correct")
+        if value is None:
+            raw_value = None
+        else:
+            raw_value = self._value_class(value)
+        if raw_value is None:
+            if self._min_length is not None and self._min_length > 0:
+                raise ValueError("The value is None but its proper minimum length is expected")
+        else:
+            if self._min_length is not None and len(raw_value) < self._min_length:
+                raise ValueError("The value length is less than expected")
+            if self._max_length is not None and len(raw_value) > self._max_length:
+                raise ValueError("The value length is higher than expected")
+            if self._min_value is not None and raw_value < self._min_value:
+                raise ValueError("The value is less than expected")
+            if self._max_value is not None and raw_value > self._max_value:
+                raise ValueError("The value is higher than expected")
+        return raw_value
