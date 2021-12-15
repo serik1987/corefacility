@@ -1,3 +1,5 @@
+from django.templatetags.static import static
+
 from .entity import Entity
 from .entity_sets.user_set import UserSet
 from .entity_fields import EntityField, EntityAliasField, ManagedEntityField, ReadOnlyField, \
@@ -27,9 +29,9 @@ class User(Entity):
         "is_locked": EntityField(bool, description="User is locked", default=False),
         "is_superuser": EntityField(bool, description="Is superuser", default=False),
         "is_support": ReadOnlyField(description="Is support", default=False),
-        "avatar": ManagedEntityField(PublicFileManager, description="User avatar", default="/path/to/some/file"),
-        "unix_group": EntityField(str, max_length=32),
-        "home_dir": EntityField(str, max_length=100),
+        "avatar": ManagedEntityField(PublicFileManager, description="User avatar", default=static("core/user.svg")),
+        "unix_group": ReadOnlyField(description="UNIX group"),
+        "home_dir": ReadOnlyField(description="Home directory"),
         "activation_code_hash": ManagedEntityField(EntityPasswordManager,
                                                    description="Activation code to be use"),
         "activation_code_expiry_date": ManagedEntityField(ExpiryDateManager,

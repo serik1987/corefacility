@@ -8,6 +8,7 @@ from core.entity.entity_exceptions import EntityNotFoundException
 from core.entity.entity_providers.entity_provider import EntityProvider
 from core.entity.entity_readers.entity_reader import EntityReader
 from core.entity.entity_sets.project_set import ProjectSet
+from core.entity.entity_sets.user_set import UserSet
 from core.entity.group import Group
 from core.entity.project import Project
 from core.entity.user import User
@@ -172,9 +173,23 @@ class DumpProject(Project):
     _dump_fields = ["alias", "avatar", "name", "description", "root_group", "project_dir", "unix_group"]
 
 
+class DumpUserEntityReader(DumpEntityReader):
+
+    _class_name = "DumpUser"
+
+
+class DumpUserSet(UserSet):
+
+    _entity_class = "DumpUser"
+
+    _entity_reader_class = DumpUserEntityReader
+
+
 class DumpUser(User):
 
     _entity_provider_list = [DumpEntityProvider()]
+
+    _entity_set_class = DumpUserSet
 
     _dump_fields = ["login", "password_hash", "name", "surname", "email", "phone", "is_locked", "is_superuser",
                     "is_support", "avatar", "unix_group", "home_dir", "activation_code_hash",

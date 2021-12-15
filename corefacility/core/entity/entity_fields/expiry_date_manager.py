@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 from .entity_value_manager import EntityValueManager
 
 
@@ -20,15 +20,22 @@ class ExpiryDateManager(EntityValueManager):
         treat some data as 'expired'. Must be an instance of datetime.timedelta
         :return: Nothing
         """
-        raise NotImplementedError("TO-DO: ExpiryDateManager.set")
+        value = datetime.now() + interval
+        setattr(self.entity, "_" + self.field_name, value)
+        self.entity.notify_field_changed(self.field_name)
 
     def is_expired(self):
         """
         Returns True is the the data is expired, False otherwise.
 
+        If the expiry date is not defined the function always returns False due to security considerations
+
         :return: True if the data is expired, False otherwise
         """
-        raise NotImplementedError("TO-DO: ExpiryDateManager.is_expired")
+        if self._field_value is None:
+            return False
+        cdate = datetime.now()
+        return cdate > self._field_value
 
     def clear(self):
         """
@@ -38,7 +45,8 @@ class ExpiryDateManager(EntityValueManager):
 
         :return: nothing
         """
-        raise NotImplementedError("TO-DO: ExpiryDateManager.clear")
+        setattr(self.entity, "_" + self.field_name, None)
+        self.entity.notify_field_changed(self.field_name)
 
     def clear_all(self):
         """
@@ -50,3 +58,11 @@ class ExpiryDateManager(EntityValueManager):
         :return: nothing
         """
         raise NotImplementedError("TO-DO: EntityDateManager.clear_all")
+
+    def __repr__(self):
+        """
+        Returns a concise representation of the expiry date field
+
+        :return: a concise representation of the expiry date field
+        """
+        return str(self._field_value)

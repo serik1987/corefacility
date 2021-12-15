@@ -22,7 +22,7 @@ class ProjectTest(EntityTest):
     group = None
 
     def setUp(self):
-        DumpEntityProvider.clear_entity_field_cache()
+        super().setUp()
         self.user = self.related_user(login="test123")
         self.user.create()
         self.group = self.related_group(name="Test group", governor=self.user)

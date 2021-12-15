@@ -319,3 +319,17 @@ class Entity:
         else:
             super().__getattribute__(name)
             super().__setattr__(name, value)
+
+    def notify_field_changed(self, field_name):
+        """
+        When EntityValueManager changes some of the entity fields it must call this method to notify this entity
+        that the field has been change.
+
+        If the EntityValueManager doesn't do this, the entity state will not be considered as 'changed' which
+        results to EntityOperationNotPermitted exception.
+
+        :param field_name: the field name that has been changed by the field manager
+        :return: nothing
+        """
+        self._edited_fields.add(field_name)
+        self.__state = "changed"

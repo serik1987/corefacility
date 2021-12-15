@@ -60,3 +60,11 @@ def string_provider(min_length, max_length):
         data.append(("-" * max_length, "text", None))
         data.append(("-" * (max_length+1), "text", EntityFieldInvalid))
     return put_stages_in_provider(data)
+
+
+def boolean_provider():
+    data = [
+        (True, False, None),
+        (False, True, None),
+    ]
+    return put_stages_in_provider(data)

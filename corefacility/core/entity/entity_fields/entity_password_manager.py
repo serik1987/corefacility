@@ -1,3 +1,7 @@
+from random import randrange
+
+from django.contrib.auth.hashers import make_password, check_password
+
 from .entity_value_manager import EntityValueManager
 
 
@@ -22,7 +26,15 @@ class EntityPasswordManager(EntityValueManager):
         :param allowed_symbols: symbols that can be contained in the password.
         :return: the newly generated password
         """
-        raise NotImplementedError("TO-DO: EntityPasswordManager.generate")
+        password = ""
+        for i in range(size):
+            index = randrange(len(allowed_symbols))
+            symbol = allowed_symbols[index]
+            password += symbol
+        password_hash = make_password(password)
+        setattr(self.entity, "_" + self.field_name, password_hash)
+        self.entity.notify_field_changed(self.field_name)
+        return password
 
     def clear(self):
         """
@@ -30,7 +42,8 @@ class EntityPasswordManager(EntityValueManager):
 
         :return:
         """
-        raise NotImplementedError("TO-DO: EntityPasswordManager.clear")
+        setattr(self.entity, "_" + self.field_name, None)
+        self.entity.notify_field_changed(self.field_name)
 
     def check(self, password: str) -> bool:
         """
@@ -39,4 +52,19 @@ class EntityPasswordManager(EntityValueManager):
         :param password: the password that is needed to be checked
         :return: True if the password is guessed, False otherwise
         """
-        raise NotImplementedError("TO-DO: EntityPasswordManager.check")
+        encoded_password = getattr(self.entity, "_" + self.field_name)
+        if encoded_password is None or encoded_password == "":
+            return False
+        return check_password(password, encoded_password)
+
+    def __repr__(self):
+        """
+        If the user attempts to print the password using the repr() function, the code below will show him
+        that the password exists but nobody can see it
+
+        :return: password placeholder
+        """
+        if self._field_value is not None:
+            return "**********"
+        else:
+            return ""

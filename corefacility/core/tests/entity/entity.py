@@ -1,8 +1,14 @@
+from datetime import timedelta
+from time import sleep
+
 from core.entity.entity import Entity
 from core.entity.entity_exceptions import EntityOperationNotPermitted, EntityNotFoundException, EntityFieldInvalid
+from .entity_providers.dump_entity_provider import DumpEntityProvider
 from django.conf import settings
 from django.test import TestCase
 from django.contrib.staticfiles.finders import find as find_static
+
+from ...entity.entity_fields import EntityPasswordManager
 
 
 class EntityTest(TestCase):
@@ -13,6 +19,9 @@ class EntityTest(TestCase):
     _entity_class = None
 
     entity_name = None
+
+    def setUp(self):
+        DumpEntityProvider.clear_entity_field_cache()
 
     def test_create_entity(self):
         entity = self._create_demo_entity()
@@ -219,6 +228,55 @@ class EntityTest(TestCase):
             self.fail("The default value of the '%s' property is static file '%s' but Django unable to find it" %
                       (file_field, file_path))
 
+    def _test_password_field(self, password_field):
+        old_entity = self._create_demo_entity()
+        old_entity.create()
+        password = getattr(old_entity, password_field).generate(EntityPasswordManager.ALL_SYMBOLS, 20)
+        old_entity.update()
+        entity_id = old_entity.id
+        entity_set = old_entity.get_entity_set_class()
+        del old_entity
+
+        entity = entity_set().get(entity_id)
+        entity_password = getattr(entity, password_field)
+        self.assertTrue(entity_password.check(password),
+                        "The entity doesn't store password for '%s' field" % password_field)
+        self.assertFalse(entity_password.check("123"),
+                         "The entity accepts any password as password for '%s' field" % password_field)
+        entity_password.clear()
+        entity.update()
+
+        new_entity = entity_set().get(entity_id)
+        entity_password = getattr(new_entity, password_field)
+        self.assertFalse(entity_password.check(password),
+                         "Unable to properly clear the password for %s field" % password_field)
+
+    def _test_expiry_date_field(self, field_name, duration=10):
+        old_entity = self._create_demo_entity()
+        old_entity.create()
+        dt_field = getattr(old_entity, field_name)
+        dt_field.set(timedelta(seconds=duration))
+        old_entity.update()
+        entity_id = old_entity.id
+        entity_set = old_entity.get_entity_set_class()
+        del old_entity
+
+        entity = entity_set().get(entity_id)
+        dt_field = getattr(entity, field_name)
+        self.assertFalse(dt_field.is_expired(),
+                         "The '%s' expiration term is less than tested" % field_name)
+        sleep(duration)
+        self.assertTrue(dt_field.is_expired(),
+                        "The '%s' expiration term is higher then tested" % field_name)
+        dt_field.clear()
+        entity.update()
+
+    def _test_read_only_field(self, field_name):
+        entity = self._create_demo_entity()
+        with self.assertRaises(ValueError, msg="'%s' field is read-only but successfully set" % field_name):
+            setattr(entity, field_name, "klshvkjuh")
+        getattr(entity, field_name)
+
     def _test_foreach(self, name, value_set):
         self._create_several_entities(name, value_set)
         entity_set = self.entity_name.get_entity_set_class()()
@@ -248,12 +306,6 @@ class EntityTest(TestCase):
         actual_value = getattr(entity, name)
         self.assertIn(actual_value, value_set,
                       "The value '%s' of '%s' was found but not set" % (actual_value, value_set))
-
-    def _test_read_only_field(self, field_name):
-        entity = self._create_demo_entity()
-        with self.assertRaises(ValueError, msg="'%s' field is read-only but successfully set" % field_name):
-            setattr(entity, field_name, "klshvkjuh")
-        getattr(entity, field_name)
 
     def _create_several_entities(self, name, value_set):
         for value in value_set:
