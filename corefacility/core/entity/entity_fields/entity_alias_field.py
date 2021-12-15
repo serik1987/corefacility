@@ -1,5 +1,6 @@
 import re
 from .entity_field import EntityField
+from ..entity_exceptions import EntityFieldInvalid
 
 
 class EntityAliasField(EntityField):
@@ -29,4 +30,4 @@ class EntityAliasField(EntityField):
         if self.ENTITY_ALIAS_PATTERN.match(raw_value):
             return raw_value
         else:
-            raise ValueError("The alias value is not correct")
+            raise EntityFieldInvalid("Entity")

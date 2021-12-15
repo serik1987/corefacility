@@ -1,3 +1,4 @@
+from django.db.models import QuerySet
 from django.utils.module_loading import import_string
 
 
@@ -111,13 +112,27 @@ class EntitySet:
         :return: if index is integer the method returns a single Entity object. If index is slice
         the method returns the entity list or any other iterable container of the entities
         """
-        raise NotImplementedError("TO-DO: EntitySet.__getitem__")
+        reader = self._entity_reader_class(**self._entity_filters)
+        provider = reader.get_entity_provider()
+        raw_dataset = reader[index]
+        if isinstance(index, slice) or isinstance(raw_dataset, QuerySet):
+            final_dataset = []
+            for external_object in raw_dataset:
+                entity = provider.wrap_entity(external_object)
+                final_dataset.append(entity)
+            return final_dataset
+        else:
+            return provider.wrap_entity(raw_dataset)
 
     def __iter__(self):
         """
         The EntitySet supports iteration that allows to sequentially process each entity from the set
         """
-        raise NotImplementedError("TO-DO: EntitySet.__iter__")
+        reader = self._entity_reader_class(**self._entity_filters)
+        provider = reader.get_entity_provider()
+        for external_object in reader:
+            entity = provider.wrap_entity(external_object)
+            yield entity
 
     def __getattr__(self, name):
         """
@@ -126,7 +141,7 @@ class EntitySet:
         :param name: the filter name
         :return: the filter value
         """
-        raise NotImplementedError("TO-DO: EntitySet.__getattr__")
+        return self._entity_filters[name]
 
     def __setattr__(self, name, value):
         """

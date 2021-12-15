@@ -1,3 +1,6 @@
+from core.entity.entity_exceptions import EntityFieldInvalid
+
+
 class EntityField:
     """
     Defines the default entity field.
@@ -98,14 +101,14 @@ class EntityField:
             raw_value = self._value_class(value)
         if raw_value is None:
             if self._min_length is not None and self._min_length > 0:
-                raise ValueError("The value is None but its proper minimum length is expected")
+                raise EntityFieldInvalid("Entity")
         else:
             if self._min_length is not None and len(raw_value) < self._min_length:
-                raise ValueError("The value length is less than expected")
+                raise EntityFieldInvalid("Entity")
             if self._max_length is not None and len(raw_value) > self._max_length:
-                raise ValueError("The value length is higher than expected")
+                raise EntityFieldInvalid("Entity")
             if self._min_value is not None and raw_value < self._min_value:
-                raise ValueError("The value is less than expected")
+                raise EntityFieldInvalid("Entity")
             if self._max_value is not None and raw_value > self._max_value:
-                raise ValueError("The value is higher than expected")
+                raise EntityFieldInvalid("Entity")
         return raw_value

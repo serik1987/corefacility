@@ -32,9 +32,12 @@ class PublicFileManager(EntityValueManager):
         raise NotImplementedError("TO-DO: detach file from the entity")
 
     @property
-    def url(self):
+    def url(self) -> str:
         """
         Returns the file URL
         """
-        raise NotImplementedError("TO-DO: url property")
+        if self._field_value is None or self._field_value.name is None:
+            return self._default_value
+        else:
+            raise NotImplementedError("TO-DO: url property")
 

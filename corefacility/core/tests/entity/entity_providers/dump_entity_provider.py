@@ -85,7 +85,7 @@ class DumpEntityProvider(EntityProvider):
                 break
             i += 1
         module = sys.modules[__name__]
-        entity_class = getattr(module, self._class_name)
+        entity_class = getattr(module, str(self._class_name))
         return entity_class(**kwargs)
 
     def unwrap_entity(self, entity: Entity):
@@ -124,10 +124,15 @@ class DumpEntityReader(EntityReader):
         self.__entity_list = DumpEntityProvider.get_entity_list(self._class_name)
 
     def __iter__(self):
-        raise NotImplementedError("TO-DO: DumpEntityReader.__iter__")
+        provider = self.get_entity_provider()
+        entity_list = provider.get_entity_list(self._class_name)
+        for entity_info in entity_list:
+            yield entity_info
 
     def __getitem__(self, index):
-        raise NotImplementedError("TO-DO: DumpEntityReader.__getitem__")
+        provider = self.get_entity_provider()
+        entity_list = provider.get_entity_list(self._class_name)
+        return entity_list[index]
 
     def get(self, **kwargs):
         if "id" in kwargs:

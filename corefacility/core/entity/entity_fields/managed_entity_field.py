@@ -40,4 +40,4 @@ class ManagedEntityField(ReadOnlyField):
 
         :return: the default property value and the manager that allows to manage this
         """
-        return self._field_manager_class(self._default, self._default)
+        return self._field_manager_class(None, self._default)

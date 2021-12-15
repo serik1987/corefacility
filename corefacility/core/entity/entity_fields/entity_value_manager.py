@@ -14,7 +14,11 @@ class EntityValueManager:
     """ Name of the field within this entity (don't forget to add underscore _ during the indirect access) """
 
     _field_value = None
-    """ Current field value set up by the user or previously stored in the database """
+    """
+    Current field value set up by the user or previously stored in the database.
+    
+    For newly created objects this value must be None 
+    """
 
     _default_value = None
     """ The default value shown by the manager when no field value was stored in the entity """
