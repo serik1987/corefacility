@@ -332,4 +332,5 @@ class Entity:
         :return: nothing
         """
         self._edited_fields.add(field_name)
-        self.__state = "changed"
+        if self.__state != "creating":
+            self.__state = "changed"

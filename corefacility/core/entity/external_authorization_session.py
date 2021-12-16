@@ -1,4 +1,8 @@
+from base64 import b64encode, b64decode
+from datetime import timedelta
+
 from .entity import Entity
+from .entity_exceptions import EntityNotFoundException
 from .entity_sets.external_authorization_session_set import ExternalAuthorizationSessionSet
 from .entity_fields import RelatedEntityField, ManagedEntityField, EntityPasswordManager, ExpiryDateManager
 
@@ -20,6 +24,8 @@ class ExternalAuthorizationSession(Entity):
     itself
     """
 
+    SESSION_KEY_LENGTH = 10
+
     _entity_set_class = ExternalAuthorizationSessionSet
 
     _entity_provider_list = []  # TO-DO: Implement the entity provider list
@@ -36,14 +42,21 @@ class ExternalAuthorizationSession(Entity):
     }
 
     @classmethod
-    def initialize(cls, module):
+    def initialize(cls, module, expiry_term: timedelta):
         """
         Initializes the external authorization session
 
         :param module: external authorization module to which the session is related
+        :param expiry_term: the session key expiry term (an instance of datetime.timedelta
         :return: session token
         """
-        raise NotImplementedError("TO-DO: ExternalAuthorizationSession.initialize")
+        session = cls(authorization_module=module)
+        session_key = session.session_key.generate(EntityPasswordManager.ALL_SYMBOLS, cls.SESSION_KEY_LENGTH)
+        session.session_key_expiry_date.set(expiry_term)
+        session.create()
+        session_info = "%s:%s" % (session.id, session_key)
+        session_token = b64encode(session_info.encode("utf-8")).decode("utf-8")
+        return session_token
 
     @classmethod
     def restore(cls, module, session_token):
@@ -55,4 +68,17 @@ class ExternalAuthorizationSession(Entity):
         :return: True if the session is successfully restored, False if session token is invalid, expired or
             has been already used
         """
-        raise NotImplementedError("TO-DO: ExternalAuthorizationSession.restore")
+        try:
+            session_info = b64decode(session_token.encode("utf-8")).decode("utf-8")
+            session_id, session_password = session_info.split(":", maxsplit=1)
+        except ValueError:
+            raise EntityNotFoundException()
+        session_set = cls.get_entity_set_class()()
+        session = session_set.get(int(session_id))
+        if session.authorization_module.get_alias() != module.get_alias():
+            raise EntityNotFoundException()
+        if session.session_key_expiry_date.is_expired():
+            raise EntityNotFoundException()
+        if not session.session_key.check(session_password):
+            raise EntityNotFoundException()
+        session.delete()

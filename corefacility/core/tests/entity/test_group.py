@@ -3,6 +3,7 @@ from parameterized import parameterized, parameterized_class
 from .entity import EntityTest
 from .entity_providers.dump_entity_provider import DumpGroup, DumpUser
 from ..data_providers.field_value_providers import string_provider
+from ...entity.entity_exceptions import EntityFieldInvalid
 
 
 @parameterized_class([
@@ -43,6 +44,16 @@ class TestGroup(EntityTest):
 
     def test_indexing(self):
         self._test_indexing("name", self.get_sample_group_names())
+
+    def test_empty_name(self):
+        group = self.entity_name(governor=self.main_user)
+        with self.assertRaises(EntityFieldInvalid, msg="Group with no name has been created"):
+            group.create()
+
+    def test_no_governor_group(self):
+        group = self.entity_name(name="Some group")
+        with self.assertRaises(EntityFieldInvalid, msg="Group with no governor has been created"):
+            group.create()
 
     def get_sample_group_names(self):
         return [

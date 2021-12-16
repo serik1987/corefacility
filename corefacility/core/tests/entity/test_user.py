@@ -3,6 +3,7 @@ from parameterized import parameterized_class, parameterized
 from .entity import EntityTest
 from .entity_providers.dump_entity_provider import *
 from ..data_providers.field_value_providers import alias_provider, string_provider, boolean_provider
+from ...entity.entity_exceptions import EntityFieldInvalid
 
 
 def user_login_provider():
@@ -79,6 +80,10 @@ class TestUser(EntityTest):
     @parameterized.expand(user_login_provider())
     def test_indexing(self, value_set):
         self._test_indexing("login", value_set)
+
+    def test_no_login_user(self):
+        with self.assertRaises(EntityFieldInvalid, msg="The user with no login has been successfully created"):
+            self.entity_name().create()
 
     def _create_demo_entity(self):
         return self.entity_name(login="sergei.kozhukhov")

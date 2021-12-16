@@ -1,3 +1,4 @@
+from django.utils.translation import gettext_lazy as _
 from .entity import Entity
 from .entity_sets.corefacility_module_set import CorefacilityModuleSet
 from .entity_sets.app_permission_set import AppPermissionSet
@@ -40,6 +41,9 @@ class CorefacilityModule(Entity):
     }
 
     _module_installation = False
+
+    def get_entity_class_name(self):
+        return _(self.get_name())
 
     def __new__(cls, *args, **kwargs):
         """
@@ -155,3 +159,18 @@ class CorefacilityModule(Entity):
         :return: nothing
         """
         raise NotImplementedError("TO-DO: CorefacilityModule.install")
+
+    @property
+    def state(self):
+        """
+        The same as Entity.state but bears in mind that the module can't be 'creating'.
+
+        The module can't be installed or enabled but this simply means that the module
+        is not visible from the rest of the app, nothing else.
+
+        :return:
+        """
+        state = super().state
+        if state == "creating":
+            state = "saved"
+        return state

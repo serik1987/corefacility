@@ -3,15 +3,21 @@ import sys
 from django.core.files import File
 from django.utils.module_loading import import_string
 
+from core.entity.authentication import Authentication
 from core.entity.entity import Entity
 from core.entity.entity_exceptions import EntityNotFoundException
 from core.entity.entity_providers.entity_provider import EntityProvider
 from core.entity.entity_readers.entity_reader import EntityReader
+from core.entity.entity_sets.authentication_set import AuthenticationSet
+from core.entity.entity_sets.external_authorization_session_set import ExternalAuthorizationSessionSet
 from core.entity.entity_sets.group_set import GroupSet
+from core.entity.entity_sets.project_permission_set import ProjectPermissionSet
 from core.entity.entity_sets.project_set import ProjectSet
 from core.entity.entity_sets.user_set import UserSet
+from core.entity.external_authorization_session import ExternalAuthorizationSession
 from core.entity.group import Group
 from core.entity.project import Project
+from core.entity.project_permission import ProjectPermission
 from core.entity.user import User
 
 
@@ -220,3 +226,66 @@ class DumpGroup(Group):
     _entity_set_class = DumpGroupSet
 
     _dump_fields = ["name", "governor"]
+
+
+class DumpProjectPermissionReader(DumpEntityReader):
+
+    _class_name = "DumpProjectPermission"
+
+
+class DumpProjectPermissionSet(ProjectPermissionSet):
+
+    _entity_class = "DumpProjectPermission"
+
+    _entity_reader_class = DumpProjectPermissionReader
+
+
+class DumpProjectPermission(ProjectPermission):
+
+    _entity_provider_list = [DumpEntityProvider()]
+
+    _entity_set_class = DumpProjectPermissionSet
+
+    _dump_fields = ["group", "access_level_alias", "access_description"]
+
+
+class DumpAuthenticationReader(DumpEntityReader):
+
+    _class_name = "DumpAuthentication"
+
+
+class DumpAuthenticationSet(AuthenticationSet):
+
+    _entity_class = "DumpAuthentication"
+
+    _entity_reader_class = DumpAuthenticationReader
+
+
+class DumpAuthentication(Authentication):
+
+    _entity_provider_list = [DumpEntityProvider()]
+
+    _entity_set_class = DumpAuthenticationSet
+
+    _dump_fields = ["user", "token_hash", "expiration_date"]
+
+
+class DumpExternalAuthorizationSessionReader(DumpEntityReader):
+
+    _class_name = "DumpExternalAuthorizationSession"
+
+
+class DumpExternalAuthorizationSessionSet(ExternalAuthorizationSessionSet):
+
+    _entity_class = "DumpExternalAuthorizationSession"
+
+    _entity_reader_class = DumpExternalAuthorizationSessionReader
+
+
+class DumpExternalAuthorizationSession(ExternalAuthorizationSession):
+
+    _entity_provider_list = [DumpEntityProvider()]
+
+    _entity_set_class = DumpExternalAuthorizationSessionSet
+
+    _dump_fields = ["authorization_module", "session_key", "session_key_expiry_date"]
