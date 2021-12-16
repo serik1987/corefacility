@@ -26,3 +26,20 @@ class UserManager(EntityValueManager):
         :return: nothing
         """
         raise NotImplementedError("TO-DO: UserManager.remove")
+
+    def __iter__(self):
+        """
+        iterates over all users in the group
+
+        :return: All users in the group
+        """
+        raise NotImplementedError("TO-DO: UserManager.__iter__")
+
+    def __getitem__(self, index):
+        """
+        Returns a user with a given index
+
+        :param index: the user index or range of indices
+        :return: list of users
+        """
+        raise NotImplementedError("TO-DO: UserManager.__getitem__")

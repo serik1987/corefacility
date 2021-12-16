@@ -1,14 +1,16 @@
 from datetime import timedelta
 from time import sleep
 
-from core.entity.entity import Entity
-from core.entity.entity_exceptions import EntityOperationNotPermitted, EntityNotFoundException, EntityFieldInvalid
-from .entity_providers.dump_entity_provider import DumpEntityProvider
 from django.conf import settings
 from django.test import TestCase
 from django.contrib.staticfiles.finders import find as find_static
 
-from ...entity.entity_fields import EntityPasswordManager
+from core.entity.entity import Entity
+from core.entity.entity_fields import EntityPasswordManager
+from core.entity.entity_exceptions import EntityOperationNotPermitted, EntityNotFoundException, EntityFieldInvalid
+from .entity_providers.dump_entity_provider import DumpEntityProvider
+
+TEST_EXPIRY_DATE_FIELD_DURATION = 1
 
 
 class EntityTest(TestCase):
@@ -251,7 +253,7 @@ class EntityTest(TestCase):
         self.assertFalse(entity_password.check(password),
                          "Unable to properly clear the password for %s field" % password_field)
 
-    def _test_expiry_date_field(self, field_name, duration=10):
+    def _test_expiry_date_field(self, field_name, duration=1):
         old_entity = self._create_demo_entity()
         old_entity.create()
         dt_field = getattr(old_entity, field_name)

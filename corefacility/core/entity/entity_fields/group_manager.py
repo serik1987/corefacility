@@ -27,3 +27,20 @@ class GroupManager(EntityValueManager):
         :return: nothing
         """
         raise NotImplementedError("TO-DO: GroupManager.remove")
+
+    def __iter__(self):
+        """
+        Iterates over all groups to which the user belongs
+
+        :return: the group iterator
+        """
+        raise NotImplementedError("TO-DO: GroupManager.__iter__")
+
+    def __getitem__(self, index):
+        """
+        Returns a given item of the list of groups to which the user belongs
+
+        :param index: group index or index range
+        :return: a particular group or list of groups
+        """
+        raise NotImplementedError("TO-DO: GroupManager.__getitem__")

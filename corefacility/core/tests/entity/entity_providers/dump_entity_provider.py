@@ -7,6 +7,7 @@ from core.entity.entity import Entity
 from core.entity.entity_exceptions import EntityNotFoundException
 from core.entity.entity_providers.entity_provider import EntityProvider
 from core.entity.entity_readers.entity_reader import EntityReader
+from core.entity.entity_sets.group_set import GroupSet
 from core.entity.entity_sets.project_set import ProjectSet
 from core.entity.entity_sets.user_set import UserSet
 from core.entity.group import Group
@@ -196,8 +197,26 @@ class DumpUser(User):
                     "activation_code_expiry_date"]
 
 
+class DumpGroupEntityReader(DumpEntityReader):
+
+    _class_name = "DumpGroup"
+
+    def __getitem__(self, item):
+        items = super().__getitem__(item)
+        return items
+
+
+class DumpGroupSet(GroupSet):
+
+    _entity_class = "DumpGroup"
+
+    _entity_reader_class = DumpGroupEntityReader
+
+
 class DumpGroup(Group):
 
     _entity_provider_list = [DumpEntityProvider()]
+
+    _entity_set_class = DumpGroupSet
 
     _dump_fields = ["name", "governor"]
