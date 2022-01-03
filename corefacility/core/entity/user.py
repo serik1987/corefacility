@@ -6,6 +6,7 @@ from .entity_fields import EntityField, EntityAliasField, ManagedEntityField, Re
     EntityPasswordManager, PublicFileManager, ExpiryDateManager
 from .entity_fields.group_manager import GroupManager
 from .entity_exceptions import EntityFieldInvalid
+from .entity_providers.model_providers.user_provider import UserProvider as ModelProvider
 
 
 class User(Entity):
@@ -16,7 +17,7 @@ class User(Entity):
 
     _entity_set_class = UserSet
 
-    _entity_provider_list = []  # TO-DO: add proper list of all entity providers
+    _entity_provider_list = [ModelProvider()]
 
     _public_field_description = {
         "login": EntityAliasField(max_length=100),
@@ -73,3 +74,26 @@ class User(Entity):
             raise EntityFieldInvalid("You are not allowed to delete the support user but you can lock it")
         else:
             super().delete()
+
+    def __eq__(self, other):
+        """
+        Compares two users
+
+        :param other: the user to compare
+        :return: True if two users are the same. False for otherwise
+        """
+        if not isinstance(other, User):
+            return False
+        if self.id != other.id:
+            return False
+        if self.login != other.login:
+            return False
+        if self.name != other.name:
+            return False
+        if self.surname != other.surname:
+            return False
+        if self.email != other.email:
+            return False
+        if self.avatar != other.avatar:
+            return False
+        return True

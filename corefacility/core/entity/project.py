@@ -4,6 +4,7 @@ from .entity_sets.project_set import ProjectSet
 from .entity_sets.project_permission_set import ProjectPermissionSet
 from .entity_fields import EntityField, EntityAliasField, PublicFileManager, ManagedEntityField, ReadOnlyField, \
     RelatedEntityField, EntityContainerManager
+from .entity_providers.model_providers.project_provider import ProjectProvider as ModelProvider
 
 
 class Project(Entity):
@@ -14,7 +15,7 @@ class Project(Entity):
 
     _entity_set_class = ProjectSet
 
-    _entity_provider_list = []  # TO-DO: Implement entity providers related to: database, POSIX operating system
+    _entity_provider_list = [ModelProvider()]
 
     _required_fields = ["alias", "name", "root_group"]
 
@@ -34,3 +35,17 @@ class Project(Entity):
         "project_dir": ReadOnlyField(description="Non-public files location directory"),
         "unix_group": ReadOnlyField(description="UNIX group to remote access to project files")
     }
+
+    def __setattr__(self, name, value):
+        """
+        Sets the public field property.
+
+        If the property name is not within the public or private fields the function throws AttributeError
+
+        :param name: public, protected or private field name
+        :param value: the field value to set
+        :return: nothing
+        """
+        super().__setattr__(name, value)
+        if name == "root_group":
+            self._public_fields["governor"] = value.governor

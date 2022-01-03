@@ -44,6 +44,9 @@ class EntitySet:
     value. Use no if you don't want any additional filter validation
     """
 
+    _alias_kwarg = "alias"
+    """ Defines the name of the field in Django model that is used for alias lookup by get('some_alias_string') """
+
     @classmethod
     def get_entity_class(cls):
         """
@@ -95,7 +98,7 @@ class EntitySet:
         if isinstance(lookup, int):
             source = reader.get(id=lookup)
         elif isinstance(lookup, str):
-            source = reader.get(alias=lookup)
+            source = reader.get(**{self._alias_kwarg: lookup})
         else:
             raise ValueError("EntitySet.get: invalid lookup argument")
         provider = reader.get_entity_provider()

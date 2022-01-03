@@ -2,6 +2,7 @@ from .entity import Entity
 from .entity_sets.group_set import GroupSet
 from .entity_fields import EntityField, RelatedEntityField, ManagedEntityField
 from .entity_fields.user_manager import UserManager
+from .entity_providers.model_providers.group_provider import GroupProvider as ModelProvider
 
 
 class Group(Entity):
@@ -13,7 +14,7 @@ class Group(Entity):
 
     _entity_set_class = GroupSet
 
-    _entity_provider_list = []  # TO-DO: define all entity providers properly
+    _entity_provider_list = [ModelProvider()]
 
     _required_fields = ["name", "governor"]
 
@@ -25,3 +26,20 @@ class Group(Entity):
         "users": ManagedEntityField(UserManager,
                                     description="Users containing in the group"),
     }
+
+    def __eq__(self, other):
+        """
+        Compares two scientific groups
+
+        :param other: the other scientific group
+        :return: True if two scientific groups are equal
+        """
+        if not isinstance(other, Group):
+            return False
+        if self.id != other.id:
+            return False
+        if self.name != other.name:
+            return False
+        if self.governor != other.governor:
+            return False
+        return True

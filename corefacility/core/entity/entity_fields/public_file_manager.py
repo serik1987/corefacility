@@ -36,8 +36,16 @@ class PublicFileManager(EntityValueManager):
         """
         Returns the file URL
         """
-        if self._field_value is None or self._field_value.name is None:
+        if self._field_value is None or self._field_value.name is None or self._field_value.name == "":
             return self._default_value
         else:
             raise NotImplementedError("TO-DO: url property")
 
+    def __eq__(self, other):
+        """
+        Two file fields are equal if and only if their URLs are equal
+
+        :param other: the other file field
+        :return: True if two files are equal
+        """
+        return self.url == other.url
