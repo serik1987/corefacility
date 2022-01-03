@@ -1,3 +1,5 @@
+import os.path
+
 from core.entity.entity_exceptions import EntityFieldInvalid
 
 
@@ -68,3 +70,22 @@ def boolean_provider():
         (False, True, None),
     ]
     return put_stages_in_provider(data)
+
+
+def image_provider():
+    data = []
+    base_dir = os.path.dirname(__file__)
+    img_dir = os.path.join(base_dir, "images")
+
+    for filename in os.listdir(img_dir):
+        if filename.endswith(".jpg") or filename.endswith(".jpeg") or \
+                filename.endswith(".gif") or filename.endswith(".png"):
+            throwing_exception = None
+        else:
+            throwing_exception = EntityFieldInvalid
+        fullname = os.path.join(img_dir, filename)
+        if os.path.isfile(fullname):
+            for test_number in range(5):
+                data.append((fullname, throwing_exception, test_number))
+
+    return data

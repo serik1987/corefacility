@@ -1,11 +1,14 @@
 import warnings
 
+from django.core.files.images import ImageFile
 from parameterized import parameterized
 
 from core.models import Project as ProjectModel
 from core.entity.group import Group
 from core.entity.user import User
-from core.tests.data_providers.field_value_providers import alias_provider
+from core.entity.project import Project
+from core.entity.entity_exceptions import EntityDuplicatedException
+from core.tests.data_providers.field_value_providers import alias_provider, image_provider
 from .base_test_class import BaseTestClass
 from .entity_objects.project_object import ProjectObject
 
@@ -29,6 +32,7 @@ class TestProject(BaseTestClass):
 
     @classmethod
     def setUpTestData(cls):
+        super().setUpTestData()
         cls.__related_user = User(login="sergei.kozhukhov")
         cls.__related_user.create()
         cls.__related_group = Group(name="Оптическое картирование", governor=cls.__related_user)
@@ -39,6 +43,21 @@ class TestProject(BaseTestClass):
     def test_alias(self, value, updated_value, exception_to_throw, route_number):
         self._test_field("alias", value, updated_value, exception_to_throw, route_number,
                          use_defaults=False, name="Некий тестовый проект", root_group=self.__related_group)
+
+    def test_alias_uniqueness(self):
+        project1 = Project(alias="vasomotor-oscillations", name="Вазомоторные колебания",
+                           root_group=self.__related_group)
+        project2 = Project(alias="vasomotor-oscillations", name="Стабильность карт",
+                           root_group=self.__related_group)
+        project1.create()
+        with self.assertRaises(EntityDuplicatedException,
+                               msg="The project with duplicated alias was successfully created"):
+            project2.create()
+
+    @parameterized.expand(image_provider())
+    def test_avatar_default(self, image_path, throwing_exception, test_number):
+        self._test_file_field("avatar", "/static/core/science.svg", ImageFile,
+                              image_path, throwing_exception, test_number)
 
     def _check_default_fields(self, entity):
         """

@@ -10,6 +10,11 @@ class EntityNotFoundException(EntityException):
         super().__init__(_("The requested resource was not found here"))
 
 
+class EntityDuplicatedException(EntityException):
+    def __init__(self):
+        super().__init__(_("Unable to create the requested resource because it has already been created"))
+
+
 class EntityFieldInvalid(EntityException):
 
     def __init__(self, entity_name):

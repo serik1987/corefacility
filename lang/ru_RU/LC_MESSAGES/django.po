@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-17 11:49+0300\n"
+"POT-Creation-Date: 2022-01-03 09:16+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,12 +21,17 @@ msgstr ""
 msgid "The requested resource was not found here"
 msgstr "Запрашиваемый ресурс не обнаружен"
 
-#: core/entity/entity_exceptions/__init__.py:16
+#: core/entity/entity_exceptions/__init__.py:15
+msgid ""
+"Unable to create the requested resource because it has already been created"
+msgstr "Невозможно создать требуемый ресурс, так как он уже был создан"
+
+#: core/entity/entity_exceptions/__init__.py:21
 #, python-format
 msgid "%s with such values can't exist"
 msgstr "Поле %s с подобными значениями не существует"
 
-#: core/entity/entity_exceptions/__init__.py:22
+#: core/entity/entity_exceptions/__init__.py:27
 msgid "The entity operation is not permitted"
 msgstr "Указанная операция над сущностью невозможна"
 
@@ -50,7 +55,7 @@ msgstr "Научный коллектив"
 msgid "Project permission"
 msgstr "Разрешения проекта"
 
-#: core/entity/entity_sets/project_set.py:10
+#: core/entity/entity_sets/project_set.py:11
 msgid "Project"
 msgstr "Проект"
 

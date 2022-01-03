@@ -1,6 +1,10 @@
+import os.path
+
+from django.core.files import File
 from django.utils.module_loading import import_string
 
 from core.entity.entity import Entity
+from core.entity.entity_exceptions import EntityDuplicatedException
 from ..entity_provider import EntityProvider
 
 
@@ -66,6 +70,20 @@ class ModelProvider(EntityProvider):
         entity_model.save()
         entity._id = entity_model.id
         entity._wrapped = entity_model
+
+    def resolve_conflict(self, given_entity: Entity, contained_entity: Entity):
+        """
+        This function is called when the user tries to save the entity when another duplicated entity
+        exists in this entity source.
+
+        The aim of this function is to resolve the underlying conflict and probably call the
+        'create_entity' function again
+
+        :param given_entity: the entity the user tries to save
+        :param contained_entity: the entity duplicate that has already been present on given entity source
+        :return: nothing but must throw an exception when such entity can't be created
+        """
+        raise EntityDuplicatedException()
 
     def update_entity(self, entity: Entity):
         """
@@ -139,6 +157,35 @@ class ModelProvider(EntityProvider):
                     field_value = field_value._wrapped
                 setattr(external_object, field_name, field_value)
         return external_object
+
+    def attach_file(self, entity: Entity, name: str, value: File) -> None:
+        """
+        Attaches a file to the entity representation located at external entity source
+
+        :param entity: the entity to which the file can be attached
+        :param name: the field name to which the file should be attached
+        :param value: an instance of django.core.files.File object
+        :return: nothing
+        """
+        entity_model = entity._wrapped
+        file_field = getattr(entity_model, name)
+        _, ext = os.path.splitext(value.name)
+        new_name = "%s_%s%s" % (entity.__class__.__name__.lower(), name, ext)
+        file_field.save(new_name, value, save=True)
+        setattr(entity, "_" + name, file_field)
+
+    def detach_file(self, entity: Entity, name: str) -> None:
+        """
+        Detaches a file from the entity representation located at external entity source
+
+        :param entity: the entity from which the file shall be detached
+        :param name: the field name from which the file should be detached
+        :return: nothing
+        """
+        entity_model = entity._wrapped
+        field_value = getattr(entity_model, name)
+        field_value.delete(save=True)
+        setattr(entity, "_" + name, field_value)
 
     @property
     def entity_model(self):
