@@ -1,6 +1,7 @@
 import os.path
 
 from django.core.files import File
+from django.db.utils import IntegrityError
 from django.utils.module_loading import import_string
 
 from core.entity.entity import Entity
@@ -66,10 +67,13 @@ class ModelProvider(EntityProvider):
         :param entity: The entity to be created on this entity source
         :return: nothing but entity provider must fill necessary entity fields
         """
-        entity_model = self.unwrap_entity(entity)
-        entity_model.save()
-        entity._id = entity_model.id
-        entity._wrapped = entity_model
+        try:
+            entity_model = self.unwrap_entity(entity)
+            entity_model.save()
+            entity._id = entity_model.id
+            entity._wrapped = entity_model
+        except IntegrityError:
+            raise EntityDuplicatedException()
 
     def resolve_conflict(self, given_entity: Entity, contained_entity: Entity):
         """
@@ -92,8 +96,11 @@ class ModelProvider(EntityProvider):
         :param entity: the entity to be updated
         :return: nothing
         """
-        entity_model = self.unwrap_entity(entity)
-        entity_model.save()
+        try:
+            entity_model = self.unwrap_entity(entity)
+            entity_model.save()
+        except IntegrityError:
+            raise EntityDuplicatedException()
 
     def delete_entity(self, entity: Entity):
         """

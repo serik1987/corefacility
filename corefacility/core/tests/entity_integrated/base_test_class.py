@@ -29,28 +29,6 @@ class BaseTestClass(TestCase):
     _entity_model_class = None
     """ The entity model class is a Django model that is used for storing entities """
 
-    def get_entity_object_class(self):
-        """
-        Returns new entity object class. New entity object will be created exactly from such a class
-
-        :return: the entity object class
-        """
-        if self._entity_object_class is None:
-            raise NotImplementedError("Please, define the _entity_object_class protected variable")
-        else:
-            return self._entity_object_class
-
-    def get_entity_model_class(self):
-        """
-        Returns the entity model class. The entity model class is used for storing entities
-
-        :return: the entity model class
-        """
-        if self._entity_model_class is None:
-            raise NotImplementedError("Please, define the _entity_model_class protected variable")
-        else:
-            return self._entity_model_class
-
     @classmethod
     def setUpTestData(cls):
         root = settings.MEDIA_ROOT
@@ -354,6 +332,28 @@ class BaseTestClass(TestCase):
             dst = os.path.join(root, filename)
             shutil.move(src, dst)
         os.rmdir(root_copy)
+
+    def get_entity_object_class(self):
+        """
+        Returns new entity object class. New entity object will be created exactly from such a class
+
+        :return: the entity object class
+        """
+        if self._entity_object_class is None:
+            raise NotImplementedError("Please, define the _entity_object_class protected variable")
+        else:
+            return self._entity_object_class
+
+    def get_entity_model_class(self):
+        """
+        Returns the entity model class. The entity model class is used for storing entities
+
+        :return: the entity model class
+        """
+        if self._entity_model_class is None:
+            raise NotImplementedError("Please, define the _entity_model_class protected variable")
+        else:
+            return self._entity_model_class
 
     def _check_creating_entity(self, entity, fields_changed):
         """

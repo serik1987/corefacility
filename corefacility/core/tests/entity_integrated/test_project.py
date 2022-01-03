@@ -8,7 +8,7 @@ from core.entity.group import Group
 from core.entity.user import User
 from core.entity.project import Project
 from core.entity.entity_exceptions import EntityDuplicatedException
-from core.tests.data_providers.field_value_providers import alias_provider, image_provider
+from core.tests.data_providers.field_value_providers import alias_provider, image_provider, string_provider
 from .base_test_class import BaseTestClass
 from .entity_objects.project_object import ProjectObject
 
@@ -58,6 +58,79 @@ class TestProject(BaseTestClass):
     def test_avatar_default(self, image_path, throwing_exception, test_number):
         self._test_file_field("avatar", "/static/core/science.svg", ImageFile,
                               image_path, throwing_exception, test_number)
+
+    @parameterized.expand(string_provider(1, 64))
+    def test_name(self, field_value, updated_value, throwing_exception, test_number):
+        self._test_field("name", field_value, updated_value, throwing_exception, test_number,
+                         use_defaults=False, alias="test", root_group=self.__related_group)
+
+    def test_name_uniqueness(self):
+        project1 = Project(alias="alias1", name="Некоторое имя", root_group=self.__related_group)
+        project2 = Project(alias="alias2", name="Некоторое имя", root_group=self.__related_group)
+        project1.create()
+        with self.assertRaises(EntityDuplicatedException,
+                               msg="Two projects with the same name were successfully created [Ref. C.1.1.3.4]"):
+            project2.create()
+
+    def test_root_group_positive(self):
+        obj = self.get_entity_object_class()()
+        obj.create_entity()
+        obj.reload_entity()
+        self.assertEquals(obj.entity.governor, self.__related_user,
+                          "Failed to retrieve the group governor")
+        self.assertEquals(obj.entity.root_group, self.__related_group,
+                          "Failed to retrieve the root group")
+
+        another_user = User(login="vasily.petrov")
+        another_user.create()
+        another_group = Group(name="Some another group", governor=another_user)
+        another_group.create()
+        obj.entity.root_group = another_group
+        obj.entity.update()
+        self.assertEquals(obj.entity.root_group, another_group,
+                          "Attempt to change the project root group had either no or bad effect")
+        self.assertEquals(obj.entity.governor, another_user,
+                          "The project leader did not change automatically when the project root group was changed")
+        obj.reload_entity()
+        self.assertEquals(obj.entity.root_group, another_group,
+                          "All root group changes were not saved to the database")
+        self.assertEquals(obj.entity.governor, another_user,
+                          "The project leader was suddenly de-attached when trying to save the root group changes "
+                          "to the database")
+
+    def test_root_group_negative(self):
+        obj = self.get_entity_object_class()()
+        obj.create_entity()
+        another_user = User(login="vasily.petrov")
+        with self.assertRaises(ValueError, msg="The user was assigned to the 'root_group' property of the project"):
+            obj.entity.root_group = another_user
+
+    def test_root_group_none(self):
+        obj = self.get_entity_object_class()()
+        obj.create_entity()
+        with self.assertRaises(ValueError, msg="The empty value to the 'root_group' was successfully assigned"):
+            obj.entity.root_group = None
+
+    def test_governor_none(self):
+        obj = self.get_entity_object_class()()
+        obj.create_entity()
+        another_user = User(login="vasily.petrov")
+        another_user.create()
+        with self.assertRaises(ValueError, msg="another value to the 'governor was assigned"):
+            obj.entity.governor = another_user
+
+    @parameterized.expand(string_provider(0, 1024))
+    def test_description(self, field_value, updated_value, throwing_exception, test_number):
+        self._test_field("description", field_value, updated_value, throwing_exception, test_number,
+                         use_defaults=True)
+
+    def test_project_dir(self):
+        with self.assertRaises(ValueError, msg="the read-only field 'project_dir' has been successfully changed"):
+            self.get_entity_object_class()(project_dir="/etc")
+
+    def test_unix_group(self):
+        with self.assertRaises(ValueError, msg="The read-only field 'unix_group' has been successfully changed"):
+            self.get_entity_object_class()(unix_group="root")
 
     def _check_default_fields(self, entity):
         """
