@@ -38,16 +38,16 @@ class ProjectSetObject(EntitySetObject):
         """
         g = self.__group_set_object
         return [
-            dict(alias="nsw", name="Нейробиология сна и бодрствования", root_group=g[2]),
-            dict(alias="n", name="Нейроонтогенез", root_group=g[3]),
-            dict(alias="nl", name="Нейрофизиология обучения", root_group=g[3]),
-            dict(alias="gcn", name="Общая и клиническая нейрофизиология", root_group=g[4]),
-            dict(alias="aphhna", name="Прикладная физиология", root_group=g[4]),
-            dict(alias="cr", name="Условные рефлексы", root_group=g[4]),
-            dict(alias="hhna", name="Высшая нервная деятельность человека", root_group=g[0]),
-            dict(alias="cnl", name="Клеточная нейробиология обучения", root_group=g[0]),
-            dict(alias="mnl", name="Математическая нейробиология обучения", root_group=g[1]),
-            dict(alias="mn", name="Молекулярная нейробиология", root_group=g[1]),
+            dict(alias="nsw", name="Нейробиология сна и бодрствования", root_group=g[2]),  # 0
+            dict(alias="n", name="Нейроонтогенез", root_group=g[3]),  # 1
+            dict(alias="nl", name="Нейрофизиология обучения", root_group=g[3]),  # 2
+            dict(alias="gcn", name="Общая и клиническая нейрофизиология", root_group=g[4]),  # 3
+            dict(alias="aphhna", name="Прикладная физиология", root_group=g[4]),  # 4
+            dict(alias="cr", name="Условные рефлексы", root_group=g[4]),  # 5
+            dict(alias="hhna", name="Высшая нервная деятельность человека", root_group=g[0]),  # 6
+            dict(alias="cnl", name="Клеточная нейробиология обучения", root_group=g[0]),  # 7
+            dict(alias="mnl", name="Математическая нейробиология обучения", root_group=g[1]),  # 8
+            dict(alias="mn", name="Молекулярная нейробиология", root_group=g[1]),  # 9
         ]
 
     def clone(self):
@@ -67,3 +67,12 @@ class ProjectSetObject(EntitySetObject):
         :return: nothing
         """
         self._entities = sorted(self._entities, key=lambda project: project.name)
+
+    def filter_by_name(self, name):
+        """
+        Provides container filtration by the name
+
+        :return: nothing
+        """
+        if isinstance(name, str) and str != "":
+            self._entities = list(filter(lambda project: project.name.startswith(name), self._entities))

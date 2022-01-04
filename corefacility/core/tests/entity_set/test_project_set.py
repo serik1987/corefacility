@@ -1,4 +1,8 @@
+import warnings
+
 from parameterized import parameterized
+
+from core.models import Project as ProjectModel
 
 from core.tests.data_providers.field_value_providers import image_provider
 from .base_test_class import BaseTestClass
@@ -31,6 +35,7 @@ class TestProjectSet(BaseTestClass):
     def setUp(self):
         self._container = self.__project_set_object.clone()
         self._container.sort()
+        self.initialize_filters()
 
     @parameterized.expand([
         (BaseTestClass.TEST_FIND_BY_ID, 3, BaseTestClass.POSITIVE_TEST_CASE),
@@ -64,6 +69,41 @@ class TestProjectSet(BaseTestClass):
     ])
     def test_no_filters(self, test_number, arg, test_type):
         self._test_all_access_features(test_number, arg, test_type)
+
+    @parameterized.expand([
+        ("Нейроонтогенез", BaseTestClass.TEST_COUNT, None, BaseTestClass.POSITIVE_TEST_CASE),
+        ("Нейроонтогенез", BaseTestClass.TEST_ITERATION, None, BaseTestClass.POSITIVE_TEST_CASE),
+        ("Нейро", BaseTestClass.TEST_COUNT, None, BaseTestClass.POSITIVE_TEST_CASE),
+        ("Нейро", BaseTestClass.TEST_FIND_BY_ID, 0, BaseTestClass.POSITIVE_TEST_CASE),
+        ("Нейро", BaseTestClass.TEST_FIND_BY_ID, 2, BaseTestClass.POSITIVE_TEST_CASE),
+        ("Нейро", BaseTestClass.TEST_FIND_BY_ID, None, BaseTestClass.NEGATIVE_TEST_CASE),
+        ("Нейро", BaseTestClass.TEST_FIND_BY_ALIAS, "n", BaseTestClass.POSITIVE_TEST_CASE),
+        ("Нейро", BaseTestClass.TEST_FIND_BY_ALIAS, "nl", BaseTestClass.POSITIVE_TEST_CASE),
+        ("Нейро", BaseTestClass.TEST_FIND_BY_ALIAS, "mnl", BaseTestClass.NEGATIVE_TEST_CASE),
+        ("Нейро", BaseTestClass.TEST_FIND_BY_INDEX, 2, BaseTestClass.POSITIVE_TEST_CASE),
+        ("Нейро", BaseTestClass.TEST_FIND_BY_INDEX, 3, BaseTestClass.NEGATIVE_TEST_CASE),
+        ("Нейро", BaseTestClass.TEST_SLICING, (0, 10, 1), BaseTestClass.POSITIVE_TEST_CASE),
+        ("Нейро", BaseTestClass.TEST_ITERATION, None, BaseTestClass.POSITIVE_TEST_CASE),
+        ("", BaseTestClass.TEST_COUNT, None, BaseTestClass.POSITIVE_TEST_CASE),
+        (None, BaseTestClass.TEST_COUNT, None, BaseTestClass.POSITIVE_TEST_CASE),
+        ("Название несуществующего проекта", BaseTestClass.TEST_COUNT, None, BaseTestClass.POSITIVE_TEST_CASE),
+    ])
+    def test_name_filter(self, project_name, test_number, arg, test_type):
+        self.apply_filter("name", project_name)
+        self._test_all_access_features(test_number, arg, test_type)
+
+    def test_user_filter(self):
+        warnings.warn("TO-DO: develop and test user filter (project permission implementation required)")
+        project = self.__project_set_object[0]
+        print(project.root_group.users)
+
+    def test_user_and_name_filter(self):
+        warnings.warn("TO-DO: develop and test user and name filter (project permission implementation required)")
+
+    def test_name_filter_invalid(self):
+        self.apply_filter("name", 42)
+        with self.assertRaises(ValueError, msg="Incorrect value was set to the project name filter"):
+            self.get_entity_set()
 
     def assertEntityFound(self, actual_entity, expected_entity, msg):
         """

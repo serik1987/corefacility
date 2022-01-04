@@ -25,6 +25,8 @@ class BaseTestClass(MediaFilesTestCase):
     _container = None
     """ Defines the container (an instance of EntitySetObject) to test """
 
+    __entity_filters = None
+
     @property
     def container(self):
         if self._container is None:
@@ -32,15 +34,6 @@ class BaseTestClass(MediaFilesTestCase):
                                       "the setUp")
         else:
             return self._container
-
-    def get_entity_set(self):
-        """
-        Returns the database set corresponding to a certain entity set class
-
-        :return: The entity set for a certain entity set class
-        """
-        entity_set = self.container.entity_class.get_entity_set_class()()
-        return entity_set
 
     def _test_all_access_features(self, feature_index, arg, test_type):
         """
@@ -202,6 +195,39 @@ class BaseTestClass(MediaFilesTestCase):
             file_field = getattr(entity, field_name)
             file_field.attach_file(file_object)
             file_object.close()
+
+    def get_entity_set(self):
+        """
+        Returns the database set corresponding to a certain entity set class
+
+        :return: The entity set for a certain entity set class
+        """
+        entity_set = self.container.entity_class.get_entity_set_class()()
+        if isinstance(self.__entity_filters, dict):
+            for name, value in self.__entity_filters.items():
+                setattr(entity_set, name, value)
+        return entity_set
+
+    def apply_filter(self, name, value):
+        """
+        Applies some filter
+
+        :param name: filter name
+        :param value: filter value
+        :return: nothing
+        """
+        if self.__entity_filters is None:
+            self.__entity_filters = dict()
+        self.__entity_filters[name] = value
+        getattr(self.container, "filter_by_" + name)(value)
+
+    def initialize_filters(self):
+        """
+        Clears all previously applied filters
+
+        :return: nothing
+        """
+        self.__entity_filters = dict()
 
     def assertEntityFound(self, actual_entity, expected_entity, msg):
         """
