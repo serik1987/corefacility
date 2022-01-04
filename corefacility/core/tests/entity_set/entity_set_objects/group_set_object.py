@@ -1,0 +1,46 @@
+from core.entity.group import Group
+
+from .entity_set_object import EntitySetObject
+from .user_set_object import UserSetObject
+
+
+class GroupSetObject(EntitySetObject):
+    """
+    Defines five arbitrary user groups and allows search among them
+    """
+
+    MIN_USER_LENGTH = 10
+    """ only user objects containing at least 10 users were allowed """
+
+    __user_set_object = None
+    """ To create the user group we need a proper user. This function will create such a proper user. """
+
+    _entity_class = Group
+    """ Defines the entity class. The EntitySetObject will create entities belonging exactly to this class. """
+
+    def __init__(self, user_set_object: UserSetObject):
+        """
+        Initializes the group set object
+
+        :param user_set_object: To create the user group we need a proper user. This property defines which
+        users shall be taken (only user objects containing at least 10 users were allowed)
+        """
+        self.__user_set_object = user_set_object
+        if len(self.__user_set_object) < self.MIN_USER_LENGTH:
+            raise ValueError("Only user objects containing at least %s users were allowed" % self.MIN_USER_LENGTH)
+        super().__init__()
+
+
+    def data_provider(self):
+        """
+        Defines properties of custom entity objects created in the constructor.
+
+        :return: list of field_name => field_value dictionary reflecting properties of a certain user
+        """
+        return [
+            dict(name="Сёстры Райт", governor=self.__user_set_object[1]),
+            dict(name="Своеобразные", governor=self.__user_set_object[3]),
+            dict(name="Управляемый хаос", governor=self.__user_set_object[4]),
+            dict(name="Изгибно-крутильный флаттер", governor=self.__user_set_object[7]),
+            dict(name="Революция сознания", governor=self.__user_set_object[7])
+        ]

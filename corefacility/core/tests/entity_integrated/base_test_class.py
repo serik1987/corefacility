@@ -1,13 +1,12 @@
 import os
-import shutil
 
 from django.conf import settings
-from django.test import TestCase
 
 from core.entity.entity_exceptions import EntityOperationNotPermitted, EntityNotFoundException
+from core.tests.media_files_test_case import MediaFilesTestCase
 
 
-class BaseTestClass(TestCase):
+class BaseTestClass(MediaFilesTestCase):
     """
     provides the base class for all test cases
     """
@@ -28,20 +27,6 @@ class BaseTestClass(TestCase):
 
     _entity_model_class = None
     """ The entity model class is a Django model that is used for storing entities """
-
-    @classmethod
-    def setUpTestData(cls):
-        root = settings.MEDIA_ROOT
-        root_copy = os.path.join(root, "original")
-        try:
-            os.mkdir(root_copy)
-        except FileExistsError:
-            pass
-        for filename in os.listdir(root):
-            fullname = os.path.join(root, filename)
-            if os.path.isfile(fullname):
-                new_name = os.path.join(root_copy, filename)
-                shutil.move(fullname, new_name)
 
     def test_object_creating_default(self):
         """
@@ -308,6 +293,13 @@ class BaseTestClass(TestCase):
                                          "detached and deleted from the media root. This was not happened")
 
     def assertMediaRootFiles(self, n, msg):
+        """
+        Asserts the media root folder contains certain media files
+
+        :param n: number of media files that shall be contained in the media root
+        :param msg: message to show if this is not true
+        :return: nothing
+        """
         root = settings.MEDIA_ROOT
         file_number = 0
         for filename in os.listdir(root):
@@ -316,22 +308,6 @@ class BaseTestClass(TestCase):
                 file_number += 1
 
         self.assertEquals(file_number, n, msg)
-
-    def tearDown(self) -> None:
-        for file in os.listdir(settings.MEDIA_ROOT):
-            full_name = os.path.join(settings.MEDIA_ROOT, file)
-            if os.path.isfile(full_name):
-                os.unlink(full_name)
-
-    @classmethod
-    def tearDownClass(cls):
-        root = settings.MEDIA_ROOT
-        root_copy = os.path.join(root, "original")
-        for filename in os.listdir(root_copy):
-            src = os.path.join(root_copy, filename)
-            dst = os.path.join(root, filename)
-            shutil.move(src, dst)
-        os.rmdir(root_copy)
 
     def get_entity_object_class(self):
         """
@@ -477,3 +453,6 @@ class BaseTestClass(TestCase):
         :return: nothing
         """
         raise NotImplementedError("The _check_default_change method must be implemented when extending this base class")
+
+
+del MediaFilesTestCase

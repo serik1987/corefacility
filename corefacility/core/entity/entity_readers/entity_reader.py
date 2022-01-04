@@ -92,6 +92,16 @@ class EntityReader:
         """
         raise NotImplementedError("EntityReader.__getitem__: the method is not implemented")
 
+    def __len__(self):
+        """
+        Returns total number of entities that can be read by this reader given all reader filters were applied.
+
+        The entity length must be retrieved using SELECT COUNT(*) query type
+
+        :return: total number of entities that can be read
+        """
+        raise NotImplementedError("EntityReader.__len__: the method is not implemented")
+
     def get(self, **kwargs):
         """
         Looks for a single entity in the entity source. If entity exists it returns the entity

@@ -29,10 +29,19 @@ class ModelReader(EntityReader):
         :param kwargs: filter keyword arguments
         """
         self.__entity_data = self.entity_model_class.objects
-        for name, value in kwargs:
+        for name, value in kwargs.items():
             if name in self._filter_map:
                 name = self._filter_map[name]
             self.__entity_data = self.__entity_data.filter(**{name: value})
+
+    @property
+    def entity_model_class(self):
+        """
+        The entity model that is used for seeking a proper entity data
+        """
+        if self._entity_model_class is None:
+            raise NotImplementedError("ModelReader._entity_model_class: this class property must be defined")
+        return self._entity_model_class
 
     def get(self, **kwargs):
         """
@@ -50,11 +59,47 @@ class ModelReader(EntityReader):
         except self.get_entity_provider().entity_model.DoesNotExist:
             raise EntityNotFoundException()
 
-    @property
-    def entity_model_class(self):
+    def __iter__(self):
         """
-        The entity model that is used for seeking a proper entity data
+        The method is called by the EntitySet's __iter__ method and must return iterator
+        that allows to consecutively read all entities from the external source.
+
+        The function is responsible for reading the entity information and for wrapping it by the entity
+        filter
+
+        :return: the iterator of Entity objects
         """
-        if self._entity_model_class is None:
-            raise NotImplementedError("ModelReader._entity_model_class: this class property must be defined")
-        return self._entity_model_class
+        if not isinstance(self.__entity_data, QuerySet):
+            self.__entity_data = self.__entity_data.all()
+        for external_object in self.__entity_data:
+            yield external_object
+
+    def __getitem__(self, index):
+        """
+        The method is called by the EntitySet's __getitem__ method and must return:
+
+        - a single entity if index is integer
+        - a list or any other iterable entity container if index is slice.
+
+        The main goal of this method is to retrieve such entities from the external source
+        which indices satisfy the 'index' condition
+
+        :param index: either integer or slice instance
+        :return: see above
+        """
+        if not isinstance(self.__entity_data, QuerySet):
+            self.__entity_data = self.__entity_data.all()
+        try:
+            return self.__entity_data[index]
+        except (AssertionError, IndexError):
+            raise EntityNotFoundException()
+
+    def __len__(self):
+        """
+        Returns total number of entities that can be read by this reader given all reader filters were applied.
+
+        The entity length will be retrieved using SELECT COUNT(*) query type
+
+        :return: total number of entities that can be read
+        """
+        return self.__entity_data.count()

@@ -36,6 +36,53 @@ class ModelProvider(EntityProvider):
     Use the string containing the class name, not class object (due to avoid cycling imports)
     """
 
+    @property
+    def entity_model(self):
+        """
+        The entity model is a Django model that immediately stores information about the entity
+
+        :return: the entity model
+        """
+        if self._entity_model is None:
+            raise NotImplementedError("ModelProvider._entity_model: the class property is not defines")
+        else:
+            return self._entity_model
+
+    @property
+    def lookup_field(self):
+        """
+        The lookup field is a unique model field that is used by the load_entity to load the entity copy from the
+        database.
+
+        :return: the lookup field
+        """
+        if self._lookup_field is None:
+            raise NotImplementedError("ModelProvider._lookup_field: the class property is not defined")
+        else:
+            return self._lookup_field
+
+    @property
+    def model_fields(self):
+        """
+        Defines fields in the entity object that shall be stored as Django model
+
+        :return: the model fields
+        """
+        if self._model_fields is None:
+            raise NotImplementedError("ModelProvider._model_fields: the class property is not defined")
+        else:
+            return self._model_fields
+
+    @property
+    def entity_class(self):
+        """
+        Defines the entity class (the string notation)
+        """
+        if self._entity_class is None:
+            raise NotImplementedError("ModelProvider._entity_class: the class property is not defined")
+        else:
+            return self._entity_class
+
     def load_entity(self, entity):
         """
         The method checks that the entity has already been loaded from the database.
@@ -193,50 +240,3 @@ class ModelProvider(EntityProvider):
         field_value = getattr(entity_model, name)
         field_value.delete(save=True)
         setattr(entity, "_" + name, field_value)
-
-    @property
-    def entity_model(self):
-        """
-        The entity model is a Django model that immediately stores information about the entity
-
-        :return: the entity model
-        """
-        if self._entity_model is None:
-            raise NotImplementedError("ModelProvider._entity_model: the class property is not defines")
-        else:
-            return self._entity_model
-
-    @property
-    def lookup_field(self):
-        """
-        The lookup field is a unique model field that is used by the load_entity to load the entity copy from the
-        database.
-
-        :return: the lookup field
-        """
-        if self._lookup_field is None:
-            raise NotImplementedError("ModelProvider._lookup_field: the class property is not defined")
-        else:
-            return self._lookup_field
-
-    @property
-    def model_fields(self):
-        """
-        Defines fields in the entity object that shall be stored as Django model
-
-        :return: the model fields
-        """
-        if self._model_fields is None:
-            raise NotImplementedError("ModelProvider._model_fields: the class property is not defined")
-        else:
-            return self._model_fields
-
-    @property
-    def entity_class(self):
-        """
-        Defines the entity class (the string notation)
-        """
-        if self._entity_class is None:
-            raise NotImplementedError("ModelProvider._entity_class: the class property is not defined")
-        else:
-            return self._entity_class

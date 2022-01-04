@@ -1,6 +1,8 @@
 from django.db.models import QuerySet
 from django.utils.module_loading import import_string
 
+from core.entity.entity_exceptions import EntityNotFoundException
+
 
 class EntitySet:
     """
@@ -109,7 +111,9 @@ class EntitySet:
         The EntitySet supports slicing in the following way:
         entity_set[7] returns the 7th entity in the set
         entity_set[3:8] returns from 3rd till 8th entity in the set
-        entity_set[3:8:2] returns every odd entity from the set from 3rd till 8th
+
+        Slicing with arbitrary step is not supported because this is hard to implement for raw-query or
+        remote entity readers and is not mentioned in the project documentation
 
         :param index: either integer or a slice instance
         :return: if index is integer the method returns a single Entity object. If index is slice
@@ -119,6 +123,8 @@ class EntitySet:
         provider = reader.get_entity_provider()
         raw_dataset = reader[index]
         if isinstance(index, slice) or isinstance(raw_dataset, QuerySet):
+            if index.step != 1:
+                raise EntityNotFoundException()
             final_dataset = []
             for external_object in raw_dataset:
                 entity = provider.wrap_entity(external_object)
@@ -137,6 +143,15 @@ class EntitySet:
             entity = provider.wrap_entity(external_object)
             yield entity
 
+    def __len__(self):
+        """
+        Returns total number of items satisfying item condition
+
+        :return: number of items in the entity set
+        """
+        reader = self._entity_reader_class(**self._entity_filters)
+        return len(reader)
+
     def __getattr__(self, name):
         """
         Returns the current filter value or None if the filter has not been set
@@ -148,13 +163,16 @@ class EntitySet:
 
     def __setattr__(self, name, value):
         """
-        Sets an appropriate filter value
+        Sets an appropriate filter value. None values and empty strings imply filter switch off
 
         :param name: filter name to set
         :param value: filter value
         :return: nothing
         """
         if name in self._entity_filter_list:
+            if value == "" or value is None:
+                delattr(self, name)
+                return
             filter_type, filter_constraint = self._entity_filter_list[name]
             if isinstance(filter_type, str):
                 filter_type = import_string(filter_type)
@@ -173,4 +191,7 @@ class EntitySet:
         :param name: the filter name
         :return: nothing
         """
-        del self._entity_filters[name]
+        try:
+            del self._entity_filters[name]
+        except KeyError:
+            pass
