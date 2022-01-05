@@ -1,3 +1,8 @@
+from django.core.exceptions import ImproperlyConfigured
+
+from core.entity.entity_providers.entity_provider import EntityProvider
+
+
 class EntityReader:
     """
     The EntityReader is an object that is responsible for looking
@@ -52,6 +57,8 @@ class EntityReader:
         if cls._entity_provider is None:
             raise NotImplementedError("EntityReader.get_entity_provider: Either define the entity provider "
                                       "class or re-implement the get_entity_provider method")
+        if not isinstance(cls._entity_provider, EntityProvider):
+            raise ImproperlyConfigured("Value of the _entity_provider property must be an instance of EntityProvider")
         else:
             return cls._entity_provider
 

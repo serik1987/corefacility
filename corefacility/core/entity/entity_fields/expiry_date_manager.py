@@ -1,4 +1,6 @@
 from datetime import timedelta, datetime
+from django.utils.timezone import make_aware
+
 from .entity_value_manager import EntityValueManager
 
 
@@ -20,13 +22,13 @@ class ExpiryDateManager(EntityValueManager):
         treat some data as 'expired'. Must be an instance of datetime.timedelta
         :return: Nothing
         """
-        value = datetime.now() + interval
-        setattr(self.entity, "_" + self.field_name, value)
+        self._field_value = make_aware(datetime.now()) + interval
+        setattr(self.entity, "_" + self.field_name, self._field_value)
         self.entity.notify_field_changed(self.field_name)
 
     def is_expired(self):
         """
-        Returns True is the the data is expired, False otherwise.
+        Returns True is the data is expired, False otherwise.
 
         If the expiry date is not defined the function always returns False due to security considerations
 
@@ -34,7 +36,7 @@ class ExpiryDateManager(EntityValueManager):
         """
         if self._field_value is None:
             return False
-        cdate = datetime.now()
+        cdate = make_aware(datetime.now())
         return cdate > self._field_value
 
     def clear(self):

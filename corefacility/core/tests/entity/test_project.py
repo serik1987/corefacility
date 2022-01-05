@@ -10,10 +10,11 @@ from core.entity.project import Project
 from core.entity.entity_exceptions import EntityDuplicatedException
 from core.tests.data_providers.field_value_providers import alias_provider, image_provider, string_provider
 from .base_test_class import BaseTestClass
+from .entity_field_mixins.file_field_mixin import FileFieldMixin
 from .entity_objects.project_object import ProjectObject
 
 
-class TestProject(BaseTestClass):
+class TestProject(FileFieldMixin, BaseTestClass):
     """
     Provides immediate project testing
     """
@@ -125,12 +126,10 @@ class TestProject(BaseTestClass):
                          use_defaults=True)
 
     def test_project_dir(self):
-        with self.assertRaises(ValueError, msg="the read-only field 'project_dir' has been successfully changed"):
-            self.get_entity_object_class()(project_dir="/etc")
+        self._test_read_only_field("project_dir", "/etc")
 
     def test_unix_group(self):
-        with self.assertRaises(ValueError, msg="The read-only field 'unix_group' has been successfully changed"):
-            self.get_entity_object_class()(unix_group="root")
+        self._test_read_only_field("unix_group", "root")
 
     def _check_default_fields(self, entity):
         """

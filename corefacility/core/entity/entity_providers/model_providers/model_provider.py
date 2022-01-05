@@ -1,4 +1,5 @@
 import os.path
+import warnings
 
 from django.core.files import File
 from django.db.utils import IntegrityError
@@ -201,9 +202,8 @@ class ModelProvider(EntityProvider):
             external_object = self.entity_model()
         else:
             external_object = entity._wrapped
-        if isinstance(external_object, dict):
+        if not isinstance(external_object, self.entity_model):
             external_object = self.entity_model.objects.get(pk=entity.id)
-            entity._wrapped = external_object
         for field_name in self.model_fields:
             if field_name in entity._edited_fields:
                 field_value = getattr(entity, '_' + field_name)

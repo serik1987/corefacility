@@ -35,6 +35,7 @@ class MediaFilesTestCase(TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        super().tearDownClass()
         try:
             root = settings.MEDIA_ROOT
             root_copy = os.path.join(root, "original")

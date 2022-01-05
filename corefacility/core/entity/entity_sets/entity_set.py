@@ -2,6 +2,7 @@ from django.db.models import QuerySet
 from django.utils.module_loading import import_string
 
 from core.entity.entity_exceptions import EntityNotFoundException
+from ..entity_providers.entity_provider import EntityProvider
 
 
 class EntitySet:
@@ -84,6 +85,13 @@ class EntitySet:
         """
         self._entity_filters = dict()
 
+    @property
+    def entity_reader_class(self):
+        if self._entity_reader_class is None:
+            raise NotImplementedError("Define EntitySet._entity_reader_class")
+        else:
+            return self._entity_reader_class
+
     def get(self, lookup):
         """
         Finds the entity by id or alias
@@ -96,7 +104,7 @@ class EntitySet:
         :param lookup: either entity id or entity alias
         :return: the Entity object or DoesNotExist if such entity have not found in the database
         """
-        reader = self._entity_reader_class(**self._entity_filters)
+        reader = self.entity_reader_class(**self._entity_filters)
         if isinstance(lookup, int):
             source = reader.get(id=lookup)
         elif isinstance(lookup, str):
@@ -119,7 +127,7 @@ class EntitySet:
         :return: if index is integer the method returns a single Entity object. If index is slice
         the method returns the entity list or any other iterable container of the entities
         """
-        reader = self._entity_reader_class(**self._entity_filters)
+        reader = self.entity_reader_class(**self._entity_filters)
         provider = reader.get_entity_provider()
         raw_dataset = reader[index]
         if isinstance(index, slice) or isinstance(raw_dataset, QuerySet):
@@ -137,7 +145,7 @@ class EntitySet:
         """
         The EntitySet supports iteration that allows to sequentially process each entity from the set
         """
-        reader = self._entity_reader_class(**self._entity_filters)
+        reader = self.entity_reader_class(**self._entity_filters)
         provider = reader.get_entity_provider()
         for external_object in reader:
             entity = provider.wrap_entity(external_object)
@@ -149,7 +157,7 @@ class EntitySet:
 
         :return: number of items in the entity set
         """
-        reader = self._entity_reader_class(**self._entity_filters)
+        reader = self.entity_reader_class(**self._entity_filters)
         return len(reader)
 
     def __getattr__(self, name):

@@ -3,24 +3,39 @@ import os
 from django.conf import settings
 
 from core.entity.entity_exceptions import EntityOperationNotPermitted, EntityNotFoundException
+from core.entity.entity_fields import EntityPasswordManager
 from core.tests.media_files_test_case import MediaFilesTestCase
 
 
 class BaseTestClass(MediaFilesTestCase):
     """
     provides the base class for all test cases
+
+    _check_default_fields and _check_default_change must be re-implemented since they test whether the entity
+    re-implement all its default fields after reloading. Given these fields were re-implemented the diagram state
+    test cases will be defined automatically by inheritance mechanism. (see test_project how)
+
+    However, field validation tests must be written. Use _test_field function for convenience.
+    (see test_project).
+    If some field contains file use FileMixin
+    If some field contains password use PasswordMixin
+
+    _check_reload function usually tests whether object fields were preserved during the object reload.
+    If you need additional checks extend this function (see test_project)
+
+    Use setUpTestData to create all related entities if you want. However, don't forget to call the same method
+    from the superclass because it temporally moves all media root files to some safe directory.
+
+    Also, tearDownClass and tearDown method must call similar ones from the superclass.
+
+
+    DO NOT FORGET to use: del BaseTestClass AFTER EACH subclass declaration
     """
 
     TEST_CREATE_AND_LOAD = 0
     TEST_CHANGE_CREATE_AND_LOAD = 1
     TEST_CREATE_CHANGE_AND_LOAD = 2
     TEST_CREATE_LOAD_AND_CHANGE = 3
-
-    FILE_TEST_DEFAULT = 0
-    FILE_TEST_UPLOAD = 1
-    FILE_TEST_UPLOAD_AND_DELETE = 2
-    FILE_TEST_UPLOAD_TWO_FILES_TWO_PROJECTS = 3
-    FILE_TEST_UPLOAD_TWO_FILES_SAME_PROJECT = 4
 
     _entity_object_class = None
     """ The entity object class. New entity object will be created from this class """
@@ -219,95 +234,18 @@ class BaseTestClass(MediaFilesTestCase):
                           "The value '%s' for field '%s' doesn't either stored or retrieved correctly" %
                           (last_value, field_name))
 
-    def _test_file_field(self, field_name, default_url, file_wrapper_class,
-                         full_path, throwing_exception, route_number):
+    def _test_read_only_field(self, field_name, sample_value, throwing_exception=ValueError):
         """
-        Tests the file upload and delete
+        Checks whether some value can be assigned to the read-only field
 
-        :param field_name: the field name corresponding to the file
-        :param default_url: the default URL that must be shown when the file has not been loaded
-        :param file_wrapper_class: the django.core.files.File subclass that will be used to induce file to the model
-        :param full_path: the full file path
-        :param throwing_exception: exception to throw is the file is invalid, None for positive tests
-        :param route_number: 0 - just check the default field value, 1 - upload the file and check,
-            2 - download the file and check
+        :param field_name: the field name
+        :param sample_value: value to assign
+        :param throwing_exception: exception to throw
         :return: nothing
         """
-        obj = self.get_entity_object_class()()
-        obj.create_entity()
-        file_field = getattr(obj.entity, field_name)
-        if route_number == self.FILE_TEST_DEFAULT:
-            self.assertEquals(file_field.url, default_url,
-                              "The default file URL is not the same as expected when the entity is created")
-            obj.reload_entity()
-            self.assertEquals(file_field.url, default_url,
-                              "The default file URL is not the same as expected when the entity is loaded")
-            self.assertTrue(file_field.url.startswith("/static/"),
-                            "The default file is not a static file")
-            return
-
-        file_object = open(full_path, "rb")
-        django_file = file_wrapper_class(file_object)
-        file_field.attach_file(django_file)
-        url_upon_create = file_field.url
-        if route_number == self.FILE_TEST_UPLOAD:
-            self.assertTrue(url_upon_create.startswith("/media/"),
-                            "The uploaded files must be stored in the media folder")
-            self.assertMediaRootFiles(1,
-                                      "We have uploaded our first file but total number of files in the media root "
-                                      "is not one")
-
-        obj.reload_entity()
-        file_field = getattr(obj.entity, field_name)
-        url = file_field.url
-        if route_number == self.FILE_TEST_UPLOAD:
-            self.assertTrue(url.startswith("/media/"),
-                            "The uploaded files must be stored in the media folder")
-            self.assertEquals(url_upon_create, url, "Unable to compute the URL of the uploaded file")
-
-        if route_number == self.FILE_TEST_UPLOAD_AND_DELETE:
-            file_field.detach_file()
-            self.assertMediaRootFiles(0, "The file has already detached but still present in the media folder")
-            self.assertEquals(file_field.url, default_url,
-                              "The URL was not recovered to the default one after file detachment")
-            obj.reload_entity()
-            file_field = getattr(obj.entity, field_name)
-            self.assertEquals(file_field.url, default_url,
-                              "The file detachment was not provided in the database")
-
-        if route_number == self.FILE_TEST_UPLOAD_TWO_FILES_TWO_PROJECTS:
-            obj2 = self.get_entity_object_class()()
-            obj2.change_entity_fields()
-            obj2.create_entity()
-            file_field2 = getattr(obj2.entity, field_name)
-            file_field2.attach_file(django_file)
-            self.assertMediaRootFiles(2,
-                                      "Two files attached to two entities, two files shall be contained in the "
-                                      "media root folder, but this is not true")
-            self.assertNotEqual(file_field.url, file_field2.url,
-                                "Two files attached to two entities have the same URL")
-
-        if route_number == self.FILE_TEST_UPLOAD_TWO_FILES_SAME_PROJECT:
-            file_field.attach_file(django_file)
-            self.assertMediaRootFiles(1, "When another file is attached to the project the previous one shall be "
-                                         "detached and deleted from the media root. This was not happened")
-
-    def assertMediaRootFiles(self, n, msg):
-        """
-        Asserts the media root folder contains certain media files
-
-        :param n: number of media files that shall be contained in the media root
-        :param msg: message to show if this is not true
-        :return: nothing
-        """
-        root = settings.MEDIA_ROOT
-        file_number = 0
-        for filename in os.listdir(root):
-            fullname = os.path.join(root, filename)
-            if os.path.isfile(fullname):
-                file_number += 1
-
-        self.assertEquals(file_number, n, msg)
+        with self.assertRaises(throwing_exception,
+                               msg="The read-only field '%s' has been successfully changed" % field_name):
+            self.get_entity_object_class()(**{field_name: sample_value})
 
     def get_entity_object_class(self):
         """

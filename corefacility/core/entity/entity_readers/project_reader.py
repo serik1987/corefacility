@@ -19,7 +19,7 @@ class ProjectReader(ModelReader):
     """ The entity model that is used for seeking a proper entity data """
 
     _filter_map = {
-        "name": "name__startswith",
+        "name": "name__istartswith",
     }
     """
     Establishes the correspondence between EntitySet filter name and Django model manager filter name

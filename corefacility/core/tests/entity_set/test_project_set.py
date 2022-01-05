@@ -2,8 +2,6 @@ import warnings
 
 from parameterized import parameterized
 
-from core.models import Project as ProjectModel
-
 from core.tests.data_providers.field_value_providers import image_provider
 from .base_test_class import BaseTestClass
 from .entity_set_objects.user_set_object import UserSetObject
@@ -94,8 +92,6 @@ class TestProjectSet(BaseTestClass):
 
     def test_user_filter(self):
         warnings.warn("TO-DO: develop and test user filter (project permission implementation required)")
-        project = self.__project_set_object[0]
-        print(project.root_group.users)
 
     def test_user_and_name_filter(self):
         warnings.warn("TO-DO: develop and test user and name filter (project permission implementation required)")

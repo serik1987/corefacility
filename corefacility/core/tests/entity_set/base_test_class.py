@@ -1,7 +1,38 @@
 from django.core.files import File
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
 
-from core.entity.entity_exceptions import EntityNotFoundException, EntityOperationNotPermitted
+from core.entity.entity_exceptions import EntityNotFoundException
 from core.tests.media_files_test_case import MediaFilesTestCase
+
+
+class _AssertLessQueriesContext(CaptureQueriesContext):
+    """
+    Checks that number of queries doesn't reach such value
+    """
+
+    __test_case = None
+    __expected_queries = None
+
+    def __init__(self, test_case, num, connection):
+        self.__test_case = test_case
+        self.__expected_queries = num
+        super().__init__(connection)
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        super().__exit__(exc_type, exc_value, traceback)
+        if exc_type is not None:
+            return
+        executed = len(self)
+        self.__test_case.assertLessEqual(
+            executed, self.__expected_queries,
+            "%d queries executed, %d expected\nCaptured queries were:\n%s" % (
+                executed, self.__expected_queries,
+                '\n'.join(
+                    '%d. %s' % (i, query['sql']) for i, query in enumerate(self.captured_queries, start=1)
+                )
+            )
+        )
 
 
 class BaseTestClass(MediaFilesTestCase):
@@ -154,7 +185,7 @@ class BaseTestClass(MediaFilesTestCase):
                 actual_entity_list = entity_set[start:stop:step]
             return
         actual_entity_list = entity_set[start:stop:step]
-        expected_entity_list = entity_set[start:stop:step]
+        expected_entity_list = self.container[start:stop:step]
         self.assertEquals(len(actual_entity_list), len(expected_entity_list),
                           "entity slicing on %d:%d:%d: number of items retrieved is not the same as expected"
                           % (start, stop, step))
@@ -243,6 +274,16 @@ class BaseTestClass(MediaFilesTestCase):
                           "%s. ID of the found entity is not the same as expected" % msg)
         self.assertEquals(actual_entity.state, "loaded",
                           "%s. The found entity state is not 'loaded'" % msg)
+
+    def assertLessQueries(self, num):
+        """
+        Asserts that the query number is strictly less than expected
+
+        :param num: maximum number of queries asserted
+        :return: nothing
+        """
+        return _AssertLessQueriesContext(self, num, connection)
+
 
 
 del MediaFilesTestCase

@@ -89,3 +89,30 @@ def image_provider():
                 data.append((fullname, throwing_exception, test_number))
 
     return data
+
+
+def password_provider():
+    """
+    Provides the full password check
+    """
+    return [(n,) for n in range(5)]
+
+
+def token_provider():
+    """
+    Provide partial password check.
+
+    The partial password check is important because full password check takes too long time and
+    providing same tests on EntityPasswordManager functions is not necessary.
+    """
+    return [(1,)]
+
+
+def base_expiry_date_provider():
+    """
+    Provides base expiry date testing (clearing all expiry entities were not implied)
+
+    :return: the expiry date test data
+    """
+    return [(n,) for n in range(3)]
+

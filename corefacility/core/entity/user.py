@@ -60,7 +60,7 @@ class User(Entity):
 
         :return: nothing
         """
-        if self._login == "support":
+        if self._login == "support" and self._edited_fields != {"is_locked"}:
             raise EntityFieldInvalid("You are not allowed to modify the 'support' user")
         else:
             super().update()
