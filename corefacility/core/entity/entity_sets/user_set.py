@@ -16,7 +16,9 @@ class UserSet(EntitySet):
 
     _entity_filter_list = {
         "login": [str, None],
-        "group": ["core.entity.group.Group", None]
+        "group": ["core.entity.group.Group", None],
+        "is_support": [bool, None],
+        "is_locked": [bool, None],
     }
 
     _alias_kwarg = "login"

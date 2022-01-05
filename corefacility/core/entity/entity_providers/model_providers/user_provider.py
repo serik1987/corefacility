@@ -17,7 +17,8 @@ class UserProvider(ModelProvider):
     """
 
     _model_fields = ["login", "password_hash", "name", "surname", "email", "phone", "is_locked", "is_superuser",
-                     "avatar", "unix_group", "home_dir", "activation_code_hash", "activation_code_expiry_date"]
+                     "is_support", "avatar", "unix_group", "home_dir", "activation_code_hash",
+                     "activation_code_expiry_date"]
     """
     Defines fields in the entity object that shall be stored as Django model
     """

@@ -16,6 +16,9 @@ class EntitySetObject:
     _entity_class = None
     """ Defines the entity class. The EntitySetObject will create entities belonging exactly to this class. """
 
+    _alias_field = "alias"
+    """ The alias field. Override this class property is this is not true. """
+
     def __init__(self, _entity_list=None):
         """
         Initializes a set of certain custom entity objects and adds such objects to the database.
@@ -84,7 +87,7 @@ class EntitySetObject:
         :return: entity itself
         """
         for entity in self._entities:
-            if entity.alias == alias:
+            if getattr(entity, self._alias_field) == alias:
                 return entity
         raise EntityNotFoundException()
 

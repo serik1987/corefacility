@@ -97,3 +97,25 @@ class User(Entity):
         if self.avatar != other.avatar:
             return False
         return True
+
+    def __lt__(self, other):
+        """
+        Declares conditions under which one user is less than another one.
+        This is important for manual user sorting by means of Python facilities.
+
+        :return: True if this object is less than the other object, False otherwise
+        """
+        if not isinstance(other, User):
+            raise NotImplemented("Two values were incomparable")
+        if self.surname < other.surname:
+            return True
+        elif self.surname > other.surname:
+            return False
+        elif self.name < other.name:
+            return True
+        elif self.name > other.name:
+            return False
+        elif self.login < other.login:
+            return True
+        else:
+            return False

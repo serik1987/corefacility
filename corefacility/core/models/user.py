@@ -36,3 +36,6 @@ class User(models.Model):
     activation_code_expiry_date = models.DateTimeField(null=True, editable=False,
                                                        help_text="The activation code when given is valid until this "
                                                                  "date")
+
+    class Meta:
+        ordering = ["surname", "name", "login"]

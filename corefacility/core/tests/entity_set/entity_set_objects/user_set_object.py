@@ -11,6 +11,9 @@ class UserSetObject(EntitySetObject):
     _entity_class = User
     """ Defines the entity class. The EntitySetObject will create entities belonging exactly to this class. """
 
+    _alias_field = "login"
+    """ The alias field. Override this class property is this is not true. """
+
     def data_provider(self):
         return [
             dict(login="user1", surname="Миронова", name="Екатерина"),
@@ -24,3 +27,21 @@ class UserSetObject(EntitySetObject):
             dict(login="user9", surname="Спиридонова", name="Анастасия"),
             dict(login="user10", surname="Сычёв", name="Александр"),
         ]
+
+    def sort(self):
+        """
+        Sorts users in such a way as to make their order identical to another one retrieved from the database
+
+        :return: nothing
+        """
+        self._entities = sorted(self._entities)
+
+    def filter_by_is_support(self, value):
+        """
+        Filters the user by whether this is support user or not.
+
+        :param value: defines whether this user is support
+        :return: nothing
+        """
+        if value:
+            self._entities = []
