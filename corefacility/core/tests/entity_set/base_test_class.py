@@ -285,5 +285,4 @@ class BaseTestClass(MediaFilesTestCase):
         return _AssertLessQueriesContext(self, num, connection)
 
 
-
 del MediaFilesTestCase

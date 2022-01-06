@@ -1,10 +1,14 @@
 from core.models import User
+from .query_builders.base import QueryBuilder
+from .query_builders.data_source import Subquery
+from .query_builders.query_filters import StringQueryFilter
+from .query_builders.sqlite import SqliteQueryBuilder
 
-from .model_reader import ModelReader
+from .sql_model_reader import SqlModelReader
 from ..entity_providers.model_providers.user_provider import UserProvider
 
 
-class UserReader(ModelReader):
+class UserReader(SqlModelReader):
     """
     Allows to retrieve users from the database
     """
@@ -18,3 +22,26 @@ class UserReader(ModelReader):
     the entity from the external source that satisfies filter conditions, it calls the
     wrap_entity method of the _entity_provider given here
     """
+
+    _query_debug = True
+    """ Set this value as True in case when query execution causes SQL errors """
+
+    def initialize_query_builder(self):
+        """
+        This function shall call certain methods for the query builder to make
+        it to generate proper queries given that no external filters applied
+
+        :return: nothing
+        """
+
+        self.items_builder.add_data_source("core_user")\
+            .add_order_term("surname")\
+            .add_order_term("name")\
+            .add_order_term("login")
+
+        self.count_builder.add_data_source("core_user")\
+            .add_select_expression(self.count_builder.select_total_count())
+
+    def apply_is_support_filter(self, value):
+        f = StringQueryFilter("is_support") if value else StringQueryFilter("NOT is_support")
+        [builder.main_filter.add(f) for builder in (self.items_builder, self.count_builder)]

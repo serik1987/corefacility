@@ -3,6 +3,10 @@ from pathlib import Path
 from configurations import Configuration, values
 from configurations.utils import uppercase_attributes
 from django.core.exceptions import ImproperlyConfigured
+
+from core.entity.entity_readers.query_builders.mysql import MysqlQueryBuilder
+from core.entity.entity_readers.query_builders.postgre_sql import PostgreSqlQueryBuilder
+from core.entity.entity_readers.query_builders.sqlite import SqliteQueryBuilder
 from . import application_settings
 
 
@@ -321,3 +325,15 @@ class CorefacilityConfiguration(Configuration):
             if not os.access(filename, access_level):
                 return False
         return True
+
+    def QUERY_BUILDER_CLASS(self):
+        """
+        Defines a proper query builder
+
+        :return: a proper query builder
+        """
+        return {
+            "django.db.backends.sqlite3": SqliteQueryBuilder,
+            "django.db.backends.mysql": MysqlQueryBuilder,
+            "django.db.backends.postgresql": PostgreSqlQueryBuilder,
+        }[self.SQL_BACKEND]

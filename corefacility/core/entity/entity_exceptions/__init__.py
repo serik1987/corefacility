@@ -33,6 +33,11 @@ class EntityProvidersNotDefined(EntityException):
                          "at least one entity provider")
 
 
+class EntityFeatureNotSupported(EntityException):
+    def __init__(self):
+        super().__init__(_("This feature is not supported for current database engine. Use another one"))
+
+
 class LogException(EntityException):
     pass
 
