@@ -59,3 +59,12 @@ class UserSetObject(EntitySetObject):
             lambda e: e.surname.find(value) != -1 or e.name.find(value) != -1 or e.login.find(value) != -1,
             self._entities
         ))
+
+    def filter_by_is_locked(self, value):
+        """
+        Filters by whether the user is locked
+
+        :param value: the filter value
+        :return: nothing
+        """
+        self._entities = list(filter(lambda user: user.is_locked == value, self._entities))

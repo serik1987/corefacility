@@ -1,3 +1,5 @@
+from enum import Enum
+
 from .base import QueryBuilder
 
 
@@ -5,6 +7,15 @@ class MysqlQueryBuilder(QueryBuilder):
     """
     Implements query builder for MySQL queries
     """
+
+    class JoinType(Enum):
+        """
+        Defines a particular join type
+        """
+        INNER = "INNER JOIN"
+        LEFT = "LEFT JOIN"
+        RIGHT = "RIGHT JOIN"
+        CROSS = "CROSS JOIN"
 
     _nulls_direction_support = False
 

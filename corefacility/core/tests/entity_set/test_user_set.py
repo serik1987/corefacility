@@ -1,3 +1,5 @@
+import warnings
+
 from parameterized import parameterized
 
 from core.models import User as UserModel
@@ -5,21 +7,63 @@ from core.entity.entity_sets.user_set import UserSet
 
 from .base_test_class import BaseTestClass
 from .entity_set_objects.user_set_object import UserSetObject
+from ..data_providers.entity_sets import filter_data_provider
 from ..data_providers.field_value_providers import image_provider
 from ...entity.user import User
 
 
-def name_provider():
-    options_data = [
+def general_test_provider():
+    return [
+        (BaseTestClass.TEST_COUNT, None, BaseTestClass.POSITIVE_TEST_CASE),
+        (BaseTestClass.TEST_ITERATION, None, BaseTestClass.POSITIVE_TEST_CASE),
+
+        (BaseTestClass.TEST_FIND_BY_ID, 0, BaseTestClass.POSITIVE_TEST_CASE),
+        (BaseTestClass.TEST_FIND_BY_ID, 9, BaseTestClass.POSITIVE_TEST_CASE),
+        (BaseTestClass.TEST_FIND_BY_ID, 10, BaseTestClass.NEGATIVE_TEST_CASE),
+
+        (BaseTestClass.TEST_FIND_BY_ALIAS, "user3", BaseTestClass.POSITIVE_TEST_CASE),
+        (BaseTestClass.TEST_FIND_BY_ALIAS, "user20", BaseTestClass.NEGATIVE_TEST_CASE),
+        (BaseTestClass.TEST_FIND_BY_ALIAS, "", BaseTestClass.NEGATIVE_TEST_CASE),
+        (BaseTestClass.TEST_FIND_BY_ALIAS, "Полина", BaseTestClass.NEGATIVE_TEST_CASE),
+
+        (BaseTestClass.TEST_FIND_BY_INDEX, -1, BaseTestClass.NEGATIVE_TEST_CASE),
+        (BaseTestClass.TEST_FIND_BY_INDEX, 0, BaseTestClass.POSITIVE_TEST_CASE),
+        (BaseTestClass.TEST_FIND_BY_INDEX, 9, BaseTestClass.POSITIVE_TEST_CASE),
+        (BaseTestClass.TEST_FIND_BY_INDEX, 10, BaseTestClass.NEGATIVE_TEST_CASE),
+
+        (BaseTestClass.TEST_SLICING, (3, 7, 1), BaseTestClass.POSITIVE_TEST_CASE),
+        (BaseTestClass.TEST_SLICING, (-1, 7, 1), BaseTestClass.NEGATIVE_TEST_CASE),
+        (BaseTestClass.TEST_SLICING, (0, 7, 1), BaseTestClass.POSITIVE_TEST_CASE),
+        (BaseTestClass.TEST_SLICING, (6, 7, 1), BaseTestClass.POSITIVE_TEST_CASE),
+        (BaseTestClass.TEST_SLICING, (7, 7, 1), BaseTestClass.POSITIVE_TEST_CASE),
+        (BaseTestClass.TEST_SLICING, (3, 3, 1), BaseTestClass.POSITIVE_TEST_CASE),
+        (BaseTestClass.TEST_SLICING, (3, 4, 1), BaseTestClass.POSITIVE_TEST_CASE),
+        (BaseTestClass.TEST_SLICING, (3, 10, 1), BaseTestClass.POSITIVE_TEST_CASE),
+        (BaseTestClass.TEST_SLICING, (3, 11, 1), BaseTestClass.POSITIVE_TEST_CASE),
+        (BaseTestClass.TEST_SLICING, (9, 20, 1), BaseTestClass.POSITIVE_TEST_CASE),
+        (BaseTestClass.TEST_SLICING, (10, 20, 1), BaseTestClass.POSITIVE_TEST_CASE),
+    ]
+
+
+def short_provider():
+    return [
         (BaseTestClass.TEST_COUNT, None, BaseTestClass.POSITIVE_TEST_CASE),
         (BaseTestClass.TEST_ITERATION, None, BaseTestClass.POSITIVE_TEST_CASE),
     ]
-    filter_data = ["Иванов", "Миронова", "ов", "Сергей", "Полина", "user1", "user10",  "support", "xxx", "", None]
-    result_data = []
-    for name in filter_data:
-        for option in options_data:
-            result_data.append((name, *option))
-    return result_data
+
+
+def name_provider():
+    return filter_data_provider(
+        ["Иванов", "Миронова", "ов", "Сергей", "Полина", "user1", "user10", "support", "xxx", "", None],
+        short_provider()
+    )
+
+
+def is_locked_provider():
+    return filter_data_provider(
+        [(True, (0, 3, 5, 8)), (False, (0, 3, 5, 8))],
+        short_provider(),
+    )
 
 
 class TestUserSet(BaseTestClass):
@@ -60,45 +104,28 @@ class TestUserSet(BaseTestClass):
         self.assertEntityFound(user, sample_user, msg="The support user is not properly loaded")
         pass
 
-    @parameterized.expand([
-        (BaseTestClass.TEST_COUNT, None, BaseTestClass.POSITIVE_TEST_CASE),
-        (BaseTestClass.TEST_ITERATION, None, BaseTestClass.POSITIVE_TEST_CASE),
-
-        (BaseTestClass.TEST_FIND_BY_ID, 0, BaseTestClass.POSITIVE_TEST_CASE),
-        (BaseTestClass.TEST_FIND_BY_ID, 9, BaseTestClass.POSITIVE_TEST_CASE),
-        (BaseTestClass.TEST_FIND_BY_ID, 10, BaseTestClass.NEGATIVE_TEST_CASE),
-
-        (BaseTestClass.TEST_FIND_BY_ALIAS, "user3", BaseTestClass.POSITIVE_TEST_CASE),
-        (BaseTestClass.TEST_FIND_BY_ALIAS, "user20", BaseTestClass.NEGATIVE_TEST_CASE),
-        (BaseTestClass.TEST_FIND_BY_ALIAS, "", BaseTestClass.NEGATIVE_TEST_CASE),
-        (BaseTestClass.TEST_FIND_BY_ALIAS, "Полина", BaseTestClass.NEGATIVE_TEST_CASE),
-
-        (BaseTestClass.TEST_FIND_BY_INDEX, -1, BaseTestClass.NEGATIVE_TEST_CASE),
-        (BaseTestClass.TEST_FIND_BY_INDEX, 0, BaseTestClass.POSITIVE_TEST_CASE),
-        (BaseTestClass.TEST_FIND_BY_INDEX, 9, BaseTestClass.POSITIVE_TEST_CASE),
-        (BaseTestClass.TEST_FIND_BY_INDEX, 10, BaseTestClass.NEGATIVE_TEST_CASE),
-
-        (BaseTestClass.TEST_SLICING, (3, 7, 1), BaseTestClass.POSITIVE_TEST_CASE),
-        (BaseTestClass.TEST_SLICING, (-1, 7, 1), BaseTestClass.NEGATIVE_TEST_CASE),
-        (BaseTestClass.TEST_SLICING, (0, 7, 1), BaseTestClass.POSITIVE_TEST_CASE),
-        (BaseTestClass.TEST_SLICING, (6, 7, 1), BaseTestClass.POSITIVE_TEST_CASE),
-        (BaseTestClass.TEST_SLICING, (7, 7, 1), BaseTestClass.POSITIVE_TEST_CASE),
-        (BaseTestClass.TEST_SLICING, (3, 3, 1), BaseTestClass.POSITIVE_TEST_CASE),
-        (BaseTestClass.TEST_SLICING, (3, 4, 1), BaseTestClass.POSITIVE_TEST_CASE),
-        (BaseTestClass.TEST_SLICING, (3, 10, 1), BaseTestClass.POSITIVE_TEST_CASE),
-        (BaseTestClass.TEST_SLICING, (3, 11, 1), BaseTestClass.POSITIVE_TEST_CASE),
-        (BaseTestClass.TEST_SLICING, (9, 20, 1), BaseTestClass.POSITIVE_TEST_CASE),
-        (BaseTestClass.TEST_SLICING, (10, 20, 1), BaseTestClass.POSITIVE_TEST_CASE),
-    ])
+    @parameterized.expand(general_test_provider())
     def test_general_features(self, *args):
         with self.assertLessQueries(1):
             self._test_all_access_features(*args)
 
     @parameterized.expand(name_provider())
-    def test_by_name(self, name, *args):
+    def test_find_by_name(self, name, *args):
         self.apply_filter("name", name)
         with self.assertLessQueries(1):
             self._test_all_access_features(*args)
+
+    def test_find_by_group(self):
+        warnings.warn("TO-DO: find user by group (group development is required)")
+
+    @parameterized.expand(is_locked_provider())
+    def test_is_locked(self, is_locked, locked_indices, *args):
+        for i in locked_indices:
+            user = self.__user_set_object[i]
+            user.is_locked = True
+            user.update()
+        self.apply_filter("is_locked", is_locked)
+        self._test_all_access_features(*args)
 
     def assertEntityFound(self, actual_user, expected_user, msg):
         """

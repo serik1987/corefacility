@@ -1,3 +1,5 @@
+from enum import Enum
+
 from .base import QueryBuilder
 
 
@@ -5,6 +7,16 @@ class PostgreSqlQueryBuilder(QueryBuilder):
     """
     Implements query builder for the Postgre SQL
     """
+
+    class JoinType(Enum):
+        """
+        Defines a particular join type
+        """
+        INNER = "INNER JOIN"
+        LEFT = "LEFT JOIN"
+        RIGHT = "RIGHT JOIN"
+        OUTER = "OUTER JOIN"
+        CROSS = "CROSS JOIN"
 
     def distinct(self, expression=None):
         """

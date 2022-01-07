@@ -1,3 +1,5 @@
+from enum import Enum
+
 from .base import QueryBuilder
 
 
@@ -5,6 +7,15 @@ class SqliteQueryBuilder(QueryBuilder):
     """
     Implements query builder for SQLite queries
     """
+
+    class JoinType(Enum):
+        """
+        Defines a particular join type
+        """
+        INNER = "INNER JOIN"
+        LEFT = "LEFT JOIN"
+        OUTER = "OUTER JOIN"
+        CROSS = "CROSS JOIN"
 
     @classmethod
     def select_string_concatenation(cls, *args):

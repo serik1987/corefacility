@@ -57,6 +57,13 @@ class QueryBuilder:
         """
         return self._main_filter
 
+    @main_filter.setter
+    def main_filter(self, value):
+        """
+        The main query filter. Don't afraid of being manipulated by this filter to add some extra WHERE clauses
+        """
+        self._main_filter = value
+
     @property
     def attached_query_builder(self):
         """
@@ -70,9 +77,57 @@ class QueryBuilder:
         The last data sources added by means of the add_data_source routine. Use this object to call join_data
         method that inserts the LEFT JOIN, INNER JOIN or CROSS JOIN clause.
 
-        :return: the last data source
+        See the following manual on various join types:
+        https://dataschool.com/how-to-teach-people-sql/sql-join-types-explained-visually/
+
+        But bear in mind that some join types are not supported in particular SQL engines. If you apply them you
+        will get AttributeError
+
+        Outer join: builder.data_source |= ("another_table", "ON left.col1=right.col2")
+        Inner join: builder.data_source &= ("another_table", "ON left.col1=right.col2")
+        Left join: builder.data_source <<= ("another_table", "ON left.col1=right.col2")
+        Right join: builder.data_source >>= ("another_table", "ON left.col1=right.col2")
+        Union join: builder.data_source += ("another_table", "ON left.col1=right.col2")
+        Cross join: builder.data_source *= ("another_table", "ON left.col1=right.col2")
+
+        If you want to use table alias you can write more complicated things:
+        Outer join:
+        builder.data_source |= (SqlTable(original_name, table_alias="other_name"), "ON left.col1=right.col2")
+        Inner join:
+        builder.data_source &= (SqlTable(original_name, table_alias="other_name"), "ON left.col1=right.col2")
+        Left join:
+        builder.data_source <<= (SqlTable(original_name, table_alias="other_name"), "ON left.col1=right.col2")
+        Right join:
+        builder.data_source >>= (SqlTable(original_name, table_alias="other_name"), "ON left.col1=right.col2")
+        Union join:
+        builder.data_source += (SqlTable(original_name, table_alias="other_name"), "ON left.col1=right.col2")
+        Cross join:
+        builder.data_source *= (SqlTable(original_name, table_alias="other_name"), "ON left.col1=right.col2")
+
+        In any way, the first element pf the tuple must be an instance of DataSource or string that will
+        be converted to SqlTable. The second element is join condition that is absolutely the same for all
+        SQL languages. If you use another data source than the SqlTable there is no problem to add such a data source
+        to your SQL query string but there is no guarantee that such a query will be understood by your SQL engine.
+        Refer to your SQL language documentation on whether you can do this or not.
+
+        According to SQL query documentation the following joins only were supported. In case when such a join type
+        is not supported you will receive the EntityFeatureNotSupported exception
+
+        SQL engine  Inner join  Left join   Right join  Outer join  Union join  Cross join
+        --------------------------------------------------------------------------------------
+        PostgreSQL  yes         yes         yes         yes         no          yes
+        MySQL       yes         yes         yes         no          no          yes
+        SQLite      yes         yes         no          no          no          yes
         """
         return self._data_sources[-1]
+
+    @data_source.setter
+    def data_source(self, value):
+        """
+        The last data sources added by means of the add_data_source routine. Use this object to call join_data
+        method that inserts the LEFT JOIN, INNER JOIN or CROSS JOIN clause.
+        """
+        self._data_sources[-1] = value
 
     def add_common_table_expression(self, expr):
         """
