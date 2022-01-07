@@ -2,6 +2,8 @@ from django.db.models import Model
 from core.models import Group, GroupUser
 from .model_provider import ModelProvider
 from .user_provider import UserProvider
+from ...entity import Entity
+from ...entity_exceptions import EntityFieldInvalid
 
 
 class GroupProvider(ModelProvider):
@@ -41,6 +43,24 @@ class GroupProvider(ModelProvider):
         governor_model = GroupUser(group_id=entity.id, user_id=entity.governor.id, is_governor=True)
         governor_model.save()
 
+    def update_entity(self, entity: Entity):
+        """
+        Updates the entity that has been already stored in the database
+
+        :param entity: the entity to be updated
+        :return: nothing
+        """
+        super().update_entity(entity)
+        if "governor" in entity._edited_fields:
+            all_users = GroupUser.objects.filter(group_id=entity.id)
+            try:
+                new_governor = all_users.get(user_id=entity._governor.id)
+            except GroupUser.DoesNotExist:
+                raise EntityFieldInvalid("governor [user exists but not in group]")
+            all_users.update(is_governor=False)
+            new_governor.is_governor = True
+            new_governor.save()
+
     def wrap_entity(self, external_object):
         """
         When the entity information is loaded from the external source, some external_object
@@ -55,7 +75,7 @@ class GroupProvider(ModelProvider):
         :return: the entity that wraps the external object
         """
         entity = super().wrap_entity(external_object)
-        governor_object = GroupUser.objects.get(group_id=external_object.id, is_governor=True).user
+        governor_object = GroupUser.objects.get(group_id=external_object.id, is_governor=True).user  # EXTRA QUERY!
         governor_provider = UserProvider()
         governor = governor_provider.wrap_entity(governor_object)
         entity._governor = governor

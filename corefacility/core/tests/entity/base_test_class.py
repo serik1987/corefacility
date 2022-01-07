@@ -1,9 +1,4 @@
-import os
-
-from django.conf import settings
-
 from core.entity.entity_exceptions import EntityOperationNotPermitted, EntityNotFoundException
-from core.entity.entity_fields import EntityPasswordManager
 from core.tests.media_files_test_case import MediaFilesTestCase
 
 

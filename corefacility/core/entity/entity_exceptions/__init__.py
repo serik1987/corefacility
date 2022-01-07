@@ -38,6 +38,13 @@ class EntityFeatureNotSupported(EntityException):
         super().__init__(_("This feature is not supported for current database engine. Use another one"))
 
 
+class GroupGovernorConstraintFails(EntityException):
+    def __init__(self):
+        super().__init__(_("The user is a governor of at least one group. "
+                           "Its delete will automatically remove these groups and reflect another user rights. "
+                           "Are you sure?"))
+
+
 class LogException(EntityException):
     pass
 

@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 from .entity_set import EntitySet
-from core.entity.entity import Entity
+from ..entity_readers.group_reader import GroupReader
 
 
 class GroupSet(EntitySet):
@@ -12,7 +12,7 @@ class GroupSet(EntitySet):
 
     _entity_class = "core.entity.group.Group"
 
-    _entity_reader_class = None  # TO-DO: Define and implement a proper group reader
+    _entity_reader_class = GroupReader
 
     _entity_filter_list = {
         "name": [str, None],

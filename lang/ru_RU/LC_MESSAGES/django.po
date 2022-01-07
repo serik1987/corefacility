@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-06 09:05+0300\n"
+"POT-Creation-Date: 2022-01-07 18:35+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -38,7 +38,19 @@ msgstr "Указанная операция над сущностью невоз
 #: core/entity/entity_exceptions/__init__.py:38
 msgid ""
 "This feature is not supported for current database engine. Use another one"
-msgstr "Данное свойство не поддерживается на установленной Вами СУБД. Установка PostgreSQL решит эту проблему"
+msgstr ""
+"Данное свойство не поддерживается на установленной Вами СУБД. Установка "
+"PostgreSQL решит эту проблему"
+
+#: core/entity/entity_exceptions/__init__.py:43
+msgid ""
+"The user is a governor of at least one group. Its delete will automatically "
+"remove these groups and reflect another user rights. Are you sure?"
+msgstr ""
+"Данный пользователь руководит одной или несколькими научными группами. Его "
+"удаление приведёт к автоматическому расформированию этих групп, а также к "
+"изменению прав доступа других пользователей к тому или иному функционалу. Вы "
+"желаете продолжить?"
 
 #: core/entity/entity_sets/app_permission_set.py:10
 #, fuzzy

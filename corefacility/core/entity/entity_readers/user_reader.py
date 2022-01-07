@@ -23,7 +23,7 @@ class UserReader(SqlModelReader):
     wrap_entity method of the _entity_provider given here
     """
 
-    _query_debug = True
+    _query_debug = False
     """ Set this value as True in case when query execution causes SQL errors """
 
     def initialize_query_builder(self):

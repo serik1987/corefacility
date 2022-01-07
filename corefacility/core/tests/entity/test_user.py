@@ -66,7 +66,7 @@ class TestUser(PasswordMixin, FileFieldMixin, ExpiryDateMixin, BaseTestClass):
         self._test_field("phone", *args)
 
     def test_user_groups(self):
-        warnings.warn("TO-DO: test groups where user exists (group development required)")
+        warnings.warn("TO-DO: test groups where user exists (group sets development required)")
 
     @parameterized.expand(boolean_provider())
     def test_is_locked(self, *args):

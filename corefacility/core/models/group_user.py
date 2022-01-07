@@ -12,5 +12,11 @@ class GroupUser(models.Model):
     is_governor = models.BooleanField(default=False,
                                       help_text="True for the group governor, False for the others")
 
+    def __str__(self):
+        info = super().__str__() + " for user ID = %d, group ID = %d" % (self.user_id, self.group_id)
+        if self.is_governor:
+            info += ". The group leader"
+        return info
+
     class Meta:
         unique_together = ["group", "user"]

@@ -1,5 +1,7 @@
-from core.models import User
+from core.models import User, GroupUser
 from .model_provider import ModelProvider
+from ...entity import Entity
+from ...entity_exceptions import GroupGovernorConstraintFails
 
 
 class UserProvider(ModelProvider):
@@ -27,3 +29,14 @@ class UserProvider(ModelProvider):
     """
     Defines the entity class (the string notation)
     """
+
+    def delete_entity(self, user):
+        """
+        Tries to delete the user from the database
+
+        :param user: the user to delete
+        :return: nothing
+        """
+        if GroupUser.objects.filter(user_id=user.id, is_governor=True).count() > 0:
+            raise GroupGovernorConstraintFails()
+        super().delete_entity(user)
