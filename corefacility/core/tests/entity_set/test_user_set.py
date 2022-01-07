@@ -9,6 +9,19 @@ from ..data_providers.field_value_providers import image_provider
 from ...entity.user import User
 
 
+def name_provider():
+    options_data = [
+        (BaseTestClass.TEST_COUNT, None, BaseTestClass.POSITIVE_TEST_CASE),
+        (BaseTestClass.TEST_ITERATION, None, BaseTestClass.POSITIVE_TEST_CASE),
+    ]
+    filter_data = ["Иванов", "Миронова", "ов", "Сергей", "Полина", "user1", "user10",  "support", "xxx", "", None]
+    result_data = []
+    for name in filter_data:
+        for option in options_data:
+            result_data.append((name, *option))
+    return result_data
+
+
 class TestUserSet(BaseTestClass):
     """
     Tests the user set
@@ -30,21 +43,21 @@ class TestUserSet(BaseTestClass):
         self.apply_filter("is_support", False)
 
     def test_environment_valid(self):
-        # user_set = UserSet()
-        # self.assertEquals(len(self._container), 10, "The number of test users created by the user set object is wrong")
-        # self.assertEquals(len(user_set), 11, "Total number of users stored in the database is not valid")
+        user_set = UserSet()
+        self.assertEquals(len(self._container), 10, "The number of test users created by the user set object is wrong")
+        self.assertEquals(len(user_set), 11, "Total number of users stored in the database is not valid")
         pass
 
     def test_find_support(self):
-        # user_set = UserSet()
-        # user = user_set.get("support")
-        # sample_user = User(_src=self.container,
-        #                    id=user.id,
-        #                    login="support",
-        #                    is_superuser=True,
-        #                    is_support=True,
-        #                    )
-        # self.assertEntityFound(user, sample_user, msg="The support user is not properly loaded")
+        user_set = UserSet()
+        user = user_set.get("support")
+        sample_user = User(_src=self.container,
+                           id=user.id,
+                           login="support",
+                           is_superuser=True,
+                           is_support=True,
+                           )
+        self.assertEntityFound(user, sample_user, msg="The support user is not properly loaded")
         pass
 
     @parameterized.expand([
@@ -58,6 +71,7 @@ class TestUserSet(BaseTestClass):
         (BaseTestClass.TEST_FIND_BY_ALIAS, "user3", BaseTestClass.POSITIVE_TEST_CASE),
         (BaseTestClass.TEST_FIND_BY_ALIAS, "user20", BaseTestClass.NEGATIVE_TEST_CASE),
         (BaseTestClass.TEST_FIND_BY_ALIAS, "", BaseTestClass.NEGATIVE_TEST_CASE),
+        (BaseTestClass.TEST_FIND_BY_ALIAS, "Полина", BaseTestClass.NEGATIVE_TEST_CASE),
 
         (BaseTestClass.TEST_FIND_BY_INDEX, -1, BaseTestClass.NEGATIVE_TEST_CASE),
         (BaseTestClass.TEST_FIND_BY_INDEX, 0, BaseTestClass.POSITIVE_TEST_CASE),
@@ -77,6 +91,12 @@ class TestUserSet(BaseTestClass):
         (BaseTestClass.TEST_SLICING, (10, 20, 1), BaseTestClass.POSITIVE_TEST_CASE),
     ])
     def test_general_features(self, *args):
+        with self.assertLessQueries(1):
+            self._test_all_access_features(*args)
+
+    @parameterized.expand(name_provider())
+    def test_by_name(self, name, *args):
+        self.apply_filter("name", name)
         with self.assertLessQueries(1):
             self._test_all_access_features(*args)
 
@@ -100,3 +120,6 @@ class TestUserSet(BaseTestClass):
         self.assertEquals(actual_user.is_superuser, expected_user.is_superuser, "Superuser status is not the same")
         self.assertEquals(actual_user.is_support, expected_user.is_support, "The support status is not the same")
         self.assertEquals(actual_user.avatar.url, expected_user.avatar.url, "User avatar URLs are not the same")
+
+
+del BaseTestClass

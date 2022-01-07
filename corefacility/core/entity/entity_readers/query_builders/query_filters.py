@@ -188,3 +188,58 @@ class OrQueryFilter(BinaryQueryFilter):
     def __or__(self, other):
         self.add(other)
         return self
+
+
+class SearchQueryFilter(QueryFilter):
+    """
+    Search query filters select all rows containing a given text in certain cell. The cell contents should not match
+    a search string but should contain such a string.
+    """
+
+    def __init__(self, col, value, is_prepared=True, must_start=False, must_finish=False):
+        """
+        Initializes the query filter
+
+        :param col: table column to look for
+        :param value: searching value
+        :param is_prepared: if True the value shall be sent to the SQL server by means of prepared statement.
+            if False this is not required.
+        :param must_start: if True the search string must be exactly at the beginning of the text. If False  this
+            is not necessary
+        :param must_finish: if True the search string must be exactly at the end of the text. If False this is not
+            necessary.
+        """
+        self.__col = col
+        self.__value = value
+        self.__is_prepared = is_prepared
+        self.__must_start = must_start
+        self.__must_finish = must_finish
+
+    def build_query(self, query_builder):
+        """
+        Builds a filter for particular query builder
+
+        :param query_builder: the query builder for which the filter shall be built
+        :return: a piece of SQL query containing such a filter
+        """
+        if self.__is_prepared:
+            concat_list = ["%s"]
+            if not self.__must_start:
+                concat_list.insert(0, "'%%'")
+            if not self.__must_finish:
+                concat_list.append("'%%'")
+            query_term = query_builder.select_string_concatenation(*concat_list)
+        else:
+            query_term = "'%%%s%%'" % self.__value
+        return "%s LIKE %s" % (self.__col, query_term)
+
+    def build_query_parameters(self):
+        """
+        The query filter supports prepared SQL query notation.
+
+        :return: list of build query parameters
+        """
+        if self.__is_prepared:
+            return self.__value,
+        else:
+            return ()

@@ -8,6 +8,16 @@ class MysqlQueryBuilder(QueryBuilder):
 
     _nulls_direction_support = False
 
+    @classmethod
+    def select_string_concatenation(cls, *args):
+        """
+        Returns an SQL query expression that concatenates different strings
+
+        :param args: strings to concatenate (all are SQL expressions)
+        :return: SQL query fragment for string concatenation
+        """
+        return "CONCAT(%s)" % ", ".join(args)
+
     def build_limit(self):
         """
         Constructs the LIMIT expression

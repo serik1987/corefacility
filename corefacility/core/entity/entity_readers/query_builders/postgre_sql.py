@@ -30,6 +30,16 @@ class PostgreSqlQueryBuilder(QueryBuilder):
             query += " ON " + self._distinct_expression
         return query
 
+    @classmethod
+    def select_string_concatenation(cls, *args):
+        """
+        Returns an SQL query expression that concatenates different strings
+
+        :param args: strings to concatenate (all are SQL expressions)
+        :return: SQL query fragment for string concatenation
+        """
+        return " || ".join(args)
+
     def build_limit(self):
         """
         Constructs the LIMIT expression

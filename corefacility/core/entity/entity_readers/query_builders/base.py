@@ -139,6 +139,16 @@ class QueryBuilder:
         """
         return "COUNT(*)"
 
+    @classmethod
+    def select_string_concatenation(cls, *args):
+        """
+        Returns an SQL query expression that concatenates different strings
+
+        :param args: strings to concatenate (all are SQL expressions)
+        :return: SQL query fragment for string concatenation
+        """
+        raise NotImplementedError("QueryBuilder.select_string_concatenation is not implemented")
+
     def add_data_source(self, data_source):
         """
         Adds data source to the query.

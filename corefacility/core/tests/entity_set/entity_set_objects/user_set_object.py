@@ -45,3 +45,17 @@ class UserSetObject(EntitySetObject):
         """
         if value:
             self._entities = []
+
+    def filter_by_name(self, value):
+        """
+        Filters the users by name
+
+        :param value: name to filter
+        :return: nothing
+        """
+        if value == "" or value is None:
+            return
+        self._entities = list(filter(
+            lambda e: e.surname.find(value) != -1 or e.name.find(value) != -1 or e.login.find(value) != -1,
+            self._entities
+        ))

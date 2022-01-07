@@ -1,7 +1,7 @@
 from core.models import User
 from .query_builders.base import QueryBuilder
 from .query_builders.data_source import Subquery
-from .query_builders.query_filters import StringQueryFilter
+from .query_builders.query_filters import StringQueryFilter, SearchQueryFilter
 from .query_builders.sqlite import SqliteQueryBuilder
 
 from .sql_model_reader import SqlModelReader
@@ -42,6 +42,16 @@ class UserReader(SqlModelReader):
         self.count_builder.add_data_source("core_user")\
             .add_select_expression(self.count_builder.select_total_count())
 
+    def apply_name_filter(self, value):
+        if value == "" or value is None:
+            return
+        qf = SearchQueryFilter("surname", value) | \
+             SearchQueryFilter("name", value) | \
+             SearchQueryFilter("login", value)
+        self.items_builder.main_filter.add(qf)
+        self.count_builder.main_filter.add(qf)
+
     def apply_is_support_filter(self, value):
-        f = StringQueryFilter("is_support") if value else StringQueryFilter("NOT is_support")
-        [builder.main_filter.add(f) for builder in (self.items_builder, self.count_builder)]
+        qf = StringQueryFilter("is_support") if value else StringQueryFilter("NOT is_support")
+        self.items_builder.main_filter.add(qf)
+        self.count_builder.main_filter.add(qf)
