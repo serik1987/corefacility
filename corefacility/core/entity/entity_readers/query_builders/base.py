@@ -186,6 +186,7 @@ class QueryBuilder:
         if alias is not None:
             expr += " AS " + alias
         self._select_expressions.append(expr)
+        return self
 
     @staticmethod
     def select_total_count():

@@ -18,7 +18,7 @@ class GroupSetObject(EntitySetObject):
     _entity_class = Group
     """ Defines the entity class. The EntitySetObject will create entities belonging exactly to this class. """
 
-    def __init__(self, user_set_object: UserSetObject):
+    def __init__(self, user_set_object: UserSetObject, _entity_list=None):
         """
         Initializes the group set object
 
@@ -28,8 +28,13 @@ class GroupSetObject(EntitySetObject):
         self.__user_set_object = user_set_object
         if len(self.__user_set_object) < self.MIN_USER_LENGTH:
             raise ValueError("Only user objects containing at least %s users were allowed" % self.MIN_USER_LENGTH)
-        super().__init__()
+        super().__init__(_entity_list)
+        if _entity_list is None:
+            self.initialize_connections()
 
+    @property
+    def user_set_object(self):
+        return self.__user_set_object
 
     def data_provider(self):
         """
@@ -44,3 +49,26 @@ class GroupSetObject(EntitySetObject):
             dict(name="Изгибно-крутильный флаттер", governor=self.__user_set_object[7]),
             dict(name="Революция сознания", governor=self.__user_set_object[7])
         ]
+
+    def initialize_connections(self):
+        self[0].users.add(self.__user_set_object[0])
+        self[0].users.add(self.__user_set_object[2])
+        self[1].users.add(self.__user_set_object[0])
+        self[1].users.add(self.__user_set_object[2])
+        self[1].users.add(self.__user_set_object[4])
+        self[2].users.add(self.__user_set_object[3])
+        self[2].users.add(self.__user_set_object[5])
+        self[2].users.add(self.__user_set_object[6])
+        self[3].users.add(self.__user_set_object[5])
+        self[3].users.add(self.__user_set_object[6])
+        self[3].users.add(self.__user_set_object[8])
+        self[4].users.add(self.__user_set_object[6])
+        self[4].users.add(self.__user_set_object[8])
+        self[4].users.add(self.__user_set_object[9])
+
+    def clone(self):
+        group_set_object = GroupSetObject(self.__user_set_object, _entity_list=list(self._entities))
+        return group_set_object
+
+    def sort(self):
+        self._entities = sorted(self._entities, key=lambda group: group.name)

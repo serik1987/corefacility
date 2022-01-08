@@ -183,8 +183,9 @@ class ModelProvider(EntityProvider):
             self._entity_class = import_string(self._entity_class)
         create_kwargs = {"_src": external_object, "id": external_object.id}
         for field_name in self.model_fields:
-            field_value = getattr(external_object, field_name)
-            create_kwargs[field_name] = field_value
+            if hasattr(external_object, field_name):
+                field_value = getattr(external_object, field_name)
+                create_kwargs[field_name] = field_value
         return self.entity_class(**create_kwargs)
 
     def unwrap_entity(self, entity):
@@ -203,7 +204,7 @@ class ModelProvider(EntityProvider):
         else:
             external_object = entity._wrapped
         if not isinstance(external_object, self.entity_model):
-            external_object = self.entity_model.objects.get(pk=entity.id)
+            external_object = self.entity_model.objects.get(pk=entity.id)  # + 1 EXTRA QUERY!
         for field_name in self.model_fields:
             if field_name in entity._edited_fields:
                 field_value = getattr(entity, '_' + field_name)

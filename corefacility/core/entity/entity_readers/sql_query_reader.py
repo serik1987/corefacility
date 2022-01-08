@@ -22,6 +22,12 @@ class SqlQueryReader(EntityReader):
     _query_debug = False
     """ Set this class property to True if you want to print your SQL query on the screen """
 
+    _lookup_table_name = None
+    """
+    Change this property if get() method will give you something like 'column ... is ambiguous'.
+    This will make get() method to add 'WHERE tbl_name.id=%s' instead of 'WHERE id=%s'
+    """
+
     def __init__(self, **kwargs):
         """
         Initializes the SQL query reader
@@ -140,8 +146,11 @@ class SqlQueryReader(EntityReader):
         :return: a single Entity object
         """
         for filter_name, filter_value in kwargs.items():
-            lookup_filter = StringQueryFilter(filter_name + "=%s", filter_value)
-            self.items_builder.main_filter.add(lookup_filter)
+            if self._lookup_table_name is None:
+                lookup_filter_clause = "%s=%%s" % filter_name
+            else:
+                lookup_filter_clause = "%s.%s=%%s" % (self._lookup_table_name, filter_name)
+            self.items_builder.main_filter &= StringQueryFilter(lookup_filter_clause, filter_value)
         return self.pick_one_item()
 
     def __len__(self):

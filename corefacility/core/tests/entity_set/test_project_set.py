@@ -16,21 +16,23 @@ class TestProjectSet(BaseTestClass):
 
     IMAGE_PROVIDER_TEST_NUMBER_INDEX = 2
 
-    __user_set_object = None
-    __group_set_object = None
+    _user_set_object = None
+    _group_set_object = None
     __project_set_object = None
 
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.__user_set_object = UserSetObject()
-        cls.__group_set_object = GroupSetObject(cls.__user_set_object)
-        cls.__project_set_object = ProjectSetObject(cls.__group_set_object)
+        cls._user_set_object = UserSetObject()
+        cls._group_set_object = GroupSetObject(cls._user_set_object)
+        cls.__project_set_object = ProjectSetObject(cls._group_set_object)
         test_avatar_files = [image_info for image_info in image_provider()
                              if image_info[cls.IMAGE_PROVIDER_TEST_NUMBER_INDEX] == 0]
         cls.load_random_avatars(cls.__project_set_object, (0, 3, 7), "avatar", test_avatar_files)
 
     def setUp(self):
+        self.__user_set_object = TestProjectSet._user_set_object
+        self.__group_set_object = TestProjectSet._group_set_object
         self._container = self.__project_set_object.clone()
         self._container.sort()
         self.initialize_filters()

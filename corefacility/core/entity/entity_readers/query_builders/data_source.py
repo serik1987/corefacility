@@ -7,8 +7,54 @@ class DataSource(QueryFragment):
     for telling SQL engine from which table and resource it shall retrieve the data
     """
 
-    pass
+    __join_list = None
 
+    def __init__(self):
+        self.__join_list = list()
+
+    def add_join(self, join_type, data_source, join_condition):
+        """
+        Inserts the JOIN clause to your SQL data source
+
+        :param join_type: join type. Use JoinType class from your QueryBuilder. Mind that not all join types are
+            supported.
+        :param data_source: the joined table
+        :param join_condition: join condition together with ON and USING keywords (join condition syntax is the same
+            for all SQL languages)
+        :return: self
+        """
+        if isinstance(data_source, str):
+            data_source = SqlTable(data_source)
+        self.__join_list.append((join_type, data_source, join_condition))
+        return self
+
+    def build_query(self, query_builder):
+        """
+        Builds a filter for particular query builder
+
+        :param query_builder: the query builder for which the filter shall be built
+        :return: a piece of SQL query containing such a filter
+        """
+        join_fragments = []
+        for join_type, data_source, join_condition in self.__join_list:
+            join_fragment = " %s %s %s" % (
+                join_type.value,
+                data_source.build_query(query_builder),
+                join_condition
+            )
+            join_fragments.append(join_fragment)
+        return "".join(join_fragments)
+
+    def build_query_parameters(self):
+        """
+        The query filter supports prepared SQL query notation.
+
+        :return: list of build query parameters
+        """
+        parameters = []
+        for _, data_source, _ in self.__join_list:
+            parameters += list(data_source.build_query_parameters())
+        return parameters
 
 class SqlTable(DataSource):
     """
@@ -22,6 +68,7 @@ class SqlTable(DataSource):
         :param table_name: the table name
         :param table_alias: the table alias (i.e., a name after the table is visible for another SQL parts
         """
+        super().__init__()
         self.__table_name = table_name
         self.__table_alias = table_alias
 
@@ -35,7 +82,7 @@ class SqlTable(DataSource):
         fragment = self.__table_name
         if self.__table_alias is not None:
             fragment += " AS " + self.__table_alias
-        return fragment
+        return fragment + super().build_query(query_builder)
 
     def build_query_parameters(self):
         """
@@ -43,7 +90,7 @@ class SqlTable(DataSource):
 
         :return: list of build query parameters
         """
-        return ()
+        return tuple(super().build_query_parameters())
 
 
 class Subquery(DataSource):
@@ -62,6 +109,7 @@ class Subquery(DataSource):
             is inavailable in subquery due to SQL syntax specifications.
         :param tbl_alias: the table alias
         """
+        super().__init__()
         self.__query_builder = query_builder
         self.__tbl_alias = tbl_alias
         self.__build_result = None
@@ -79,7 +127,7 @@ class Subquery(DataSource):
         :param query_builder: the query builder for which the filter shall be built
         :return: a piece of SQL query containing such a filter
         """
-        return "(%s) AS %s" % (self._build_result[0], self.__tbl_alias)
+        return "(%s) AS %s" % (self._build_result[0], self.__tbl_alias) + super().build_query(query_builder)
 
     def build_query_parameters(self):
         """
@@ -87,4 +135,4 @@ class Subquery(DataSource):
 
         :return: list of build query parameters
         """
-        return self._build_result[1:]
+        return tuple(list(self._build_result[1:]) + list(super().build_query_parameters()))

@@ -75,7 +75,11 @@ class GroupProvider(ModelProvider):
         :return: the entity that wraps the external object
         """
         entity = super().wrap_entity(external_object)
-        governor_object = GroupUser.objects.get(group_id=external_object.id, is_governor=True).user  # EXTRA QUERY!
+        if hasattr(external_object, "governor"):
+            governor_object = external_object.governor
+        else:
+            governor_object = \
+                GroupUser.objects.get(group_id=external_object.id, is_governor=True).user  # +2 EXTRA QUERIES!
         governor_provider = UserProvider()
         governor = governor_provider.wrap_entity(governor_object)
         entity._governor = governor

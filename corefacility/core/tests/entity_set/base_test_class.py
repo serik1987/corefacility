@@ -207,6 +207,23 @@ class BaseTestClass(MediaFilesTestCase):
                           "Number of entity items is not the same as expected")
 
     @staticmethod
+    def practise_sql_query(query, *args):
+        """
+        If you want to see SQL data before their interpretation as entities use this method.
+
+        :param query: SQL query. You can use the whole string as well as string fragment.
+        :param args: Arguments in case of prepared query
+        :return: nothing
+        """
+        with connection.cursor() as cursor:
+            cursor.execute(query, args)
+            while True:
+                row = cursor.fetchone()
+                if row is None:
+                    break
+                print(row)
+
+    @staticmethod
     def load_random_avatars(container, entity_indices, field_name, files):
         """
         Attaches random avatars to the field indices
