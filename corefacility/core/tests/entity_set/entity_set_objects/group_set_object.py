@@ -1,4 +1,5 @@
 from core.entity.group import Group
+from core.entity.user import User
 
 from .entity_set_object import EntitySetObject
 from .user_set_object import UserSetObject
@@ -72,3 +73,23 @@ class GroupSetObject(EntitySetObject):
 
     def sort(self):
         self._entities = sorted(self._entities, key=lambda group: group.name)
+
+    def filter_by_name(self, search_string):
+        """
+        Filters the objects by name
+
+        :param search_string: a part of a group name
+        :return: nothing
+        """
+        if search_string is not None and search_string != "":
+            self._entities = list(filter(lambda group: group.name.startswith(search_string), self._entities))
+
+    def filter_by_user(self, user):
+        """
+        Filters the object by the containing user
+
+        :param user: the user to search
+        :return: nothing
+        """
+        if isinstance(user, User):
+            self._entities = list(filter(lambda group: group.users.exists(user), self._entities))

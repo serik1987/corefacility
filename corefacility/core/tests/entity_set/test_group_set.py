@@ -1,5 +1,8 @@
 from parameterized import parameterized
 
+from core.entity.entity_sets.group_set import GroupSet
+from core.entity.user import User
+from core.tests.data_providers.entity_sets import filter_data_provider
 from core.tests.entity_set.base_test_class import BaseTestClass
 from core.tests.entity_set.entity_set_objects.group_set_object import GroupSetObject
 from core.tests.entity_set.entity_set_objects.user_set_object import UserSetObject
@@ -38,6 +41,24 @@ def general_search_provider():
     ]
 
 
+def base_search_provider():
+    return [
+        (BaseTestClass.TEST_COUNT, None, BaseTestClass.POSITIVE_TEST_CASE),
+        (BaseTestClass.TEST_ITERATION, None, BaseTestClass.POSITIVE_TEST_CASE),
+    ]
+
+
+def group_name_provider():
+    return filter_data_provider(
+        ["Сёстры Райт", "Райт", "Управляемый хаос", "Управля", "С", "inexistent", "", None],
+        base_search_provider(),
+    )
+
+
+def group_user_provider():
+    return filter_data_provider(range(10), base_search_provider())
+
+
 class TestGroupSet(BaseTestClass):
     """
     Defines testing routines for group sets
@@ -56,6 +77,7 @@ class TestGroupSet(BaseTestClass):
         self._user_set_object = TestGroupSet._user_set_object
         self._container = self._group_set_object.clone()
         self.container.sort()
+        self.initialize_filters()
 
     @parameterized.expand(initial_conditions_provider())
     def test_initial_conditions(self, group_index, governor_index, member_indices):
@@ -70,3 +92,64 @@ class TestGroupSet(BaseTestClass):
     def test_general_search(self, *args):
         with self.assertLessQueries(1):
             self._test_all_access_features(*args)
+
+    @parameterized.expand(group_name_provider())
+    def test_group_name(self, search_string, *args):
+        self.apply_filter("name", search_string)
+        with self.assertLessQueries(1):
+            self._test_all_access_features(*args)
+
+    @parameterized.expand(group_user_provider())
+    def test_group_user_positive(self, user_index, *args):
+        user = self._user_set_object[user_index]
+        self.apply_filter("user", user)
+        self._test_all_access_features(*args)
+
+    @parameterized.expand(group_user_provider())
+    def test_group_user_performance(self, user_index, *args):
+        with self.assertLessQueries(2):
+            user = self._user_set_object[user_index]
+            group_set = GroupSet()
+            group_set.user = user
+            len1 = len(group_set)
+            group_list = [group for group in group_set]
+            self.assertEquals(len1, len(group_list), "Group conuting and iteration doesn't give the same item number")
+
+
+    @parameterized.expand([(True,), (False,)])
+    def test_group_user_inexistent(self, create):
+        user = User(login="sergei.kozhukhov")
+        if create:
+            user.create()
+        group_set = GroupSet()
+        group_set.user = user
+        self.assertEquals(len(group_set), 0,
+                          "The number of groups are not correct where user is not included in any group")
+        for _ in group_set:
+            self.fail("When we filter the group set by user not included in any group some groups still found")
+
+    def test_group_user_invalid(self):
+        group_set = GroupSet()
+        with self.assertRaises(ValueError, msg="The 'user' filter in the group set can have invalid value: 42"):
+            group_set.user = 42
+
+    def assertEntityFound(self, actual_entity, expected_entity, msg):
+        """
+        Asserts that the entity has been successfully found.
+        Class derivatives can re-implement this method to ensure that all entity fields were uploaded successfully.
+
+        :param actual_entity: the entity found in the database
+        :param expected_entity: the entity expected to be found in the database
+        :param msg: message to print when the entity is failed to be found
+        :return: nothing
+        """
+        super().assertEntityFound(actual_entity, expected_entity, msg)
+        self.assertEquals(actual_entity.name, expected_entity.name, msg + ": Group names are not the same")
+        self.assertEquals(actual_entity.governor.id, expected_entity.governor.id,
+                          msg + ": Governor IDs are not the same")
+        self.assertEquals(actual_entity.governor.login, expected_entity.governor.login,
+                          msg + ": Governor logins are not the same")
+        self.assertEquals(actual_entity.governor.name, expected_entity.governor.name,
+                          msg + ": Governor names are not the same")
+        self.assertEquals(actual_entity.governor.surname, expected_entity.governor.surname,
+                          msg + ": Governor surnames are not the same")
