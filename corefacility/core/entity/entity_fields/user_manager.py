@@ -1,5 +1,6 @@
 from .entity_value_manager import EntityValueManager
 from ..entity_exceptions import EntityOperationNotPermitted
+from ..entity_sets.user_set import UserSet
 from ...models import GroupUser
 
 
@@ -59,7 +60,10 @@ class UserManager(EntityValueManager):
         :return: All users in the group
         """
         self._check_system_permissions()
-        raise NotImplementedError("TO-DO: UserManager.__iter__")
+        user_set = UserSet()
+        user_set.group = self.entity
+        for user in user_set:
+            yield user
 
     def __getitem__(self, index):
         """
@@ -69,7 +73,9 @@ class UserManager(EntityValueManager):
         :return: list of users
         """
         self._check_system_permissions()
-        raise NotImplementedError("TO-DO: UserManager.__getitem__")
+        user_set = UserSet()
+        user_set.group = self.entity
+        return user_set[index]
 
     def __len__(self):
         """
@@ -78,7 +84,9 @@ class UserManager(EntityValueManager):
         :return: total number of users in the group
         """
         self._check_system_permissions()
-        raise NotImplementedError("TO-DO: UserManager.__len__")
+        user_set = UserSet()
+        user_set.group = self.entity
+        return len(user_set)
 
     def _check_system_permissions(self, user=None):
         """

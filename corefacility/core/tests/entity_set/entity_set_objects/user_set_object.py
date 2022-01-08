@@ -68,3 +68,12 @@ class UserSetObject(EntitySetObject):
         :return: nothing
         """
         self._entities = list(filter(lambda user: user.is_locked == value, self._entities))
+
+    def filter_by_group(self, group):
+        """
+        Filters only such users that exists in a given group
+
+        :param group: the group that must be checked
+        :return: nothing
+        """
+        self._entities = list(filter(lambda user: group in user.groups, self._entities))

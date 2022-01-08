@@ -64,3 +64,17 @@ class UserReader(SqlModelReader):
 
         self.items_builder.main_filter &= qf
         self.count_builder.main_filter &= qf
+
+    def apply_group_filter(self, group):
+        """
+        Applies the group filter to the project
+
+        :param group: the group for filtration. None means all groups
+        :return: nothing
+        """
+        if group is None:
+            return
+        for builder in [self.items_builder, self.count_builder]:
+            builder.data_source.add_join(builder.JoinType.INNER, "core_groupuser",
+                                         "ON (core_groupuser.user_id=core_user.id)")
+            builder.main_filter &= StringQueryFilter("core_groupuser.group_id=%s", group.id)

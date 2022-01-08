@@ -6,9 +6,11 @@ from core.models import User as UserModel
 from core.entity.entity_sets.user_set import UserSet
 
 from .base_test_class import BaseTestClass
+from .entity_set_objects.group_set_object import GroupSetObject
 from .entity_set_objects.user_set_object import UserSetObject
 from ..data_providers.entity_sets import filter_data_provider
 from ..data_providers.field_value_providers import image_provider
+from ...entity.group import Group
 from ...entity.user import User
 
 
@@ -66,6 +68,13 @@ def is_locked_provider():
     )
 
 
+def group_index_provider():
+    return filter_data_provider(
+        range(5),
+        short_provider()
+    )
+
+
 class TestUserSet(BaseTestClass):
     """
     Tests the user set
@@ -115,8 +124,11 @@ class TestUserSet(BaseTestClass):
         with self.assertLessQueries(1):
             self._test_all_access_features(*args)
 
-    def test_find_by_group(self):
-        warnings.warn("TO-DO: find user by group (group development is required)")
+    @parameterized.expand(group_index_provider())
+    def test_find_by_group(self, group_index, *args):
+        group_set_object = GroupSetObject(self.container.clone())
+        self.apply_filter("group", group_set_object[group_index])
+        self._test_all_access_features(*args)
 
     @parameterized.expand(is_locked_provider())
     def test_is_locked(self, is_locked, locked_indices, *args):

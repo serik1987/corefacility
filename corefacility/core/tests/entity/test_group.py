@@ -3,7 +3,8 @@ import warnings
 from django.test import TestCase
 from parameterized import parameterized
 
-from core.entity.entity_exceptions import EntityFieldInvalid, EntityOperationNotPermitted, GroupGovernorConstraintFails
+from core.entity.entity_exceptions import EntityFieldInvalid, EntityOperationNotPermitted, GroupGovernorConstraintFails, \
+    EntityNotFoundException
 from core.entity.entity_sets.user_set import UserSet
 from core.entity.group import Group
 from core.entity.user import User
@@ -176,8 +177,29 @@ class TestGroup(BaseTestClass):
                                    "in corresponding group"):
             user.delete()
 
-    def test_user_groups(self):
-        warnings.warn("TO-DO: test iteration over all users in the group (group set development required")
+    def test_users_len(self):
+        obj = GroupObject()
+        obj.create_entity()
+        self.assertEquals(len(obj.entity.users), 1, "All users have been created")
+
+    def test_users_iteration(self):
+        obj = GroupObject()
+        obj.create_entity()
+        for user in obj.entity.users:
+            self.assertEquals(user, self.__test_user, "The group must contain one use only for this test case")
+
+    def test_user_index_positive(self):
+        obj = GroupObject()
+        obj.create_entity()
+        self.assertEquals(obj.entity.users[0], self.__test_user,
+                          "The user containing in the test group is not a test user")
+
+    def test_user_index_negative(self):
+        obj = GroupObject()
+        obj.create_entity()
+        with self.assertRaises(EntityNotFoundException,
+                               msg="The user with non-existent index is suddenly found within the group's user list"):
+            print(obj.entity.users[1])
 
     def _create_test_group_users_precondition(self):
         obj = GroupObject()
