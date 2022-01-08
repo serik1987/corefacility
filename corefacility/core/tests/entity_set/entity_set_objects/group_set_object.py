@@ -54,6 +54,7 @@ class GroupSetObject(EntitySetObject):
     def initialize_connections(self):
         self[0].users.add(self.__user_set_object[0])
         self[0].users.add(self.__user_set_object[2])
+        self[0].users.add(self.__user_set_object[5])
         self[1].users.add(self.__user_set_object[0])
         self[1].users.add(self.__user_set_object[2])
         self[1].users.add(self.__user_set_object[4])

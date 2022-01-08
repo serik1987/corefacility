@@ -1,4 +1,9 @@
+from django.db.utils import IntegrityError
+
+from core.models import GroupUser
 from .entity_value_manager import EntityValueManager
+from ..entity_exceptions import EntityOperationNotPermitted
+from ..entity_sets.group_set import GroupSet
 
 
 class GroupManager(EntityValueManager):
@@ -16,7 +21,10 @@ class GroupManager(EntityValueManager):
         :param group: the group to which the user shall be attached
         :return: nothing
         """
-        raise NotImplementedError("TO-DO: GroupManager.add")
+        self._check_system_permissions(group)
+        if group not in self:
+            group_user = GroupUser(is_governor=False, group_id=group.id, user_id=self.entity.id)
+            group_user.save()
 
     def remove(self, group):
         """
@@ -26,7 +34,28 @@ class GroupManager(EntityValueManager):
         :param group: the group to which the user shall be attached
         :return: nothing
         """
-        raise NotImplementedError("TO-DO: GroupManager.remove")
+        self._check_system_permissions(group)
+        try:
+            group_user = GroupUser.objects.get(group_id=group.id, user_id=self.entity.id)
+            if group_user.is_governor:
+                raise EntityOperationNotPermitted()
+            group_user.delete()
+        except GroupUser.DoesNotExist:
+            pass
+
+    def __contains__(self, group):
+        """
+        Checks whether the user is within the certain group
+
+        :param group: the group to check
+        :return: True is user exists in the group, False otherwise
+        """
+        self._check_system_permissions(group)
+        try:
+            group_user = GroupUser.objects.get(group_id=group.id, user_id=self.entity.id)
+            return True
+        except:
+            return False
 
     def __iter__(self):
         """
@@ -34,7 +63,11 @@ class GroupManager(EntityValueManager):
 
         :return: the group iterator
         """
-        raise NotImplementedError("TO-DO: GroupManager.__iter__")
+        self._check_system_permissions()
+        group_set = GroupSet()
+        group_set.user = self.entity
+        for group in group_set:
+            yield group
 
     def __getitem__(self, index):
         """
@@ -43,4 +76,19 @@ class GroupManager(EntityValueManager):
         :param index: group index or index range
         :return: a particular group or list of groups
         """
-        raise NotImplementedError("TO-DO: GroupManager.__getitem__")
+        self._check_system_permissions()
+        group_set = GroupSet()
+        group_set.user = self.entity
+        return group_set[index]
+
+    def _check_system_permissions(self, group=None):
+        """
+        Checks whether the group user's group list can be manipulated.
+
+        :param group: the group to manipulate with
+        :return: nothing
+        """
+        if self.entity.state in ["creating", "deleted"]:
+            raise EntityOperationNotPermitted()
+        if group is not None and group.state in ["creating", "deleted"]:
+            raise EntityOperationNotPermitted()
