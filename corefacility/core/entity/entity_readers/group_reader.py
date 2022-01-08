@@ -70,6 +70,14 @@ class GroupReader(RawSqlQueryReader):
             builder.data_source.add_join(builder.JoinType.INNER, user_source, user_condition)
             builder.main_filter &= user_filter
 
+    def apply_governor_filter(self, governor):
+        if governor is not None:
+            self.count_builder.data_source\
+                .add_join(self.items_builder.JoinType.INNER, SqlTable("core_groupuser", "governors"),
+                          "ON (governors.group_id=core_group.id AND governors.is_governor)")
+            for builder in [self.items_builder, self.count_builder]:
+                builder.main_filter &= StringQueryFilter("governors.user_id=%s", governor.id)
+
     def create_external_object(self, group_id, group_name,
                                governor_id, governor_login, governor_name, governor_surname):
         return ModelEmulator(

@@ -94,3 +94,13 @@ class GroupSetObject(EntitySetObject):
         """
         if isinstance(user, User):
             self._entities = list(filter(lambda group: group.users.exists(user), self._entities))
+
+    def filter_by_governor(self, governor):
+        """
+        Filters object by governor
+
+        :param governor: the governor
+        :return: nothing
+        """
+        if governor is not None:
+            self._entities = list(filter(lambda group: group.governor.id == governor.id, self._entities))

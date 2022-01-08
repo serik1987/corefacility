@@ -59,6 +59,13 @@ def group_user_provider():
     return filter_data_provider(range(10), base_search_provider())
 
 
+def group_governor_provider():
+    return filter_data_provider(
+        (0, 1, 7, None),
+        base_search_provider()
+    )
+
+
 class TestGroupSet(BaseTestClass):
     """
     Defines testing routines for group sets
@@ -115,7 +122,6 @@ class TestGroupSet(BaseTestClass):
             group_list = [group for group in group_set]
             self.assertEquals(len1, len(group_list), "Group conuting and iteration doesn't give the same item number")
 
-
     @parameterized.expand([(True,), (False,)])
     def test_group_user_inexistent(self, create):
         user = User(login="sergei.kozhukhov")
@@ -132,6 +138,12 @@ class TestGroupSet(BaseTestClass):
         group_set = GroupSet()
         with self.assertRaises(ValueError, msg="The 'user' filter in the group set can have invalid value: 42"):
             group_set.user = 42
+
+    @parameterized.expand(group_governor_provider())
+    def test_governor_filter(self, governor_index, *args):
+        governor = self._user_set_object[governor_index] if governor_index is not None else None
+        self.apply_filter("governor", governor)
+        self._test_all_access_features(*args)
 
     def assertEntityFound(self, actual_entity, expected_entity, msg):
         """

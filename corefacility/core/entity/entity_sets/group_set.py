@@ -16,5 +16,6 @@ class GroupSet(EntitySet):
 
     _entity_filter_list = {
         "name": [str, None],
-        "user": ["core.entity.user.User", lambda user: user.login != "support"]
+        "user": ["core.entity.user.User", lambda user: user.login != "support"],
+        "governor": ["core.entity.user.User", lambda user: user.login != "support"]
     }
