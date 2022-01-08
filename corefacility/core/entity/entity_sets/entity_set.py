@@ -131,7 +131,7 @@ class EntitySet:
         provider = reader.get_entity_provider()
         raw_dataset = reader[index]
         if isinstance(index, slice) or isinstance(raw_dataset, QuerySet):
-            if index.step != 1:
+            if index.step != 1 and index.step is not None:
                 raise EntityNotFoundException()
             final_dataset = []
             for external_object in raw_dataset:

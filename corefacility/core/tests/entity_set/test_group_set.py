@@ -145,6 +145,16 @@ class TestGroupSet(BaseTestClass):
         self.apply_filter("governor", governor)
         self._test_all_access_features(*args)
 
+    @parameterized.expand(group_governor_provider())
+    def test_governor_filter_performance(self, governor_index, *args):
+        governor = self._user_set_object[governor_index] if governor_index is not None else None
+        with self.assertLessQueries(3):
+            group_set = GroupSet()
+            group_set.governor = governor
+            set_length = len(group_set)
+            self.assertEquals(len(group_set[:]), set_length, "Governor filter performance test failed")
+            self.assertEquals(len(group_set[5:10]), 0, "The group set contains too much elements")
+
     def assertEntityFound(self, actual_entity, expected_entity, msg):
         """
         Asserts that the entity has been successfully found.

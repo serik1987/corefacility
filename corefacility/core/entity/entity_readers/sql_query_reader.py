@@ -123,12 +123,16 @@ class SqlQueryReader(EntityReader):
             self.items_builder.limit(index, 1)
             return self.pick_one_item()
         elif isinstance(index, slice):
-            if index.start < 0 or index.step != 1:
+            istart = index.start if index.start is not None else 0
+            istep = index.step if index.step is not None else 1
+            istop = index.stop
+            if istart < 0 or istep != 1:
                 raise EntityNotFoundException()
-            elif index.start >= index.stop:
+            elif istop is not None and istart >= istop:
                 external_object_collection = list()
             else:
-                self.items_builder.limit(index.start, index.stop - index.start)
+                icount = istop - istart if istop is not None else None
+                self.items_builder.limit(istart, icount)
                 external_object_collection = self.pick_many_items()
             return external_object_collection
         else:

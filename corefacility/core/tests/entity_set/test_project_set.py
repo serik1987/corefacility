@@ -95,9 +95,6 @@ class TestProjectSet(BaseTestClass):
     def test_user_filter(self):
         warnings.warn("TO-DO: develop and test user filter (project permission implementation required)")
 
-    def test_user_and_name_filter(self):
-        warnings.warn("TO-DO: develop and test user and name filter (project permission implementation required)")
-
     def test_name_filter_invalid(self):
         self.apply_filter("name", 42)
         with self.assertRaises(ValueError, msg="Incorrect value was set to the project name filter"):

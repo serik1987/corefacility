@@ -285,8 +285,8 @@ class QueryBuilder:
         :return: self
         """
         self._offset = int(offset)
-        self._limit = int(limit)
-        if self._offset < 0 or self._limit < 0:
+        self._limit = int(limit) if limit is not None else None
+        if self._offset < 0 or (self._limit is not None and self._limit < 0):
             raise EntityNotFoundException()
         return self
 
