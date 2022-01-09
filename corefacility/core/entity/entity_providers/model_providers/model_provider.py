@@ -1,5 +1,4 @@
 import os.path
-import warnings
 
 from django.core.files import File
 from django.db.utils import IntegrityError

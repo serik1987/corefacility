@@ -1,8 +1,9 @@
 from core.models.enums import LevelType
+
 from .entity import Entity
 from .entity_sets.access_level_set import AccessLevelSet
-from .entity_fields import EntityField, ReadOnlyField
-from .entity_exceptions import EntityOperationNotPermitted
+from .entity_providers.model_providers.access_level_provider import AccessLevelProvider
+from .entity_fields import EntityField, ReadOnlyField, EntityAliasField
 
 
 class AccessLevel(Entity):
@@ -12,38 +13,22 @@ class AccessLevel(Entity):
 
     _entity_set_class = AccessLevelSet
 
-    _entity_provider_list = []  # TO-DO: define the access level provider
+    _entity_provider_list = [AccessLevelProvider()]  # TO-DO: define the access level provider
 
     _required_fields = ["type", "alias", "name"]
 
     _public_field_description = {
         "type": ReadOnlyField(description="Access level type"),
-        "alias": EntityField(str, max_length=50),
-        "name": EntityField(str, max_length=64)
+        "alias": EntityAliasField(max_length=50),
+        "name": EntityField(str, min_length=1, max_length=64, description="Access level name")
     }
 
-    def create(self):
+    def __init__(self, **kwargs):
         """
-        Creates new access level.
-        Note that only project access levels are suitable for creation
+        Initializes the access level
 
-        :return: nothing
+        :param kwargs: access level field values
         """
-        raise NotImplementedError("TO-DO: AccessLevel.create")
-
-    def update(self):
-        """
-        Changing the access level is not permitted
-
-        :return:nothing
-        """
-        raise EntityOperationNotPermitted()
-
-    def delete(self):
-        """
-        Deletes access level.
-        Access levels installed by default are not permitted to be destroyed
-
-        :return: nothing
-        """
-        raise NotImplementedError("TO-DO: AccessLevel.delete")
+        super().__init__(**kwargs)
+        if self._type is None:
+            self._type = LevelType.app_level
