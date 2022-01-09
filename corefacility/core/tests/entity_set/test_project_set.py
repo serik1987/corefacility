@@ -9,35 +9,8 @@ from .entity_set_objects.group_set_object import GroupSetObject
 from .entity_set_objects.project_set_object import ProjectSetObject
 
 
-class TestProjectSet(BaseTestClass):
-    """
-    Tests the project set
-    """
-
-    IMAGE_PROVIDER_TEST_NUMBER_INDEX = 2
-
-    _user_set_object = None
-    _group_set_object = None
-    __project_set_object = None
-
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-        cls._user_set_object = UserSetObject()
-        cls._group_set_object = GroupSetObject(cls._user_set_object)
-        cls.__project_set_object = ProjectSetObject(cls._group_set_object)
-        test_avatar_files = [image_info for image_info in image_provider()
-                             if image_info[cls.IMAGE_PROVIDER_TEST_NUMBER_INDEX] == 0]
-        cls.load_random_avatars(cls.__project_set_object, (0, 3, 7), "avatar", test_avatar_files)
-
-    def setUp(self):
-        self.__user_set_object = TestProjectSet._user_set_object
-        self.__group_set_object = TestProjectSet._group_set_object
-        self._container = self.__project_set_object.clone()
-        self._container.sort()
-        self.initialize_filters()
-
-    @parameterized.expand([
+def general_data_provider():
+    return [
         (BaseTestClass.TEST_FIND_BY_ID, 3, BaseTestClass.POSITIVE_TEST_CASE),
         (BaseTestClass.TEST_FIND_BY_ID, 8, BaseTestClass.POSITIVE_TEST_CASE),
         (BaseTestClass.TEST_FIND_BY_ID, -1, BaseTestClass.NEGATIVE_TEST_CASE),
@@ -75,11 +48,18 @@ class TestProjectSet(BaseTestClass):
         (BaseTestClass.TEST_SLICING, (None, None, None), BaseTestClass.POSITIVE_TEST_CASE),
 
         (BaseTestClass.TEST_COUNT, None, BaseTestClass.POSITIVE_TEST_CASE),
-    ])
-    def test_no_filters(self, test_number, arg, test_type):
-        self._test_all_access_features(test_number, arg, test_type)
+    ]
 
-    @parameterized.expand([
+
+def search_filter_provider():
+    return [
+        (BaseTestClass.TEST_COUNT, None, BaseTestClass.POSITIVE_TEST_CASE),
+        (BaseTestClass.TEST_ITERATION, None, BaseTestClass.POSITIVE_TEST_CASE),
+    ]
+
+
+def name_search_provider():
+    return [
         ("Нейроонтогенез", BaseTestClass.TEST_COUNT, None, BaseTestClass.POSITIVE_TEST_CASE),
         ("Нейроонтогенез", BaseTestClass.TEST_ITERATION, None, BaseTestClass.POSITIVE_TEST_CASE),
         ("Нейро", BaseTestClass.TEST_COUNT, None, BaseTestClass.POSITIVE_TEST_CASE),
@@ -96,7 +76,42 @@ class TestProjectSet(BaseTestClass):
         ("", BaseTestClass.TEST_COUNT, None, BaseTestClass.POSITIVE_TEST_CASE),
         (None, BaseTestClass.TEST_COUNT, None, BaseTestClass.POSITIVE_TEST_CASE),
         ("Название несуществующего проекта", BaseTestClass.TEST_COUNT, None, BaseTestClass.POSITIVE_TEST_CASE),
-    ])
+    ]
+
+
+class TestProjectSet(BaseTestClass):
+    """
+    Tests the project set
+    """
+
+    IMAGE_PROVIDER_TEST_NUMBER_INDEX = 2
+
+    _user_set_object = None
+    _group_set_object = None
+    __project_set_object = None
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls._user_set_object = UserSetObject()
+        cls._group_set_object = GroupSetObject(cls._user_set_object)
+        cls.__project_set_object = ProjectSetObject(cls._group_set_object)
+        test_avatar_files = [image_info for image_info in image_provider()
+                             if image_info[cls.IMAGE_PROVIDER_TEST_NUMBER_INDEX] == 0]
+        cls.load_random_avatars(cls.__project_set_object, (0, 3, 7), "avatar", test_avatar_files)
+
+    def setUp(self):
+        self.__user_set_object = TestProjectSet._user_set_object
+        self.__group_set_object = TestProjectSet._group_set_object
+        self._container = self.__project_set_object.clone()
+        self._container.sort()
+        self.initialize_filters()
+
+    @parameterized.expand(general_data_provider())
+    def test_no_filters(self, test_number, arg, test_type):
+        self._test_all_access_features(test_number, arg, test_type)
+
+    @parameterized.expand(name_search_provider())
     def test_name_filter(self, project_name, test_number, arg, test_type):
         self.apply_filter("name", project_name)
         self._test_all_access_features(test_number, arg, test_type)

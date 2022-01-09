@@ -4,7 +4,7 @@ from django.db import connection
 
 from .entity_reader import EntityReader
 from .query_builders.query_filters import StringQueryFilter, AndQueryFilter
-from ..entity_exceptions import EntityNotFoundException
+from ..entity_exceptions import EntityNotFoundException, EntityOperationNotPermitted
 
 
 class SqlQueryReader(EntityReader):
@@ -123,16 +123,18 @@ class SqlQueryReader(EntityReader):
             self.items_builder.limit(index, 1)
             return self.pick_one_item()
         elif isinstance(index, slice):
-            istart = index.start if index.start is not None else 0
-            istep = index.step if index.step is not None else 1
+            istart = index.start
             istop = index.stop
-            if istart < 0 or istep != 1:
-                raise EntityNotFoundException()
-            elif istop is not None and istart >= istop:
-                external_object_collection = list()
+            if istart is not None and istop is not None:
+                if istart < istop:
+                    self.items_builder.limit(istart, istop - istart)
+                    external_object_collection = self.pick_many_items()
+                else:
+                    external_object_collection = list()
+            elif istart is None and istop is not None:
+                self.items_builder.limit(0, istop)
+                external_object_collection = self.pick_many_items()
             else:
-                icount = istop - istart if istop is not None else None
-                self.items_builder.limit(istart, icount)
                 external_object_collection = self.pick_many_items()
             return external_object_collection
         else:

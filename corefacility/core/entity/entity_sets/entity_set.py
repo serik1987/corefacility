@@ -120,12 +120,20 @@ class EntitySet:
         entity_set[7] returns the 7th entity in the set
         entity_set[3:8] returns from 3rd till 8th entity in the set
 
-        Slicing with arbitrary step is not supported because this is hard to implement for raw-query or
-        remote entity readers and is not mentioned in the project documentation
+        However, the following slicing is not supported:
+        - slicing with arbitrary step;
+        - slicing where either start or stop index is negative;
+        - slicing where start but not stop index is defined.
+
+        The main goal for slicing entity sets is to send SQL queries containing LIMIT clause. Hence, the main
+        slice functionality is restricted by condition related to this particular slice. Use the following notation
+        to overcome such restriction:
+
+        entity_set[:][3:]
 
         :param index: either integer or a slice instance
-        :return: if index is integer the method returns a single Entity object. If index is slice
-        the method returns the entity list or any other iterable container of the entities
+        :return: if index is an integer the method returns a single Entity object. If index is a slice
+        the method returns python's list of all found entities (both for 0, 1 and many found entities)
         """
         reader = self.entity_reader_class(**self._entity_filters)
         provider = reader.get_entity_provider()
@@ -133,13 +141,10 @@ class EntitySet:
             if index.step != 1 and index.step is not None:
                 raise EntityOperationNotPermitted(
                     "The slicing operation with steps not equal to 1 is not supported on entity sets")
+            if (index.start is not None and index.start < 0) or (index.stop is not None and index.stop < 0):
+                raise EntityOperationNotPermitted("Negative indices are not supported for the entity set slicing")
             if index.start is not None and index.stop is None:
-                raise EntityOperationNotPermitted(
-                    "The stop index in the entity set slice must be given if the start index is given")
-            if index.start is not None and index.start < 0:
-                raise EntityOperationNotPermitted("Negative indices are not supported for the entity set slicing")
-            if index.stop is not None and index.stop < 0:
-                raise EntityOperationNotPermitted("Negative indices are not supported for the entity set slicing")
+                raise EntityOperationNotPermitted("The stop index is None while the start index is not None")
             raw_dataset = reader[index]
             final_dataset = []
             for external_object in raw_dataset:
