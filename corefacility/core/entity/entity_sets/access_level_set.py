@@ -16,6 +16,5 @@ class AccessLevelSet(EntitySet):
     _entity_reader_class = AccessLevelReader
 
     _entity_filter_list = {
-        "type": [lambda t: t, lambda t: t in (LevelType.project_level, LevelType.app_level)],
-        "alias": [str, None],
+        "type": [LevelType, None],
     }

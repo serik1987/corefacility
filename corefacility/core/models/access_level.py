@@ -20,3 +20,4 @@ class AccessLevel(models.Model):
             ("type", "alias"),
             ("type", "name")
         )
+        ordering = ["id"]
