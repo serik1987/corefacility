@@ -223,6 +223,8 @@ class ModelProvider(EntityProvider):
         :return: nothing
         """
         entity_model = entity._wrapped
+        if not isinstance(entity_model, self.entity_model):
+            entity_model = self.entity_model.objects.get(pk=entity.id)  # + 1 EXTRA QUERY!
         file_field = getattr(entity_model, name)
         _, ext = os.path.splitext(value.name)
         new_name = "%s_%s%s" % (entity.__class__.__name__.lower(), name, ext)
@@ -238,6 +240,8 @@ class ModelProvider(EntityProvider):
         :return: nothing
         """
         entity_model = entity._wrapped
+        if not isinstance(entity_model, self.entity_model):
+            entity_model = self.entity_model.objects.get(pk=entity.id)  # + 1 EXTRA QUERY!
         field_value = getattr(entity_model, name)
         field_value.delete(save=True)
         setattr(entity, "_" + name, field_value)

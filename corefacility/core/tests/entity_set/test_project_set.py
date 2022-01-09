@@ -109,12 +109,14 @@ class TestProjectSet(BaseTestClass):
 
     @parameterized.expand(general_data_provider())
     def test_no_filters(self, test_number, arg, test_type):
-        self._test_all_access_features(test_number, arg, test_type)
+        with self.assertLessQueries(1):
+            self._test_all_access_features(test_number, arg, test_type)
 
     @parameterized.expand(name_search_provider())
     def test_name_filter(self, project_name, test_number, arg, test_type):
         self.apply_filter("name", project_name)
-        self._test_all_access_features(test_number, arg, test_type)
+        with self.assertLessQueries(1):
+            self._test_all_access_features(test_number, arg, test_type)
 
     def test_user_filter(self):
         warnings.warn("TO-DO: develop and test user filter (project permission implementation required)")

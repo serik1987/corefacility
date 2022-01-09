@@ -31,3 +31,6 @@ class ModelEmulator:
             return self.__wrapped[name]
         except KeyError:
             raise AttributeError("The external object doesn't have the following field: " + name)
+
+
+ModelEmulatorFileField = ModelEmulator
