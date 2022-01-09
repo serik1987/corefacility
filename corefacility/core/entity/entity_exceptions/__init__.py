@@ -23,8 +23,10 @@ class EntityFieldInvalid(EntityException):
 
 class EntityOperationNotPermitted(EntityException):
 
-    def __init__(self):
-        super().__init__(_("The entity operation is not permitted"))
+    def __init__(self, msg=None):
+        if msg is None:
+            msg = _("The entity operation is not permitted")
+        super().__init__(msg)
 
 
 class EntityProvidersNotDefined(EntityException):

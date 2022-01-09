@@ -1,7 +1,7 @@
 from django.db.models import QuerySet
 from django.utils.module_loading import import_string
 
-from core.entity.entity_exceptions import EntityNotFoundException
+from core.entity.entity_exceptions import EntityNotFoundException, EntityOperationNotPermitted
 from ..entity_providers.entity_provider import EntityProvider
 
 
@@ -129,17 +129,25 @@ class EntitySet:
         """
         reader = self.entity_reader_class(**self._entity_filters)
         provider = reader.get_entity_provider()
-        raw_dataset = reader[index]
-        if isinstance(index, slice) or isinstance(raw_dataset, QuerySet):
+        if isinstance(index, slice):
             if index.step != 1 and index.step is not None:
-                raise EntityNotFoundException()
+                raise EntityOperationNotPermitted(
+                    "The slicing operation with steps not equal to 1 is not supported on entity sets")
+            if index.start is not None and index.stop is None:
+                raise EntityOperationNotPermitted(
+                    "The stop index in the entity set slice must be given if the start index is given")
+            if index.start is not None and index.start < 0:
+                raise EntityOperationNotPermitted("Negative indices are not supported for the entity set slicing")
+            if index.stop is not None and index.stop < 0:
+                raise EntityOperationNotPermitted("Negative indices are not supported for the entity set slicing")
+            raw_dataset = reader[index]
             final_dataset = []
             for external_object in raw_dataset:
                 entity = provider.wrap_entity(external_object)
                 final_dataset.append(entity)
             return final_dataset
         else:
-            return provider.wrap_entity(raw_dataset)
+            return provider.wrap_entity(reader[index])
 
     def __iter__(self):
         """

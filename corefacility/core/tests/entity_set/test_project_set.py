@@ -41,15 +41,19 @@ class TestProjectSet(BaseTestClass):
         (BaseTestClass.TEST_FIND_BY_ID, 3, BaseTestClass.POSITIVE_TEST_CASE),
         (BaseTestClass.TEST_FIND_BY_ID, 8, BaseTestClass.POSITIVE_TEST_CASE),
         (BaseTestClass.TEST_FIND_BY_ID, -1, BaseTestClass.NEGATIVE_TEST_CASE),
+
         (BaseTestClass.TEST_FIND_BY_ALIAS, "cnl", BaseTestClass.POSITIVE_TEST_CASE),
         (BaseTestClass.TEST_FIND_BY_ALIAS, "mn", BaseTestClass.POSITIVE_TEST_CASE),
         (BaseTestClass.TEST_FIND_BY_ALIAS, "xz", BaseTestClass.NEGATIVE_TEST_CASE),
+
         (BaseTestClass.TEST_ITERATION, None, BaseTestClass.POSITIVE_TEST_CASE),
+
         (BaseTestClass.TEST_FIND_BY_INDEX, 0, BaseTestClass.POSITIVE_TEST_CASE),
         (BaseTestClass.TEST_FIND_BY_INDEX, 3, BaseTestClass.POSITIVE_TEST_CASE),
         (BaseTestClass.TEST_FIND_BY_INDEX, 9, BaseTestClass.POSITIVE_TEST_CASE),
         (BaseTestClass.TEST_FIND_BY_INDEX, -1, BaseTestClass.NEGATIVE_TEST_CASE),
         (BaseTestClass.TEST_FIND_BY_INDEX, 10, BaseTestClass.NEGATIVE_TEST_CASE),
+
         (BaseTestClass.TEST_SLICING, (3, 7, 1), BaseTestClass.POSITIVE_TEST_CASE),
         (BaseTestClass.TEST_SLICING, (0, 7, 1), BaseTestClass.POSITIVE_TEST_CASE),
         (BaseTestClass.TEST_SLICING, (-1, 7, 1), BaseTestClass.NEGATIVE_TEST_CASE),
@@ -65,6 +69,11 @@ class TestProjectSet(BaseTestClass):
         (BaseTestClass.TEST_SLICING, (10, 20, 1), BaseTestClass.POSITIVE_TEST_CASE),
         (BaseTestClass.TEST_SLICING, (3, 7, 2), BaseTestClass.NEGATIVE_TEST_CASE),
         (BaseTestClass.TEST_SLICING, (3, 7, 0), BaseTestClass.NEGATIVE_TEST_CASE),
+        (BaseTestClass.TEST_SLICING, (3, 7, None), BaseTestClass.POSITIVE_TEST_CASE),
+        (BaseTestClass.TEST_SLICING, (None, 7, None), BaseTestClass.POSITIVE_TEST_CASE),
+        (BaseTestClass.TEST_SLICING, (3, None, None), BaseTestClass.NEGATIVE_TEST_CASE),
+        (BaseTestClass.TEST_SLICING, (None, None, None), BaseTestClass.POSITIVE_TEST_CASE),
+
         (BaseTestClass.TEST_COUNT, None, BaseTestClass.POSITIVE_TEST_CASE),
     ])
     def test_no_filters(self, test_number, arg, test_type):

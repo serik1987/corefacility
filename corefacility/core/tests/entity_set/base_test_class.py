@@ -2,7 +2,7 @@ from django.core.files import File
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
 
-from core.entity.entity_exceptions import EntityNotFoundException
+from core.entity.entity_exceptions import EntityNotFoundException, EntityOperationNotPermitted
 from core.tests.media_files_test_case import MediaFilesTestCase
 
 
@@ -180,18 +180,18 @@ class BaseTestClass(MediaFilesTestCase):
         """
         entity_set = self.get_entity_set()
         if test_type == self.NEGATIVE_TEST_CASE:
-            with self.assertRaises(EntityNotFoundException,
-                                   msg="entity slicing on %d:%d:%d is OK" % (start, stop, step)):
+            with self.assertRaises(EntityOperationNotPermitted,
+                                   msg="entity slicing on %s:%s:%s is OK" % (start, stop, step)):
                 actual_entity_list = entity_set[start:stop:step]
             return
         actual_entity_list = entity_set[start:stop:step]
         expected_entity_list = self.container[start:stop:step]
         self.assertEquals(len(actual_entity_list), len(expected_entity_list),
-                          "entity slicing on %d:%d:%d: number of items retrieved is not the same as expected"
+                          "entity slicing on %s:%s:%s: number of items retrieved is not the same as expected"
                           % (start, stop, step))
         for i in range(len(actual_entity_list)):
             self.assertEntityFound(actual_entity_list[i], expected_entity_list[i],
-                                   "entity slicing on %d:%d:%d: the list returned is incorrect or invalid"
+                                   "entity slicing on %s:%s:%s: the list returned is incorrect or invalid"
                                    % (start, stop, step))
 
     def _test_entity_count(self):
