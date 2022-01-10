@@ -1,7 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 from .entity import Entity
+from .entity_fields.field_managers.app_permission_manager import AppPermissionManager
 from .entity_sets.corefacility_module_set import CorefacilityModuleSet
-from .entity_sets.app_permission_set import AppPermissionSet
 from .entity_fields import EntityField, ReadOnlyField, ManagedEntityField
 from .entity_exceptions import EntityOperationNotPermitted
 
@@ -36,7 +36,7 @@ class CorefacilityModule(Entity):
                                      description="The user-controlled module settings"),
         "is_application": ReadOnlyField(description="Is module an application"),
         "is_enabled": EntityField(dict, description="Is module enabled"),
-        "permissions": ManagedEntityField(AppPermissionSet,
+        "permissions": ManagedEntityField(AppPermissionManager,
                                           description="Application permissions")
     }
 

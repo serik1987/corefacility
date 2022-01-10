@@ -42,6 +42,13 @@ class EntitySetObject:
         else:
             return self._entity_class
 
+    @property
+    def entities(self):
+        """
+        List of all entities in the entity set object
+        """
+        return self._entities
+
     def data_provider(self):
         """
         Defines properties of custom entity objects created in the constructor.

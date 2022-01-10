@@ -4,7 +4,7 @@ from .entity import Entity
 from .entity_sets.user_set import UserSet
 from .entity_fields import EntityField, EntityAliasField, ManagedEntityField, ReadOnlyField, \
     EntityPasswordManager, PublicFileManager, ExpiryDateManager
-from .entity_fields.group_manager import GroupManager
+from core.entity.entity_fields.field_managers.group_manager import GroupManager
 from .entity_exceptions import EntityFieldInvalid
 from .entity_providers.model_providers.user_provider import UserProvider as ModelProvider
 

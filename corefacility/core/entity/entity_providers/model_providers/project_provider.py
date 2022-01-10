@@ -1,12 +1,17 @@
 from core.models import Project, ProjectPermission
+from core.models.enums import LevelType
 from .model_provider import ModelProvider
 from .group_provider import GroupProvider
+from ...entity_sets.access_level_set import AccessLevelSet
 
 
 class ProjectProvider(ModelProvider):
     """
     Defines the project model provider. The project model provider allows storing projects on the database
     """
+
+    DEFAULT_ACCESS_LEVEL = "no_access"
+    """ The default access level for the rest of users """
 
     _entity_model = Project
     """ the entity model is a Django model that immediately stores information about the entity """
@@ -27,6 +32,22 @@ class ProjectProvider(ModelProvider):
     """
     Defines the entity class (the string notation)
     """
+
+    def create_entity(self, entity):
+        """
+        Creates the entity in a certain entity source and changes the entity's _id and _wrapped properties
+        according to how the entity changes its status.
+
+        :param entity: The entity to be created on this entity source
+        :return: nothing but entity provider must fill necessary entity fields
+        """
+        super().create_entity(entity)
+        level_set = AccessLevelSet()
+        level_set.type = LevelType.project_level
+        default_access_level = level_set.get(self.DEFAULT_ACCESS_LEVEL)
+        permission = ProjectPermission(project_id=entity.id, group_id=None,
+                                       access_level_id=default_access_level.id)
+        permission.save()
 
     def wrap_entity(self, external_object):
         """

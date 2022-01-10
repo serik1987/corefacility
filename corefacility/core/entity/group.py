@@ -1,7 +1,7 @@
 from .entity import Entity
 from .entity_sets.group_set import GroupSet
 from .entity_fields import EntityField, RelatedEntityField, ManagedEntityField
-from .entity_fields.user_manager import UserManager
+from core.entity.entity_fields.field_managers.user_manager import UserManager
 from .entity_providers.model_providers.group_provider import GroupProvider as ModelProvider
 
 

@@ -1,7 +1,7 @@
 from django.templatetags.static import static
 from .entity import Entity
+from .entity_fields.field_managers.project_permission_manager import ProjectPermissionManager
 from .entity_sets.project_set import ProjectSet
-from .entity_sets.project_permission_set import ProjectPermissionSet
 from .entity_fields import EntityField, EntityAliasField, PublicFileManager, ManagedEntityField, ReadOnlyField, \
     RelatedEntityField, EntityContainerManager
 from .entity_providers.model_providers.project_provider import ProjectProvider as ModelProvider
@@ -28,7 +28,7 @@ class Project(Entity):
         "governor": ReadOnlyField(description="Project leader"),
         "root_group": RelatedEntityField("core.entity.group.Group",
                                          description="Responsible scientific group"),
-        "permissions": ManagedEntityField(ProjectPermissionSet,
+        "permissions": ManagedEntityField(ProjectPermissionManager,
                                           description="Permissions of the other users"),
         "project_apps": ManagedEntityField(EntityContainerManager,
                                            description="All applications attached to a certain project"),

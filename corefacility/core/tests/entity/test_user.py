@@ -3,9 +3,8 @@ from parameterized import parameterized
 
 from core.entity.user import User
 from core.entity.entity_sets.user_set import UserSet
-from core.entity.entity_fields.entity_password_manager import EntityPasswordManager
-from core.entity.entity_exceptions import EntityDuplicatedException, EntityFieldInvalid, EntityOperationNotPermitted, \
-    EntityNotFoundException
+from core.entity.entity_fields.field_managers.entity_password_manager import EntityPasswordManager
+from core.entity.entity_exceptions import EntityDuplicatedException, EntityFieldInvalid, EntityOperationNotPermitted
 
 from .base_test_class import BaseTestClass
 from .entity_field_mixins.expiry_date_mixin import ExpiryDateMixin
@@ -16,7 +15,6 @@ from ..data_providers.field_value_providers import alias_provider, password_prov
     boolean_provider, image_provider, token_provider, base_expiry_date_provider
 from ..entity_set.entity_set_objects.group_set_object import GroupSetObject
 from ..entity_set.entity_set_objects.user_set_object import UserSetObject
-from ...entity.entity_sets.group_set import GroupSet
 
 
 class TestUser(PasswordMixin, FileFieldMixin, ExpiryDateMixin, BaseTestClass):

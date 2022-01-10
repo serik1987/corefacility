@@ -2,9 +2,9 @@ from .entity_field import EntityField
 from .entity_alias_field import EntityAliasField
 from .read_only_field import ReadOnlyField
 from .managed_entity_field import ManagedEntityField
-from .entity_value_manager import EntityValueManager
-from .public_file_manager import PublicFileManager
+from core.entity.entity_fields.field_managers.entity_value_manager import EntityValueManager
+from core.entity.entity_fields.field_managers.public_file_manager import PublicFileManager
 from .related_entity_field import RelatedEntityField
-from .entity_container_manager import EntityContainerManager
-from .entity_password_manager import EntityPasswordManager
-from .expiry_date_manager import ExpiryDateManager
+from core.entity.entity_fields.field_managers.entity_container_manager import EntityContainerManager
+from core.entity.entity_fields.field_managers.entity_password_manager import EntityPasswordManager
+from core.entity.entity_fields.field_managers.expiry_date_manager import ExpiryDateManager

@@ -1,9 +1,7 @@
-from django.db.utils import IntegrityError
-
 from core.models import GroupUser
-from .entity_value_manager import EntityValueManager
-from ..entity_exceptions import EntityOperationNotPermitted
-from ..entity_sets.group_set import GroupSet
+from core.entity.entity_fields.field_managers.entity_value_manager import EntityValueManager
+from core.entity.entity_exceptions import EntityOperationNotPermitted
+from core.entity.entity_sets.group_set import GroupSet
 
 
 class GroupManager(EntityValueManager):

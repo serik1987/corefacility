@@ -2,8 +2,8 @@ from django.core.files import File
 from django.db import transaction
 from django.conf import settings
 
-from .entity_value_manager import EntityValueManager
-from ..entity_exceptions import EntityOperationNotPermitted
+from core.entity.entity_fields.field_managers.entity_value_manager import EntityValueManager
+from core.entity.entity_exceptions import EntityOperationNotPermitted
 
 
 class PublicFileManager(EntityValueManager):

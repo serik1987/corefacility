@@ -1,4 +1,6 @@
+from core.entity.entity_sets.access_level_set import AccessLevelSet
 from core.entity.project import Project
+from core.models.enums import LevelType
 
 from .entity_set_object import EntitySetObject
 from .group_set_object import GroupSetObject
@@ -29,6 +31,7 @@ class ProjectSetObject(EntitySetObject):
                              self.MIN_GROUP_COUNT)
         self.__group_set_object = group_set_object
         super().__init__(_entity_list=_entity_list)
+        self.establish_connections()
 
     def data_provider(self):
         """
@@ -49,6 +52,32 @@ class ProjectSetObject(EntitySetObject):
             dict(alias="mnl", name="Математическая нейробиология обучения", root_group=g[1]),  # 8
             dict(alias="mn", name="Молекулярная нейробиология", root_group=g[1]),  # 9
         ]
+
+    def establish_connections(self):
+        level_set = AccessLevelSet()
+        level_set.type = LevelType.project_level
+        data_full = level_set.get("data_full")
+        data_process = level_set.get("data_process")
+        data_view = level_set.get("data_view")
+        data_add = level_set.get("data_add")
+        no_access = level_set.get("no_access")
+        g = self.__group_set_object
+        p = self._entities
+
+        p[7].permissions.set(g[1], data_process)
+
+        p[8].permissions.set(g[0], data_full)
+        p[8].permissions.set(g[2], data_view)
+
+        p[9].permissions.set(g[0], data_add)
+        p[9].permissions.set(g[2], no_access)
+
+        p[0].permissions.set(g[3], data_add)
+        p[1].permissions.set(g[2], data_full)
+
+        p[2].permissions.set(g[4], data_view)
+
+        p[3].permissions.set(g[3], data_process)
 
     def clone(self):
         """

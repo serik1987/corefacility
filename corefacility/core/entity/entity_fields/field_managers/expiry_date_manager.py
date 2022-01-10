@@ -1,7 +1,7 @@
 from datetime import timedelta, datetime
 from django.utils.timezone import make_aware
 
-from .entity_value_manager import EntityValueManager
+from core.entity.entity_fields.field_managers.entity_value_manager import EntityValueManager
 
 
 class ExpiryDateManager(EntityValueManager):

@@ -2,7 +2,7 @@ from random import randrange
 
 from django.contrib.auth.hashers import make_password, check_password
 
-from .entity_value_manager import EntityValueManager
+from core.entity.entity_fields.field_managers.entity_value_manager import EntityValueManager
 
 
 class EntityPasswordManager(EntityValueManager):

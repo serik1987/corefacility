@@ -1,7 +1,7 @@
-from .entity_value_manager import EntityValueManager
-from ..entity_exceptions import EntityOperationNotPermitted
-from ..entity_sets.user_set import UserSet
-from ...models import GroupUser
+from core.entity.entity_fields.field_managers.entity_value_manager import EntityValueManager
+from core.entity.entity_exceptions import EntityOperationNotPermitted
+from core.entity.entity_sets.user_set import UserSet
+from core.models import GroupUser
 
 
 class UserManager(EntityValueManager):

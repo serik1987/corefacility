@@ -1,5 +1,5 @@
 from .read_only_field import ReadOnlyField
-from .entity_value_manager import EntityValueManager
+from core.entity.entity_fields.field_managers.entity_value_manager import EntityValueManager
 
 
 class ManagedEntityField(ReadOnlyField):

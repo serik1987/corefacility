@@ -1,5 +1,5 @@
-from .entity_value_manager import EntityValueManager
-from ..entity import Entity
+from core.entity.entity_fields.field_managers.entity_value_manager import EntityValueManager
+from core.entity.entity import Entity
 
 
 class EntityContainerManager(EntityValueManager):
