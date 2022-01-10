@@ -64,7 +64,7 @@ class PermissionManager(EntityValueManager):
             permission.save()
         except self.permission_model.DoesNotExist:
             permission = self.permission_model(**{
-                self._entity_link_field: self.entity.id,
+                self.entity_link_field: self.entity.id,
                 "group_id": group.id,
                 "access_level_id": access_level.id
             })
@@ -105,7 +105,17 @@ class PermissionManager(EntityValueManager):
         :param group: the group for which the access level shall be removed.
         :return: nothing
         """
-        raise NotImplementedError("TO-DO: PermissionManager.delete")
+        self._check_system_permissions(group, None)
+        if group is None:
+            raise EntityOperationNotPermitted()
+        try:
+            permission = self.permission_model.objects.get(**{
+                self.entity_link_field: self.entity.id,
+                "group_id": group.id
+            })
+            permission.delete()
+        except self.permission_model.DoesNotExist:
+            pass
 
     def _check_system_permissions(self, group, access_level):
         """

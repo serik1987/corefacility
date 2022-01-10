@@ -16,75 +16,75 @@ from ...models.enums import LevelType
 
 def initial_access_level_scheme_provider():
     return [
-        (6, 0,          "full",             None),
-        (6, -1,         None,               None),
-        (6, Group(),    None,               EntityOperationNotPermitted),
+        (6, 0, "full", None),
+        (6, -1, None, None),
+        (6, Group(), None, EntityOperationNotPermitted),
 
-        (7, 0,          "full",             None),
-        (7, 1,          "data_process",     None),
-        (7, -1,         None,               None),
-        (7, Group(),    None,               EntityOperationNotPermitted),
+        (7, 0, "full", None),
+        (7, 1, "data_process", None),
+        (7, -1, None, None),
+        (7, Group(), None, EntityOperationNotPermitted),
 
-        (8, 0,          "data_full",        None),
-        (8, 1,          "full",             None),
-        (8, 2,          "data_view",        None),
-        (8, -1,         None,               None),
-        (8, Group(),    None,               EntityOperationNotPermitted),
+        (8, 0, "data_full", None),
+        (8, 1, "full", None),
+        (8, 2, "data_view", None),
+        (8, -1, None, None),
+        (8, Group(), None, EntityOperationNotPermitted),
 
-        (9, 0,          "data_add",         None),
-        (9, 1,          "full",             None),
-        (9, 2,          "no_access",        None),
-        (9, -1,         None,               None),
-        (9, Group(),    None,               EntityOperationNotPermitted),
+        (9, 0, "data_add", None),
+        (9, 1, "full", None),
+        (9, 2, "no_access", None),
+        (9, -1, None, None),
+        (9, Group(), None, EntityOperationNotPermitted),
 
-        (0, 2,          "full",             None),
-        (0, 3,          "data_add",         None),
-        (0, -1,         None,               None),
-        (0, Group(),    None,               EntityOperationNotPermitted),
+        (0, 2, "full", None),
+        (0, 3, "data_add", None),
+        (0, -1, None, None),
+        (0, Group(), None, EntityOperationNotPermitted),
 
-        (1, 2,          "data_full",        None),
-        (1, 3,          "full",             None),
-        (1, -1,         None,               None),
-        (1, Group(),    None,               EntityOperationNotPermitted),
+        (1, 2, "data_full", None),
+        (1, 3, "full", None),
+        (1, -1, None, None),
+        (1, Group(), None, EntityOperationNotPermitted),
 
-        (2, 3,          "full",             None),
-        (2, 4,          "data_view",        None),
-        (2, -1,         None,               None),
-        (2, Group(),    None,               EntityOperationNotPermitted),
+        (2, 3, "full", None),
+        (2, 4, "data_view", None),
+        (2, -1, None, None),
+        (2, Group(), None, EntityOperationNotPermitted),
 
-        (3, 3,          "data_process",     None),
-        (3, 4,          "full",             None),
-        (3, -1,         None,               None),
-        (3, Group(),    None,               EntityOperationNotPermitted),
+        (3, 3, "data_process", None),
+        (3, 4, "full", None),
+        (3, -1, None, None),
+        (3, Group(), None, EntityOperationNotPermitted),
 
-        (4, 4,          "full",             None),
-        (4, -1,         None,               None),
-        (4, Group(),    None,               EntityOperationNotPermitted),
+        (4, 4, "full", None),
+        (4, -1, None, None),
+        (4, Group(), None, EntityOperationNotPermitted),
 
-        (5, 4,          "full",             None),
-        (5, -1,         None,               None),
-        (5, Group(),    None,               EntityOperationNotPermitted),
+        (5, 4, "full", None),
+        (5, -1, None, None),
+        (5, Group(), None, EntityOperationNotPermitted),
 
-        (Project(), 0,  None,               EntityOperationNotPermitted),
+        (Project(), 0, None, EntityOperationNotPermitted),
     ]
 
 
 def group_set_provider():
     return [
         # project_index     group_index     access_level        state_must_change       is_deletable    is_settable
-        (0,                 3,              "data_add",         False,                  True,           True),
-        (0,                 3,              "data_process",     False,                  True,           True),
-        (0,                 2,              "no_access",        False,                  False,          False),
-        (0,                 -1,             "full",             True,                   True,           True),
-        (0,                 Group(),        "full",             False,                  False,          False),
+        (0, 3, "data_add", False, True, True),
+        (0, 3, "data_process", False, True, True),
+        (0, 2, "no_access", False, False, False),
+        (0, -1, "full", True, True, True),
+        (0, Group(), "full", False, False, False),
 
-        (1,                 2,              "data_full",        False,                  True,           True),
-        (1,                 2,              "no_access",        False,                  True,           True),
-        (1,                 3,              "no_access",        False,                  False,          False),
-        (1,                -1,              "data_add",         True,                   True,           True),
-        (1,                 Group(),        "full",             False,                  False,          False),
+        (1, 2, "data_full", False, True, True),
+        (1, 2, "no_access", False, True, True),
+        (1, 3, "no_access", False, False, False),
+        (1, -1, "data_add", True, True, True),
+        (1, Group(), "full", False, False, False),
 
-        (Project(),         0,              "full",             False,                  False,          False),
+        (Project(), 0, "full", False, False, False),
     ]
 
 
@@ -129,16 +129,8 @@ class TestProjectPermission(BaseTestClass):
         :param expected_exception: None for positive test, exception that must be generated for negative test
         :return: nothing
         """
-        if isinstance(project_index, Project):
-            project = project_index
-        else:
-            project = self._project_set_object[project_index]
-        if isinstance(group_index, Group):
-            group = group_index
-        elif group_index == -1:
-            group = self._sample_group
-        else:
-            group = self._group_set_object[group_index]
+        project = self.get_project_by_index(project_index)
+        group = self.get_group_by_index(group_index)
         if expected_access_level is None:
             expected_access_level = self.default_access_level
         if expected_access_level == -1:
@@ -172,25 +164,17 @@ class TestProjectPermission(BaseTestClass):
         :param state_must_change: True if number of records in the core_projectpermission table must be changed
         :param is_deletable: True if such a group can be deleted from the access control lists
         :param is_settable: True if permissions for such a group can be modified
-        :return:
+        :return: nothing
         """
-        if isinstance(project_index, Project):
-            project = project_index
-        else:
-            project = self._project_set_object[project_index]
-        if isinstance(group_index, Group):
-            group = group_index
-        elif group_index == -1:
-            group = self._sample_group
-        else:
-            group = self._group_set_object[group_index]
+        project = self.get_project_by_index(project_index)
+        group = self.get_group_by_index(group_index)
         desired_access_level = AccessLevelSet.project_level(access_level)
         initial_state = models.ProjectPermission.objects.count()
         if is_settable:
             project.permissions.set(group, desired_access_level)
             final_state = models.ProjectPermission.objects.count()
             if state_must_change:
-                self.assertEquals(final_state, initial_state+1,
+                self.assertEquals(final_state, initial_state + 1,
                                   "This test case implies adding one extra row to the core_projectpermission table")
             else:
                 self.assertEquals(final_state, initial_state,
@@ -203,6 +187,63 @@ class TestProjectPermission(BaseTestClass):
             with self.assertRaises(EntityOperationNotPermitted,
                                    msg="The permission was successfully added to the permission list"):
                 project.permissions.set(group, access_level)
+
+    @parameterized.expand(group_set_provider())
+    def test_delete_permission(self, project_index, group_index, access_level, state_must_change,
+                               is_deletable, is_settable):
+        """
+        Checks whether deleting additional permissions work correctly
+
+        :param project_index: the project index or newly created project
+        :param group_index: the group index or -1 if the group is not within the group object or newly created group
+        :param access_level: access level alias
+        :param state_must_change: True if number of records in the core_projectpermission table must be changed
+        :param is_deletable: True if such a group can be deleted from the access control lists
+        :param is_settable: True if permissions for such a group can be modified
+        :return: nothing
+        """
+        project = self.get_project_by_index(project_index)
+        group = self.get_group_by_index(group_index)
+        access_level = AccessLevelSet.project_level(access_level)
+        if is_settable:
+            project.permissions.set(group, access_level)
+        if is_deletable:
+            initial_state = models.ProjectPermission.objects.count()
+            project.permissions.delete(group)
+            final_state = models.ProjectPermission.objects.count()
+            self.assertEquals(final_state, initial_state-1,
+                              "Deleting project permission didn't result in declining number of rows in the "
+                              "core_projectpermission table by 1")
+            actual_access_level = project.permissions.get(group)
+            desired_access_level = AccessLevelSet.project_level(self.default_access_level)
+            self.assertAccessLevelEquals(actual_access_level, desired_access_level,
+                                         "The access level for the group doesn't turn to its default state "
+                                         "after the delete")
+            project.permissions.delete(group)
+            dd_state = models.ProjectPermission.objects.count()
+            self.assertEquals(dd_state, final_state,
+                              "The second project permission delete is not useless")
+        else:
+            with self.assertRaises(EntityOperationNotPermitted,
+                                   msg="The tester is able to violate data consistency: one mandatory permission was "
+                                   "successfully deleted"):
+                project.permissions.delete(group)
+
+    def get_project_by_index(self, project_index):
+        if isinstance(project_index, Project):
+            project = project_index
+        else:
+            project = self._project_set_object[project_index]
+        return project
+
+    def get_group_by_index(self, group_index):
+        if isinstance(group_index, Group):
+            group = group_index
+        elif group_index == -1:
+            group = self._sample_group
+        else:
+            group = self._group_set_object[group_index]
+        return group
 
     def assertAccessLevelEquals(self, actual, expected, msg):
         self.assertEquals(actual.id, expected.id, msg + ". Access level IDs are not the same")

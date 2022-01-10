@@ -59,6 +59,18 @@ class ProjectPermissionManager(PermissionManager):
         else:
             return super().get(group)
 
+    def delete(self, group):
+        """
+        Removes the access level for a certain group
+
+        :param group: the group for which the access level shall be removed.
+        :return: nothing
+        """
+        if self.is_root_group(group):
+            raise EntityOperationNotPermitted()
+        else:
+            super().delete(group)
+
     def is_root_group(self, group):
         """
         Checks whether certain group is root group
@@ -68,5 +80,5 @@ class ProjectPermissionManager(PermissionManager):
             c. the group has the same ID as the project root group
         """
         return isinstance(group, Group) and \
-               self.entity.root_group is not None and \
-               group.id == self.entity.root_group.id
+            self.entity.root_group is not None and \
+            group.id == self.entity.root_group.id
