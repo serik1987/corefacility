@@ -1,6 +1,8 @@
 from nose_parameterized import parameterized
 from parameterized import parameterized_class
 
+from core import models
+
 from .base_test_class import BaseTestClass
 from .entity_set_objects.group_set_object import GroupSetObject
 from .entity_set_objects.project_set_object import ProjectSetObject
@@ -64,6 +66,25 @@ def initial_access_level_scheme_provider():
         (5, Group(),    None,               EntityOperationNotPermitted),
 
         (Project(), 0,  None,               EntityOperationNotPermitted),
+    ]
+
+
+def group_set_provider():
+    return [
+        # project_index     group_index     access_level        state_must_change       is_deletable    is_settable
+        (0,                 3,              "data_add",         False,                  True,           True),
+        (0,                 3,              "data_process",     False,                  True,           True),
+        (0,                 2,              "no_access",        False,                  False,          False),
+        (0,                 -1,             "full",             True,                   True,           True),
+        (0,                 Group(),        "full",             False,                  False,          False),
+
+        (1,                 2,              "data_full",        False,                  True,           True),
+        (1,                 2,              "no_access",        False,                  True,           True),
+        (1,                 3,              "no_access",        False,                  False,          False),
+        (1,                -1,              "data_add",         True,                   True,           True),
+        (1,                 Group(),        "full",             False,                  False,          False),
+
+        (Project(),         0,              "full",             False,                  False,          False),
     ]
 
 
@@ -138,6 +159,50 @@ class TestProjectPermission(BaseTestClass):
                                          "Failed to retrieve proper access level for "
                                          "project name = %s, group name = %s" %
                                          (project.name, group.name))
+
+    @parameterized.expand(group_set_provider())
+    def test_set_permission(self, project_index, group_index, access_level, state_must_change,
+                            is_deletable, is_settable):
+        """
+        Checks whether setting additional permissions work correctly
+
+        :param project_index: the project index or newly created project
+        :param group_index: the group index or -1 if the group is not within the group object or newly created group
+        :param access_level: access level alias
+        :param state_must_change: True if number of records in the core_projectpermission table must be changed
+        :param is_deletable: True if such a group can be deleted from the access control lists
+        :param is_settable: True if permissions for such a group can be modified
+        :return:
+        """
+        if isinstance(project_index, Project):
+            project = project_index
+        else:
+            project = self._project_set_object[project_index]
+        if isinstance(group_index, Group):
+            group = group_index
+        elif group_index == -1:
+            group = self._sample_group
+        else:
+            group = self._group_set_object[group_index]
+        desired_access_level = AccessLevelSet.project_level(access_level)
+        initial_state = models.ProjectPermission.objects.count()
+        if is_settable:
+            project.permissions.set(group, desired_access_level)
+            final_state = models.ProjectPermission.objects.count()
+            if state_must_change:
+                self.assertEquals(final_state, initial_state+1,
+                                  "This test case implies adding one extra row to the core_projectpermission table")
+            else:
+                self.assertEquals(final_state, initial_state,
+                                  "The test case doesn't imply adding any extra rows to the "
+                                  "core_projectpermission table")
+            actual_access_level = project.permissions.get(group)
+            self.assertAccessLevelEquals(actual_access_level, desired_access_level,
+                                         "The access level was not properly set.")
+        else:
+            with self.assertRaises(EntityOperationNotPermitted,
+                                   msg="The permission was successfully added to the permission list"):
+                project.permissions.set(group, access_level)
 
     def assertAccessLevelEquals(self, actual, expected, msg):
         self.assertEquals(actual.id, expected.id, msg + ". Access level IDs are not the same")

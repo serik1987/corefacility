@@ -18,3 +18,27 @@ class AccessLevelSet(EntitySet):
     _entity_filter_list = {
         "type": [LevelType, None],
     }
+
+    @staticmethod
+    def project_level(alias: str):
+        """
+        Retrieves the project access level from the database.
+
+        :param alias: access level alias
+        :return: the AccessLevel object
+        """
+        access_level_set = AccessLevelSet()
+        access_level_set.type = LevelType.project_level
+        return access_level_set.get(alias)
+
+    @staticmethod
+    def application_level(alias: str):
+        """
+        Retrieves the application access level from the database.
+
+        :param alias: access level alias
+        :return: the AccessLevel object
+        """
+        access_level_set = AccessLevelSet()
+        access_level_set.type = LevelType.app_level
+        return access_level_set.get(alias)
