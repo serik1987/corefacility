@@ -11,6 +11,7 @@ from ...entity.entity_exceptions import EntityOperationNotPermitted
 from ...entity.entity_sets.access_level_set import AccessLevelSet
 from ...entity.group import Group
 from ...entity.project import Project
+from ...models import ProjectPermission
 from ...models.enums import LevelType
 
 
@@ -67,6 +68,12 @@ def initial_access_level_scheme_provider():
 
         (Project(), 0, None, EntityOperationNotPermitted),
     ]
+
+
+def project_index_provider():
+    project_list = list(range(10))
+    project_list.append(-1)
+    return [(project_index,) for project_index in project_list]
 
 
 def group_set_provider():
@@ -183,6 +190,8 @@ class TestProjectPermission(BaseTestClass):
             actual_access_level = project.permissions.get(group)
             self.assertAccessLevelEquals(actual_access_level, desired_access_level,
                                          "The access level was not properly set.")
+            if project_index != -1 and group_index == -1:
+                self._check_initial_access_scheme(project)
         else:
             with self.assertRaises(EntityOperationNotPermitted,
                                    msg="The permission was successfully added to the permission list"):
@@ -223,11 +232,60 @@ class TestProjectPermission(BaseTestClass):
             dd_state = models.ProjectPermission.objects.count()
             self.assertEquals(dd_state, final_state,
                               "The second project permission delete is not useless")
+            if project_index != -1 and group_index == -1:
+                self._check_initial_access_scheme(project)
         else:
             with self.assertRaises(EntityOperationNotPermitted,
                                    msg="The tester is able to violate data consistency: one mandatory permission was "
                                    "successfully deleted"):
                 project.permissions.delete(group)
+
+    @parameterized.expand(project_index_provider())
+    def test_permission_iteration(self, project_index):
+        """
+        Checks whether iteration over project permission give the same results as the project's get(...) function
+
+        :param project_index: the project index to reveal
+        :return: nothing
+        """
+        project = self.get_project_by_index(project_index)
+        print(project)
+
+    @parameterized.expand(project_index_provider())
+    def test_permission_iteration(self, project_index):
+        project = self.get_project_by_index(project_index)
+        root_group_detected = False
+        none_group_detected = False
+        permission_count = 0
+        for group, actual_access in project.permissions:
+            if none_group_detected:
+                self.fail("The rest of all permissions doesn't correspond to the last group")
+            expected_access = project.permissions.get(group)
+            self.assertAccessLevelEquals(actual_access, expected_access,
+                                         "The project permission iteration doesn't define the same access levels as "
+                                         "Project.permissions.get")
+            if group is not None and group.id == project.root_group.id:
+                root_group_detected = True
+            if not root_group_detected:
+                self.fail("The first group in the list is not root group")
+            if group is None:
+                none_group_detected = True
+            permission_count += 1
+        expected_permission_count = ProjectPermission.objects \
+            .filter(project_id=project.id) \
+            .count()
+        expected_permission_count += 1  # + 1 root group permission not presented in the database but implied!
+        self.assertEquals(permission_count, expected_permission_count,
+                          "Number of permissions iterated is not the same as expected")
+        self.assertTrue(root_group_detected, "At least one permission must belong to the root group")
+        self.assertTrue(none_group_detected, "At least one permission must belong to the rest of the users")
+
+    @parameterized.expand(project_index_provider())
+    def test_permission_one_request_iteration(self, project_index):
+        with self.assertLessQueries(2):
+            project = self.get_project_by_index(project_index)
+            for _, _ in project.permissions:
+                pass
 
     def get_project_by_index(self, project_index):
         if isinstance(project_index, Project):
@@ -244,6 +302,18 @@ class TestProjectPermission(BaseTestClass):
         else:
             group = self._group_set_object[group_index]
         return group
+
+    def _check_initial_access_scheme(self, project):
+        for project_index, group_index, access_level, exception in initial_access_level_scheme_provider():
+            another_project = self.get_project_by_index(project_index)
+            if project.id == another_project.id:
+                if isinstance(group_index, int) and group_index != -1 and exception is None:
+                    group = self.get_group_by_index(group_index)
+                    actual_level = project.permissions.get(group)
+                    expected_level = AccessLevelSet.project_level(access_level)
+                    self.assertAccessLevelEquals(actual_level, expected_level,
+                                                 "Changing permissions for one group reflects permission for the "
+                                                 "other group")
 
     def assertAccessLevelEquals(self, actual, expected, msg):
         self.assertEquals(actual.id, expected.id, msg + ". Access level IDs are not the same")

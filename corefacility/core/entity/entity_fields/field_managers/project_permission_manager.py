@@ -3,6 +3,7 @@ from core.models.enums import LevelType
 
 from .permission_manager import PermissionManager
 from ...entity_exceptions import EntityOperationNotPermitted
+from ...entity_readers.model_emulators import ModelEmulator
 from ...group import Group
 
 
@@ -14,20 +15,31 @@ class ProjectPermissionManager(PermissionManager):
     _permission_model = ProjectPermission
     """ Defines particular model connects your entity model, the Group model and particular access level """
 
+    _permission_table = "core_projectpermission"
+    """ Defines the SQL table where permission information is stored """
+
     _entity_link_field = "project_id"
     """ Defines a link that connects particular entity to the permission model mentioned above """
 
     _access_level_type = LevelType.project_level
     """ Accepted access level type """
 
-    __full_access = None
+    _full_access = None
 
     @property
-    def _full_access(self):
-        if self.__full_access is None:
+    def full_access(self):
+        if self._full_access is None:
             from core.entity.entity_sets.access_level_set import AccessLevelSet
-            self.__full_access = AccessLevelSet.project_level("full")
-        return self.__full_access
+            self._full_access = AccessLevelSet.project_level("full")
+        return self._full_access
+
+    def __iter__(self):
+        """
+        Iterates over all permission set
+        """
+        yield self.entity.root_group, self.full_access
+        for group, access_level in super().__iter__():
+            yield group, access_level
 
     def set(self, group, access_level):
         """
@@ -55,7 +67,7 @@ class ProjectPermissionManager(PermissionManager):
         :return: the AccessLevel entity reflecting a certain access level for the group.
         """
         if self.is_root_group(group):
-            return self._full_access
+            return self.full_access
         else:
             return super().get(group)
 
