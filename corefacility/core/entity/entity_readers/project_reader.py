@@ -40,10 +40,10 @@ class ProjectReader(RawSqlQueryReader):
             .add_select_expression("core_project.unix_group")\
             .add_select_expression("root_group.id")\
             .add_select_expression("root_group.name")\
-            .add_select_expression("governor.id", agg_safe_int=True)\
-            .add_select_expression("governor.login", agg_safe_str=True)\
-            .add_select_expression("governor.name", agg_safe_str=True)\
-            .add_select_expression("governor.surname", agg_safe_str=True)\
+            .add_select_expression("governor.id")\
+            .add_select_expression("governor.login")\
+            .add_select_expression("governor.name")\
+            .add_select_expression("governor.surname")\
             .add_data_source("core_project")\
             .add_order_term("core_project.name")
         self.items_builder.data_source\
