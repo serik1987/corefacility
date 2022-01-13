@@ -192,7 +192,7 @@ class QueryBuilder:
         self._is_distinct = False
         self._distinct_expression = None
 
-    def add_select_expression(self, expr, alias=None):
+    def add_select_expression(self, expr, alias=None, **kwargs):
         """
         Adds the select expression (a term between SELECT and FROM keywords).
         Don't afraid to use build-in select_**** since they provide platform independent selection routines.
@@ -200,6 +200,14 @@ class QueryBuilder:
 
         :param expr: expression to select
         :param alias: resultant column name
+        :param kwargs: any platform-dependent options that will be ignored on the other platforms. Any platform
+        supports the following options:
+            agg_safe_int - if column contains integers, you use GROUP BY condition group results you may reveal an
+            error 'SELECT list is not in GROUP BY clause and contains non-aggregated column'. If you do this,
+            put agg_safe_int=True to overcome the problem. This will wrap the column by proper aggregate function
+            agg_safe_str - if column contains strings, you use GROUP BY condition group results you may reveal an
+            error 'SELECT list is not in GROUP BY clause and contains non-aggregated column'. If you do this,
+            put agg_safe_int=True to overcome the problem. This will wrap the column by proper aggregate function
         :return: nothing
         """
         if alias is not None:
