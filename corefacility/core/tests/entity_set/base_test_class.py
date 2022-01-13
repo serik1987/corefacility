@@ -128,7 +128,8 @@ class BaseTestClass(MediaFilesTestCase):
         """
         entity_set = self.get_entity_set()
         if test_type == self.NEGATIVE_TEST_CASE:
-            with self.assertRaises(EntityNotFoundException, msg="Entity with non-existent alias was found"):
+            with self.assertRaises(EntityNotFoundException,
+                                   msg="Entity with non-existent alias '%s' was found" % alias):
                 entity_set.get(alias)
             return
         actual_entity = entity_set.get(alias)

@@ -79,7 +79,7 @@ class QueryBuilder:
         """
         if len(self._select_expressions) == -1:
             raise ValueError("No select expression was added by add_select_expression")
-        return self._select_expressions[-1]
+        return self._select_expressions[-1][0]
 
     @select_expression.setter
     def select_expression(self, value):
@@ -88,7 +88,7 @@ class QueryBuilder:
         """
         if len(self._select_expressions) == -1:
             raise ValueError("No select expression was added by add_select_expression")
-        self._select_expressions[-1] = value
+        self._select_expressions[-1] = (value, self._select_expressions[-1][1], self._select_expressions[-1][2])
 
     @property
     def data_source(self):
@@ -210,9 +210,7 @@ class QueryBuilder:
             put agg_safe_int=True to overcome the problem. This will wrap the column by proper aggregate function
         :return: nothing
         """
-        if alias is not None:
-            expr += " AS " + alias
-        self._select_expressions.append(expr)
+        self._select_expressions.append((expr, alias, kwargs))
         return self
 
     @staticmethod
@@ -401,10 +399,15 @@ class QueryBuilder:
         :return: the query fragment
         """
         if len(self._select_expressions) > 0:
-            query_fragment = ", ".join(self._select_expressions)
+            select_expressions = [self._build_select_expression(expr, alias, kwargs)
+                                  for expr, alias, kwargs in self._select_expressions]
+            query_fragment = ", ".join(select_expressions)
         else:
             query_fragment = "*"
         return query_fragment
+
+    def _build_select_expression(self, expr, alias, kwargs):
+        return "%s AS %s" % (expr, alias)
 
     def build_from_expressions(self):
         """
