@@ -1,5 +1,5 @@
 from django.db import connection
-from django.db.utils import OperationalError
+from django.db.utils import OperationalError, ProgrammingError
 
 from core.entity.entity_exceptions import EntityNotFoundException
 from core.entity.entity_readers.sql_query_reader import SqlQueryReader
@@ -70,7 +70,7 @@ class RawSqlQueryReader(SqlQueryReader):
         """
         try:
             cursor.execute(query[0], query[1:])
-        except OperationalError as e:
+        except (OperationalError, ProgrammingError) as e:
             print("======================== ERROR IN QUERY HAPPENED ===================================")
             print(self.items_builder)
             print("======================== END OF THE ERROR REPORT ===================================")
