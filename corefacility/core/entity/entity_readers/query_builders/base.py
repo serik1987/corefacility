@@ -36,6 +36,7 @@ class QueryBuilder:
         self._main_filter = None
         self._union_type = None
         self._union_query = None
+        self._group_col = []
         self._order_terms = []
         self._limit = None
         self._offset = None
@@ -70,6 +71,24 @@ class QueryBuilder:
         The query builder attached by means of attach_query function (UNION expression will be used)
         """
         return self._union_query
+
+    @property
+    def select_expression(self):
+        """
+        The last select expression added by means of add_select_expression
+        """
+        if len(self._select_expressions) == -1:
+            raise ValueError("No select expression was added by add_select_expression")
+        return self._select_expressions[-1]
+
+    @select_expression.setter
+    def select_expression(self, value):
+        """
+        The last select expression added by means of add_select_expression
+        """
+        if len(self._select_expressions) == -1:
+            raise ValueError("No select expression was added by add_select_expression")
+        self._select_expressions[-1] = value
 
     @property
     def data_source(self):
@@ -189,11 +208,38 @@ class QueryBuilder:
         return self
 
     @staticmethod
-    def select_total_count():
+    def select_total_count(col_name="*", distinct=False):
         """
-        SELECT expression that will count total row number in 99.9999999% of cases.
+        Generates the select expression that counts total item number
+
+        :param col_name: column for which the count must be performed
+        :param distinct: count distinct number of values within this single column
+        :return: the count expression
         """
-        return "COUNT(*)"
+        if distinct:
+            return "COUNT(DISTINCT %s)" % col_name
+        else:
+            return "COUNT(%s)" % col_name
+
+    @classmethod
+    def agg_string_concat(cls, col_name):
+        """
+        Concatenates all values within the column into a single string (aggregate function)
+
+        :param col_name: the column name
+        :return: SQL query fragment
+        """
+        raise NotImplementedError("The function is not implemented in the base class")
+
+    @classmethod
+    def agg_sum(cls, col_name):
+        """
+        Computes sum of all values within the group across the entire column (aggregate function)
+
+        :param col_name: column name
+        :return: SQL query fragment
+        """
+        return "SUM(%s)" % col_name
 
     @classmethod
     def select_string_concatenation(cls, *args):
@@ -258,6 +304,16 @@ class QueryBuilder:
         """
         self._union_type = union_type
         self._union_query = query_builder
+        return self
+
+    def add_group_term(self, term):
+        """
+        Adds a grouping term
+
+        :param term: a grouping term (i.e., a valid SQL expression)
+        :return: self
+        """
+        self._group_col.append(term)
         return self
 
     def add_order_term(self, col_name, direction=ASC, null_direction=DEFAULT_NULL_ORDER):
@@ -378,7 +434,10 @@ class QueryBuilder:
 
         :return: the GROUP BY expression
         """
-        return None
+        if len(self._group_col) > 0:
+            return "GROUP BY " + ", ".join(self._group_col)
+        else:
+            return None
 
     def build_union_expression(self):
         """

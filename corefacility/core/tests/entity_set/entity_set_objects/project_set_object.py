@@ -56,6 +56,7 @@ class ProjectSetObject(EntitySetObject):
     def establish_connections(self):
         level_set = AccessLevelSet()
         level_set.type = LevelType.project_level
+        full = level_set.get("full")
         data_full = level_set.get("data_full")
         data_process = level_set.get("data_process")
         data_view = level_set.get("data_view")
@@ -73,7 +74,8 @@ class ProjectSetObject(EntitySetObject):
         p[9].permissions.set(g[2], no_access)
 
         p[0].permissions.set(g[3], data_add)
-        p[1].permissions.set(g[2], data_full)
+
+        p[1].permissions.set(g[2], full)
 
         p[2].permissions.set(g[4], data_view)
 

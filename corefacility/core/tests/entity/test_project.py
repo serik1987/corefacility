@@ -144,8 +144,6 @@ class TestProject(FileFieldMixin, BaseTestClass):
         self.assertEquals(entity.description, None)
         self.assertEquals(entity.governor.id, self.__related_user.id)
         self.assertEquals(entity.root_group.id, self.__related_group.id)
-        warnings.warn("TO-DO: TestProject.__check_default_fields: check 'permissions' field (permissions required)")
-        warnings.warn("TO-DO: TestProject.__check_default_fields: check 'project_apps' field (applications required)")
         self.assertEquals(entity.project_dir, None)
         self.assertEquals(entity.unix_group, None)
 
@@ -157,8 +155,6 @@ class TestProject(FileFieldMixin, BaseTestClass):
                           "Исследование критических периодов онтогенеза в первичной зрительной коре")
         self.assertEquals(entity.governor.id, self.__related_user.id)
         self.assertEquals(entity.root_group.id, self.__related_group.id)
-        warnings.warn("TO-DO: TestProject.__check_default_fields: check 'permissions' field (permissions required)")
-        warnings.warn("TO-DO: TestProject.__check_default_fields: check 'project_apps' field (applications required)")
         self.assertEquals(entity.project_dir, None)
         self.assertEquals(entity.unix_group, None)
 

@@ -8,6 +8,10 @@ class SqliteQueryBuilder(QueryBuilder):
     Implements query builder for SQLite queries
     """
 
+    @classmethod
+    def agg_string_concat(cls, col_name):
+        return "GROUP_CONCAT(%s)" % col_name
+
     class JoinType(Enum):
         """
         Defines a particular join type

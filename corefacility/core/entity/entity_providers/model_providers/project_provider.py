@@ -22,7 +22,8 @@ class ProjectProvider(ModelProvider):
     database
     """
 
-    _model_fields = ["alias", "avatar", "name", "description", "root_group", "project_dir", "unix_group"]
+    _model_fields = ["alias", "avatar", "name", "description", "root_group", "project_dir", "unix_group",
+                     "is_user_governor", "user_access_level"]
     """
     Defines fields in the entity object that shall be stored as Django model. The model fields will be applied
     during object create and update operations

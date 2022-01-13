@@ -71,12 +71,17 @@ class PermissionManager(EntityValueManager):
         """
         Sets the access level to a particular group.
 
-        :param group: a group to which access level must be set or None if access level shall be set for the rest
-            of users
+        :param group: a group to which access level must be set. Setting so called 'default access level' to the None
+            group is not supported since I don't have much time to implement this
         :param access_level: the access level to set (an instance of AccessLevel entity)
         :return: nothing
         """
         self._check_system_permissions(group, access_level)
+        if group is None:
+            if access_level.alias == "no_access":
+                return
+            else:
+                raise NotImplementedError("This feature is syntaxically correct but still not implemented yet")
         try:
             permission = self.permission_model.objects.get(**{
                 self.entity_link_field: self.entity.id,

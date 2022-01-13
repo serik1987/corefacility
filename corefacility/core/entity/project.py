@@ -33,7 +33,11 @@ class Project(Entity):
         "project_apps": ManagedEntityField(EntityContainerManager,
                                            description="All applications attached to a certain project"),
         "project_dir": ReadOnlyField(description="Non-public files location directory"),
-        "unix_group": ReadOnlyField(description="UNIX group to remote access to project files")
+        "unix_group": ReadOnlyField(description="UNIX group to remote access to project files"),
+
+        "user_access_level": ReadOnlyField(description="The user access level list (if applicable)"),
+        "is_user_governor": ReadOnlyField(
+            description="Whether the user is governor for group with 'full' access (if applicable)")
     }
 
     def __setattr__(self, name, value):

@@ -15,5 +15,6 @@ class ProjectSet(EntitySet):
     _entity_reader_class = ProjectReader
 
     _entity_filter_list = {
-        "name": [str, None]
+        "name": [str, None],
+        "user": ["core.entity.user.User", lambda user: user.state not in {"creating", "deleted"}],
     }

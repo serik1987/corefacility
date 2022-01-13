@@ -8,6 +8,10 @@ class PostgreSqlQueryBuilder(QueryBuilder):
     Implements query builder for the Postgre SQL
     """
 
+    @classmethod
+    def agg_string_concat(cls, col_name):
+        return "STRING_AGG(%s, ',')" % col_name
+
     class JoinType(Enum):
         """
         Defines a particular join type
