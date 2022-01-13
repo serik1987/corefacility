@@ -28,7 +28,7 @@ class MysqlQueryBuilder(QueryBuilder):
             if "agg_safe_int" in kwargs and kwargs['agg_safe_int']:
                 expr = "AVG(%s)" % expr
             elif "agg_safe_str" in kwargs and kwargs['agg_safe_str']:
-                expr = "GROUP_CONCAT(%s)" % expr
+                expr = "GROUP_CONCAT(DISTINCT %s)" % expr
         return super()._build_select_expression(expr, alias, kwargs)
 
     @classmethod
