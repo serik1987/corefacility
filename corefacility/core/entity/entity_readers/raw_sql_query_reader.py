@@ -1,4 +1,5 @@
 from django.db import connection
+from django.db.utils import OperationalError
 
 from core.entity.entity_exceptions import EntityNotFoundException
 from core.entity.entity_readers.sql_query_reader import SqlQueryReader
@@ -32,7 +33,7 @@ class RawSqlQueryReader(SqlQueryReader):
             print(self.items_builder)
         query = self.items_builder.build()
         with connection.cursor() as cursor:
-            cursor.execute(query[0], query[1:])
+            self.__execute_query(cursor, query)
             while True:
                 result_row = cursor.fetchone()
                 if result_row is None:
@@ -52,9 +53,25 @@ class RawSqlQueryReader(SqlQueryReader):
             print(self.items_builder)
         query = self.items_builder.build()
         with connection.cursor() as cursor:
-            cursor.execute(query[0], query[1:])
+            self.__execute_query(cursor, query)
             result_row = cursor.fetchone()
         if result_row is None:
             raise EntityNotFoundException()
         else:
             return self.create_external_object(*result_row)
+
+    def __execute_query(self, cursor, query):
+        """
+        Executes a query build by the builder or prints it in case of fail
+
+        :param cursor: the SQL cursor
+        :param query: an output of the QueryBuilder's build() function (a tuple with a query itself and its arguments)
+        :return: nothing
+        """
+        try:
+            cursor.execute(query[0], query[1:])
+        except OperationalError as e:
+            print("======================== ERROR IN QUERY HAPPENED ===================================")
+            print(self.items_builder)
+            print("======================== END OF THE ERROR REPORT ===================================")
+            raise e
