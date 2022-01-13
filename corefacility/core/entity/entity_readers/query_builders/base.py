@@ -248,6 +248,16 @@ class QueryBuilder:
         return "SUM(%s)" % col_name
 
     @classmethod
+    def agg_or(cls, col_name):
+        """
+        Joins all values by the aggregate OR function.
+
+        :param col_name: column name to aggregate
+        :return: nothing
+        """
+        return "SUM(%s) > 0" % col_name
+
+    @classmethod
     def select_string_concatenation(cls, *args):
         """
         Returns an SQL query expression that concatenates different strings
@@ -407,7 +417,10 @@ class QueryBuilder:
         return query_fragment
 
     def _build_select_expression(self, expr, alias, kwargs):
-        return "%s AS %s" % (expr, alias)
+        if alias is None:
+            return expr
+        else:
+            return "%s AS %s" % (expr, alias)
 
     def build_from_expressions(self):
         """

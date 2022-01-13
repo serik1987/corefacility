@@ -35,6 +35,16 @@ class PostgreSqlQueryBuilder(QueryBuilder):
             self._distinct_expression = expression
         return self
 
+    @classmethod
+    def agg_or(cls, col_name):
+        """
+        Joins all values by the aggregate OR function.
+
+        :param col_name: column name to aggregate
+        :return: nothing
+        """
+        return "bool_or(%s)" % col_name
+
     def build_distinct_conditions(self):
         """
         Constructs the distinct conditions if necessary.

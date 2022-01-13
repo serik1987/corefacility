@@ -104,8 +104,8 @@ class ProjectReader(RawSqlQueryReader):
 
         self.items_builder\
             .add_select_expression("root_user.is_governor")\
-            .add_select_expression(self.items_builder.agg_sum("acl_user.is_governor"))\
-            .add_select_expression(self.items_builder.agg_sum("acl_user.is_governor AND acl_value.alias='full'"))\
+            .add_select_expression(self.items_builder.agg_or("acl_user.is_governor"))\
+            .add_select_expression(self.items_builder.agg_or("acl_user.is_governor AND acl_value.alias='full'"))\
             .add_select_expression(self.items_builder.agg_string_concat("acl_value.alias"))\
             .add_group_term("core_project.id")
 
