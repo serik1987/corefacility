@@ -109,7 +109,8 @@ class ProjectReader(RawSqlQueryReader):
             .add_select_expression(self.items_builder.agg_string_concat("acl_value.alias"))\
             .add_group_term("core_project.id")\
             .add_group_term("root_group.id")\
-            .add_group_term("governor.id")
+            .add_group_term("governor.id")\
+            .add_group_term("root_user.id")
 
     def create_external_object(self, project_id, project_alias, project_avatar,
                                project_name, project_description, project_dir, unix_group,
