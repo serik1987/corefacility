@@ -11,7 +11,7 @@ class AuthenticationSetObject(EntitySetObject):
     """
 
     TOTAL_SYMBOLS = 20
-    EXPIRY_TERM = timedelta(minutes=30)
+    EXPIRY_TERM = timedelta(milliseconds=400)
 
     def __init__(self, user_set_object, _entity_list=None):
         if len(user_set_object) < 4:

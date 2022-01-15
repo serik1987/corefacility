@@ -1,5 +1,8 @@
 from base64 import b64encode, b64decode
-from datetime import timedelta
+from datetime import datetime, timedelta
+from django.utils import timezone
+
+from core.models import Authentication as AuthenticationModel
 
 from .entity import Entity
 from .entity_exceptions import EntityNotFoundException
@@ -18,6 +21,8 @@ class Authentication(Entity):
     AUTHENTICATION_TOKEN_SIZE = 20
 
     _entity_set_class = AuthenticationSet
+
+    _token_model = AuthenticationModel
 
     _entity_provider_list = [AuthenticationProvider()]
 
@@ -81,3 +86,8 @@ class Authentication(Entity):
         token_id = authentication.id
         token = "%s:%s" % (token_id, token_password)
         return b64encode(token.encode("utf-8")).decode("utf-8")
+
+    @classmethod
+    def clear_all_expired_authentications(cls):
+        t = timezone.make_aware(datetime.now())
+        cls._token_model.objects.filter(expiration_date__lt=t).delete()

@@ -57,6 +57,24 @@ class TestAuthenticationSet(BaseTestClass):
         with self.assertRaises(EntityNotFoundException, msg="The token can't be expired within the expiration time"):
             Authentication.authenticate(token)
 
+    def test_clear_all_authentications_positive(self):
+        user = self._user_set_object[0]
+        token = Authentication.new_authentication(user, self.TEST_EXPIRY_TERM)
+        Authentication.clear_all_expired_authentications()
+        Authentication.authenticate(token)
+
+    def test_clear_all_authentications_negative(self):
+        user = self._user_set_object[0]
+        auth = Authentication(user=user)
+        auth.token_hash.generate(auth.token_hash.ALL_SYMBOLS, auth.AUTHENTICATION_TOKEN_SIZE)
+        auth.expiration_date.set(self.TEST_EXPIRY_TERM)
+        auth.create()
+        sleep(self.TEST_EXPIRY_TERM.total_seconds())
+        Authentication.clear_all_expired_authentications()
+        auth_set = AuthenticationSet()
+        with self.assertRaises(EntityNotFoundException, msg="The expired tokens were not carefully cleared"):
+            auth_set.get(auth.id)
+
     def assertAuthenticationUser(self, actual_user, desired_user):
         self.assertEquals(actual_user.id, desired_user.id, "The desired user was not loaded correctly")
         self.assertEquals(actual_user.login, desired_user.login, "The desired user login was not loaded correctly")
