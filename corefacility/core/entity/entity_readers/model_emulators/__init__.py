@@ -2,6 +2,8 @@
 Model emulators are objects that processes by the ModelProvider's wrap_entity method in the same way as
 real Django models. Model emulators are the main connectors between RawSqlQueryReader and entity providers.
 """
+import pytz
+from django.utils import timezone
 
 
 class ModelEmulator:
@@ -34,3 +36,17 @@ class ModelEmulator:
 
 
 ModelEmulatorFileField = ModelEmulator
+
+
+def time_from_db(time):
+    """
+    When you load the time from the database the time is given relatively to the UTC timezone with no timezone info.
+    Use this function to transform it to the local time with timezone given
+
+    :param time: time read from the database
+    :return: local time with the local timezone given
+    """
+    if time is not None:
+        time = timezone.make_aware(time, timezone=pytz.UTC)
+        time = timezone.localtime(time)
+    return time
