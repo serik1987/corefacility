@@ -44,7 +44,7 @@ class EntityObject:
     @classmethod
     def define_default_kwarg(cls, name, value):
         """
-        If some default entity fields must be defined during the set up or tear down please, use this method
+        If some default entity fields must be defined during the setup or tear down please, use this method
         to do it
 
         :param name: the default field name
@@ -52,6 +52,17 @@ class EntityObject:
         :return: nothing
         """
         cls._default_create_kwargs[name] = value
+
+    @classmethod
+    def define_change_kwarg(cls, name, value):
+        """
+        If some default change fields must be defined during the setup or tear down, please, use this method to do it
+
+        :param name: the field name
+        :param value: the field value
+        :return: nothing
+        """
+        cls._default_change_kwargs[name] = value
 
     def __init__(self, use_defaults=True, **kwargs):
         """

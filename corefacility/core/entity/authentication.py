@@ -6,6 +6,7 @@ from .entity_exceptions import EntityNotFoundException
 from .entity_sets.authentication_set import AuthenticationSet
 from .entity_fields import RelatedEntityField, ManagedEntityField, \
     EntityPasswordManager, ExpiryDateManager
+from .entity_providers.model_providers.authentication_provider import AuthenticationProvider
 
 
 class Authentication(Entity):
@@ -18,7 +19,7 @@ class Authentication(Entity):
 
     _entity_set_class = AuthenticationSet
 
-    _entity_provider_list = []  # TO-DO: Write down all authentication providers here
+    _entity_provider_list = [AuthenticationProvider()]
 
     _required_fields = ["user", "token_hash", "expiration_date"]
 

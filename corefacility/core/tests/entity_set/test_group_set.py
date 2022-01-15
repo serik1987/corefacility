@@ -81,6 +81,7 @@ class TestGroupSet(BaseTestClass):
         cls._group_set_object = GroupSetObject(cls._user_set_object)
 
     def setUp(self):
+        super().setUp()
         self._user_set_object = TestGroupSet._user_set_object
         self._container = self._group_set_object.clone()
         self.container.sort()

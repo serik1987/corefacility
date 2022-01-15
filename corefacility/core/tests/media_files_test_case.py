@@ -32,10 +32,10 @@ class MediaFilesTestCase(TestCase):
             full_name = os.path.join(settings.MEDIA_ROOT, file)
             if os.path.isfile(full_name):
                 os.unlink(full_name)
+        super().tearDown()
 
     @classmethod
     def tearDownClass(cls):
-        super().tearDownClass()
         try:
             root = settings.MEDIA_ROOT
             root_copy = os.path.join(root, "original")
@@ -48,3 +48,4 @@ class MediaFilesTestCase(TestCase):
             raise FileNotFoundError("The 'original' directory doesn't exist in your media root. "
                                     "Did you forget to call setUpTestData() method in the superclass when overriding "
                                     "setUpTestData method for your class?")
+        super().tearDownClass()

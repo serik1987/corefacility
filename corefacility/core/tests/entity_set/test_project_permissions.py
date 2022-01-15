@@ -229,6 +229,7 @@ class TestProjectPermission(BaseTestClass):
         cls._project_set_object = ProjectSetObject(cls._group_set_object)
 
     def setUp(self):
+        super().setUp()
         self._user_set_object = self.__class__._user_set_object
         self._group_set_object = self.__class__._group_set_object
         self._project_set_object = self.__class__._project_set_object

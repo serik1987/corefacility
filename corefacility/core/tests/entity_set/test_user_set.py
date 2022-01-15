@@ -90,6 +90,7 @@ class TestUserSet(BaseTestClass):
         cls.load_random_avatars(cls.__user_set_object, (0, 2, 5), "avatar", files)
 
     def setUp(self):
+        super().setUp()
         self._container = self.__user_set_object.clone()
         self._container.sort()
         self.initialize_filters()

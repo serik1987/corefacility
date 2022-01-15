@@ -16,7 +16,7 @@ class ExpiryDateMixin:
         destroyed in one request)
     """
 
-    ENOUGH_INTERVAL_MS = 200
+    ENOUGH_INTERVAL_MS = 300
 
     TEST_EXPIRY_DATE_NOT_SET = 0
     TEST_EXPIRY_DATE_WAS_SET = 1

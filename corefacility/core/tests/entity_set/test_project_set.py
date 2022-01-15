@@ -101,6 +101,7 @@ class TestProjectSet(BaseTestClass):
         cls.load_random_avatars(cls.__project_set_object, (0, 3, 7), "avatar", test_avatar_files)
 
     def setUp(self):
+        super().setUp()
         self.__user_set_object = TestProjectSet._user_set_object
         self.__group_set_object = TestProjectSet._group_set_object
         self._container = self.__project_set_object.clone()

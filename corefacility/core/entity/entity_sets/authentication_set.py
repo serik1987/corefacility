@@ -1,4 +1,5 @@
 from .entity_set import EntitySet
+from ..entity_readers.authentication_reader import AuthenticationReader
 
 
 class AuthenticationSet(EntitySet):
@@ -10,6 +11,6 @@ class AuthenticationSet(EntitySet):
 
     _entity_class = "core.entity.authentication.Authentication"
 
-    _entity_reader_class = None  # TO-DO: Define proper authentication reader here!
+    _entity_reader_class = AuthenticationReader
 
     _entity_filter_list = {}
