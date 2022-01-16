@@ -3,7 +3,7 @@ from django.db.models.deletion import RestrictedError
 from parameterized import parameterized
 from core.models import Project, Module, ProjectPermission, AppPermission, AccessLevel
 from core.models.enums import LevelType
-from core.tests.data_providers.permission_providers import access_level_provider
+from core.test.data_providers.permission_providers import access_level_provider
 from .many_group_test import ManyGroupTest
 
 prj = LevelType.project_level

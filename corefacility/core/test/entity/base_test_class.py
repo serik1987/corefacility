@@ -1,5 +1,5 @@
 from core.entity.entity_exceptions import EntityOperationNotPermitted, EntityNotFoundException
-from core.tests.media_files_test_case import MediaFilesTestCase
+from core.test.media_files_test_case import MediaFilesTestCase
 
 
 class BaseTestClass(MediaFilesTestCase):

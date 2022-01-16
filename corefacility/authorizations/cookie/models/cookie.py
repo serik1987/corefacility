@@ -12,5 +12,5 @@ class Cookie(models.Model):
                              help_text="Actual corefacility user that have this cookie")
     token_hash = models.CharField(max_length=256,
                                   help_text="Token hash given to that user")
-    token_expiry_date = models.DateTimeField(help_text="Cookie also have some short amount of life defined by a "
-                                                       "the server system administrator")
+    expiration_date = models.DateTimeField(help_text="Cookie also have some short amount of life defined by a "
+                                                     "the server system administrator")

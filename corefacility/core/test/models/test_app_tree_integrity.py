@@ -3,7 +3,7 @@ from django.utils.module_loading import import_string
 from django.utils.translation import gettext as _
 from core.models import Module, EntryPoint
 from core.models.enums import EntryPointType
-from core.tests.data_providers.default_applications_provider import get_default_applications_provider
+from core.test.data_providers.default_applications_provider import get_default_applications_provider
 
 
 class TestAppTreeIntegrity(TestCase):

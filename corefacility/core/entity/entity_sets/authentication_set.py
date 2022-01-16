@@ -4,7 +4,7 @@ from ..entity_readers.authentication_reader import AuthenticationReader
 
 class AuthenticationSet(EntitySet):
     """
-    An auxiliary class that is used to manage different authentications
+    An auxiliary class that is used to manage different authentications.
     """
 
     _entity_name = "Authentication info"

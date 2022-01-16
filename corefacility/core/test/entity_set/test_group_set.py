@@ -2,10 +2,10 @@ from parameterized import parameterized
 
 from core.entity.entity_sets.group_set import GroupSet
 from core.entity.user import User
-from core.tests.data_providers.entity_sets import filter_data_provider
-from core.tests.entity_set.base_test_class import BaseTestClass
-from core.tests.entity_set.entity_set_objects.group_set_object import GroupSetObject
-from core.tests.entity_set.entity_set_objects.user_set_object import UserSetObject
+from core.test.data_providers.entity_sets import filter_data_provider
+from core.test.entity_set.base_test_class import BaseTestClass
+from core.test.entity_set.entity_set_objects.group_set_object import GroupSetObject
+from core.test.entity_set.entity_set_objects.user_set_object import UserSetObject
 
 
 def initial_conditions_provider():

@@ -3,7 +3,7 @@ from django.db import connection
 from django.test.utils import CaptureQueriesContext
 
 from core.entity.entity_exceptions import EntityNotFoundException, EntityOperationNotPermitted
-from core.tests.media_files_test_case import MediaFilesTestCase
+from core.test.media_files_test_case import MediaFilesTestCase
 
 
 class _AssertLessQueriesContext(CaptureQueriesContext):

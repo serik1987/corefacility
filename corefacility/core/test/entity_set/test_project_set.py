@@ -2,7 +2,7 @@ import warnings
 
 from parameterized import parameterized
 
-from core.tests.data_providers.field_value_providers import image_provider
+from core.test.data_providers.field_value_providers import image_provider
 from .base_test_class import BaseTestClass
 from .entity_set_objects.user_set_object import UserSetObject
 from .entity_set_objects.group_set_object import GroupSetObject

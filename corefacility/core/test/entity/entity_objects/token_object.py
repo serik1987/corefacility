@@ -1,19 +1,15 @@
 from datetime import timedelta
 
-from core.entity.authentication import Authentication
-
 from .entity_object import EntityObject
 
 
-class AuthenticationObject(EntityObject):
+class TokenObject(EntityObject):
     """
-    Contains routines that facilitate creation of the object test class
+    An abstract base class for CookieObject and AuthenticationObject
     """
 
     TOTAL_SYMBOL_NUMBER = 20
     EXPIRATION_TERM = timedelta(milliseconds=300)
-
-    _entity_class = Authentication
 
     _initial_password = None
 
@@ -21,7 +17,7 @@ class AuthenticationObject(EntityObject):
         """
         Creates the entity object that results to creating an entity
 
-        :param use_defaults: if True, the constructor will use the _default_create_kwargs fields. Otherwise this
+        :param use_defaults: if True, the constructor will use the _default_create_kwargs fields. Otherwise, this
         class property will be ignored
         :param kwargs: Any additional field values that shall be embedded to the entity or 'id' that reflects the
         entity ID

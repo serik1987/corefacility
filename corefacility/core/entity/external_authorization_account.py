@@ -20,8 +20,6 @@ class ExternalAuthorizationAccount(Entity):
     information received from the external website
     """
 
-    _required_fields = ["token"]
-
     _intermediate_field_description = {}
     """
     All public fields on this class are:
@@ -35,8 +33,6 @@ class ExternalAuthorizationAccount(Entity):
 
     def __init__(self, **kwargs):
         self._public_field_description = {
-            "token": RelatedEntityField("core.entity.external_authorization_token.ExternalAuthorizationToken",
-                                        description="Authorization token"),
             "user": RelatedEntityField("core.entity.user.User",
                                        description="Attached authorization user")
         }

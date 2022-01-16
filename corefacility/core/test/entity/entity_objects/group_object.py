@@ -1,5 +1,5 @@
 from core.entity.group import Group
-from core.tests.entity.entity_objects.entity_object import EntityObject
+from core.test.entity.entity_objects.entity_object import EntityObject
 
 
 class GroupObject(EntityObject):

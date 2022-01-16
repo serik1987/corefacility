@@ -9,9 +9,9 @@ from core.entity.entity_sets.user_set import UserSet
 from core.entity.group import Group
 from core.entity.user import User
 from core.models import GroupUser
-from core.tests.data_providers.field_value_providers import string_provider
-from core.tests.entity.base_test_class import BaseTestClass
-from core.tests.entity.entity_objects.group_object import GroupObject
+from core.test.data_providers.field_value_providers import string_provider
+from core.test.entity.base_test_class import BaseTestClass
+from core.test.entity.entity_objects.group_object import GroupObject
 
 
 class TestGroup(BaseTestClass):

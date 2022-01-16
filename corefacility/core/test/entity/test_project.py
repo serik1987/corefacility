@@ -8,7 +8,7 @@ from core.entity.group import Group
 from core.entity.user import User
 from core.entity.project import Project
 from core.entity.entity_exceptions import EntityDuplicatedException
-from core.tests.data_providers.field_value_providers import alias_provider, image_provider, string_provider
+from core.test.data_providers.field_value_providers import alias_provider, image_provider, string_provider
 from .base_test_class import BaseTestClass
 from .entity_field_mixins.file_field_mixin import FileFieldMixin
 from .entity_objects.project_object import ProjectObject

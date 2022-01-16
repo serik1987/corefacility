@@ -2,20 +2,20 @@ from parameterized import parameterized
 
 from core.entity.user import User
 from core.entity.entity_exceptions import EntityFieldInvalid
+from core.test.data_providers.field_value_providers import token_provider, base_expiry_date_provider
 
-from .base_test_class import BaseTestClass
-from .entity_objects.authentication_object import AuthenticationObject
-from .entity_field_mixins.password_mixin import PasswordMixin
-from .entity_field_mixins.expiry_date_mixin import ExpiryDateMixin
-from ..data_providers.field_value_providers import token_provider, base_expiry_date_provider
+from ..base_test_class import BaseTestClass
+from ..entity_field_mixins.expiry_date_mixin import ExpiryDateMixin
+from ..entity_field_mixins.password_mixin import PasswordMixin
 
 
-class TestAuthentication(ExpiryDateMixin, PasswordMixin, BaseTestClass):
+class TestToken(ExpiryDateMixin, PasswordMixin, BaseTestClass):
     """
-    Implements the authentication test routines
+    The base class for testing authentications and cookies
     """
 
-    _entity_object_class = AuthenticationObject
+    _entity_object_class = None
+    """ An object for a testing entity """
 
     _initial_user = None
     _final_user = None
@@ -30,8 +30,8 @@ class TestAuthentication(ExpiryDateMixin, PasswordMixin, BaseTestClass):
         cls._initial_user.create()
         cls._final_user.create()
 
-        AuthenticationObject.define_default_kwarg("user", cls._initial_user)
-        AuthenticationObject.define_change_kwarg("user", cls._final_user)
+        cls._entity_object_class.define_default_kwarg("user", cls._initial_user)
+        cls._entity_object_class.define_change_kwarg("user", cls._final_user)
 
     @parameterized.expand(token_provider())
     def test_token_hash(self, test_number):
@@ -45,9 +45,18 @@ class TestAuthentication(ExpiryDateMixin, PasswordMixin, BaseTestClass):
 
     @parameterized.expand(base_expiry_date_provider())
     def test_expiry_date(self, test_number):
+        """
+        Tests the token expiration date
+
+        :param test_number: the test number from the base_expiry_date_provider
+        :return: nothing
+        """
         self._test_expiry_date("expiration_date", test_number)
 
     def test_user_negative(self):
+        """
+        Tests whether recently created, not saved user can be assigned
+        """
         obj = self.get_entity_object_class()()
         obj.create_entity()
         obj.reload_entity()
@@ -57,27 +66,27 @@ class TestAuthentication(ExpiryDateMixin, PasswordMixin, BaseTestClass):
             obj.entity.user = sample_user
             obj.entity.update()
 
-    def _check_default_fields(self, authentication):
+    def _check_default_fields(self, token):
         """
         Checks whether the default fields were properly stored.
         The method deals with default data only.
 
-        :param authentication: the entity which default fields shall be checked
+        :param token: the entity which default fields shall be checked
         :return: nothing
         """
-        self.assertFalse(authentication.expiration_date.is_expired(), "The token was immediately expired")
-        self.assertEquals(authentication.user.id, self._initial_user.id, "The token user didn't saved correctly")
+        self.assertFalse(token.expiration_date.is_expired(), "The token was immediately expired")
+        self.assertEquals(token.user.id, self._initial_user.id, "The token user didn't saved correctly")
 
-    def _check_default_change(self, authentication):
+    def _check_default_change(self, token):
         """
         Checks whether the fields were properly change.
         The method deals with default data only.
 
-        :param authentication: the entity to store
+        :param token: the entity to store
         :return: nothing
         """
-        self.assertFalse(authentication.expiration_date.is_expired(), "The token was immediately expired")
-        self.assertEquals(authentication.user.id, self._final_user.id, "The token user didn't save correctly")
+        self.assertFalse(token.expiration_date.is_expired(), "The token was immediately expired")
+        self.assertEquals(token.user.id, self._final_user.id, "The token user didn't save correctly")
 
     def _check_field_consistency(self, obj):
         """
