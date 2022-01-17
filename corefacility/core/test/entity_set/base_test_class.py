@@ -110,7 +110,10 @@ class BaseTestClass(MediaFilesTestCase):
         """
         entity_set = self.get_entity_set()
         if test_type == self.NEGATIVE_TEST_CASE:
-            max_id = max(self._container, key=lambda entity: entity.id).id
+            try:
+                max_id = max(self._container, key=lambda entity: entity.id).id
+            except ValueError:
+                max_id = 0
             with self.assertRaises(EntityNotFoundException, msg="The entity with inexistent ID was found"):
                 entity_set.get(max_id+1)
             return

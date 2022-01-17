@@ -1,5 +1,7 @@
 from core.entity.entity_sets.external_authorization_account_set import ExternalAuthorizationAccountSet
 
+from .account_reader import AccountReader
+
 
 class AccountSet(ExternalAuthorizationAccountSet):
     """
@@ -10,4 +12,6 @@ class AccountSet(ExternalAuthorizationAccountSet):
 
     _entity_class = "authorizations.google.entity.account.Account"
 
-    _entity_reader_class = None  # TO-DO: Define a proper account reader
+    _entity_reader_class = AccountReader
+
+    _alias_kwarg = "email"
