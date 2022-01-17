@@ -25,6 +25,10 @@ class ExternalAuthorizationAccountReader(RawSqlQueryReader):
             .add_select_expression("core_user.login")\
             .add_select_expression("core_user.name")\
             .add_select_expression("core_user.surname")\
+            .add_select_expression("core_user.email")\
+            .add_select_expression("core_user.phone")\
+            .add_select_expression("core_user.is_locked")\
+            .add_select_expression("core_user.is_superuser")\
             .add_data_source(self.lookup_table_name)
         self.items_builder.data_source.add_join(self.items_builder.JoinType.INNER, "core_user",
                                                 "ON (core_user.id=%s.user_id)" % self.lookup_table_name)

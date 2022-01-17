@@ -19,7 +19,8 @@ class AccountReader(ExternalAuthorizationAccountReader):
         super().initialize_query_builder()
         self.items_builder.add_select_expression("ihna_account.email")
 
-    def create_external_object(self, account_id, user_id, user_login, user_name, user_surname, account_email):
+    def create_external_object(self, account_id, user_id, user_login, user_name, user_surname,
+                               user_email, user_phone, user_is_locked, user_is_superuser, account_email):
         return ModelEmulator(
             id=account_id,
             email=account_email,
@@ -27,6 +28,10 @@ class AccountReader(ExternalAuthorizationAccountReader):
                 id=user_id,
                 login=user_login,
                 name=user_name,
-                surname=user_surname
+                surname=user_surname,
+                email=user_email,
+                phone=user_phone,
+                is_locked=user_is_locked,
+                is_superuser=user_is_superuser
             )
         )

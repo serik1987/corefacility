@@ -7,9 +7,10 @@ from core.test.data_providers.field_value_providers import token_provider, base_
 from ..base_test_class import BaseTestClass
 from ..entity_field_mixins.expiry_date_mixin import ExpiryDateMixin
 from ..entity_field_mixins.password_mixin import PasswordMixin
+from ..entity_field_mixins.user_field_mixin import UserFieldMixin
 
 
-class TestToken(ExpiryDateMixin, PasswordMixin, BaseTestClass):
+class TestToken(UserFieldMixin, ExpiryDateMixin, PasswordMixin, BaseTestClass):
     """
     The base class for testing authentications and cookies
     """

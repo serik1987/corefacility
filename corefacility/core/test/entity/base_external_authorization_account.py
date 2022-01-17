@@ -1,11 +1,12 @@
 from parameterized import parameterized
 
-from core.entity.entity_exceptions import EntityDuplicatedException
+from core.entity.entity_exceptions import EntityDuplicatedException, EntityNotFoundException
 from core.entity.user import User
 from core.entity.entity_exceptions import EntityFieldInvalid
 from core.test.data_providers.field_value_providers import put_stages_in_provider
 
 from .base_test_class import BaseTestClass
+from .entity_field_mixins.user_field_mixin import UserFieldMixin
 
 
 def user_provider():
@@ -20,7 +21,7 @@ def user_provider():
     return put_stages_in_provider(provided_data)
 
 
-class TestExternalAuthorizationAccount(BaseTestClass):
+class TestExternalAuthorizationAccount(UserFieldMixin, BaseTestClass):
     """
     Tests the external authorization account
     """
@@ -67,6 +68,18 @@ class TestExternalAuthorizationAccount(BaseTestClass):
         obj2.change_entity_fields()
         with self.assertRaises(EntityDuplicatedException, msg="We assigned two accounts to the same user"):
             obj2.create_entity()
+
+    def test_cascade_user_delete(self):
+        some_user = User(login="vasya.pupkin")
+        some_user.create()
+
+        obj = self.get_entity_object_class()(user=some_user)
+        obj.create_entity()
+
+        some_user.delete()
+        with self.assertRaises(EntityNotFoundException,
+                               msg="The external account was not automatically deleted when the user is deleted"):
+            obj.reload_entity()
 
     def _check_user_fields(self, account):
         """
