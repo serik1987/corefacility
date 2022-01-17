@@ -34,13 +34,6 @@ class TestAccount(TestExternalAuthorizationAccount):
                                msg="The same Google account may belong to two or more users"):
             account2.create()
 
-    def test_user_uniqueness(self):
-        account1 = Account(email="serik1987@gmail.com", user=self._sample_user)
-        account1.create()
-        account2 = Account(email="serik1988@gmail.com", user=self._sample_user)
-        with self.assertRaises(EntityDuplicatedException, msg="We assigned two google accounts to the same user"):
-            account2.create()
-
     def _check_default_fields(self, account):
         """
         Checks whether the default fields were properly stored.

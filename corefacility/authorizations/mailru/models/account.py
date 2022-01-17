@@ -7,5 +7,5 @@ class Account(models.Model):
     """
     email = models.EmailField(db_index=True, unique=True,
                               help_text="The user E-mail when he registered in the Mail.ru system")
-    user = models.ForeignKey("core.User", on_delete=models.CASCADE, related_name="mailru_account",
+    user = models.OneToOneField("core.User", on_delete=models.CASCADE, related_name="mailru_account",
                              help_text="corefacility user to which this account is attached")

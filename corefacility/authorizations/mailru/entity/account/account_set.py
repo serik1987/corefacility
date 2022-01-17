@@ -1,5 +1,7 @@
 from core.entity.entity_sets.external_authorization_account_set import ExternalAuthorizationAccountSet
 
+from .account_reader import AccountReader
+
 
 class AccountSet(ExternalAuthorizationAccountSet):
     """
@@ -11,4 +13,6 @@ class AccountSet(ExternalAuthorizationAccountSet):
 
     _entity_class = "authorizations.mailru.entity.account.Account"
 
-    _entity_reader_class = None   # TO-DO: define a proper mail.ru account reader
+    _entity_reader_class = AccountReader
+
+    _alias_kwarg = "email"

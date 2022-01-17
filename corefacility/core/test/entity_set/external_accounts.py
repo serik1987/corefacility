@@ -13,8 +13,8 @@ def no_filter_provider():
         (BaseTestClass.TEST_FIND_BY_ID, 4, BaseTestClass.POSITIVE_TEST_CASE),
         (BaseTestClass.TEST_FIND_BY_ID, -1, BaseTestClass.NEGATIVE_TEST_CASE),
 
-        (BaseTestClass.TEST_FIND_BY_ALIAS, "account2@gmail.com", BaseTestClass.POSITIVE_TEST_CASE),
-        (BaseTestClass.TEST_FIND_BY_ALIAS, "account10@gmail.com", BaseTestClass.NEGATIVE_TEST_CASE),
+        (BaseTestClass.TEST_FIND_BY_ALIAS, 0, BaseTestClass.POSITIVE_TEST_CASE),
+        (BaseTestClass.TEST_FIND_BY_ALIAS, 1, BaseTestClass.NEGATIVE_TEST_CASE),
         (BaseTestClass.TEST_FIND_BY_ALIAS, "", BaseTestClass.NEGATIVE_TEST_CASE),
 
         (BaseTestClass.TEST_FIND_BY_INDEX, 0, BaseTestClass.POSITIVE_TEST_CASE),
@@ -86,6 +86,8 @@ class TestExternalAccounts(BaseTestClass):
 
     @parameterized.expand(no_filter_provider())
     def test_no_filter(self, number, arg, test_type):
+        if number == self.TEST_FIND_BY_ALIAS and type(arg) == int:
+            arg = self._no_filter_accounts[arg]
         with self.assertLessQueries(1):
             self._test_all_access_features(number, arg, test_type)
 

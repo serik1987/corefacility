@@ -1,5 +1,6 @@
 from parameterized import parameterized
 
+from core.entity.entity_exceptions import EntityDuplicatedException
 from core.entity.user import User
 from core.entity.entity_exceptions import EntityFieldInvalid
 from core.test.data_providers.field_value_providers import put_stages_in_provider
@@ -57,6 +58,15 @@ class TestExternalAuthorizationAccount(BaseTestClass):
         changed_user = self._test_users[changed_user]
         self._test_field("user", user, changed_user, throwing_exception, test_number, use_defaults=False,
                          **self._user_test_additional_kwargs)
+
+    def test_user_uniqueness(self):
+        obj1 = self.get_entity_object_class()()
+        obj1.create_entity()
+
+        obj2 = self.get_entity_object_class()()
+        obj2.change_entity_fields()
+        with self.assertRaises(EntityDuplicatedException, msg="We assigned two accounts to the same user"):
+            obj2.create_entity()
 
     def _check_user_fields(self, account):
         """
