@@ -4,7 +4,16 @@ from .entity_fields import RelatedEntityField
 
 class ExternalAuthorizationAccount(Entity):
     """
-    Declares connection of the user account on the external website with the local authorization account
+    The external authorization account is an account that the user has been created on a 3rd part server.
+
+    This entity must be created before the user attempt to log in using the external authorization method.
+    The goal of the entity is to provide enough information that unambiguously connect the corefacility account
+    to the account on the 3rd part service (usually, this is login name). The entity contains the user entity
+    together with the 3rd party account details.
+
+    When the authorization using the 3rd party service is successfull the service itself sends corefacility
+    some account details (usually, this is user's login). Then, corefacility finds the entity by such account
+    details and looks to a 'user' field of this entity.
     """
 
     _entity_set_class = None

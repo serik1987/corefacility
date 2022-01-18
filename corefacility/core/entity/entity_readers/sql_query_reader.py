@@ -4,7 +4,6 @@ from django.db import connection
 
 from .entity_reader import EntityReader
 from .query_builders.query_filters import StringQueryFilter, AndQueryFilter
-from ..entity_exceptions import EntityNotFoundException, EntityOperationNotPermitted
 
 
 class SqlQueryReader(EntityReader):

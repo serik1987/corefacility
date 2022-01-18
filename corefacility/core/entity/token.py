@@ -98,3 +98,15 @@ class Token(Entity):
     def clear_all_expired_tokens(cls):
         t = timezone.make_aware(datetime.now())
         cls._token_model.objects.filter(expiration_date__lt=t).delete()
+
+    def __eq__(self, other):
+        """
+        Compares two tokens
+
+        :param other: another token to which this token shall be compared
+        :return: True if two tokens are the same, False otherwise.
+        """
+        if isinstance(other, self.__class__):
+            return self.id == other.id
+        else:
+            return False

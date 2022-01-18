@@ -108,8 +108,7 @@ class BaseTestClass(MediaFilesTestCase):
         """
         obj = self.get_entity_object_class()()
         obj.create_entity()
-        obj.change_entity_fields()
-        obj.entity.update()
+        self._do_entity_update(obj)
         self._check_updated_entity(obj.entity, obj.id)
         self._check_fields_changed(obj.entity, [])
         with self.assertRaises(EntityOperationNotPermitted,
@@ -127,8 +126,7 @@ class BaseTestClass(MediaFilesTestCase):
         """
         obj = self.get_entity_object_class()()
         obj.create_entity()
-        obj.change_entity_fields()
-        obj.entity.update()
+        self._do_entity_update(obj)
         obj.reload_entity()
         self._check_reload(obj)
         self._check_fields_changed(obj.entity, [])
@@ -182,6 +180,10 @@ class BaseTestClass(MediaFilesTestCase):
         obj.change_entity_fields()
         obj.entity.delete()
         self._check_entity_delete(obj)
+
+    def _do_entity_update(self, obj):
+        obj.change_entity_fields()
+        obj.entity.update()
 
     def _test_field(self, field_name, field_value, updated_value, exception_to_throw, route_number, use_defaults=True,
                     **additional_kwargs):
