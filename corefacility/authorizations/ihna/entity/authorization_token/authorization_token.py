@@ -1,5 +1,7 @@
 from core.entity.external_authorization_token import ExternalAuthorizationToken
-from core.entity.entity_fields import EntityField, ReadOnlyField
+from core.entity.entity_fields import ReadOnlyField
+
+from .mock_provider import MockProvider
 
 
 class AuthorizationToken(ExternalAuthorizationToken):
@@ -12,9 +14,8 @@ class AuthorizationToken(ExternalAuthorizationToken):
     some user info assigned to his account here.
     """
 
-    _entity_provider_list = []  # TO-DO: define the way to check the authorization code
+    _entity_provider_list = [MockProvider()]
 
-    _public_field_description = {
-        "code": EntityField(str, description="Authorization code"),
-        "email": ReadOnlyField(description="Login for a user that received this code")
+    _intermediate_field_description = {
+        "email": ReadOnlyField(description="User's login on the ihna.ru website")
     }
