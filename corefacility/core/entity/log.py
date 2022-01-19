@@ -16,7 +16,7 @@ class Log(Entity):
 
     _entity_provider_list = [LogProvider()]
 
-    required_fields = ["request_date"]
+    _required_fields = ["request_date"]
 
     _public_field_description = {
         "request_date": ManagedEntityField(CurrentTimeManager, description="Request receiving date"),

@@ -50,3 +50,16 @@ def time_from_db(time):
         time = timezone.make_aware(time, timezone=pytz.UTC)
         time = timezone.localtime(time)
     return time
+
+
+def prepare_time(time):
+    """
+    Transforms the time to UTC
+
+    :param time: datetime object that represents local time
+    :return: nothing
+    """
+    if timezone.is_naive(time):
+        time = timezone.make_aware(time)
+    time = time.astimezone(tz=pytz.UTC)
+    return time

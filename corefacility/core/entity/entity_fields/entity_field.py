@@ -101,14 +101,14 @@ class EntityField:
             raw_value = self._value_class(value)
         if raw_value is None:
             if self._min_length is not None and self._min_length > 0:
-                raise EntityFieldInvalid("Entity")
+                raise EntityFieldInvalid("")
         else:
             if self._min_length is not None and len(raw_value) < self._min_length:
-                raise EntityFieldInvalid("Entity")
+                raise EntityFieldInvalid("")
             if self._max_length is not None and len(raw_value) > self._max_length:
-                raise EntityFieldInvalid("Entity")
+                raise EntityFieldInvalid("")
             if self._min_value is not None and raw_value < self._min_value:
-                raise EntityFieldInvalid("Entity")
+                raise EntityFieldInvalid("")
             if self._max_value is not None and raw_value > self._max_value:
-                raise EntityFieldInvalid("Entity")
+                raise EntityFieldInvalid("")
         return raw_value

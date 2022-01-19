@@ -31,7 +31,7 @@ class EntitySetObject:
         else:
             self._entities = []
             for entity_fields in self.data_provider():
-                entity = self.entity_class(**entity_fields)
+                entity = self._new_entity(**entity_fields)
                 entity.create()
                 self._entities.append(entity)
 
@@ -115,3 +115,12 @@ class EntitySetObject:
         """
         for entity in self._entities:
             print(entity)
+
+    def _new_entity(self, **entity_fields):
+        """
+        Creates new entity with given initial parameters
+
+        :param entity_fields: the initial parameters passed here from the data provider
+        :return: nothing
+        """
+        return self.entity_class(**entity_fields)
