@@ -1,5 +1,7 @@
 from datetime import datetime
+
 from .entity_set import EntitySet
+from ..entity_readers.log_reader import LogReader
 
 
 class LogSet(EntitySet):
@@ -11,7 +13,7 @@ class LogSet(EntitySet):
 
     _entity_class = "core.entity.log.Log"
 
-    _entity_reader_class = None  # TO-DO: create some log reader
+    _entity_reader_class = LogReader
 
     _entity_filter_list = {
         "request_date_from": [datetime, None],
@@ -22,7 +24,7 @@ class LogSet(EntitySet):
 
     def rotate(self, up_to: datetime) -> str:
         """
-        Rotates all logs earlier than this particular time. Rotetion means:
+        Rotates all logs earlier than this particular time. Rotation means:
         1) All log information will be converted to string
         2) After conversion such information will be deleted from the database
 

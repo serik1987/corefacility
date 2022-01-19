@@ -1,9 +1,8 @@
-from datetime import datetime
-
 from . import entity_exceptions as e
 from .entity import Entity
 from .entity_sets.log_set import LogSet
-from .entity_fields import EntityField, RelatedEntityField
+from .entity_fields import EntityField, RelatedEntityField, ManagedEntityField, CurrentTimeManager, IpAddressField
+from .entity_providers.model_providers.log_provider import LogProvider
 
 
 class Log(Entity):
@@ -15,30 +14,29 @@ class Log(Entity):
 
     _entity_set_class = LogSet
 
-    _entity_provider_list = []  # TO-DO: describe some log providers
+    _entity_provider_list = [LogProvider()]
 
     required_fields = ["request_date"]
 
     _public_field_description = {
-        "request_date": EntityField(datetime, description="Request receiving date"),
+        "request_date": ManagedEntityField(CurrentTimeManager, description="Request receiving date"),
         "log_address": EntityField(str, min_length=1, max_length=4096,
                                    description="Log address"),
-        "request_method": EntityField(str, min_length=3, max_length=5,
+        "request_method": EntityField(str, min_length=3, max_length=7,
                                       description="Request method"),
         "operation_description": EntityField(str, max_length=4096,
                                              description="Operation description"),
-        "request_body": EntityField(str, description="Request body"),
-        "input_data": EntityField(str, description="Request input data"),
+        "request_body": EntityField(str, max_length=16384, description="Request body"),
+        "input_data": EntityField(str, max_length=16384, description="Request input data"),
         "user": RelatedEntityField("core.entity.user.User",
                                    description="Authorized user"),
-        "ip_address": EntityField(str, min_length=0, max_length=256,
-                                  description="IP address"),
+        "ip_address": IpAddressField(description="IP address"),
         "geolocation": EntityField(str, min_length=0, max_length=256,
                                    description="Geolocation"),
         "response_status": EntityField(int, min_value=100, max_value=599,
                                        description="HTTP response status"),
-        "response_body": EntityField(str, description="Response body"),
-        "output_data": EntityField(str, description="Response output data"),
+        "response_body": EntityField(str, max_length=16384, description="Response body"),
+        "output_data": EntityField(str, max_length=16384, description="Response output data"),
     }
 
     _current = None
@@ -62,7 +60,7 @@ class Log(Entity):
         :return: nothing
         """
         super().create()
-        self._current = self
+        Log._current = self
 
     def update(self):
         """
