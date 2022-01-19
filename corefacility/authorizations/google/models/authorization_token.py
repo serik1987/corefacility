@@ -13,4 +13,5 @@ class AuthorizationToken(models.Model):
     refresh_token = models.CharField(max_length=256, editable=False,
                                      help_text="This token will be used when authorization token expires")
     authentication = models.OneToOneField("core.Authentication", on_delete=models.CASCADE, null=True,
-                                          help_text="Link to the authentication details")
+                                          help_text="Link to the authentication details",
+                                          related_name="google_token")

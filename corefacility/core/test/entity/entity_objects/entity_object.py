@@ -84,45 +84,6 @@ class EntityObject:
         self._entity = self.get_entity_class()(**options)
         self._entity_fields = options
 
-    def create_entity(self):
-        """
-        Creates an entity wrapped to this entity object and stores the entity to the database.
-        The 'id' property will be updated according to the entity status
-
-        :return: the entity created
-        """
-        self._entity.create()
-        self._id = self._entity.id
-
-    def change_entity_fields(self, use_defaults=True, **kwargs):
-        """
-        Changes some fields of the wrapped entity
-
-        :param use_defaults: if True the _default_change_kwargs property will be applied. If false, nothing will be
-        applied
-        :param kwargs: additional entity fields to change. All kwargs defined here will override the default kwargs
-        :return: nothing
-        """
-        if use_defaults:
-            options = self._default_change_kwargs.copy()
-            options.update(kwargs)
-        else:
-            options = kwargs
-        for name, value in options.items():
-            setattr(self._entity, name, value)
-            self._entity_fields[name] = value
-
-    def reload_entity(self):
-        """
-        Loads the recently saved entity from the database
-
-        :return: nothing
-        """
-        if self._id is None:
-            raise RuntimeError("EntityObject.reload_entity: can't reload the entity that is recently saved")
-        entity_set = self._entity.get_entity_set_class()()
-        self._entity = entity_set.get(self._id)
-
     @property
     def entity(self):
         """
@@ -167,3 +128,42 @@ class EntityObject:
         :return:
         """
         return self._default_change_kwargs.keys()
+
+    def create_entity(self):
+        """
+        Creates an entity wrapped to this entity object and stores the entity to the database.
+        The 'id' property will be updated according to the entity status
+
+        :return: the entity created
+        """
+        self._entity.create()
+        self._id = self._entity.id
+
+    def change_entity_fields(self, use_defaults=True, **kwargs):
+        """
+        Changes some fields of the wrapped entity
+
+        :param use_defaults: if True the _default_change_kwargs property will be applied. If false, nothing will be
+        applied
+        :param kwargs: additional entity fields to change. All kwargs defined here will override the default kwargs
+        :return: nothing
+        """
+        if use_defaults:
+            options = self._default_change_kwargs.copy()
+            options.update(kwargs)
+        else:
+            options = kwargs
+        for name, value in options.items():
+            setattr(self._entity, name, value)
+            self._entity_fields[name] = value
+
+    def reload_entity(self):
+        """
+        Loads the recently saved entity from the database
+
+        :return: nothing
+        """
+        if self._id is None:
+            raise RuntimeError("EntityObject.reload_entity: can't reload the entity that is recently saved")
+        entity_set = self._entity.get_entity_set_class()()
+        self._entity = entity_set.get(self._id)
