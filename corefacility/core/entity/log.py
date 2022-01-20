@@ -1,5 +1,6 @@
 from . import entity_exceptions as e
 from .entity import Entity
+from .log_record import LogRecord
 from .entity_sets.log_set import LogSet
 from .entity_fields import EntityField, RelatedEntityField, ManagedEntityField, CurrentTimeManager, IpAddressField
 from .entity_providers.model_providers.log_provider import LogProvider
@@ -90,7 +91,9 @@ class Log(Entity):
         :param message: the log message
         :return:
         """
-        raise NotImplementedError("TO-DO: add log record")
+        log_record = LogRecord(level=level, message=message, log=self)
+        log_record.record_time.mark()
+        log_record.create()
 
     def __eq__(self, other):
         """
