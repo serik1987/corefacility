@@ -39,7 +39,7 @@ class BaseTestClass(MediaFilesTestCase):
     """
     This is the base test class for all entity tests.
 
-    We advice to extend the following methods:
+    We advise to extend the following methods:
     assertEntityFound - ensure that all entity fields were loaded properly
     """
 
