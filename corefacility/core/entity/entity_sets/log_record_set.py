@@ -1,4 +1,5 @@
 from .entity_set import EntitySet
+from ..entity_readers.log_record_reader import LogRecordReader
 
 
 class LogRecordSet(EntitySet):
@@ -10,7 +11,7 @@ class LogRecordSet(EntitySet):
 
     _entity_class = "core.entity.log_record.LogRecord"
 
-    _entity_reader_class = None  # TO-DO: define a proper entity reader
+    _entity_reader_class = LogRecordReader
 
     _entity_filter_list = {
         "log": ["core.entity.log.Log", None]

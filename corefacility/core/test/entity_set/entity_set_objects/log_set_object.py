@@ -101,14 +101,14 @@ None, POST, 127.0.0.1, 4
 /path/to/resource/1/, DELETE, ::1, 1
 /path/to/resource/1/, DELETE, 127.0.0.1, 2
 /path/to/resource/1/, DELETE, None, 1""".split("\n"):
-            log_address, request_method, ip_address, user_index = sample_data_info.split(", ")
+            log_address, request_method, ipaddr, user_index = sample_data_info.split(", ")
             sample_item = {}
             if log_address != 'None':
                 sample_item['log_address'] = log_address
             if request_method != 'None':
                 sample_item['request_method'] = request_method
-            if ip_address != 'None':
-                sample_item['ip_address'] = ip_address
+            if ipaddr != 'None':
+                sample_item['ip_address'] = ipaddr
             if user_index != 'None':
                 user = self._user_set_object[int(user_index)]
                 sample_item['user'] = user

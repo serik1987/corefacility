@@ -145,7 +145,12 @@ class Entity:
         else:
             self.__state = "creating"
             for name, value in kwargs.items():
-                setattr(self, name, value)
+                try:
+                    setattr(self, name, value)
+                except ValueError:
+                    raise ValueError("The field '%s' is not writable" % name)
+                except EntityFieldInvalid:
+                    raise EntityFieldInvalid(name)
 
     @property
     def id(self):

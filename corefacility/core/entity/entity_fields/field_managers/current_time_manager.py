@@ -19,7 +19,7 @@ class CurrentTimeManager(EntityValueManager):
         """
         if self._field_value is None:
             setattr(self.entity, '_' + self.field_name, make_aware(datetime.now()))
-            self.entity.notify_field_changed('request_date')
+            self.entity.notify_field_changed(self.field_name)
         else:
             raise EntityFieldInvalid(self.field_name)
 
@@ -32,6 +32,9 @@ class CurrentTimeManager(EntityValueManager):
         return self._field_value
 
     def __str__(self):
+        return str(self.get())
+
+    def __repr__(self):
         return str(self.get())
 
     def __eq__(self, other):

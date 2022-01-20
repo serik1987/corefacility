@@ -87,6 +87,8 @@ class TestLog(BaseTestClass):
         obj.create_entity()
         obj.reload_entity()
         obj.change_entity_fields()
+        another_obj = LogObject()
+        another_obj.create_entity()
         with self.assertRaises(EntityOperationNotPermitted, msg="Successful log correction"):
             obj.entity.update()
 

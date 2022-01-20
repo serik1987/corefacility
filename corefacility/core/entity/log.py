@@ -91,3 +91,15 @@ class Log(Entity):
         :return:
         """
         raise NotImplementedError("TO-DO: add log record")
+
+    def __eq__(self, other):
+        """
+        Compares two log (for testing purpose only
+
+        :param other: the other log
+        :return: nothing
+        """
+        if isinstance(other, Log):
+            return self.id == other.id
+        else:
+            return False
