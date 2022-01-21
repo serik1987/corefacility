@@ -55,3 +55,10 @@ class NoCurrentLog(LogException):
 
     def __init__(self):
         super().__init__("No current log was created. Did you include proper 'core' module middleware?")
+
+
+class CorefacilityModuleDamagedException(EntityException):
+
+    def __init__(self):
+        super().__init__("The corefacility module is damaged: the information containing in the database "
+                         "is not the same as information containing in the module class")

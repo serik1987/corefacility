@@ -2,6 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from .entity import Entity
 from .entity_fields.field_managers.app_permission_manager import AppPermissionManager
 from .entity_sets.corefacility_module_set import CorefacilityModuleSet
+from .entity_providers.model_providers.corefacility_module_provider import CorefacilityModuleProvider
 from .entity_fields import EntityField, ReadOnlyField, ManagedEntityField
 from .entity_exceptions import EntityOperationNotPermitted
 
@@ -21,7 +22,7 @@ class CorefacilityModule(Entity):
 
     _entity_set_class = CorefacilityModuleSet
 
-    _entity_provider_list = []  # TO-DO: declare the proper corefacility module provider
+    _entity_provider_list = [CorefacilityModuleProvider()]
 
     _required_fields = []
 
@@ -42,8 +43,45 @@ class CorefacilityModule(Entity):
 
     _module_installation = False
 
+    _state = None
+
     def get_entity_class_name(self):
         return _(self.get_name())
+
+    @property
+    def parent_entry_point(self):
+        """
+        The entry point which the module belongs to
+        """
+        return self.get_parent_entry_point()
+
+    @property
+    def alias(self):
+        """
+        The module alias
+        """
+        return self.get_alias()
+
+    @property
+    def name(self):
+        """
+        The module name
+        """
+        return self.get_name()
+
+    @property
+    def html_code(self):
+        """
+        HTML code
+        """
+        return self.get_html_code()
+
+    @property
+    def app_class(self):
+        """
+        The module app class
+        """
+        return "%s.%s" % (self.__module__, self.__class__.__name__)
 
     def __new__(cls, *args, **kwargs):
         """
@@ -55,6 +93,18 @@ class CorefacilityModule(Entity):
         if not hasattr(cls, "_instance"):
             cls._instance = super(CorefacilityModule, cls).__new__(cls, *args, **kwargs)
         return getattr(cls, "_instance")
+
+    def __init__(self):
+        """
+        The corefacility module has special init function with no keywords. Any options will be loaded from the
+        database automatically or embedded into entity by the module developer.
+        """
+        if self._public_fields is None:
+            self._public_fields = {}
+        if self._edited_fields is None:
+            self._edited_fields = set()
+        if self._state is None:
+            self._state = "found"
 
     def get_alias(self):
         """
@@ -96,6 +146,7 @@ class CorefacilityModule(Entity):
         """
         raise NotImplementedError("get_html_code")
 
+    @property
     def is_application(self):
         """
         Let's say that the module is "application" if the superuser can provide additional access restrictions to
@@ -170,7 +221,4 @@ class CorefacilityModule(Entity):
 
         :return:
         """
-        state = super().state
-        if state == "creating":
-            state = "saved"
-        return state
+        return self._state

@@ -46,6 +46,7 @@ class App(CorefacilityModule):
         """
         return None
 
+    @property
     def is_application(self):
         """
         The core module is not application because it shall be accessible even for unauthorized users

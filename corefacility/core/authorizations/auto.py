@@ -13,6 +13,13 @@ class AutomaticAuthorization(AuthorizationModule):
     when one person only uses the application and hence there is no necessity to provide credentials.
     """
 
+    @property
+    def app_class(self):
+        """
+        The module class
+        """
+        return "core.authorizations.AutomaticAuthorization"
+
     def get_alias(self):
         """
         The method alias

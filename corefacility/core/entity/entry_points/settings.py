@@ -1,4 +1,5 @@
 from .entry_point import EntryPoint
+from ..corefacility_module import CorefacilityModule
 
 
 class SettingsEntryPoint(EntryPoint):
@@ -27,3 +28,36 @@ class SettingsEntryPoint(EntryPoint):
 
     def get_type(self):
         return "lst"
+
+
+class SettingsModule(CorefacilityModule):
+    """
+    Defines the settings module.
+
+    The settings module provides basic routines for server testing and launching basic server routines.
+    """
+
+    def get_parent_entry_point(self):
+        """
+        Informs the corefacility about the base entry point
+
+        :return: always SettingsEntryPoint instance
+        """
+        return SettingsEntryPoint()
+
+    @property
+    def is_application(self):
+        """
+        Returns whether the module is application (i.e., whether its access rules can be adjusted)
+
+        :return: always False
+        """
+        return False
+
+    def is_enabled_by_default(self):
+        """
+        Checks whether the application shall be enabled by default
+
+        :return: always True: just install and use the settings module, no additional security holes will be happened.
+        """
+        return True

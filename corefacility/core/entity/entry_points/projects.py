@@ -49,6 +49,7 @@ class ProjectApp(CorefacilityModule):
         """
         return None
 
+    @property
     def is_application(self):
         """
         This is the application: superuser can control its access and attachment

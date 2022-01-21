@@ -1,5 +1,7 @@
 from django.utils.translation import gettext_lazy as _
+
 from .entity_set import EntitySet
+from ..entity_readers.corefacility_module_reader import CorefacilityModuleReader
 
 
 class CorefacilityModuleSet(EntitySet):
@@ -11,12 +13,8 @@ class CorefacilityModuleSet(EntitySet):
 
     _entity_class = "core.entity.corefacility_module.CorefacilityModule"
 
-    _entity_reader_class = None   # TO-DO: define a proper entity reader
+    _entity_reader_class = CorefacilityModuleReader
 
     _entity_filter_list = {
-        "uuid": [str, None],
-        "parent_entry_point": ["core.entity.entry_point.EntryPoint", None],
-        "alias": [str, None],
-        "is_application": [bool, None],
-        "is_enabled": [bool, None],
+        "entry_point_alias": [str, None],
     }

@@ -15,6 +15,13 @@ class UnixAuthorization(AuthorizationModule):
     information and API
     """
 
+    @property
+    def app_class(self):
+        """
+        Returns the application class
+        """
+        return "core.authorizations.UnixAuthorization"
+
     def get_alias(self):
         """
         Always 'unix'

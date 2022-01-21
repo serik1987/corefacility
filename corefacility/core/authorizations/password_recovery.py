@@ -14,6 +14,13 @@ class PasswordRecoveryAuthorization(AuthorizationModule):
     - they will be destroyed after the user have been authorized
     """
 
+    @property
+    def app_class(self):
+        """
+        Returns the application class
+        """
+        return "core.authorizations.PasswordRecoveryAuthorization"
+
     def get_alias(self):
         """
         Some method alias

@@ -1,3 +1,5 @@
+from django.utils.translation import gettext as _
+
 from core.entity.entity import Entity
 from core.entity.entity_fields import ReadOnlyField
 from core.entity.entity_exceptions import EntityOperationNotPermitted
@@ -20,7 +22,7 @@ class EntryPoint(Entity):
     _is_installing = False
     """ True if entry point is currently installing to the application """
 
-    _public_fields = {
+    _public_field_description = {
         "belonging_module": ReadOnlyField(description="Module to which this entry point is related"),
         "alias": ReadOnlyField(description="Entry point alias"),
         "name": ReadOnlyField(description="Human-readable name"),
@@ -38,6 +40,27 @@ class EntryPoint(Entity):
             cls._instance = super(EntryPoint, cls).__new__(cls, *args, **kwargs)
         return getattr(cls, "_instance")
 
+    @property
+    def alias(self):
+        """
+        Entry point alias to be used in generation and parsing URLs.
+        """
+        return self.get_alias()
+
+    @property
+    def name(self):
+        """
+        Human-readable name of the entry point
+        """
+        return self.get_entity_class_name()
+
+    @property
+    def type(self):
+        """
+        The entry point type defines how many modules can be attached to this entry point.
+        """
+        return self.get_type()
+
     def get_alias(self):
         """
         Entry point alias is a special name containing letters, digits underscores and/or dashes
@@ -49,6 +72,14 @@ class EntryPoint(Entity):
         :return: a string containing entry point alias
         """
         raise NotImplementedError("get_alias")
+
+    def get_entity_class_name(self):
+        """
+        Returns the class name of the current entity
+
+        :return: class name of the current entity
+        """
+        return _(self.get_name())
 
     def get_name(self):
         """

@@ -6,6 +6,13 @@ class IhnaSynchronization(SynchronizationModule):
     Provides synchronization through the IHNA website for demonstration and testing
     """
 
+    @property
+    def app_class(self):
+        """
+        Returns the application class
+        """
+        return "core.synchronizations.IhnaSynchronization"
+
     def get_alias(self):
         """
         The application alias

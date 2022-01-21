@@ -46,6 +46,7 @@ class SynchronizationModule(CorefacilityModule):
         """
         return None
 
+    @property
     def is_application(self):
         """
         This is not application because its access permissions can't be manually adjusted:

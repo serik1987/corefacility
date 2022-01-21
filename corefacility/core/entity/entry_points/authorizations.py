@@ -45,6 +45,7 @@ class AuthorizationModule(CorefacilityModule):
         """
         return AuthorizationsEntryPoint()
 
+    @property
     def is_application(self):
         """
         Since authorization modules shall authorize non-authorized user, they are modules, not applications

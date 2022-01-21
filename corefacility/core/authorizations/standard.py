@@ -10,6 +10,13 @@ class StandardAuthorization(AuthorizationModule):
     module
     """
 
+    @property
+    def app_class(self):
+        """
+        Returns the module application class
+        """
+        return "core.authorizations.StandardAuthorization"
+
     def get_alias(self):
         """
         The authorization method alias is 'standard'
