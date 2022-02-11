@@ -10,9 +10,7 @@ class EntryPointSet(EntitySet):
 
     _entity_class = "core.entity.entry_points.EntryPoint"
 
-    _entity_reader_class = None  # TO-DO: define proper entity reader
+    _entity_reader_class = "core.entity.entity_readers.entry_point_reader.EntryPointReader"
 
     _entity_filter_list = {
-        "belonging_module": ["core.entity.corefacility_module.CorefacilityModule", None],
-        "alias": [str, None]
     }

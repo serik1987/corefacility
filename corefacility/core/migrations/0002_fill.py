@@ -97,7 +97,9 @@ class Migration(migrations.Migration):
         core_application.save()
 
         authorizations = EntryPoint(alias="authorizations", belonging_module=core_application,
-                                    name=_("Authorization methods"), type=EntryPointType.list.value)
+                                    name=_("Authorization methods"), type=EntryPointType.list.value,
+                                    entry_point_class="core.entity.entry_points.authorizations."
+                                                      "AuthorizationsEntryPoint")
         authorizations.save()
         Module(parent_entry_point=authorizations, alias="standard", name=_("Standard authorization"), html_code=None,
                app_class="core.authorizations.StandardAuthorization", is_application=False, is_enabled=False,
@@ -125,7 +127,9 @@ class Migration(migrations.Migration):
                is_application=False, is_enabled=True).save()
 
         synchronizations = EntryPoint(alias="synchronizations", belonging_module=core_application,
-                                      name=_("Account synchronization"), type=EntryPointType.select.value)
+                                      name=_("Account synchronization"), type=EntryPointType.select.value,
+                                      entry_point_class="core.entity.entry_points.synchronizations"
+                                                        ".SynchronizationsEntryPoint")
         synchronizations.save()
         Module(parent_entry_point=synchronizations, alias="ihna_employees",
                name=_("IHNA RAS account synchronization"), html_code=None,
@@ -133,7 +137,8 @@ class Migration(migrations.Migration):
                is_enabled=False).save()
 
         projects = EntryPoint(alias="projects", belonging_module=core_application, name=_("Project applications"),
-                              type=EntryPointType.list.value)
+                              type=EntryPointType.list.value,
+                              entry_point_class="core.entity.entry_points.projects.ProjectsEntryPoint")
         projects.save()
         imaging = Module(parent_entry_point=projects, alias="imaging",
                          name=_("Basic functional maps processing"), html_code=None, app_class="imaging.App",
@@ -141,13 +146,15 @@ class Migration(migrations.Migration):
         imaging.save()
 
         image_processors = EntryPoint(alias="processors", belonging_module=imaging,
-                                      name=_("Imaging processors"), type=EntryPointType.list.value)
+                                      name=_("Imaging processors"), type=EntryPointType.list.value,
+                                      entry_point_class="imaging.entity.entry_points.processors.ProcessorsEntryPoint")
         image_processors.save()
         Module(parent_entry_point=image_processors, alias="roi", name=_("ROI definition"), html_code=None,
                app_class="roi.App", user_settings=dict(), is_application=True, is_enabled=True).save()
 
         EntryPoint(alias="settings", belonging_module=core_application, name=_("Other settings"),
-                   type=EntryPointType.list.value).save()
+                   type=EntryPointType.list.value,
+                   entry_point_class="core.entity.entry_points.settings.SettingsEntryPoint").save()
 
     dependencies = [
         ("core", "0001_initial")

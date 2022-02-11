@@ -36,7 +36,7 @@ class CorefacilityModule(Entity):
         "user_settings": EntityField(dict,
                                      description="The user-controlled module settings"),
         "is_application": ReadOnlyField(description="Is module an application"),
-        "is_enabled": EntityField(dict, description="Is module enabled"),
+        "is_enabled": EntityField(bool, description="Is module enabled"),
         "permissions": ManagedEntityField(AppPermissionManager,
                                           description="Application permissions")
     }
@@ -82,6 +82,18 @@ class CorefacilityModule(Entity):
         The module app class
         """
         return "%s.%s" % (self.__module__, self.__class__.__name__)
+
+    @property
+    def permissions(self):
+        """
+        Defines the application permissions if applicable
+
+        :return: application permissions, if the module is application, None otherwise
+        """
+        if self.is_application:
+            return super().permissions
+        else:
+            return None
 
     def __new__(cls, *args, **kwargs):
         """
@@ -214,11 +226,8 @@ class CorefacilityModule(Entity):
     @property
     def state(self):
         """
-        The same as Entity.state but bears in mind that the module can't be 'creating'.
+        Detects the module state
 
-        The module can't be installed or enabled but this simply means that the module
-        is not visible from the rest of the app, nothing else.
-
-        :return:
+        :return: the module state
         """
         return self._state

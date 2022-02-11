@@ -57,8 +57,19 @@ class NoCurrentLog(LogException):
         super().__init__("No current log was created. Did you include proper 'core' module middleware?")
 
 
-class CorefacilityModuleDamagedException(EntityException):
+class CorefacilityModuleException(EntityException):
+    pass
+
+
+class CorefacilityModuleDamagedException(CorefacilityModuleException):
 
     def __init__(self):
         super().__init__("The corefacility module is damaged: the information containing in the database "
                          "is not the same as information containing in the module class")
+
+
+class CorefacilityModuleAutoloadFailedException(CorefacilityModuleException):
+
+    def __init__(self, prop, obj):
+        super().__init__("Can't retrieve the property %s for the %s because the property was not loaded during the"
+                         "autoload" % (property, repr(obj)))

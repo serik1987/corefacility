@@ -22,12 +22,26 @@ class EntryPoint(Entity):
     _is_installing = False
     """ True if entry point is currently installing to the application """
 
+    _state = None
+    """ The entry point state """
+
     _public_field_description = {
         "belonging_module": ReadOnlyField(description="Module to which this entry point is related"),
         "alias": ReadOnlyField(description="Entry point alias"),
         "name": ReadOnlyField(description="Human-readable name"),
         "type": ReadOnlyField(description="Entry point type"),
+        "entry_point_class": ReadOnlyField(description="Entry point application class")
     }
+
+    @property
+    def entry_point_class(self):
+        """
+        The entry point class
+
+        :return: the string connected with the entry point class. Such a string can be substituted to the
+        entry point
+        """
+        return "%s.%s" % (self.__module__, self.__class__.__name__)
 
     def __new__(cls, *args, **kwargs):
         """
@@ -39,6 +53,19 @@ class EntryPoint(Entity):
         if not hasattr(cls, "_instance"):
             cls._instance = super(EntryPoint, cls).__new__(cls, *args, **kwargs)
         return getattr(cls, "_instance")
+
+    def __init__(self):
+        """
+        Initializes the entry point.
+
+        Please, bear in mind that absolutely no arguments are accepted.
+        """
+        if self._public_fields is None:
+            self._public_fields = {}
+        if self._edited_fields is None:
+            self._edited_fields = set()
+        if self._state is None:
+            self._state = "found"
 
     @property
     def alias(self):
@@ -52,7 +79,7 @@ class EntryPoint(Entity):
         """
         Human-readable name of the entry point
         """
-        return self.get_entity_class_name()
+        return self.get_name()
 
     @property
     def type(self):
@@ -129,3 +156,12 @@ class EntryPoint(Entity):
         :return: nothing
         """
         raise NotImplementedError("TO-DO: install entry point")
+
+    @property
+    def state(self):
+        """
+        State of the entity
+
+        :return: the entry point state
+        """
+        return self._state

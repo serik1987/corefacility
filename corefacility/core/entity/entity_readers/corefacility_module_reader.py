@@ -1,8 +1,10 @@
 from uuid import UUID
 
+from .query_builders.base import QueryBuilder
 from .raw_sql_query_reader import RawSqlQueryReader
 from .model_emulators import ModelEmulator
 from .query_builders.query_filters import StringQueryFilter
+from ..entity_exceptions import CorefacilityModuleAutoloadFailedException
 from ..entity_providers.model_providers.corefacility_module_provider import CorefacilityModuleProvider
 
 
@@ -13,6 +15,10 @@ class CorefacilityModuleReader(RawSqlQueryReader):
     """
 
     _entity_provider = CorefacilityModuleProvider()
+
+    _query_debug = False
+
+    _lookup_table_name = "core_module"
 
     def initialize_query_builder(self):
         """
@@ -29,25 +35,58 @@ class CorefacilityModuleReader(RawSqlQueryReader):
             .add_select_expression("core_module.user_settings")\
             .add_select_expression("core_module.is_application")\
             .add_select_expression("core_module.is_enabled")\
-            .add_data_source("core_module")
+            .add_data_source("core_module")\
+            .add_order_term("core_module.name", QueryBuilder.ASC)
 
         self.count_builder\
             .add_select_expression(self.count_builder.select_total_count())\
             .add_data_source("core_module")
 
         for builder in (self.items_builder, self.count_builder):
-            builder.data_source.add_join(self.items_builder.JoinType.INNER, "core_entrypoint",
+            builder.data_source.add_join(builder.JoinType.LEFT, "core_entrypoint",
                                          "ON (core_entrypoint.id=core_module.parent_entry_point_id)")
 
-    def apply_entry_point_alias_filter(self, alias):
+    def apply_is_root_module_filter(self, filter_value):
         """
-        Selects only such corefacility modules that attaches to a given entry point
+        The filter selects core module only
 
-        :param alias: alias of the attaching entry point
+        :param filter_value: True - select core module only, False - select all modules except core module
         :return: nothing
         """
+        if filter_value:
+            query_filter = StringQueryFilter("core_module.parent_entry_point_id IS NULL")
+        else:
+            query_filter = StringQueryFilter("core_module.parent_entry_point_id IS NOT NULL")
         for builder in (self.items_builder, self.count_builder):
-            builder.main_filter &= StringQueryFilter("core_entrypoint.alias=%s", alias)
+            builder.main_filter &= query_filter
+
+    def apply_entry_point_filter(self, entry_point):
+        """
+        The filter selects modules that are attached to a certain entry point.
+        Note that information connected to a certain entry point must be preloaded.
+
+        :param entry_point: an entry point to which modules shall be attached (An EntryPoint instance)
+        :return: nothing
+        """
+        entry_point_id = entry_point.id
+        if not isinstance(entry_point_id, int):
+            raise CorefacilityModuleAutoloadFailedException("id", entry_point)
+        for builder in (self.items_builder, self.count_builder):
+            builder.main_filter &= StringQueryFilter("core_module.parent_entry_point_id = %s", entry_point_id)
+
+    def apply_is_enabled_filter(self, is_enabled):
+        filter_clause = StringQueryFilter("core_module.is_enabled")
+        if not is_enabled:
+            filter_clause = ~filter_clause
+        for builder in (self.items_builder, self.count_builder):
+            builder.main_filter &= filter_clause
+
+    def apply_is_application_filter(self, is_application):
+        filter_clause = StringQueryFilter("core_module.is_application")
+        if not is_application:
+            filter_clause = ~filter_clause
+        for builder in (self.items_builder, self.count_builder):
+            builder.main_filter &= filter_clause
 
     def create_external_object(self, uuid, alias, name, html_code, app_class, user_settings,
                                is_application, is_enabled):

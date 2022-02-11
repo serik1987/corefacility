@@ -90,6 +90,8 @@ class EntitySet:
         if self._entity_reader_class is None:
             raise NotImplementedError("Define EntitySet._entity_reader_class")
         else:
+            if isinstance(self._entity_reader_class, str):
+                self._entity_reader_class = import_string(self._entity_reader_class)
             return self._entity_reader_class
 
     def get(self, lookup):
@@ -200,7 +202,7 @@ class EntitySet:
             if not isinstance(value, filter_type):
                 raise ValueError("EntitySet: type of the filter '%s' is not valid" % name)
             if filter_constraint is not None and not filter_constraint(value):
-                raise ValueError("EntitySet: contraint for '%s' filter fails" % filter_constraint)
+                raise ValueError("EntitySet: constraint for '%s' filter fails" % filter_constraint)
             self._entity_filters[name] = value
         else:
             super().__setattr__(name, value)
