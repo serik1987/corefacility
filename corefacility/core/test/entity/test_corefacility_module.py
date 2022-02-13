@@ -1,9 +1,11 @@
 from uuid import UUID, uuid4
 from parameterized import parameterized
 
+from core import App as CoreApp
 from core.entity.entity_fields.field_managers.app_permission_manager import AppPermissionManager
 from core.entity.entity_sets.corefacility_module_set import CorefacilityModuleSet
 from core.entity.entry_points import EntryPoint
+from core.entity.entry_points.authorizations import AuthorizationsEntryPoint
 
 from core.test.data_providers.entity_sets import filter_data_provider
 from core.test.data_providers.module_providers import module_provider, entry_point_provider
@@ -54,6 +56,42 @@ def property_autoload_provider():
             ("is_enabled", None)
         ]
         for use_uuid in (True, False)
+    ]
+
+
+def read_only_property_provider():
+    return [
+        (module_info[0], name, desired_class, default_value, can_be_none)
+        for module_info in module_provider()
+        for name, desired_class, default_value, can_be_none in (
+            ("alias", str, "unknown", False),
+            ("name", str, "unknown", False),
+            ("html_code", str, "<div class='xss-injection'></div>", True),
+            ("app_class", str, "django.test.TestCase", False),
+            ("is_application", bool, False, False),
+        )
+    ]
+
+
+def is_enabled_provider():
+    return [
+        (module_info[0], value)
+        for module_info in module_provider()
+        for value in (True, False)
+    ]
+
+
+def user_settings_provider():
+    return [
+        (module_info[0], name, value, default_value)
+        for module_info in module_provider()
+        for name, value, default_value in (
+            ("some_integer_value", 42, 100),
+            ("some_string_value", "hello", "Hello, World!"),
+            ("some_boolean_value", True, False),
+            ("some_float_value", 3.14, 6.42),
+            ("some_none_value", None, None),
+        )
     ]
 
 
@@ -216,10 +254,85 @@ class TestCorefacilityModule(BaseAppsTest):
     def test_uuid(self, module_class):
         module_class.reset()
         module = module_class()
-        self.assertEquals(module.state, "found", "The module state must be flushed to FOUND after the module reset")
-        self.assertIsInstance(module._uuid, str, "The module UUID must be erased after the module reset")
-        self.assertIsInstance(module.uuid, UUID, "The module UUID must be an instance of UUID class")
-        self.assertEquals(module.state, "loaded", "The module must be autoloaded when accessing to its UUID")
-        with self.assertRaises(ValueError,
-                               msg="The corefacility module's uuid property is not read-only"):
-            module.uuid = uuid4()
+        with self.assertNumQueries(1):
+            self.assertEquals(module.state, "found", "The module state must be flushed to FOUND after the module reset")
+            self.assertIsInstance(module._uuid, str, "The module UUID must be erased after the module reset")
+            self.assertIsInstance(module.uuid, UUID, "The module UUID must be an instance of UUID class")
+            self.assertEquals(module.state, "loaded", "The module must be autoloaded when accessing to its UUID")
+            with self.assertRaises(ValueError,
+                                   msg="The corefacility module's uuid property is not read-only"):
+                module.uuid = uuid4()
+
+    @parameterized.expand(module_provider())
+    def test_parent_entry_point(self, module_class):
+        module_class.reset()
+        module = module_class()
+        with self.assertNumQueries(0):
+            self.assertEquals(module.state, "found", "The module state must be flushed to FOUND after the module reset")
+            parent_ep = module.parent_entry_point
+            if isinstance(module, CoreApp):
+                self.assertIsNone(parent_ep, "The core module must not be attached to any entry point")
+            else:
+                self.assertIsInstance(parent_ep, EntryPoint,
+                                      "The module's parent entry point must be an instance of EntryPoint")
+            self.assertEquals(module.state, "found", "The module's parent entry point property is not autoloading")
+            with self.assertRaises(ValueError, msg="The module's parent entry point is read-only property"):
+                module.parent_entry_point = AuthorizationsEntryPoint()
+
+    @parameterized.expand(read_only_property_provider())
+    def test_read_only_property(self, module_class, property_name, expected_class, test_value, can_be_none):
+        module_class.reset()
+        module = module_class()
+        with self.assertNumQueries(0):
+            self.assertEquals(module.state, "found", "The module state was not flushed during the module reset")
+            property_value = getattr(module, property_name)
+            if not can_be_none or property_value is not None:
+                self.assertIsInstance(property_value, expected_class,
+                                      "The property %s for the module is not an instance of %s" %
+                                      (property_name, expected_class.__name__))
+            self.assertEquals(module.state, "found",
+                              "Accessing read-only default properties shall not change the module state")
+            with self.assertRaises(ValueError, msg="The module property %s is not read-only" % property_name):
+                setattr(module, property_name, test_value)
+
+    @parameterized.expand(is_enabled_provider())
+    def test_is_enabled(self, module_class, value):
+        module_class.reset()
+        module = module_class()
+        with self.assertNumQueries(1):
+            self.assertEquals(module.state, "found", "The module state was not flushed during the module reset")
+            old_value = module.is_enabled
+            self.assertEquals(module.state, "loaded", "The module was not autoloaded during the enability")
+            self.assertIsInstance(old_value, bool, "The module is_enabled property is not boolean")
+            module.is_enabled = value
+            self.assertEquals(module.state, "changed", "The module state doesn't moved to 'changed'")
+        module.update()
+        self.assertEquals(module.state, "saved", "The module state doesn't moved to SAVED after property save")
+        self.assertEquals(module.is_enabled, value, "The module is_enabled value doesn't stored correctly")
+        del module
+        module_class.reset()
+        module = module_class()
+        self.assertEquals(module.is_enabled, value, "The module is_enabled state can't be correctly transmitted")
+
+    @parameterized.expand(user_settings_provider())
+    def test_user_settings(self, module_class, sample_name, sample_value, default_value):
+        module_class.reset()
+        module = module_class()
+        with self.assertNumQueries(1):
+            self.assertEquals(module.state, "found", "The module state was not flushed during the module reset")
+            actual_value = module.user_settings.get(sample_name, default_value)
+            self.assertEquals(module.state, "loaded",
+                              "The module was not autoloaded during the access to user settings")
+            self.assertEquals(actual_value, default_value,
+                              "The module setting shall be equal to its default value when it has not been setup")
+            module.user_settings.set(sample_name, sample_value)
+            self.assertEquals(module.state, "changed", "The module state doesn't moved to 'changed'")
+        module.update()
+        self.assertEquals(module.state, "saved", "The module state doesn't moved to SAVED after property save")
+        self.assertEquals(module.user_settings.get(sample_name), sample_value,
+                          "The module user settings was not stored perfectly")
+        del module
+        module_class.reset()
+        module = module_class()
+        self.assertEquals(module.user_settings.get(sample_name), sample_value,
+                          "The module user settings was not transmitted correctly")

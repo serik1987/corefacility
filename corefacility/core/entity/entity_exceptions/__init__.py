@@ -104,6 +104,12 @@ class RootModuleDeleteException(CorefacilityModuleException):
         super().__init__("The root module can't be deleted")
 
 
+class ModuleNotInstalledException(CorefacilityModuleException):
+
+    def __init__(self):
+        super().__init__("Can't setup the module property because the module has not been installed")
+
+
 class ModuleInstallationException(CorefacilityModuleException):
 
     def __init__(self, module, msg):

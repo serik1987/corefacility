@@ -35,7 +35,7 @@ class App(AuthorizationModule):
 
     def is_enabled_by_default(self):
         """
-        By default the authorization module is disabled because it doesn't adjusted
+        By default, the authorization module is disabled because it doesn't adjusted
 
         :return: always False
         """

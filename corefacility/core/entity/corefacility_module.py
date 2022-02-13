@@ -2,17 +2,18 @@ import re
 from uuid import UUID
 
 from django.db import transaction
-from django.utils.module_loading import import_string
 from django.utils.translation import gettext_lazy as _
+
 from .entity import Entity
-from .entity_fields.field_managers.app_permission_manager import AppPermissionManager
 from .entity_sets.corefacility_module_set import CorefacilityModuleSet
 from .entity_providers.model_providers.corefacility_module_provider import CorefacilityModuleProvider
 from .entity_fields import EntityField, ReadOnlyField, ManagedEntityField
-from .entity_exceptions import EntityOperationNotPermitted, ModuleUuidNotGuessedException, \
+from .entity_fields.field_managers.app_permission_manager import AppPermissionManager
+from .entity_fields.field_managers.module_settings_manager import ModuleSettingsManager
+from .entity_exceptions import ModuleUuidNotGuessedException, \
     CorefacilityModuleDamagedException, EntityNotFoundException, ModuleInstallationStateException, \
     ModuleInstallationAliasException, ModuleInstallationEntryPointException, ParentEntryPointStateException, \
-    ModuleNameException, ModuleHtmlCodeException, ModuleApplicationStatusException
+    ModuleNameException, ModuleHtmlCodeException, ModuleApplicationStatusException, ModuleNotInstalledException
 
 
 class CorefacilityModule(Entity):
@@ -41,8 +42,8 @@ class CorefacilityModule(Entity):
         "name": ReadOnlyField(description="Human-readable module name"),
         "html_code": ReadOnlyField(description="Module HTML code if applicable"),
         "app_class": ReadOnlyField(description="The module application class"),
-        "user_settings": EntityField(dict,
-                                     description="The user-controlled module settings"),
+        "user_settings": ManagedEntityField(ModuleSettingsManager,
+                                            description="The user-controlled module settings"),
         "is_application": ReadOnlyField(description="Is module an application"),
         "is_enabled": EntityField(bool, description="Is module enabled"),
         "permissions": ManagedEntityField(AppPermissionManager,
@@ -287,6 +288,7 @@ class CorefacilityModule(Entity):
         self._check_module_is_application()
         self._set_database_property("user_settings", dict())
         self._set_database_property("app_class", self.app_class)
+        self._set_database_property("is_enabled", self.is_enabled_by_default())
         with transaction.atomic():
             self._state = "creating"
             self.create()
@@ -420,6 +422,31 @@ class CorefacilityModule(Entity):
             self._state = "deleted"
             self.__class__.reset()
 
+    def update(self):
+        """
+        Updates the entity to the database and all its auxiliary sources
+
+        The update is not possible when the entity state is not 'changed'
+
+        :return: nothing
+        """
+        super().update()
+        self._state = "saved"
+
+    def notify_field_changed(self, field_name):
+        """
+        When EntityValueManager changes some of the entity fields it must call this method to notify this entity
+        that the field has been change.
+
+        If the EntityValueManager doesn't do this, the entity state will not be considered as 'changed' which
+        results to EntityOperationNotPermitted exception.
+
+        :param field_name: the field name that has been changed by the field manager
+        :return: nothing
+        """
+        super().notify_field_changed(field_name)
+        self._state = "changed"
+
     def __repr__(self):
         """
         Returns a short entity representation used for debugging purpose only
@@ -459,3 +486,25 @@ class CorefacilityModule(Entity):
                     raise CorefacilityModuleDamagedException()
         except EntityNotFoundException:
             self._state = "uninstalled"
+
+    def __setattr__(self, name, value):
+        """
+        Sets the public field property.
+
+        If the property name is not within the public or private fields the function throws AttributeError
+
+        :param name: public, protected or private field name
+        :param value: the field value to set
+        :return: nothing
+        """
+        if name in self._public_field_description:
+            description = self._public_field_description[name]
+            description.correct(value)
+            if self.state == "found":
+                self._autoload()
+            if self.state == "uninstalled":
+                raise ModuleNotInstalledException()
+            super().__setattr__(name, value)
+            self._state = "changed"
+        else:
+            super().__setattr__(name, value)

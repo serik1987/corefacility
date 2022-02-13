@@ -7,6 +7,7 @@ from parameterized import parameterized
 from core import App as CoreApp
 from core.entity.entity_exceptions import RootModuleDeleteException, ModuleConstraintFailedException, \
     EntityNotFoundException, EntityOperationNotPermitted, ModuleInstallationStateException
+from core.entity.entity_fields.field_managers.module_settings_manager import ModuleSettingsManager
 from core.entity.entity_sets.corefacility_module_set import CorefacilityModuleSet
 from core.entity.entry_points.entry_point_set import EntryPointSet
 from core.authorizations import AutomaticAuthorization, PasswordRecoveryAuthorization, StandardAuthorization, \
@@ -79,8 +80,9 @@ class TestCorefacilityModuleDelete(TestCase):
                               "The state of the delete module is not FOUND when the module has been resetted")
             self.assertEquals(module.uuid, "xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx",
                               "The module UUID was not successfully cleared when the module was deleted")
-            self.assertIsNone(module.user_settings,
-                              "The module user settings were not successfully cleared when the module was deleted")
+            self.assertIsInstance(module.user_settings, ModuleSettingsManager,
+                                  "The module settings must be an instance of ModuleSettingsManager even though "
+                                  "the module does not exist")
             self.assertIsNone(module.is_enabled,
                               "The module enability status was not successfully cleared when the module was deleted")
             self.assertEquals(module.state, "uninstalled",

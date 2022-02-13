@@ -210,7 +210,7 @@ class Entity:
 
         :return: nothing
         """
-        if self.__state != "changed":
+        if self.state != "changed":
             raise EntityOperationNotPermitted()
         self.check_entity_providers_defined()
         with transaction.atomic():
