@@ -9,6 +9,8 @@ class EntryPointProvider(ModelProvider):
     The class is responsible for exchange of information between the EntryPoint entity and the Django model layer.
     """
 
+    _entity_model = "core.models.EntryPoint"
+
     _model_fields = ["alias", "name", "type", "entry_point_class", "belonging_module"]
 
     def wrap_entity(self, external_object):

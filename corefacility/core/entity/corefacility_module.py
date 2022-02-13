@@ -1,10 +1,18 @@
+import re
+from uuid import UUID
+
+from django.db import transaction
+from django.utils.module_loading import import_string
 from django.utils.translation import gettext_lazy as _
 from .entity import Entity
 from .entity_fields.field_managers.app_permission_manager import AppPermissionManager
 from .entity_sets.corefacility_module_set import CorefacilityModuleSet
 from .entity_providers.model_providers.corefacility_module_provider import CorefacilityModuleProvider
 from .entity_fields import EntityField, ReadOnlyField, ManagedEntityField
-from .entity_exceptions import EntityOperationNotPermitted
+from .entity_exceptions import EntityOperationNotPermitted, ModuleUuidNotGuessedException, \
+    CorefacilityModuleDamagedException, EntityNotFoundException, ModuleInstallationStateException, \
+    ModuleInstallationAliasException, ModuleInstallationEntryPointException, ParentEntryPointStateException, \
+    ModuleNameException, ModuleHtmlCodeException, ModuleApplicationStatusException
 
 
 class CorefacilityModule(Entity):
@@ -45,8 +53,52 @@ class CorefacilityModule(Entity):
 
     _state = None
 
-    def get_entity_class_name(self):
-        return _(self.get_name())
+    _desired_uuid = None
+
+    @classmethod
+    def reset(cls):
+        """
+        Clears all module information loaded from the database.
+        This method can probably be used for testing purpose.
+
+        :return: nothing
+        """
+        if hasattr(cls, "_instance"):
+            delattr(cls, "_instance")
+
+    def __new__(cls, *args, **kwargs):
+        """
+        The CorefacilityModule is a singleton which mean that you can create just one module instance
+
+        :param args: Some argument from the superclass constructor
+        :param kwargs: Some keyword arguments from the superclass constructor
+        """
+        if not hasattr(cls, "_instance"):
+            cls._instance = super(CorefacilityModule, cls).__new__(cls, *args, **kwargs)
+        return getattr(cls, "_instance")
+
+    def __init__(self):
+        """
+        The corefacility module has special init function with no keywords. Any options will be loaded from the
+        database automatically or embedded into entity by the module developer.
+        """
+        if self._public_fields is None:
+            self._public_fields = {}
+        if self._edited_fields is None:
+            self._edited_fields = set()
+        if self._state is None:
+            self._state = "found"
+
+    @property
+    def uuid(self):
+        """
+        Tries to reveal the module's UUID
+
+        :return: module UUID
+        """
+        if self.state == "found":
+            self._autoload()
+        return super().uuid
 
     @property
     def parent_entry_point(self):
@@ -95,28 +147,36 @@ class CorefacilityModule(Entity):
         else:
             return None
 
-    def __new__(cls, *args, **kwargs):
+    @property
+    def user_settings(self):
         """
-        The CorefacilityModule is a singleton which mean that you can create just one module instance
+        Defines the module user settings
 
-        :param args: Some argument from the superclass constructor
-        :param kwargs: Some keyword arguments from the superclass constructor
+        :return: the module user settings
         """
-        if not hasattr(cls, "_instance"):
-            cls._instance = super(CorefacilityModule, cls).__new__(cls, *args, **kwargs)
-        return getattr(cls, "_instance")
+        if self.state == "found":
+            self._autoload()
+        return super().user_settings
 
-    def __init__(self):
+    @property
+    def is_enabled(self):
         """
-        The corefacility module has special init function with no keywords. Any options will be loaded from the
-        database automatically or embedded into entity by the module developer.
+        Defines whether the module is enabled
+
+        :return: True if the module is enabled, False otherwise
         """
-        if self._public_fields is None:
-            self._public_fields = {}
-        if self._edited_fields is None:
-            self._edited_fields = set()
-        if self._state is None:
-            self._state = "found"
+        if self.state == "found":
+            self._autoload()
+        return super().is_enabled()
+
+    @property
+    def state(self):
+        """
+        Detects the module state
+
+        :return: the module state
+        """
+        return self._state
 
     def get_alias(self):
         """
@@ -205,15 +265,13 @@ class CorefacilityModule(Entity):
         """
         return {}
 
-    def create(self):
+    def get_entity_class_name(self):
         """
-        You can't create the module, just install it!
+        Returns the module name in the currently set language
 
-        :return: nothing
+        :return: the human-readable module name
         """
-        if not self._module_installation:
-            raise EntityOperationNotPermitted()
-        super().create()
+        return _(self.get_name())
 
     def install(self):
         """
@@ -221,13 +279,183 @@ class CorefacilityModule(Entity):
 
         :return: nothing
         """
-        raise NotImplementedError("TO-DO: CorefacilityModule.install")
+        self._check_preinstall_state()
+        parent_entry_point = self._check_parent_entry_point()
+        self._check_module_alias(parent_entry_point)
+        self._check_module_name()
+        self._check_module_html_code()
+        self._check_module_is_application()
+        self._set_database_property("user_settings", dict())
+        self._set_database_property("app_class", self.app_class)
+        with transaction.atomic():
+            self._state = "creating"
+            self.create()
+            self._desired_uuid = self._uuid
+            self._autoload()
+            for _, entry_point in self.get_entry_points().items():
+                entry_point.install()
 
-    @property
-    def state(self):
+    def _check_preinstall_state(self):
         """
-        Detects the module state
+        Module installation step 1: ensure that the module has not been installed
 
-        :return: the module state
+        :return: nothing
         """
-        return self._state
+        self._autoload()
+        if self.state != "uninstalled":
+            raise ModuleInstallationStateException(self)
+
+    def _check_parent_entry_point(self):
+        """
+        Module installation step 2: parent entry point validation
+        has already been installed
+
+        :return: the parent entry point
+        """
+        from core.entity.entry_points.entry_point import EntryPoint
+        parent_entry_point = self.get_parent_entry_point()
+        if not isinstance(parent_entry_point, EntryPoint):
+            raise ModuleInstallationEntryPointException(self)
+        parent_entry_point_id = parent_entry_point.id
+        if parent_entry_point.state != "loaded":
+            raise ParentEntryPointStateException(self)
+        self._set_database_property("parent_entry_point", parent_entry_point)
+        return parent_entry_point
+
+    def _check_module_alias(self, parent_entry_point):
+        """
+        Module installation step 3: module alias validation
+
+        :param parent_entry_point: the parent entry point revealed during the step 2
+        :return: nothing
+        """
+        module_alias = self.get_alias()
+        if not isinstance(module_alias, str) or re.match(r'^[\w\-]+$', module_alias) is None:
+            raise ModuleInstallationAliasException(self)
+        module_set = CorefacilityModuleSet()
+        module_set.entry_point = parent_entry_point
+        try:
+            module_set.get(module_alias)
+        except EntityNotFoundException:
+            pass
+        self._set_database_property("alias", module_alias)
+
+    def _check_module_name(self):
+        """
+        Module installation step 4: module name validation
+
+        :return: nothing
+        """
+        module_name = self.get_name()
+        if not isinstance(module_name, str):
+            raise ModuleNameException(self)
+        self._set_database_property("name", module_name)
+
+    def _check_module_html_code(self):
+        """
+        Module installation step 5: HTML code validation
+
+        :return: nothing
+        """
+        html_code = self.get_html_code()
+        if html_code is not None and not isinstance(html_code, str):
+            raise ModuleHtmlCodeException(self)
+        self._set_database_property("html_code", html_code)
+
+    def _check_module_is_application(self):
+        """
+        Module installation step 6: is_application property validation
+
+        :return: nothing
+        """
+        is_application = self.is_application
+        if not isinstance(is_application, bool):
+            raise ModuleApplicationStatusException(self)
+        self._set_database_property("is_application", is_application)
+
+    def _set_database_property(self, name, value):
+        """
+        Module installation sub-routine: sets the property to its default value. This sub-routine is important
+        if we want this value to be saved to the database
+
+        :param name: the property name
+        :param value: the property value
+        :return: nothing
+        """
+        setattr(self, '_' + name, value)
+        self.notify_field_changed(name)
+
+    def use_uuid(self, uuid):
+        """
+        In order to reveal the module UUID, user_settings and is_enabled properties the module shall be
+        autoloaded from the database. In order to autoload the module you shall use this method to set up
+        module's UUID as cue. Such a cue is saved in the module's api_urls moudule.
+
+        If the cue is valid UUID value these properties will be autoloaded successfully. Otherwise an exception will
+        be generated.
+
+        :param uuid: the UUID cue to setup.
+        :return: nothing
+        """
+        if isinstance(uuid, str):
+            uuid = UUID(uuid)
+        self._desired_uuid = uuid
+
+    def delete(self):
+        """
+        Deletes the entity from the database and all its auxiliary sources
+
+        The entity can't be deleted when it still 'creating'.
+
+        NOTE. Please, delete the module variable as well, like here:
+        module.delete()
+        del module
+
+        :return: nothing
+        """
+        with transaction.atomic():
+            for entry_point_alias, entry_point in self.get_entry_points().items():
+                entry_point.delete()
+            super().delete()
+            self._state = "deleted"
+            self.__class__.reset()
+
+    def __repr__(self):
+        """
+        Returns a short entity representation used for debugging purpose only
+
+        :return: a short entity representation
+        """
+        s = self.get_entity_class_name()
+        if self._uuid is not None:
+            s += " (%s) " % str(self._uuid)
+        else:
+            s += " (UUID is unknown) "
+        s += self.state.upper()
+        return s
+
+    def _autoload(self):
+        """
+        Autoloads the module. Call use_uuid in order to autoload the module successfully.
+
+        Also, is the module's entry point has already been loaded there is no necessity to autoload the module.
+
+        :return: nothing
+        """
+        module_set = CorefacilityModuleSet()
+        try:
+            if self._desired_uuid is not None:
+                another_module = module_set.get(self._desired_uuid)
+                if another_module is not self:
+                    raise ModuleUuidNotGuessedException(self)
+            else:
+                entry_point = self.get_parent_entry_point()
+                if entry_point is None:
+                    module_set.is_root_module = True
+                else:
+                    module_set.entry_point = entry_point
+                another_module = module_set.get(self.get_alias())
+                if another_module is not self:
+                    raise CorefacilityModuleDamagedException()
+        except EntityNotFoundException:
+            self._state = "uninstalled"

@@ -186,7 +186,7 @@ class Entity:
 
         :return: nothing
         """
-        if self.__state != "creating":
+        if self.state != "creating":
             raise EntityOperationNotPermitted()
         self.check_entity_providers_defined()
         for field in self._required_fields:
@@ -227,7 +227,7 @@ class Entity:
 
         :return: nothing
         """
-        if self.__state == "creating" or self.__state == "deleted":
+        if self.state == "creating" or self.state == "deleted":
             raise EntityOperationNotPermitted()
         self.check_entity_providers_defined()
         with transaction.atomic():

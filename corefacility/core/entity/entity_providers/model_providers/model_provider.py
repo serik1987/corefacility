@@ -43,6 +43,8 @@ class ModelProvider(EntityProvider):
 
         :return: the entity model
         """
+        if isinstance(self._entity_model, str):
+            self._entity_model = import_string(self._entity_model)
         if self._entity_model is None:
             raise NotImplementedError("ModelProvider._entity_model: the class property is not defines")
         else:
@@ -204,13 +206,16 @@ class ModelProvider(EntityProvider):
             external_object = entity._wrapped
         if not isinstance(external_object, self.entity_model):
             external_object = self.entity_model.objects.get(pk=entity.id)  # + 1 EXTRA QUERY!
+        self._unwrap_entity_properties(external_object, entity)
+        return external_object
+
+    def _unwrap_entity_properties(self, external_object, entity):
         for field_name in self.model_fields:
             if field_name in entity._edited_fields:
                 field_value = getattr(entity, '_' + field_name)
                 if isinstance(field_value, Entity):
                     field_value = field_value._wrapped
                 setattr(external_object, field_name, field_value)
-        return external_object
 
     def attach_file(self, entity: Entity, name: str, value: File) -> None:
         """

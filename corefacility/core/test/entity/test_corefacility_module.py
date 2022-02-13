@@ -1,12 +1,16 @@
-from uuid import UUID
-
+from uuid import UUID, uuid4
 from parameterized import parameterized
+
+from core.entity.entity_fields.field_managers.app_permission_manager import AppPermissionManager
+from core.entity.entity_sets.corefacility_module_set import CorefacilityModuleSet
+from core.entity.entry_points import EntryPoint
 
 from core.test.data_providers.entity_sets import filter_data_provider
 from core.test.data_providers.module_providers import module_provider, entry_point_provider
 from .base_apps_test import BaseAppsTest
 from .entity_objects.corefacility_module_set_object import CorefacilityModuleSetObject
-from ...entity.entity_sets.corefacility_module_set import CorefacilityModuleSet
+
+ALL_ENTRY_POINT_CLASSES = [ep_info['entry_point'] for ep_info in entry_point_provider()]
 
 
 def entry_point_filter_provider():
@@ -38,6 +42,19 @@ def default_module_list_provider():
 
 def improved_entry_point_provider():
     return [(entry_point_info,) for entry_point_info in entry_point_provider()]
+
+
+def property_autoload_provider():
+    return [
+        (module_class[0], name, default_value, use_uuid)
+        for module_class in module_provider()
+        for name, default_value in [
+            ("uuid", "xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx"),
+            ("user_settings", None),
+            ("is_enabled", None)
+        ]
+        for use_uuid in (True, False)
+    ]
 
 
 class TestCorefacilityModule(BaseAppsTest):
@@ -152,3 +169,57 @@ class TestCorefacilityModule(BaseAppsTest):
         self.apply_filter("is_application", is_application)
         with self.assertLessQueries(1):
             self._test_all_access_features(*args)
+
+    @parameterized.expand(module_provider())
+    def test_initial_state(self, module_class):
+        module_class.reset()
+        with self.assertLessQueries(0):
+            module = module_class()
+            self.assertEquals(module.state, "found", "When the module is just importing its state must be FOUND")
+            self.assertEquals(module.alias, module.get_alias(), "The module alias must be predefined")
+            self.assertEquals(module.name, module.get_name(), "The human-readable module name must be predefined")
+            if module.alias != "core":
+                self.assertIsInstance(module.parent_entry_point, EntryPoint,
+                                      "The module is not core and doesn't have a parent entry point")
+            else:
+                self.assertIsNone(module.parent_entry_point, "The core module has an entry point")
+            self.assertEquals(module.html_code, module.get_html_code(), "The module HTML code is not the same")
+            self.assertIsNone(module._user_settings, "The module user settings were self-generated")
+            self.assertIsNone(module._is_enabled, "The module enability was not reset to the default state")
+            if module.is_application:
+                self.assertIsInstance(module.permissions, AppPermissionManager,
+                                      "The application doeasn't have permissions that are "
+                                      "instance of the AppPermissionManager")
+            else:
+                self.assertIsNone(module.permissions, "The module is not an application but has permissions")
+
+    @parameterized.expand(property_autoload_provider())
+    def test_property_autoload(self, module_class, name, default_value, use_uuid):
+        module = module_class()
+        expected_value = getattr(module, name)
+        uuid = module.uuid
+        module_class.reset()
+        module = module_class()
+        with self.assertLessQueries(0):
+            null_value = getattr(module, '_' + name)
+            self.assertEquals(null_value, default_value,
+                              "The property %s doesn't throw its value to default set during the module reset" % name)
+        with self.assertLessQueries(1):
+            if use_uuid:
+                module.use_uuid(uuid)
+            actual_value = getattr(module, name)
+            self.assertEquals(actual_value, expected_value,
+                              "The value %s for module %s was not autoloaded by UUID" % (name, repr(module)))
+            self.assertEquals(module.state, "loaded", "The module state was not 'loaded' after being autoloaded")
+
+    @parameterized.expand(module_provider())
+    def test_uuid(self, module_class):
+        module_class.reset()
+        module = module_class()
+        self.assertEquals(module.state, "found", "The module state must be flushed to FOUND after the module reset")
+        self.assertIsInstance(module._uuid, str, "The module UUID must be erased after the module reset")
+        self.assertIsInstance(module.uuid, UUID, "The module UUID must be an instance of UUID class")
+        self.assertEquals(module.state, "loaded", "The module must be autoloaded when accessing to its UUID")
+        with self.assertRaises(ValueError,
+                               msg="The corefacility module's uuid property is not read-only"):
+            module.uuid = uuid4()

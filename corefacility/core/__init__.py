@@ -1,4 +1,5 @@
 from .entity import CorefacilityModule
+from .entity.entity_exceptions import RootModuleDeleteException
 from .entity.entry_points import AuthorizationsEntryPoint, SynchronizationsEntryPoint, ProjectsEntryPoint, \
     SettingsEntryPoint
 
@@ -82,3 +83,14 @@ class App(CorefacilityModule):
             "projects": ProjectsEntryPoint(),
             "settings": SettingsEntryPoint(),
         }
+
+    def delete(self):
+        """
+        Raises an exception because you can't delete the core module.
+
+        Deleting the core module will damage the whole application functionality. Nobody can install or modify
+        any module since this is exactly core module that is responsible for this.
+
+        :return: nothing
+        """
+        raise RootModuleDeleteException()

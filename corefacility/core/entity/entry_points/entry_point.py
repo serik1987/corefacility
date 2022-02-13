@@ -1,9 +1,15 @@
+import warnings
+
+from django.db import transaction
 from django.utils.translation import gettext as _
 
 from core.entity.entity import Entity
 from core.entity.entity_fields import ReadOnlyField
-from core.entity.entity_exceptions import EntityOperationNotPermitted
+from core.entity.entity_providers.model_providers.entry_point_provider import EntryPointProvider
+from core.entity.entity_exceptions import EntityOperationNotPermitted, EntityNotFoundException, \
+    ModuleConstraintFailedException
 from .entry_point_set import EntryPointSet
+from ..entity_sets.corefacility_module_set import CorefacilityModuleSet
 
 
 class EntryPoint(Entity):
@@ -15,7 +21,7 @@ class EntryPoint(Entity):
 
     _entity_set_class = EntryPointSet
 
-    _entity_provider_list = []   # TO-DO: define proper entity provider
+    _entity_provider_list = [EntryPointProvider()]
 
     _required_fields = []
 
@@ -88,6 +94,15 @@ class EntryPoint(Entity):
         """
         return self.get_type()
 
+    @property
+    def state(self):
+        """
+        State of the entity
+
+        :return: the entry point state
+        """
+        return self._state
+
     def get_alias(self):
         """
         Entry point alias is a special name containing letters, digits underscores and/or dashes
@@ -155,13 +170,22 @@ class EntryPoint(Entity):
 
         :return: nothing
         """
-        raise NotImplementedError("TO-DO: install entry point")
+        warnings.warn("TO-DO: install entry point")
 
-    @property
-    def state(self):
+    def delete(self):
         """
-        State of the entity
+        Deletes the entry point
 
-        :return: the entry point state
+        :return: nothing
         """
-        return self._state
+        module_set = CorefacilityModuleSet()
+        module_set.entry_point = self
+        module = None
+        try:
+            module = module_set[0]
+        except EntityNotFoundException:
+            pass
+        if module is not None:
+            raise ModuleConstraintFailedException(module)
+        super().delete()
+        self._state = "deleted"

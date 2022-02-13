@@ -1,3 +1,4 @@
+import json
 from uuid import UUID
 
 from .query_builders.base import QueryBuilder
@@ -103,6 +104,11 @@ class CorefacilityModuleReader(RawSqlQueryReader):
         :param is_enabled: defines whether the module is enabled
         :return: an external object that will be transformed by the CorefacilityModuleProvider to an appropriate module.
         """
+        if isinstance(user_settings, str):
+            try:
+                user_settings = json.loads(user_settings)
+            except json.JSONDecodeError:
+                user_settings = {}
         return ModelEmulator(
             id=None,
             uuid=UUID(uuid),
