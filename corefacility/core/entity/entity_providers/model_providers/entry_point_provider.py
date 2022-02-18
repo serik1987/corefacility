@@ -28,6 +28,8 @@ class EntryPointProvider(ModelProvider):
             raise CorefacilityModuleDamagedException()
         if entry_point.get_name() != external_object.name:
             raise CorefacilityModuleDamagedException()
+        belonging_module_class = import_string(external_object.belonging_module_class)
+        entry_point._belonging_module = belonging_module_class()
         entry_point._id = external_object.id
         entry_point._state = 'loaded'
         return entry_point

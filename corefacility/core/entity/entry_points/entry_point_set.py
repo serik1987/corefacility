@@ -13,4 +13,6 @@ class EntryPointSet(EntitySet):
     _entity_reader_class = "core.entity.entity_readers.entry_point_reader.EntryPointReader"
 
     _entity_filter_list = {
+        "parent_module_is_root": (bool, None),
+        "parent_module": ("core.entity.corefacility_module.CorefacilityModule", None),
     }
