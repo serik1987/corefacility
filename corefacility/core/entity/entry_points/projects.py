@@ -10,6 +10,9 @@ class ProjectsEntryPoint(EntryPoint):
     to this entry point or to any application the deal with science rather than perform administrative tasks
     """
 
+    _is_parent_module_root = True
+    """ The property is used during the autoloading """
+
     def get_alias(self):
         """
         Alias of this entry point is always the same: 'projects'

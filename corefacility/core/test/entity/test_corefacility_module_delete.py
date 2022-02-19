@@ -6,7 +6,8 @@ from parameterized import parameterized
 
 from core import App as CoreApp
 from core.entity.entity_exceptions import RootModuleDeleteException, ModuleConstraintFailedException, \
-    EntityNotFoundException, EntityOperationNotPermitted, ModuleInstallationStateException
+    EntityNotFoundException, EntityOperationNotPermitted, ModuleInstallationStateException, \
+    ParentModuleNotInstalledException
 from core.entity.entity_fields.field_managers.module_settings_manager import ModuleSettingsManager
 from core.entity.entity_sets.corefacility_module_set import CorefacilityModuleSet
 from core.entity.entry_points.entry_point_set import EntryPointSet
@@ -142,4 +143,10 @@ class TestCorefacilityModuleDelete(TestCase):
             roi_app.install()
 
     def test_module_install_wo_entry_point(self):
-        warnings.warn("TO-DO: test loading with no entry point")
+        RoiApp().delete()
+        ImagingApp().delete()
+        RoiApp.reset()
+        ImagingApp.reset()
+        with self.assertRaises(ParentModuleNotInstalledException,
+                               msg="The module can't be installed without parent module being installed"):
+            RoiApp().install()

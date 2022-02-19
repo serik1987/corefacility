@@ -9,6 +9,8 @@ class SettingsEntryPoint(EntryPoint):
     The settings entry point is used to setup various operating system settings as well as perform
     different hardware health checks
     """
+    _is_parent_module_root = True
+    """ The property is used during the autoloading """
 
     def get_alias(self):
         """

@@ -1,4 +1,6 @@
+import re
 import warnings
+from uuid import UUID
 
 from django.db import transaction
 from django.utils.translation import gettext as _
@@ -7,9 +9,13 @@ from core.entity.entity import Entity
 from core.entity.entity_fields import ReadOnlyField
 from core.entity.entity_providers.model_providers.entry_point_provider import EntryPointProvider
 from core.entity.entity_exceptions import EntityOperationNotPermitted, EntityNotFoundException, \
-    ModuleConstraintFailedException
+    ModuleConstraintFailedException, EntryPointAutoloadFailedException, ModuleInstallationEntryPointException, \
+    BelongingModuleIncorrectException, EntryPointAliasIncorrectException, EntryPointDuplicatedException, \
+    EntryPointNameIncorrectException, EntryPointTypeIncorrectException
+
 from .entry_point_set import EntryPointSet
 from ..entity_sets.corefacility_module_set import CorefacilityModuleSet
+from ... import CorefacilityModule
 
 
 class EntryPoint(Entity):
@@ -31,6 +37,9 @@ class EntryPoint(Entity):
     _state = None
     """ The entry point state """
 
+    _is_parent_module_root = False
+    """ The property is used during the autoloading """
+
     _public_field_description = {
         "belonging_module": ReadOnlyField(description="Module to which this entry point is related"),
         "alias": ReadOnlyField(description="Entry point alias"),
@@ -39,15 +48,18 @@ class EntryPoint(Entity):
         "entry_point_class": ReadOnlyField(description="Entry point application class")
     }
 
-    @property
-    def entry_point_class(self):
+    @classmethod
+    def reset(cls):
         """
-        The entry point class
+        Clears the instance that was recently created and/or autoloaded.
+        For debugging purpose only.
 
-        :return: the string connected with the entry point class. Such a string can be substituted to the
-        entry point
+        Don't forget to delete the instance object after the reset.
+
+        :return: nothing
         """
-        return "%s.%s" % (self.__module__, self.__class__.__name__)
+        if hasattr(cls, "_instance"):
+            delattr(cls, "_instance")
 
     def __new__(cls, *args, **kwargs):
         """
@@ -72,6 +84,38 @@ class EntryPoint(Entity):
             self._edited_fields = set()
         if self._state is None:
             self._state = "found"
+
+    @property
+    def id(self):
+        """
+        Any entry point shall have its unique ID.
+
+        :return: a unique ID of the entry point
+        """
+        if self._id is None:
+            self._autoload()
+        return super().id
+
+    @property
+    def belonging_module(self):
+        """
+        Returns the module to which this entry point belongs to
+
+        :return: belonging module of this entry point
+        """
+        if self._belonging_module is None:
+            self._autoload()
+        return super().belonging_module
+
+    @property
+    def entry_point_class(self):
+        """
+        The entry point class
+
+        :return: the string connected with the entry point class. Such a string can be substituted to the
+        entry point
+        """
+        return "%s.%s" % (self.__module__, self.__class__.__name__)
 
     @property
     def alias(self):
@@ -146,15 +190,16 @@ class EntryPoint(Entity):
         """
         raise NotImplementedError("get_type")
 
-    def create(self):
+    def get_parent_module_class(self):
         """
-        Creates entry point if and only if this is currently installing
+        Returns the parent module for a given entry point. Such a module will be used as an entry point cue
 
-        :return: nothing
+        :return: the parent module or None if no cue shall be provided
         """
-        if not self._is_installing:
-            raise EntityOperationNotPermitted()
-        super().create()
+        warnings.warn("The entry point autoload may be failed because the entry point doesn't belong to the core "
+                      "module and get_parent_module returns False. If EntryPointAutoloadFailedException has been "
+                      "raised please, re-implement the get_parent_module_class method")
+        return None
 
     def update(self):
         """
@@ -164,13 +209,106 @@ class EntryPoint(Entity):
         """
         raise EntityOperationNotPermitted()
 
-    def install(self):
+    def install(self, belonging_module):
         """
         Installs this particular entry point
 
+        :param: belonging_module the module which this entry point relates to
         :return: nothing
         """
-        warnings.warn("TO-DO: install entry point")
+        self._check_preinstall_state()
+        self._set_belonging_module(belonging_module)
+        self._set_alias()
+        self._set_human_readable_name()
+        self._set_entry_point_type()
+        self._set_database_property("entry_point_class", self.entry_point_class)
+        with transaction.atomic():
+            self._state = "creating"
+            self.create()
+            self._state = "found"
+            self._autoload()
+
+    def _check_preinstall_state(self):
+        """
+        Checks the pre-installation state
+
+        :return: nothing
+        """
+        self._autoload()
+        if self.state != "uninstalled":
+            raise ModuleInstallationEntryPointException(self)
+
+    def _set_belonging_module(self, module):
+        """
+        Sets the belonging module during the entry point installation
+
+        :param module: the belonging module
+        :return: nothing
+        """
+        if not isinstance(module, CorefacilityModule):
+            raise BelongingModuleIncorrectException(self)
+        if not isinstance(module.uuid, UUID):
+            raise BelongingModuleIncorrectException(self)
+        if module.state != "loaded":
+            raise BelongingModuleIncorrectException(self)
+        self._set_database_property("belonging_module", module)
+
+    def _set_alias(self):
+        """
+        Checks and sets the entry point alias
+
+        :return: alias
+        """
+        desired_alias = self.get_alias()
+        if not isinstance(desired_alias, str) or re.match(r'^[\w\-]+$', desired_alias) is None:
+            raise EntryPointAliasIncorrectException(self)
+        entry_point_set = EntryPointSet()
+        entry_point_set.parent_module = self.belonging_module
+        try:
+            entry_point_set.get(desired_alias)
+            raise EntryPointDuplicatedException(self)
+        except EntityNotFoundException:
+            pass
+        self._set_database_property("alias", desired_alias)
+
+    def _set_human_readable_name(self):
+        """
+        Checks the human-readable name.
+
+        :return: nothing
+        """
+        desired_name = self.get_name()
+        if not isinstance(desired_name, str):
+            raise EntryPointNameIncorrectException(self)
+        self._set_database_property("name", desired_name)
+
+    def _set_entry_point_type(self):
+        """
+        Checks the entry point type
+
+        :return: nothing
+        """
+        from core.models.enums import EntryPointType
+        desired_type = self.get_type()
+        if not isinstance(desired_type, EntryPointType):
+            if not isinstance(desired_type, str):
+                raise EntryPointTypeIncorrectException(self)
+            try:
+                desired_type = EntryPointType(desired_type)
+            except ValueError:
+                raise EntryPointTypeIncorrectException(self)
+        self._set_database_property("type", desired_type)
+
+    def _set_database_property(self, name, value):
+        """
+        Sets the database property to the module
+
+        :param name: property name
+        :param value: property value
+        :return: nothing
+        """
+        setattr(self, '_' + name, value)
+        self.notify_field_changed(name)
 
     def delete(self):
         """
@@ -188,4 +326,31 @@ class EntryPoint(Entity):
         if module is not None:
             raise ModuleConstraintFailedException(module)
         super().delete()
+        self._public_fields = {}
         self._state = "deleted"
+        self.__class__.reset()
+
+    def _autoload(self):
+        """
+        Automatically loads properties that have not been loaded yet
+
+        :return: nothing
+        """
+        if self.state in ("deleted", "uninstalled", "creating"):
+            return
+        entry_point_set = EntryPointSet()
+        if self._is_parent_module_root:
+            entry_point_set.parent_module_is_root = True
+        else:
+            parent_module_class = self.get_parent_module_class()
+            if parent_module_class is None:
+                raise EntryPointAutoloadFailedException(self)
+            else:
+                entry_point_set.parent_module = parent_module_class()
+        entry_point = None
+        try:
+            entry_point = entry_point_set.get(self.get_alias())
+        except EntityNotFoundException:
+            self._state = "uninstalled"
+        if entry_point is not None and entry_point is not self:
+            raise EntryPointAutoloadFailedException(self)

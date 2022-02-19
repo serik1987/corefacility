@@ -72,7 +72,14 @@ class CorefacilityModuleAutoloadFailedException(CorefacilityModuleException):
 
     def __init__(self, prop, obj):
         super().__init__("Can't retrieve the property %s for the %s because the property was not loaded during the "
-                         "autoload" % (prop, repr(obj)))
+                         "autoload" % (prop, obj.get_entity_class_name()))
+
+
+class EntryPointAutoloadFailedException(CorefacilityModuleException):
+
+    def __init__(self, obj):
+        super().__init__("Can't retrieve the autoloadable property for entry point %s because its belonging module "
+                         "is not a root module or has not been loaded yet" % obj.get_entity_class_name())
 
 
 class ModuleUuidNotGuessedException(CorefacilityModuleException):
@@ -113,13 +120,26 @@ class ModuleNotInstalledException(CorefacilityModuleException):
 class ModuleInstallationException(CorefacilityModuleException):
 
     def __init__(self, module, msg):
-        super().__init__("Error during installation of the module '%s': %s" % (repr(module), msg))
+        super().__init__(_("Error during installation of the module") + " '%s': %s" % (repr(module), msg))
 
 
 class ModuleInstallationStateException(ModuleInstallationException):
 
     def __init__(self, module):
         super().__init__(module, "Can't install the module because its state is not UNINSTALLED")
+
+
+class ParentModuleNotInstalledException(ModuleInstallationException):
+
+    def __init__(self, module):
+        super().__init__(module, _("This module has a parent module that have not been completely installed yet"))
+
+
+class EntryPointInstallationStateException(CorefacilityModuleException):
+
+    def __init__(self, entry_point):
+        super().__init__("Can't install entry point %s because its state is not UNINSTALLED" %
+                         entry_point.get_entity_name())
 
 
 class ModuleInstallationAliasException(ModuleInstallationException):
@@ -165,7 +185,36 @@ class ModuleApplicationStatusException(ModuleInstallationException):
         super().__init__(module, "The module 'is_application' property was set incorrectly")
 
 
-class EntryPointDuplicatedException(ModuleInstallationException):
+class BelongingModuleIncorrectException(CorefacilityModuleException):
 
-    def __init__(self, module, entry_point):
-        super().__init__(module, "The entry point '%s' has been duplicated" % repr(entry_point))
+    def __init__(self, entry_point):
+        super().__init__("Can't install the entry point '%s' because its belonging module is incorrect "
+                         "or can't be autoloaded" % entry_point.get_entity_name())
+
+
+class EntryPointAliasIncorrectException(CorefacilityModuleException):
+
+    def __init__(self, entry_point):
+        super().__init__("Can't install the entry point '%s' because its alias is incorrect"
+                         % entry_point.get_entity_name())
+
+
+class EntryPointDuplicatedException(CorefacilityModuleException):
+
+    def __init__(self, entry_point):
+        super().__init__("The entry point '%s' is duplicated" % entry_point.get_entity_name())
+
+
+class EntryPointNameIncorrectException(CorefacilityModuleException):
+
+    def __init__(self, entry_point):
+        super().__init__("Can't install the entry point '%s' because its name is not correct"
+                         % entry_point.get_entity_name())
+
+
+class EntryPointTypeIncorrectException(CorefacilityModuleException):
+
+    def __init__(self, entry_point):
+        super().__init__("Can't install the entry point '%s' "
+                         "because its type is not a string being equal to either 'lst' or 'sel'"
+                         % entry_point.get_entity_name())

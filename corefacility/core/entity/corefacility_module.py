@@ -13,7 +13,8 @@ from .entity_fields.field_managers.module_settings_manager import ModuleSettings
 from .entity_exceptions import ModuleUuidNotGuessedException, \
     CorefacilityModuleDamagedException, EntityNotFoundException, ModuleInstallationStateException, \
     ModuleInstallationAliasException, ModuleInstallationEntryPointException, ParentEntryPointStateException, \
-    ModuleNameException, ModuleHtmlCodeException, ModuleApplicationStatusException, ModuleNotInstalledException
+    ModuleNameException, ModuleHtmlCodeException, ModuleApplicationStatusException, ModuleNotInstalledException, \
+    ParentModuleNotInstalledException
 
 
 class CorefacilityModule(Entity):
@@ -295,7 +296,7 @@ class CorefacilityModule(Entity):
             self._desired_uuid = self._uuid
             self._autoload()
             for _, entry_point in self.get_entry_points().items():
-                entry_point.install()
+                entry_point.install(self)
 
     def _check_preinstall_state(self):
         """
@@ -303,6 +304,11 @@ class CorefacilityModule(Entity):
 
         :return: nothing
         """
+        entry_point = self.get_parent_entry_point()
+        if entry_point is not None:
+            ep_id = entry_point.id
+            if entry_point.state == "uninstalled":
+                raise ParentModuleNotInstalledException(self)
         self._autoload()
         if self.state != "uninstalled":
             raise ModuleInstallationStateException(self)

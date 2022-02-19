@@ -1,8 +1,6 @@
-from django.db.models import QuerySet
 from django.utils.module_loading import import_string
 
-from core.entity.entity_exceptions import EntityNotFoundException, EntityOperationNotPermitted
-from ..entity_providers.entity_provider import EntityProvider
+from core.entity.entity_exceptions import EntityOperationNotPermitted
 
 
 class EntitySet:

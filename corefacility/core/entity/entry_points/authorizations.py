@@ -9,6 +9,9 @@ class AuthorizationsEntryPoint(EntryPoint):
     authorization though Google, authorization through Research Gate and so on.
     """
 
+    _is_parent_module_root = True
+    """ The property is used during the autoloading """
+
     def get_alias(self):
         """
         The entry point alias is also the same

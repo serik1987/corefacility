@@ -1,7 +1,6 @@
 from core.entity.entry_points.entry_point import EntryPoint
 from core.entity.entry_points.projects import ProjectApp
 
-
 class ProcessorsEntryPoint(EntryPoint):
     """
     A single entry point for all imaging map processors
@@ -30,6 +29,15 @@ class ProcessorsEntryPoint(EntryPoint):
         :return:
         """
         return "lst"
+
+    def get_parent_module_class(self):
+        """
+        Returns the parent module class which is always ImagingApp
+
+        :return:
+        """
+        from imaging import App
+        return App
 
 
 class ImagingProcessor(ProjectApp):

@@ -7,6 +7,9 @@ class SynchronizationsEntryPoint(EntryPoint):
     Allows to attach different kinds of synchronizations and select an appropriate one
     """
 
+    _is_parent_module_root = True
+    """ The property is used during the autoloading """
+
     def get_alias(self):
         """
         Alias for this entry point is also the same: synchronizations

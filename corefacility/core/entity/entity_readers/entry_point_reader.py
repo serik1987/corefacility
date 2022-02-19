@@ -14,6 +14,12 @@ class EntryPointReader(RawSqlQueryReader):
 
     _entity_provider = EntryPointProvider()
 
+    _lookup_table_name = "core_entrypoint"
+    """
+    Change this property if get() method will give you something like 'column ... is ambiguous'.
+    This will make get() method to add 'WHERE tbl_name.id=%s' instead of 'WHERE id=%s'
+    """
+
     def initialize_query_builder(self):
         """
         Initializes items_builder and count_builder

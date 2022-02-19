@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-07 18:35+0300\n"
+"POT-Creation-Date: 2022-02-19 22:08+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,18 +31,18 @@ msgstr "Невозможно создать требуемый ресурс, т�
 msgid "%s with such values can't exist"
 msgstr "Поле %s с подобными значениями не существует"
 
-#: core/entity/entity_exceptions/__init__.py:27
+#: core/entity/entity_exceptions/__init__.py:28
 msgid "The entity operation is not permitted"
 msgstr "Указанная операция над сущностью невозможна"
 
-#: core/entity/entity_exceptions/__init__.py:38
+#: core/entity/entity_exceptions/__init__.py:40
 msgid ""
 "This feature is not supported for current database engine. Use another one"
 msgstr ""
 "Данное свойство не поддерживается на установленной Вами СУБД. Установка "
 "PostgreSQL решит эту проблему"
 
-#: core/entity/entity_exceptions/__init__.py:43
+#: core/entity/entity_exceptions/__init__.py:45
 msgid ""
 "The user is a governor of at least one group. Its delete will automatically "
 "remove these groups and reflect another user rights. Are you sure?"
@@ -52,25 +52,22 @@ msgstr ""
 "изменению прав доступа других пользователей к тому или иному функционалу. Вы "
 "желаете продолжить?"
 
-#: core/entity/entity_sets/app_permission_set.py:10
-#, fuzzy
-#| msgid "Application usage"
-msgid "Application permission"
-msgstr "Разрешения приложения"
+#: core/entity/entity_exceptions/__init__.py:123
+msgid "Error during installation of the module"
+msgstr "Ошибка в процессе установки модуля"
 
-#: core/entity/entity_sets/corefacility_module_set.py:10
+#: core/entity/entity_exceptions/__init__.py:135
+msgid ""
+"This module has a parent module that have not been completely installed yet"
+msgstr "Данный модуль имеет родительский модуль, который не был полностью установлен"
+
+#: core/entity/entity_sets/corefacility_module_set.py:14
 msgid "Corefacility module"
 msgstr "Модуль"
 
 #: core/entity/entity_sets/group_set.py:11
 msgid "Scientific Group"
 msgstr "Научный коллектив"
-
-#: core/entity/entity_sets/project_permission_set.py:10
-#, fuzzy
-#| msgid "Project applications"
-msgid "Project permission"
-msgstr "Разрешения проекта"
 
 #: core/entity/entity_sets/project_set.py:11
 msgid "Project"
@@ -124,63 +121,63 @@ msgstr "Базовый функционал"
 msgid "Authorization methods"
 msgstr "Способы авторизации"
 
-#: core/migrations/0002_fill.py:102
+#: core/migrations/0002_fill.py:104
 msgid "Standard authorization"
 msgstr "Стандартная авторизация"
 
-#: core/migrations/0002_fill.py:105
+#: core/migrations/0002_fill.py:107
 msgid "Authorization through IHNA website"
 msgstr "Авторизация через сайт ИВНД и НФ РАН"
 
-#: core/migrations/0002_fill.py:108
+#: core/migrations/0002_fill.py:110
 msgid "Authorization through Google"
 msgstr "Авторизация через Google"
 
-#: core/migrations/0002_fill.py:111
+#: core/migrations/0002_fill.py:113
 msgid "Authorization through Mail.ru"
 msgstr "Авторизация через Mail.ru"
 
-#: core/migrations/0002_fill.py:114
+#: core/migrations/0002_fill.py:116
 msgid "Authorization through UNIX account"
 msgstr "Авторизация через операционную систему"
 
-#: core/migrations/0002_fill.py:117
+#: core/migrations/0002_fill.py:119
 msgid "Authorization through Cookie"
 msgstr "Авторизация через Cookie"
 
-#: core/migrations/0002_fill.py:120
+#: core/migrations/0002_fill.py:122
 msgid "Password recovery function"
 msgstr "Функция восстановления пароля"
 
-#: core/migrations/0002_fill.py:123
+#: core/migrations/0002_fill.py:125
 msgid "Automatic authorization"
 msgstr "Автоматическая авторизация"
 
-#: core/migrations/0002_fill.py:128
+#: core/migrations/0002_fill.py:130
 msgid "Account synchronization"
 msgstr "Синхронизация учётных записей"
 
-#: core/migrations/0002_fill.py:131
+#: core/migrations/0002_fill.py:135
 msgid "IHNA RAS account synchronization"
 msgstr "Синхронизация с сайтом ИВНД и НФ РАН"
 
-#: core/migrations/0002_fill.py:135
+#: core/migrations/0002_fill.py:139
 msgid "Project applications"
 msgstr "Работа с научными проектами"
 
-#: core/migrations/0002_fill.py:139
+#: core/migrations/0002_fill.py:144
 msgid "Basic functional maps processing"
 msgstr "Базовая обработка функциональных карт"
 
-#: core/migrations/0002_fill.py:144
+#: core/migrations/0002_fill.py:149
 msgid "Imaging processors"
 msgstr "Обработка функциональных карт"
 
-#: core/migrations/0002_fill.py:146
+#: core/migrations/0002_fill.py:152
 msgid "ROI definition"
 msgstr "Выделение ROI"
 
-#: core/migrations/0002_fill.py:149
+#: core/migrations/0002_fill.py:155
 msgid "Other settings"
 msgstr "Прочие настройки"
 
@@ -233,3 +230,13 @@ msgstr "Карта ориентационной настройки"
 #: imaging/models/enums/map_type.py:10
 msgid "Direction map"
 msgstr "Карта дирекциональной настройки"
+
+#, fuzzy
+#~| msgid "Application usage"
+#~ msgid "Application permission"
+#~ msgstr "Разрешения приложения"
+
+#, fuzzy
+#~| msgid "Project applications"
+#~ msgid "Project permission"
+#~ msgstr "Разрешения проекта"
