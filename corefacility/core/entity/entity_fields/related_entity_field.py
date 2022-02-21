@@ -31,6 +31,6 @@ class RelatedEntityField(EntityField):
             self._entity_class = import_string(self._entity_class)
         if not isinstance(value, self._entity_class):
             raise ValueError("RelatedEntityField.correct: attempting to assign the incorrect entity type")
-        if value.id is None or value.state == "creating":
+        if value.state == "creating":
             raise ValueError("RelatedEntityField.correct: the value is not create()'d before assigning")
         return value

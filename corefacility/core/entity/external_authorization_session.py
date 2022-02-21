@@ -4,6 +4,8 @@ from datetime import timedelta
 from .entity import Entity
 from .entity_exceptions import EntityNotFoundException
 from .entity_sets.external_authorization_session_set import ExternalAuthorizationSessionSet
+from .entity_providers.model_providers.external_authorization_session_provider import \
+    ExternalAuthorizationSessionProvider
 from .entity_fields import RelatedEntityField, ManagedEntityField, EntityPasswordManager, ExpiryDateManager
 
 
@@ -28,12 +30,12 @@ class ExternalAuthorizationSession(Entity):
 
     _entity_set_class = ExternalAuthorizationSessionSet
 
-    _entity_provider_list = []  # TO-DO: Implement the entity provider list
+    _entity_provider_list = [ExternalAuthorizationSessionProvider()]
 
     _required_fields = ["authorization_module", "session_key", "session_key_expiry_date"]
 
     _public_field_description = {
-        "authorization_module": RelatedEntityField("core.entity.corefacility_module.CorefacilityModule",
+        "authorization_module": RelatedEntityField("core.entity.entry_points.authorizations.AuthorizationModule",
                                                    description="Related authorization module"),
         "session_key": ManagedEntityField(EntityPasswordManager,
                                           description="Issued session key"),
