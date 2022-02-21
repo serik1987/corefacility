@@ -9,8 +9,8 @@ from imaging import App as ImagingApp, ProcessorsEntryPoint
 
 from core.test.data_providers.module_providers import entry_point_provider
 from core.test.data_providers.entity_sets import filter_data_provider
-from .base_apps_test import BaseAppsTest
-from .entity_objects.entry_point_set_object import EntryPointSetObject
+from core.test.entity.base_apps_test import BaseAppsTest
+from core.test.entity.entity_objects.entry_point_set_object import EntryPointSetObject
 
 
 def entry_point_classes_provider():
@@ -53,6 +53,49 @@ def core_entry_point_with_parent_module_provider():
         (SynchronizationsEntryPoint, CoreApp()),
         (ProjectsEntryPoint, CoreApp()),
         (ProcessorsEntryPoint, ImagingApp())
+    ]
+
+
+def entry_point_alias_provider():
+    return [
+        (AuthorizationsEntryPoint, "authorizations"),
+        (SettingsEntryPoint, "settings"),
+        (SynchronizationsEntryPoint, "synchronizations"),
+        (ProjectsEntryPoint, "projects"),
+        (ProcessorsEntryPoint, "processors"),
+    ]
+
+
+def entry_point_name_provider():
+    return [
+        (AuthorizationsEntryPoint, "Authorization methods"),
+        (SettingsEntryPoint, "Other settings"),
+        (SynchronizationsEntryPoint, "Account synchronization"),
+        (ProjectsEntryPoint, "Project applications"),
+        (ProcessorsEntryPoint, "Imaging processors"),
+    ]
+
+
+def entry_point_type_provider():
+    return [
+        (AuthorizationsEntryPoint, "lst"),
+        (SettingsEntryPoint, "lst"),
+        (SynchronizationsEntryPoint, "sel"),
+        (ProjectsEntryPoint, "lst"),
+        (ProcessorsEntryPoint, "lst"),
+    ]
+
+
+def entry_point_class_provider():
+    return [
+        (entry_point, "%s.%s" % (entry_point.__module__, entry_point.__name__))
+        for entry_point in (
+            AuthorizationsEntryPoint,
+            SettingsEntryPoint,
+            SynchronizationsEntryPoint,
+            ProjectsEntryPoint,
+            ProcessorsEntryPoint
+        )
     ]
 
 
@@ -178,6 +221,7 @@ class TestEntryPoint(BaseAppsTest):
     @parameterized.expand(core_entry_point_with_parent_module_provider())
     def test_autoload(self, entry_point_class, parent_module):
         entry_point_class.reset()
+        parent_module = parent_module.__class__()
         with self.assertNumQueries(1):
             entry_point = entry_point_class()
             self.assertIsInstance(entry_point.id, int, "The entry point ID must be integer after the autoload")
@@ -208,6 +252,35 @@ class TestEntryPoint(BaseAppsTest):
                           "The entry point must be de-attached from the root module even after its reload "
                           "after uninstall")
         self.assertEntryPointFound(entry_point)
+
+    @parameterized.expand(core_entry_point_with_parent_module_provider())
+    def test_belonging_module(self, entry_point_class, expected_value):
+        expected_value = expected_value.__class__()
+        self._test_entry_point_field(entry_point_class, "belonging_module", expected_value)
+
+    @parameterized.expand(entry_point_alias_provider())
+    def test_alias(self, entry_point_class, expected_value):
+        self._test_entry_point_field(entry_point_class, "alias", expected_value)
+
+    @parameterized.expand(entry_point_name_provider())
+    def test_name(self, entry_point_class, expected_value):
+        self._test_entry_point_field(entry_point_class, "name", expected_value)
+
+    @parameterized.expand(entry_point_type_provider())
+    def test_type(self, entry_point_class, expected_value):
+        self._test_entry_point_field(entry_point_class, "type", expected_value)
+
+    @parameterized.expand(entry_point_class_provider())
+    def test_entry_point_class(self, entry_point_class, expected_value):
+        self._test_entry_point_field(entry_point_class, "entry_point_class", expected_value)
+
+    def _test_entry_point_field(self, entry_point_class, name, expected_value):
+        entry_point = entry_point_class()
+        actual_value = getattr(entry_point, name)
+        self.assertEquals(actual_value, expected_value, "Invalid value for the property '%s' of %s"
+                          % (name, repr(entry_point)))
+        with self.assertRaises(ValueError, msg="All entry point fields must be read only"):
+            setattr(entry_point, name, expected_value)
 
     def assertEntryPointFound(self, entry_point):
         self.assertEquals(entry_point.alias, entry_point.get_alias(),

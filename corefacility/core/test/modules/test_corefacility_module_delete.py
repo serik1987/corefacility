@@ -7,7 +7,7 @@ from parameterized import parameterized
 from core import App as CoreApp
 from core.entity.entity_exceptions import RootModuleDeleteException, ModuleConstraintFailedException, \
     EntityNotFoundException, EntityOperationNotPermitted, ModuleInstallationStateException, \
-    ParentModuleNotInstalledException
+    ParentModuleNotInstalledException, ModuleDeprecatedException
 from core.entity.entity_fields.field_managers.module_settings_manager import ModuleSettingsManager
 from core.entity.entity_sets.corefacility_module_set import CorefacilityModuleSet
 from core.entity.entry_points.entry_point_set import EntryPointSet
@@ -67,8 +67,8 @@ class TestCorefacilityModuleDelete(TestCase):
                 module.delete()
         else:
             module.delete()
-            self.assertEquals(module.state, "deleted",
-                              "The module state doesn't switched to 'deleted' after module delete")
+            self.assertIn(module.state, ("deleted", "deprecated"),
+                          "The module state doesn't switched to 'deleted' after module delete")
             with self.assertRaises(EntityNotFoundException,
                                    msg="The module has been deleted but still presented in the database"):
                 module_set = CorefacilityModuleSet()
@@ -114,8 +114,11 @@ class TestCorefacilityModuleDelete(TestCase):
     def test_delete_double(self):
         roi_app = RoiApp()
         roi_app.delete()
+        with self.assertRaises(ModuleDeprecatedException, msg="The same entity can't be deleted twice"):
+            roi_app.delete()
         with self.assertRaises(EntityOperationNotPermitted,
-                               msg="The same entity can be deleted twice"):
+                               msg="The same entity can't be deleted twice"):
+            roi_app = RoiApp()
             roi_app.delete()
         RoiApp.reset()
         ImagingApp.reset()

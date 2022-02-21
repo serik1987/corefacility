@@ -14,7 +14,7 @@ from .entity_exceptions import ModuleUuidNotGuessedException, \
     CorefacilityModuleDamagedException, EntityNotFoundException, ModuleInstallationStateException, \
     ModuleInstallationAliasException, ModuleInstallationEntryPointException, ParentEntryPointStateException, \
     ModuleNameException, ModuleHtmlCodeException, ModuleApplicationStatusException, ModuleNotInstalledException, \
-    ParentModuleNotInstalledException
+    ParentModuleNotInstalledException, ModuleDeprecatedException, EntityOperationNotPermitted
 
 
 class CorefacilityModule(Entity):
@@ -66,6 +66,7 @@ class CorefacilityModule(Entity):
         :return: nothing
         """
         if hasattr(cls, "_instance"):
+            cls._instance._state = "deprecated"
             delattr(cls, "_instance")
 
     def __new__(cls, *args, **kwargs):
@@ -421,6 +422,12 @@ class CorefacilityModule(Entity):
 
         :return: nothing
         """
+        if self.state == "found":
+            self._autoload()
+        if self.state == "deprecated":
+            raise ModuleDeprecatedException()
+        if self.state == "uninstalled":
+            raise EntityOperationNotPermitted()
         with transaction.atomic():
             for entry_point_alias, entry_point in self.get_entry_points().items():
                 entry_point.delete()
@@ -476,6 +483,8 @@ class CorefacilityModule(Entity):
         :return: nothing
         """
         module_set = CorefacilityModuleSet()
+        if self._state == "deprecated":
+            raise ModuleDeprecatedException()
         try:
             if self._desired_uuid is not None:
                 another_module = module_set.get(self._desired_uuid)
@@ -514,3 +523,14 @@ class CorefacilityModule(Entity):
             self._state = "changed"
         else:
             super().__setattr__(name, value)
+
+    def __eq__(self, other):
+        """
+        Compares two corefacility modules, just for the debugging purpose
+
+        :param other: another module
+        :return: True if two modules are equal, False otherwise
+        """
+        if not isinstance(other, CorefacilityModule):
+            return False
+        return self.uuid == other.uuid

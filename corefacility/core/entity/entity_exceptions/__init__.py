@@ -117,6 +117,14 @@ class ModuleNotInstalledException(CorefacilityModuleException):
         super().__init__("Can't setup the module property because the module has not been installed")
 
 
+class ModuleDeprecatedException(CorefacilityModuleException):
+
+    def __init__(self):
+        super().__init__("The module you are trying to use is deprecated. The autoload of an instance you are "
+                         "currently using is not possible any more. To solve this problem, please, create another "
+                         "module instance using the module constructor and apply autoload again")
+
+
 class ModuleInstallationException(CorefacilityModuleException):
 
     def __init__(self, module, msg):

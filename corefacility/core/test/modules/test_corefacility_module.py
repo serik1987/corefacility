@@ -9,8 +9,8 @@ from core.entity.entry_points.authorizations import AuthorizationsEntryPoint
 
 from core.test.data_providers.entity_sets import filter_data_provider
 from core.test.data_providers.module_providers import module_provider, entry_point_provider
-from .base_apps_test import BaseAppsTest
-from .entity_objects.corefacility_module_set_object import CorefacilityModuleSetObject
+from core.test.entity.base_apps_test import BaseAppsTest
+from core.test.entity.entity_objects.corefacility_module_set_object import CorefacilityModuleSetObject
 
 ALL_ENTRY_POINT_CLASSES = [ep_info['entry_point'] for ep_info in entry_point_provider()]
 

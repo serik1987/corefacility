@@ -12,10 +12,11 @@ from core.entity.entity_exceptions import EntityOperationNotPermitted, EntityNot
     ModuleConstraintFailedException, EntryPointAutoloadFailedException, ModuleInstallationEntryPointException, \
     BelongingModuleIncorrectException, EntryPointAliasIncorrectException, EntryPointDuplicatedException, \
     EntryPointNameIncorrectException, EntryPointTypeIncorrectException
+from core.entity.entity_sets.corefacility_module_set import CorefacilityModuleSet
+from core.entity.corefacility_module import CorefacilityModule
 
 from .entry_point_set import EntryPointSet
-from ..entity_sets.corefacility_module_set import CorefacilityModuleSet
-from ... import CorefacilityModule
+from ..entity_readers.query_builders.query_filters import AndQueryFilter, StringQueryFilter
 
 
 class EntryPoint(Entity):
@@ -30,9 +31,6 @@ class EntryPoint(Entity):
     _entity_provider_list = [EntryPointProvider()]
 
     _required_fields = []
-
-    _is_installing = False
-    """ True if entry point is currently installing to the application """
 
     _state = None
     """ The entry point state """
@@ -329,6 +327,66 @@ class EntryPoint(Entity):
         self._public_fields = {}
         self._state = "deleted"
         self.__class__.reset()
+
+    def modules(self, is_enabled=True):
+        """
+        Iterates over all modules attached to this entry point.
+
+        :param is_enabled: True to iterate over all modules where is_enabled property is True. False to iterate over
+        all modules
+        :return: module iterator
+        """
+        module_set = CorefacilityModuleSet()
+        module_set.entry_point = self
+        if is_enabled:
+            module_set.is_enabled = True
+        for module in module_set:
+            yield module
+
+    def widgets(self, is_enabled=True):
+        """
+        Iterates over all modules attached to this entry point and returns module widgets only.
+
+        :param is_enabled: True to iterate over all modules where is_enabled property is True. False to iterate over
+        all modules
+        :return: module iterator
+        """
+        from django.conf import settings
+        from django.db import connection
+        from django.utils.translation import gettext
+        query_builder = settings.QUERY_BUILDER_CLASS()
+        query_builder\
+            .add_select_expression("uuid")\
+            .add_select_expression("alias")\
+            .add_select_expression("name")\
+            .add_select_expression("html_code")\
+            .add_data_source("core_module")\
+            .set_main_filter(AndQueryFilter())
+        query_builder.main_filter &= StringQueryFilter("parent_entry_point_id=%s", self.id)
+        if is_enabled:
+            query_builder.main_filter &= StringQueryFilter("is_enabled")
+        query = query_builder.build()
+        with connection.cursor() as cursor:
+            cursor.execute(query[0], query[1:])
+            while True:
+                row = cursor.fetchone()
+                if row is None:
+                    break
+                yield UUID(row[0]), row[1], gettext(row[2]), row[3]
+
+    def module(self, alias, is_enabled=True):
+        """
+        Looks for a module with a given alias attached to this entry point.
+
+        :param alias: alias of the module to find
+        :param is_enabled: True - find across all enabled modules, False - find across all modules
+        :return: the module found
+        """
+        module_set = CorefacilityModuleSet()
+        module_set.entry_point = self
+        if is_enabled:
+            module_set.is_enabled = True
+        return module_set.get(alias)
 
     def _autoload(self):
         """
