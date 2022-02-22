@@ -1,5 +1,6 @@
 from .entity_set import EntitySet
 from ..entity_readers.external_authorization_session_reader import ExternalAuthorizationSessionReader
+from ..entry_points.authorizations import AuthorizationModule
 
 
 class ExternalAuthorizationSessionSet(EntitySet):
@@ -13,4 +14,6 @@ class ExternalAuthorizationSessionSet(EntitySet):
 
     _entity_reader_class = ExternalAuthorizationSessionReader
 
-    _entity_filter_list = {}
+    _entity_filter_list = {
+        "authorization_module": (AuthorizationModule, None),
+    }
