@@ -15,8 +15,6 @@ class Project(models.Model):
                                    help_text="Short project description, necessary for sending submissions")
     root_group = models.ForeignKey("Group", on_delete=models.RESTRICT,
                                    help_text="The group that created and initialized the project")
-    project_apps = models.ManyToManyField("Module",
-                                          help_text="List of application visible in the particular project")
     project_dir = models.CharField(max_length=100, unique=True, null=True, editable=False,
                                    help_text="directory where project files will be located")
     unix_group = models.CharField(max_length=11, unique=True, null=True, editable=False,
