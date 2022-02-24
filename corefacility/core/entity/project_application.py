@@ -1,6 +1,7 @@
 from .entity import Entity
 from .entity_sets.project_application_set import ProjectApplicationSet
 from .entity_fields.related_entity_field import RelatedEntityField
+from .entity_fields.application_entity_field import ApplicationEntityField
 from .entity_fields.entity_field import EntityField
 from .entity_providers.model_providers.project_application_provider import ProjectApplicationProvider
 
@@ -13,7 +14,7 @@ class ProjectApplication(Entity):
     _entity_set_class = ProjectApplicationSet
     """ The entity set class that allows to quickly move towards the EntitySet """
 
-    _entity_provider_list = [ ProjectApplicationProvider() ]
+    _entity_provider_list = [ProjectApplicationProvider()]
     """ List of entity providers that organize connection between entities and certain data sources """
 
     _required_fields = ["application", "project", "is_enabled"]
@@ -24,8 +25,7 @@ class ProjectApplication(Entity):
     """
 
     _public_field_description = {
-        "application": RelatedEntityField("core.entity.corefacility_module.CorefacilityModule",
-                                          description="The project application"),
+        "application": ApplicationEntityField(description="The project application"),
         "project": RelatedEntityField("core.entity.project.Project",
                                       description="The project which this application relates to"),
         "is_enabled": EntityField(bool, default=False,

@@ -53,3 +53,24 @@ class Project(Entity):
         super().__setattr__(name, value)
         if name == "root_group":
             self._public_fields["governor"] = value.governor
+
+    def __eq__(self, other):
+        """
+        Compares two projects (to be used for the debugging purpose)
+
+        :param other: the other project to compare to
+        :return: nothing
+        """
+        if not isinstance(other, Project):
+            return False
+        if self.id != other.id:
+            return False
+        if self.alias != other.alias:
+            return False
+        if self.name != other.name:
+            return False
+        if self.description != other.description:
+            return False
+        if self.root_group != other.root_group:
+            return False
+        return True
