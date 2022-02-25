@@ -1,6 +1,7 @@
 from parameterized import parameterized
 
 from core.authorizations.standard import StandardAuthorization
+from core.entity.project_application import ProjectApplication
 from core.entity.project import Project
 from core.entity.user import User
 from core.entity.group import Group
@@ -10,6 +11,7 @@ from roi import App as RoiApp
 from core.test.data_providers.field_value_providers import boolean_provider, put_stages_in_provider
 from .base_test_class import BaseTestClass
 from .entity_objects.project_application_object import ProjectApplicationObject
+from ...entity.entity_exceptions import EntityDuplicatedException
 
 
 def application_project_provider():
@@ -86,6 +88,14 @@ class TestProjectApplication(BaseTestClass):
         changed_app = changed_app_class()
         self._test_field("application", initial_app, changed_app, exception_to_throw, route_number,
                          use_defaults=False, project=self._another_project, is_enabled=True)
+
+    def test_double_create(self):
+        p1 = ProjectApplication(project=self._sample_project, application=ImagingApp(), is_enabled=True)
+        p1.create()
+        p2 = ProjectApplication(project=self._sample_project, application=ImagingApp(), is_enabled=False)
+        with self.assertRaises(EntityDuplicatedException,
+                               msg="Each ProjectApplication entity is a unique pair (project, application)"):
+            p2.create()
 
     def _check_default_fields(self, project_application):
         """

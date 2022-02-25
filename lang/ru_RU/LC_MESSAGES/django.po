@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-19 22:08+0300\n"
+"POT-Creation-Date: 2022-02-24 06:40+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -52,14 +52,15 @@ msgstr ""
 "изменению прав доступа других пользователей к тому или иному функционалу. Вы "
 "желаете продолжить?"
 
-#: core/entity/entity_exceptions/__init__.py:123
+#: core/entity/entity_exceptions/__init__.py:131
 msgid "Error during installation of the module"
 msgstr "Ошибка в процессе установки модуля"
 
-#: core/entity/entity_exceptions/__init__.py:135
+#: core/entity/entity_exceptions/__init__.py:143
 msgid ""
 "This module has a parent module that have not been completely installed yet"
-msgstr "Данный модуль имеет родительский модуль, который не был полностью установлен"
+msgstr ""
+"Данный модуль имеет родительский модуль, который не был полностью установлен"
 
 #: core/entity/entity_sets/corefacility_module_set.py:14
 msgid "Corefacility module"
@@ -68,6 +69,10 @@ msgstr "Модуль"
 #: core/entity/entity_sets/group_set.py:11
 msgid "Scientific Group"
 msgstr "Научный коллектив"
+
+#: core/entity/entity_sets/project_application_set.py:12
+msgid "Project application"
+msgstr "Приложение в проекте"
 
 #: core/entity/entity_sets/project_set.py:11
 msgid "Project"

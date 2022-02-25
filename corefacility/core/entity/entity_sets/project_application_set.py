@@ -23,5 +23,6 @@ class ProjectApplicationSet(EntitySet):
     _entity_filter_list = {
         "application": ["core.entity.corefacility_module.CorefacilityModule", lambda module: module.is_application],
         "project": ["core.entity.project.Project", None],
-        "is_enabled": [bool, None],
+        "entity_is_enabled": [bool, None],
+        "application_is_enabled": [bool, None],
     }
