@@ -89,6 +89,13 @@ class CorefacilityModuleReader(RawSqlQueryReader):
         for builder in (self.items_builder, self.count_builder):
             builder.main_filter &= filter_clause
 
+    def apply_project_filter(self, project):
+        for builder in (self.items_builder, self.count_builder):
+            builder.data_source.add_join(builder.JoinType.LEFT, "core_projectapplication",
+                                         "ON (core_projectapplication.application_id=core_module.uuid AND "
+                                         "core_projectapplication.is_enabled)")
+            builder.main_filter &= StringQueryFilter("core_projectapplication.project_id=%s", project.id)
+
     def create_external_object(self, uuid, alias, name, html_code, app_class, user_settings,
                                is_application, is_enabled):
         """

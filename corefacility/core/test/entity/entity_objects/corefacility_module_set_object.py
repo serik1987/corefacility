@@ -1,4 +1,7 @@
 from core import App as CoreApp, CorefacilityModule
+from core.entity.entity_exceptions import EntityNotFoundException
+
+from core.entity.entity_sets.project_application_set import ProjectApplicationSet
 
 from core.test.entity_set.entity_set_objects.entity_set_object import EntitySetObject
 from core.test.data_providers.module_providers import module_provider
@@ -37,3 +40,18 @@ class CorefacilityModuleSetObject(EntitySetObject):
 
     def filter_by_is_application(self, is_application):
         self._entities = list(filter(lambda module: module.is_application == is_application, self._entities))
+
+    def filter_by_project(self, project):
+        new_entities = []
+        app_set = ProjectApplicationSet()
+        app_set.project = project
+        app_set.entity_is_enabled = True
+        for module in self.entities:
+            if module.is_application:
+                try:
+                    app_set.application = module
+                    app_obj = app_set[0]
+                    new_entities.append(module)
+                except EntityNotFoundException:
+                    pass
+        self._entities = new_entities
