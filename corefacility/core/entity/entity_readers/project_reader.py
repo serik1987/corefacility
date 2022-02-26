@@ -112,6 +112,14 @@ class ProjectReader(RawSqlQueryReader):
             .add_group_term("governor.id")\
             .add_group_term("root_user.id")
 
+    def apply_application_filter(self, application):
+        uuid = str(application.uuid).replace("-", "")
+        for builder in (self.items_builder, self.count_builder):
+            builder.data_source.add_join(builder.JoinType.LEFT, "core_projectapplication",
+                                         "ON (core_projectapplication.project_id=core_project.id AND "
+                                         "core_projectapplication.is_enabled)")
+            builder.main_filter &= StringQueryFilter("core_projectapplication.application_id=%s", uuid)
+
     def create_external_object(self, project_id, project_alias, project_avatar,
                                project_name, project_description, project_dir, unix_group,
                                root_group_id, root_group_name,

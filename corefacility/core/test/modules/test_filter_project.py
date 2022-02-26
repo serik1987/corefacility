@@ -1,5 +1,6 @@
 from parameterized import parameterized
 
+from core.entity.entity_sets.project_set import ProjectSet
 from core.entity.entity_exceptions import EntityNotFoundException
 from imaging import App as ImagingApp
 from roi import App as RoiApp
@@ -112,6 +113,18 @@ class TestProjectFilter(BaseTestClass):
         actual_length = len(project.project_apps)
         self.assertEquals(actual_length, expected_length, "Total number of project applications is not the same "
                                                           "as expected")
+
+    @parameterized.expand([
+        (ImagingApp(),),
+        (RoiApp(),),
+    ])
+    def test_filter_application(self, app):
+        project_set = ProjectSet()
+        project_set.application = app
+        for project in project_set:
+            expected_app = project.project_apps.get(app.alias)
+            self.assertIs(app, expected_app, "The application filter remains projects that are not a part "
+                                             "of the op")
 
 
 del BaseTestClass
