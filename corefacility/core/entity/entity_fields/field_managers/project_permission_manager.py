@@ -1,4 +1,3 @@
-from core.models import ProjectPermission
 from core.models.enums import LevelType
 
 from .permission_manager import PermissionManager
@@ -12,7 +11,7 @@ class ProjectPermissionManager(PermissionManager):
     Manages access control lists for a particular project.
     """
 
-    _permission_model = ProjectPermission
+    _permission_model = "core.models.ProjectPermission"
     """ Defines particular model connects your entity model, the Group model and particular access level """
 
     _permission_table = "core_projectpermission"

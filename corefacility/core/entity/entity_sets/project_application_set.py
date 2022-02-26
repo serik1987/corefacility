@@ -25,4 +25,10 @@ class ProjectApplicationSet(EntitySet):
         "project": ["core.entity.project.Project", None],
         "entity_is_enabled": [bool, None],
         "application_is_enabled": [bool, None],
+        "application_alias": [str, None],
     }
+
+    @property
+    def is_enabled(self):
+        raise AttributeError("The property is_enabled does not exist. "
+                             "May be, you mean: entity_is_enabled, application_is_enabled")

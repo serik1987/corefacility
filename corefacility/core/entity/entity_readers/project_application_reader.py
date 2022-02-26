@@ -95,6 +95,10 @@ class ProjectApplicationReader(RawSqlQueryReader):
         for builder in (self.items_builder, self.count_builder):
             builder.main_filter &= current_filter
 
+    def apply_application_alias_filter(self, application_alias):
+        for builder in (self.items_builder, self.count_builder):
+            builder.main_filter &= StringQueryFilter("core_module.alias=%s", application_alias)
+
     def create_external_object(self, entity_id, is_enabled, module_uuid, module_alias, module_name, module_html_code,
                                module_is_application, module_app_class, module_is_enabled, module_user_settings,
                                project_id, project_alias, project_avatar, project_name, project_description,

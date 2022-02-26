@@ -3,7 +3,7 @@ from .entity import Entity
 from .entity_fields.field_managers.project_permission_manager import ProjectPermissionManager
 from .entity_sets.project_set import ProjectSet
 from .entity_fields import EntityField, EntityAliasField, PublicFileManager, ManagedEntityField, ReadOnlyField, \
-    RelatedEntityField, EntityContainerManager
+    RelatedEntityField, ProjectApplicationManager
 from .entity_providers.model_providers.project_provider import ProjectProvider as ModelProvider
 
 
@@ -30,7 +30,7 @@ class Project(Entity):
                                          description="Responsible scientific group"),
         "permissions": ManagedEntityField(ProjectPermissionManager,
                                           description="Permissions of the other users"),
-        "project_apps": ManagedEntityField(EntityContainerManager,
+        "project_apps": ManagedEntityField(ProjectApplicationManager,
                                            description="All applications attached to a certain project"),
         "project_dir": ReadOnlyField(description="Non-public files location directory"),
         "unix_group": ReadOnlyField(description="UNIX group to remote access to project files"),

@@ -7,7 +7,7 @@ from .ip_address_field import IpAddressField
 
 from .field_managers.entity_value_manager import EntityValueManager
 from .field_managers.public_file_manager import PublicFileManager
-from .field_managers.entity_container_manager import EntityContainerManager
+from .field_managers.project_application_manager import ProjectApplicationManager
 from .field_managers.entity_password_manager import EntityPasswordManager
 from .field_managers.expiry_date_manager import ExpiryDateManager
 from .field_managers.current_time_manager import CurrentTimeManager
