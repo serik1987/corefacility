@@ -50,6 +50,9 @@ class PermissionManager(EntityValueManager):
     def access_level_type(self):
         if self._access_level_type is None:
             raise NotImplementedError("Please, define the _access_level_type class property")
+        if isinstance(self._access_level_type, str):
+            from core.models.enums import LevelType
+            self._access_level_type = LevelType(self._access_level_type)
         return self._access_level_type
 
     def __iter__(self):
@@ -81,17 +84,17 @@ class PermissionManager(EntityValueManager):
             if access_level.alias == "no_access":
                 return
             else:
-                raise NotImplementedError("This feature is syntaxically correct but still not implemented yet")
+                raise NotImplementedError("This feature is correct correct but still not implemented yet")
         try:
             permission = self.permission_model.objects.get(**{
-                self.entity_link_field: self.entity.id,
+                self.entity_link_field: self._get_entity_id(self.entity),
                 "group_id": group.id
             })
             permission.access_level_id = access_level.id
             permission.save()
         except self.permission_model.DoesNotExist:
             permission = self.permission_model(**{
-                self.entity_link_field: self.entity.id,
+                self.entity_link_field: self._get_entity_id(self.entity),
                 "group_id": group.id,
                 "access_level_id": access_level.id
             })
@@ -112,18 +115,23 @@ class PermissionManager(EntityValueManager):
 
         self._check_system_permissions(group, None)
         try:
-            permission = self.permission_model.objects.get(**{
-                self.entity_link_field: self.entity.id,
-                "group_id": group.id
-            })
+            try:
+                permission = self.permission_model.objects.get(**{
+                    self.entity_link_field: self._get_entity_id(self.entity),
+                    "group_id": group.id
+                })
+            except (self.permission_model.DoesNotExist, AttributeError):
+                permission = self.permission_model.objects.get(**{
+                    self.entity_link_field: self._get_entity_id(self.entity),
+                    "group_id": None
+                })
+            access_level_set = AccessLevelSet()
+            access_level_set.type = self.access_level_type
+            return access_level_set.get(permission.access_level_id)  # +1 EXTRA SQL QUERY!
         except (self.permission_model.DoesNotExist, AttributeError):
-            permission = self.permission_model.objects.get(**{
-                self.entity_link_field: self.entity.id,
-                "group_id": None
-            })
-        access_level_set = AccessLevelSet()
-        access_level_set.type = self.access_level_type
-        return access_level_set.get(permission.access_level_id)  # +1 EXTRA SQL QUERY!
+            access_level_set = AccessLevelSet()
+            access_level_set.type = self.access_level_type
+            return access_level_set.get("no_access")
 
     def delete(self, group):
         """
@@ -137,7 +145,7 @@ class PermissionManager(EntityValueManager):
             raise EntityOperationNotPermitted()
         try:
             permission = self.permission_model.objects.get(**{
-                self.entity_link_field: self.entity.id,
+                self.entity_link_field: self._get_entity_id(self.entity),
                 "group_id": group.id
             })
             permission.delete()
@@ -162,6 +170,14 @@ class PermissionManager(EntityValueManager):
                 raise EntityOperationNotPermitted()
         if access_level is not None and access_level.type != self.access_level_type:
             raise EntityOperationNotPermitted()
+
+    def _get_entity_id(self, entity):
+        """
+        Returns the entity ID.
+
+        :return: the entity id
+        """
+        return entity.id
 
     def __build_iteration_query(self):
         builder = settings.QUERY_BUILDER_CLASS()

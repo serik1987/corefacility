@@ -51,3 +51,14 @@ class CorefacilityModuleSet(EntitySet):
             raise ValueError("To find the module you must provide either its alias or UUID")
         provider = reader.get_entity_provider()
         return provider.wrap_entity(source)
+
+    def __setattr__(self, key, value):
+        super().__setattr__(key, value)
+        if key == "user":
+            setattr(self, "is_application", True)
+        if key == "project":
+            setattr(self, "is_application", True)
+        if key == "is_application":
+            if not value:
+                setattr(self, "user", None)
+                setattr(self, "project", None)

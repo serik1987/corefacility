@@ -75,6 +75,10 @@ class CorefacilityModuleProvider(ModelProvider):
         module._is_application = external_object.is_application
         module._is_enabled = external_object.is_enabled
         module._state = "loaded"
+        try:
+            module._user_access_level = external_object.user_access_level
+        except AttributeError:
+            module._user_access_level = None
         return module
 
     def unwrap_entity(self, module):

@@ -48,7 +48,8 @@ class CorefacilityModule(Entity):
         "is_application": ReadOnlyField(description="Is module an application"),
         "is_enabled": EntityField(bool, description="Is module enabled"),
         "permissions": ManagedEntityField(AppPermissionManager,
-                                          description="Application permissions")
+                                          description="Application permissions"),
+        "user_access_level": ReadOnlyField(description="Access level list"),
     }
 
     _module_installation = False
