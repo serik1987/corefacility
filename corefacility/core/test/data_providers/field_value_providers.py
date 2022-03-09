@@ -2,6 +2,8 @@ import os.path
 
 from core.entity.entity_exceptions import EntityFieldInvalid
 
+EPSILON = 1e-8
+
 
 def put_stages_in_provider(data):
     final_data = []
@@ -116,3 +118,60 @@ def base_expiry_date_provider():
     """
     return [(n,) for n in range(3)]
 
+
+def integer_provider(min_value=None, max_value=None):
+    """
+    Provides the integer values
+
+    :param min_value: min value if applicable
+    :param max_value: max value if applicable
+    :return: provided data
+    """
+    data = []
+    if min_value is None and max_value is None:
+        data.append((10, 10, None))
+        updated_value = 10
+    elif min_value is not None:
+        updated_value = min_value + 1
+    else:
+        updated_value = max_value - 1
+    if min_value is not None:
+        data.append((min_value, updated_value, None))
+        data.append((min_value-1, updated_value, ValueError))
+    if max_value is not None:
+        data.append((max_value, updated_value, None))
+        data.append((max_value+1, updated_value, ValueError))
+    return put_stages_in_provider(data)
+
+
+def float_provider(min_value=None, max_value=None, min_value_enclosed=False, max_value_enclosed=False):
+    """
+    Provides the float value
+
+    :param min_value: the min value
+    :param max_value: the max value
+    :param min_value_enclosed: True if min value shall belong to the valid range
+    :param max_value_enclosed: True if max value shall belong to the valid range
+    :return: provided data
+    """
+    data = []
+    if min_value is None and max_value is None:
+        data.append((10.0, 10.0, None))
+        updated_value = 10.0
+    elif min_value is None:
+        updated_value = max_value - EPSILON
+    else:
+        updated_value = min_value + EPSILON
+    if min_value is not None and min_value_enclosed:
+        data.append((min_value, updated_value, None))
+        data.append((min_value - EPSILON, updated_value, ValueError))
+    if min_value is not None and not min_value_enclosed:
+        data.append((min_value, updated_value, ValueError))
+        data.append((min_value + EPSILON, updated_value, None))
+    if max_value is not None and max_value_enclosed:
+        data.append((max_value, updated_value, None))
+        data.append((max_value + EPSILON, updated_value, ValueError))
+    if max_value is not None and not max_value_enclosed:
+        data.append((max_value, updated_value, ValueError))
+        data.append((max_value - EPSILON, updated_value, None))
+    return put_stages_in_provider(data)

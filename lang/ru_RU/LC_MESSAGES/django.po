@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-24 06:40+0300\n"
+"POT-Creation-Date: 2022-03-08 23:25+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -227,6 +227,10 @@ msgstr "Ошибка"
 #: core/models/enums/log_level.py:13
 msgid "The system was down"
 msgstr "Сервер экстренно прекратил работу"
+
+#: imaging/entity/map/map_set.py:15
+msgid "Functional map"
+msgstr "Функциональная карта"
 
 #: imaging/models/enums/map_type.py:9
 msgid "Orientation map"

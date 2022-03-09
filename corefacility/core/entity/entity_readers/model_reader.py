@@ -1,4 +1,6 @@
 from django.db.models import QuerySet
+from django.utils.module_loading import import_string
+
 from .entity_reader import EntityReader
 from ..entity_exceptions import EntityNotFoundException
 
@@ -41,6 +43,8 @@ class ModelReader(EntityReader):
         """
         if self._entity_model_class is None:
             raise NotImplementedError("ModelReader._entity_model_class: this class property must be defined")
+        if isinstance(self._entity_model_class, str):
+            self._entity_model_class = import_string(self._entity_model_class)
         return self._entity_model_class
 
     def get(self, **kwargs):
