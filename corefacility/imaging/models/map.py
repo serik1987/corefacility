@@ -7,8 +7,7 @@ class Map(models.Model):
     Defines the way to store map files in the NUMPY format
     """
     alias = models.SlugField(unique=True, help_text="Defines the model slug to be used in HTTP requests")
-    data = models.FileField(unique=True,
-                            help_text="The associated map file")
+    data = models.FileField(help_text="The associated map file")
     type = models.CharField(max_length=3, choices=MapType.choices, null=False, blank=False,
                             help_text="Whether the map is orientational or directional")
     resolution_x = models.PositiveIntegerField(help_text="Map width, px", null=True, blank=True)
