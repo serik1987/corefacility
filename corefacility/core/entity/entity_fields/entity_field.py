@@ -108,7 +108,7 @@ class EntityField:
             if self._max_length is not None and len(raw_value) > self._max_length:
                 raise EntityFieldInvalid("")
             if self._min_value is not None and raw_value < self._min_value:
-                raise EntityFieldInvalid("")
+                raise ValueError("The value is too low")
             if self._max_value is not None and raw_value > self._max_value:
-                raise EntityFieldInvalid("")
+                raise ValueError("The value is too high")
         return raw_value

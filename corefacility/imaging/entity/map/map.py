@@ -31,3 +31,28 @@ class Map(Entity):
         "width": FloatField(min_value=0.0, min_value_included=False, description="Map width, um"),
         "height": FloatField(min_value=0.0, min_value_included=False, description="Map height, um"),
     }
+
+    def __eq__(self, other):
+        """
+        Compares two functional maps (for debugging purpose only)
+
+        :param other: the other functional map
+        :return: nothing
+        """
+        if not isinstance(other, Map):
+            return False
+        if self.alias != other.alias:
+            return False
+        if self.data != other.data:
+            return False
+        if self.type != other.type:
+            return False
+        if self.resolution_x != other.resolution_x:
+            return False
+        if self.resolution_y != other.resolution_y:
+            return False
+        if self.width != other.width:
+            return False
+        if self.height != other.height:
+            return False
+        return True
