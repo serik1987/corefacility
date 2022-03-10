@@ -123,8 +123,7 @@ class TestProjectFilter(BaseTestClass):
         project_set.application = app
         for project in project_set:
             expected_app = project.project_apps.get(app.alias)
-            self.assertIs(app, expected_app, "The application filter remains projects that are not a part "
-                                             "of the op")
+            self.assertEquals(app.uuid, expected_app.uuid, "Project application filter doesn't work correctly")
 
 
 del BaseTestClass

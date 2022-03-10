@@ -134,25 +134,3 @@ class EntityProvider:
         :return: nothing
         """
         raise NotImplementedError("EntityProvider.detach_file is not implemented")
-
-    def attach_entity(self, container: Entity, property_name: str, entity: Entity) -> None:
-        """
-        Attaches entity to the entity container
-
-        :param container: the container entity that is attachable for another entities
-        :param property_name: field name in the container entity
-        :param entity: the entity to attach
-        :return: nothing
-        """
-        raise NotImplementedError("EntityProvider.attach_entity is not implemented")
-
-    def detach_entity(self, container: Entity, property_name: str, entity: Entity) -> None:
-        """
-        Detaches entity from the entity container
-
-        :param container: the container entity that is attachable for another entities
-        :param property_name: the attachable field name
-        :param entity: the entity to detach
-        :return: nothing
-        """
-        raise NotImplementedError("EntityProvider.detach_entity is not implemented")

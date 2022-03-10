@@ -124,8 +124,6 @@ class TestProject(TestCase):
     def assertNoExtraInvasions(self, another_project):
         self.assertEquals(another_project.permissions.count(), 0,
                           "Another groups must be added to the project automatically")
-        self.assertEquals(another_project.project_apps.count(), 0,
-                          "No applications must be automatically added to the project")
         self.assertIsNone(another_project.project_dir, "By default, the project directory is None")
         self.assertIsNone(another_project.unix_group, "By default, no UNIX group is assigned to the project")
         self.assertEquals(Project.objects.count(), 1,

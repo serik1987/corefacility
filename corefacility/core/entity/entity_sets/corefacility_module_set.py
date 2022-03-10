@@ -54,9 +54,9 @@ class CorefacilityModuleSet(EntitySet):
 
     def __setattr__(self, key, value):
         super().__setattr__(key, value)
-        if key == "user":
+        if key == "user" and value is not None:
             setattr(self, "is_application", True)
-        if key == "project":
+        if key == "project" and value is not None:
             setattr(self, "is_application", True)
         if key == "is_application":
             if not value:

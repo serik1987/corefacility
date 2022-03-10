@@ -1,16 +1,15 @@
 from nose_parameterized import parameterized
 
 from core import models
-from core.entity.entity_exceptions import EntityOperationNotPermitted, EntityNotFoundException
+from core.models.enums import LevelType
+from core.entity.entity_exceptions import EntityOperationNotPermitted
+from core.entity.entity_sets.access_level_set import AccessLevelSet
+from core.entity.entity_sets.project_set import ProjectSet
+from core.entity.group import Group
+from core.entity.project import Project
 
 from .base_permissions_test import BasePermissionsTest
 from ..data_providers.entity_sets import filter_data_provider
-from ...entity.entity_sets.access_level_set import AccessLevelSet
-from ...entity.entity_sets.project_set import ProjectSet
-from ...entity.group import Group
-from ...entity.project import Project
-from ...entity.user import User
-from ...models.enums import LevelType
 
 
 def initial_access_level_scheme_provider():

@@ -224,12 +224,12 @@ class TestCorefacilityModule(BaseAppsTest):
             self.assertEquals(module.html_code, module.get_html_code(), "The module HTML code is not the same")
             self.assertIsNone(module._user_settings, "The module user settings were self-generated")
             self.assertIsNone(module._is_enabled, "The module enability was not reset to the default state")
-            if module.is_application:
-                self.assertIsInstance(module.permissions, AppPermissionManager,
-                                      "The application doeasn't have permissions that are "
-                                      "instance of the AppPermissionManager")
-            else:
-                self.assertIsNone(module.permissions, "The module is not an application but has permissions")
+        if module.is_application:
+            self.assertIsInstance(module.permissions, AppPermissionManager,
+                                  "The application doesn't have permissions that are "
+                                  "instance of the AppPermissionManager")
+        else:
+            self.assertIsNone(module.permissions, "The module is not an application but has permissions")
 
     @parameterized.expand(property_autoload_provider())
     def test_property_autoload(self, module_class, name, default_value, use_uuid):

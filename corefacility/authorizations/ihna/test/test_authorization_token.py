@@ -25,3 +25,13 @@ class TestAuthorizationToken(TestCase):
         self.assertEquals(token.state, "saved",
                           "The authorization token doesn't turn into 'saved' after its create")
         self.assertIsNotNone(token.authentication, "Authentication was not assigned to the token during save")
+
+    def _check_fields_changed(self, entity, field_list):
+        """
+        Checks whether the certain and only certain fields in the entity was changed
+
+        :param entity: the entity to test
+        :param field_list: field list to check in the entity object
+        :return: nothing
+        """
+        pass
