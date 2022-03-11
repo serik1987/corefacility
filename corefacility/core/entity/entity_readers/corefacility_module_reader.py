@@ -153,7 +153,7 @@ class CorefacilityModuleReader(RawSqlQueryReader):
             app_class=app_class,
             html_code=html_code,
             user_settings=user_settings,
-            is_application=is_application,
-            is_enabled=is_enabled,
+            is_application=bool(is_application),
+            is_enabled=bool(is_enabled),
             user_access_level=access_control_list,
         )
