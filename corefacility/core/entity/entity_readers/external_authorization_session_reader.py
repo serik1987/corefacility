@@ -36,7 +36,8 @@ class ExternalAuthorizationSessionReader(RawSqlQueryReader):
             .add_select_expression("core_module.app_class")\
             .add_select_expression("core_module.user_settings")\
             .add_select_expression("core_module.is_application")\
-            .add_select_expression("core_module.is_enabled")
+            .add_select_expression("core_module.is_enabled") \
+            .add_order_term("core_externalauthorizationsession.id")
 
         self.count_builder.add_select_expression(self.count_builder.select_total_count())
 
