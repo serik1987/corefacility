@@ -50,14 +50,14 @@ class ProjectApplicationReader(RawSqlQueryReader):
             .add_select_expression("governor.id")\
             .add_select_expression("governor.login")\
             .add_select_expression("governor.name")\
-            .add_select_expression("governor.surname")
+            .add_select_expression("governor.surname") \
+            .add_order_term("core_projectapplication.id", self.items_builder.ASC)
 
         self.count_builder.add_select_expression(self.count_builder.select_total_count())
 
         for builder in (self.items_builder, self.count_builder):
             builder\
-                .add_data_source("core_projectapplication") \
-                .add_order_term("core_projectapplication.id", builder.ASC)
+                .add_data_source("core_projectapplication")
             builder.data_source \
                 .add_join(builder.JoinType.INNER, "core_module",
                           "ON (core_module.uuid=core_projectapplication.application_id)") \
