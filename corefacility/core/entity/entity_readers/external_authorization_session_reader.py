@@ -60,13 +60,15 @@ class ExternalAuthorizationSessionReader(RawSqlQueryReader):
     def create_external_object(self, session_id, session_key, session_key_expiry_date,
                                module_uuid, module_alias, module_name, module_html_code, module_app_class,
                                module_user_settings, module_is_application, module_is_enabled):
+        if isinstance(module_uuid, str):
+            module_uuid = UUID(module_uuid)
         return ModelEmulator(
             id=session_id,
             session_key=session_key,
             session_key_expiry_date=time_from_db(session_key_expiry_date),
             authorization_module=ModelEmulator(
                 id=None,
-                uuid=UUID(module_uuid),
+                uuid=module_uuid,
                 alias=module_alias,
                 name=module_name,
                 html_code=module_html_code,
