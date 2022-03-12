@@ -21,7 +21,8 @@ class TokenReader(RawSqlQueryReader):
             .add_select_expression("core_user.phone")\
             .add_select_expression("core_user.is_locked")\
             .add_select_expression("core_user.is_superuser")\
-            .add_data_source(self._lookup_table_name)
+            .add_data_source(self._lookup_table_name)\
+            .add_order_term(self._lookup_table_name + ".id")
         self.items_builder.data_source\
             .add_join(self.items_builder.JoinType.INNER, "core_user",
                       "ON (core_user.id=%s.user_id)" % self._lookup_table_name)

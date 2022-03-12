@@ -372,7 +372,10 @@ class EntryPoint(Entity):
                 row = cursor.fetchone()
                 if row is None:
                     break
-                yield UUID(row[0]), row[1], gettext(row[2]), row[3]
+                uuid = row[0]
+                if isinstance(uuid, str):
+                    uuid = UUID(uuid)
+                yield uuid, row[1], gettext(row[2]), row[3]
 
     def module(self, alias, is_enabled=True):
         """
