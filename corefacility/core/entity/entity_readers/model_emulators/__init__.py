@@ -47,7 +47,8 @@ def time_from_db(time):
     :return: local time with the local timezone given
     """
     if time is not None:
-        time = timezone.make_aware(time, timezone=pytz.UTC)
+        if timezone.is_naive(time):
+            time = timezone.make_aware(time, timezone=pytz.UTC)
         time = timezone.localtime(time)
     return time
 
