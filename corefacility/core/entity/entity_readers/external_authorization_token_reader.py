@@ -44,7 +44,8 @@ class ExternalAuthorizationTokenReader(RawSqlQueryReader):
             .add_select_expression("%s.id" % self.lookup_table_name)\
             .add_select_expression("%s.authentication_id" % self.lookup_table_name)\
             .add_select_expression("core_authentication.user_id")\
-            .add_data_source(self.lookup_table_name)
+            .add_data_source(self.lookup_table_name)\
+            .add_order_term(self.lookup_table_name + ".id")
         self.items_builder.data_source\
             .add_join(self.items_builder.JoinType.INNER, "core_authentication",
                       "ON (core_authentication.id=%s.authentication_id)" % self.lookup_table_name)

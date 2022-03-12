@@ -145,9 +145,11 @@ class CorefacilityModuleReader(RawSqlQueryReader):
                 user_settings = json.loads(user_settings)
             except json.JSONDecodeError:
                 user_settings = {}
+        if isinstance(uuid, str):
+            uuid = UUID(uuid)
         return ModelEmulator(
             id=None,
-            uuid=UUID(uuid),
+            uuid=uuid,
             alias=alias,
             name=name,
             app_class=app_class,

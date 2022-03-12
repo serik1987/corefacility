@@ -110,11 +110,13 @@ class ProjectApplicationReader(RawSqlQueryReader):
                 module_user_settings = json.loads(module_user_settings)
             except json.JSONDecodeError:
                 module_user_settings = {}
+        if isinstance(module_uuid, str):
+            module_uuid = UUID(module_uuid)
         return ModelEmulator(
             id=entity_id,
             is_enabled=is_enabled,
             application=ModelEmulator(
-                uuid=UUID(module_uuid),
+                uuid=module_uuid,
                 alias=module_alias,
                 name=module_name,
                 html_code=module_html_code,
