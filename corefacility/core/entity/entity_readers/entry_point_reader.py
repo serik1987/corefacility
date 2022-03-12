@@ -20,6 +20,8 @@ class EntryPointReader(RawSqlQueryReader):
     This will make get() method to add 'WHERE tbl_name.id=%s' instead of 'WHERE id=%s'
     """
 
+    _query_debug = True
+
     def initialize_query_builder(self):
         """
         Initializes items_builder and count_builder
