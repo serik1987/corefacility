@@ -70,8 +70,12 @@ class EntryPointReader(RawSqlQueryReader):
         :return: nothing
         """
         uuid = str(parent_module.uuid).replace('-', '')
-        for builder in (self.items_builder, self.count_builder):
-            builder.main_filter &= StringQueryFilter("belonging_module_id=%s", uuid)
+        if parent_module.state == "uninstalled":
+            for builder in (self.items_builder, self.count_builder):
+                builder.main_filter &= StringQueryFilter("belonging_module_id IS NULL")
+        else:
+            for builder in (self.items_builder, self.count_builder):
+                builder.main_filter &= StringQueryFilter("belonging_module_id=%s", uuid)
 
     def create_external_object(self, entry_point_id, entry_point_class, alias, ep_type, name, belonging_module_class):
         return ModelEmulator(
