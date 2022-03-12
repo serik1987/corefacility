@@ -150,7 +150,7 @@ class TestEntryPoint(BaseAppsTest):
         (BaseAppsTest.TEST_SLICING, (10, 20, 1), BaseAppsTest.POSITIVE_TEST_CASE),
         (BaseAppsTest.TEST_SLICING, (2, 1, 1), BaseAppsTest.POSITIVE_TEST_CASE),
     ])
-    def test_entry_pont_set(self, *args):
+    def test_entry_point_set(self, *args):
         with self.assertLessQueries(1):
             self._test_all_access_features(*args)
 

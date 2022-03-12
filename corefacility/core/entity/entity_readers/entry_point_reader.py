@@ -20,7 +20,7 @@ class EntryPointReader(RawSqlQueryReader):
     This will make get() method to add 'WHERE tbl_name.id=%s' instead of 'WHERE id=%s'
     """
 
-    _query_debug = True
+    _query_debug = False
 
     def initialize_query_builder(self):
         """
@@ -38,7 +38,7 @@ class EntryPointReader(RawSqlQueryReader):
             .add_order_term("core_entrypoint.name")
 
         self.count_builder\
-            .add_select_expression(self.count_builder.select_total_count(""))
+            .add_select_expression(self.count_builder.select_total_count())
 
         for builder in (self.items_builder, self.count_builder):
             builder.add_data_source("core_entrypoint")
