@@ -61,6 +61,15 @@ NO_OPTION_MESSAGE = "No such option exists"
 
 
 def config(request):
+    """
+    Prints the corefacility base configuration.
+
+    Request arguments:
+        None
+
+    Response:
+        A HTML page containing human-readable argument parameters.
+    """
     if not settings.DEBUG:
         raise Http404("Page not found")
     important_config = {}

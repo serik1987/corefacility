@@ -1,8 +1,10 @@
 INSTALLED_APPS = [
+        'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
         'django.contrib.staticfiles',
         'django.contrib.messages',
+        'rest_framework',
         'core',
         'authorizations.google',
         'authorizations.mailru',
@@ -13,6 +15,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'core.middleware.LogMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',

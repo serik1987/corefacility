@@ -1,26 +1,17 @@
-"""corefacility URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/3.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 import os
+
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
+
 from core.testviews.config import config
+from core.testviews.test_ui import test_ui
+from core.testviews.test_api import test_api
 
 urlpatterns = [
-    path('__config__/', config, name="config")
+    path('__config__/', config, name="config"),
+    path('__test__/ui/<int:n>/', test_ui, name="test_ui"),
+    path('__test__/api/<int:n>/', test_api, name="test_api"),
 ]
 
 urlpatterns += static("/favicon.ico", document_root=os.path.join(settings.BASE_DIR, "corefacility/static/favicon.ico"))

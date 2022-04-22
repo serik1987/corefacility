@@ -13,6 +13,8 @@ class Log(Entity):
     Each request log is made per each request
     """
 
+    TEXT_MAX_LENGTH = 16384
+
     _entity_set_class = LogSet
 
     _entity_provider_list = [LogProvider()]
@@ -27,8 +29,8 @@ class Log(Entity):
                                       description="Request method"),
         "operation_description": EntityField(str, max_length=4096,
                                              description="Operation description"),
-        "request_body": EntityField(str, max_length=16384, description="Request body"),
-        "input_data": EntityField(str, max_length=16384, description="Request input data"),
+        "request_body": EntityField(str, max_length=TEXT_MAX_LENGTH, description="Request body"),
+        "input_data": EntityField(str, max_length=TEXT_MAX_LENGTH, description="Request input data"),
         "user": RelatedEntityField("core.entity.user.User",
                                    description="Authorized user"),
         "ip_address": IpAddressField(description="IP address"),
@@ -36,8 +38,8 @@ class Log(Entity):
                                    description="Geolocation"),
         "response_status": EntityField(int, min_value=100, max_value=599,
                                        description="HTTP response status"),
-        "response_body": EntityField(str, max_length=16384, description="Response body"),
-        "output_data": EntityField(str, max_length=16384, description="Response output data"),
+        "response_body": EntityField(str, max_length=TEXT_MAX_LENGTH, description="Response body"),
+        "output_data": EntityField(str, max_length=TEXT_MAX_LENGTH, description="Response output data"),
     }
 
     _current = None

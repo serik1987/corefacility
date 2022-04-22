@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-09 21:07+0300\n"
+"POT-Creation-Date: 2022-04-21 16:13+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -244,7 +244,7 @@ msgstr "Карта дирекциональной настройки"
 msgid "Pinwheel"
 msgstr "Центр ориентационной гиперколонки"
 
-#: roi/entity/rectangular_roi/rectangular_roi_set.py:11
+#: roi/entity/rectangular_roi/rectangular_roi_set.py:13
 msgid "Rectangular ROI"
 msgstr "Прямоугольная область интереса"
 

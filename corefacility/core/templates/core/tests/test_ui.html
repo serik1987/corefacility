@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The test UI request</title>
+</head>
+<body>
+    <p>y = {{y}}</p>
+    <table>
+        <tr>
+            <th>key</th>
+            <th>value</th>
+        </tr>
+        {% for key, value in data.items %}
+        <tr>
+            <td>{{key}}</td>
+            <td>{{value}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
