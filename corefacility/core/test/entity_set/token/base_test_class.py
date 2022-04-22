@@ -70,7 +70,7 @@ class TokenTest(BaseTestClass):
         auth.token_hash.generate(auth.token_hash.ALL_SYMBOLS, auth.TOKEN_PASSWORD_SIZE)
         auth.expiration_date.set(self.TEST_EXPIRY_TERM)
         auth.create()
-        sleep(self.TEST_EXPIRY_TERM.total_seconds())
+        sleep(self.TEST_EXPIRY_TERM.total_seconds() * 10)
         self._token_class.clear_all_expired_tokens()
         auth_set = self._token_set_class()
         with self.assertRaises(EntityNotFoundException, msg="The expired tokens were not carefully cleared"):
