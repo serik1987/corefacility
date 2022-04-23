@@ -7,6 +7,7 @@ from django.utils.timezone import make_aware
 from parameterized import parameterized
 
 from core.entity.entity_sets.log_set import LogSet
+from core.entity.entity_sets.log_record_set import LogRecordSet
 
 
 def log_provider():
@@ -66,8 +67,15 @@ class TestLogBase(TestCase):
         400: "django.core.exceptions.BadRequest",
         403: "django.core.exceptions.PermissionDenied",
         404: "django.http.Http404",
-        500: "ValueError",
+        500: "django.core.exceptions.ObjectDoesNotExist",
     }
+
+    TEST_RECORDS = [
+        {"level": "CRI", "message": "This is a critical test message"},
+        {"level": "ERR", "message": "This is an error test message"},
+        {"level": "WAR", "message": "This is a warning test message"},
+        {"level": "INF", "message": "This is an info test message"},
+    ]
 
     __client = None
     __log_set = None
@@ -75,14 +83,15 @@ class TestLogBase(TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.__client = client.Client()
 
     def setUp(self):
         super().setUp()
+        self.__client = client.Client(raise_request_exception=False)
         self.__log_set = LogSet()
+        self.__record_set = LogRecordSet()
         logger = logging.getLogger("django.request")
         self.previous_level = logger.getEffectiveLevel()
-        logger.setLevel(logging.ERROR)
+        logger.setLevel(logging.CRITICAL)
 
     def tearDown(self):
         logger = logging.getLogger("django.request")
@@ -117,6 +126,8 @@ class TestLogBase(TestCase):
                 if exception is not None:
                     request_path += "?exception=" + exception
             response = request_function(request_path, **request_kwargs)
+            self.assertEquals(response.status_code, response_type,
+                              "There is an internal error in the testing request: %s" % str(response.exc_info))
             log_number = len(self.__log_set)
             if method.lower() in ["get", "head"] and not debug_mode:
                 self.assertEquals(log_number, 0, "All GET request shall not be written when debug mode is off")
@@ -133,3 +144,22 @@ class TestLogBase(TestCase):
                                   "The IP address must be 127.0.0.1")
                 self.assertEquals(log.response_status, response.status_code,
                                   "The response status must be written correctly")
+
+    def test_no_log_record(self):
+        self.__client.get("/__test__/logger/")
+        self.assertEquals(len(self.__log_set), 0, "The log must not be recorded")
+        self.assertEquals(len(self.__record_set), 0, "The log record must not be recorded")
+
+    def test_log_record(self):
+        self.__client.post("/__test__/logger/")
+        self.assertEquals(len(self.__log_set), 1, "The log set must contain exactly one instance")
+        self.assertEquals(len(self.__record_set), len(self.TEST_RECORDS),
+                          "The record set must contain exactly four instances")
+        log = self.__log_set[0]
+        record_index = -1
+        for record in self.__record_set:
+            desired_info = self.TEST_RECORDS[record_index]
+            self.assertEquals(record.level, desired_info['level'], "The log record level must be consistent")
+            self.assertEquals(record.message, desired_info['message'], "The log record message must be consistent")
+            self.assertEquals(record.log.id, log.id, "All log records must be related to the same record")
+            record_index -= 1

@@ -2,6 +2,8 @@
 """Django's command-line utility for administrative tasks."""
 import sys
 from corefacility.settings_launcher import select_config_profile
+from colorama import init
+init()
 
 
 def main():

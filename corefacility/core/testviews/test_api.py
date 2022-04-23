@@ -1,7 +1,11 @@
+import logging
+
 from django.views.generic.base import View
 from django.utils.module_loading import import_string
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
+request_logger = logging.getLogger("django.corefacility.test")
 
 
 @api_view(View.http_method_names)
@@ -31,3 +35,19 @@ def test_api(request, n):
         "y": y,
         "data": data
     })
+
+
+@api_view(['get', 'post'])
+def test_logger(request):
+    """
+    The logger testing system
+
+    :param request: the request itself
+    :return: nothing
+    """
+    request_logger.debug("This is the debugging test message", extra={"request": request})
+    request_logger.info("This is an info test message", extra={"request": request})
+    request_logger.warning("This is a warning test message", extra={"request": request})
+    request_logger.error("This is an error test message", extra={"request": request})
+    request_logger.critical("This is a critical test message", extra={"request": request})
+    return Response({})
