@@ -21,8 +21,6 @@ class TokenTest(BaseTestClass):
     The base class for testing all internally issued tokens (i.e., authentications, cookies etc.)
     """
 
-    TEST_EXPIRY_TERM = timedelta(milliseconds=300)
-
     _token_set_class = None
     _token_class = None
     _token_object_class = None
@@ -44,37 +42,6 @@ class TokenTest(BaseTestClass):
         with self.assertLessQueries(1):
             auth = auth_set.get(auth_id)
         self.assertTokenUser(auth.user, desired_user)
-
-    def test_high_level_positive(self):
-        user = self._user_set_object[0]
-        token = self._token_class.issue(user, self.TEST_EXPIRY_TERM)
-        self._token_class.apply(token)
-        self.assertTokenUser(self._token_class.get_user(), user)
-
-    def test_high_level_expired(self):
-        user = self._user_set_object[0]
-        token = self._token_class.issue(user, self.TEST_EXPIRY_TERM)
-        sleep(self.TEST_EXPIRY_TERM.total_seconds())
-        with self.assertRaises(EntityNotFoundException, msg="The token can't be expired within the expiration time"):
-            self._token_class.apply(token)
-
-    def test_clear_all_authentications_positive(self):
-        user = self._user_set_object[0]
-        token = self._token_class.issue(user, self.TEST_EXPIRY_TERM)
-        self._token_class.clear_all_expired_tokens()
-        self._token_class.apply(token)
-
-    def test_clear_all_authentications_negative(self):
-        user = self._user_set_object[0]
-        auth = self._token_class(user=user)
-        auth.token_hash.generate(auth.token_hash.ALL_SYMBOLS, auth.TOKEN_PASSWORD_SIZE)
-        auth.expiration_date.set(self.TEST_EXPIRY_TERM)
-        auth.create()
-        sleep(self.TEST_EXPIRY_TERM.total_seconds() * 10)
-        self._token_class.clear_all_expired_tokens()
-        auth_set = self._token_set_class()
-        with self.assertRaises(EntityNotFoundException, msg="The expired tokens were not carefully cleared"):
-            auth_set.get(auth.id)
 
     def assertTokenUser(self, actual_user, desired_user):
         self.assertEquals(actual_user.id, desired_user.id, "The desired user was not loaded correctly")
