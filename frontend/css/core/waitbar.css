@@ -1,0 +1,123 @@
+@keyframes waitbar-base{
+    from {  transform: none; }
+    8.33% { transform: rotate(30deg); }
+    16.67% { transition: rotate(60deg); }
+    25% { transform: rotate(90deg); }
+    33.33% { transform: rotate(120deg); }
+    41.67% { transform: rotate(150deg); }
+    50% { transform: rotate(180deg); }
+    58.33% { transform: rotate(210deg); }
+    66.67% { transform: rotate(240deg); }
+    75% { transform: rotate(270deg); }
+    83.33% { transform: rotate(300deg); }
+    91.67% { transform: rotate(330deg); }
+    to { transform: rotate(360deg); }
+}
+
+#waitbar{
+    position:  fixed;
+    z-index:  1000;
+    left:  0;
+    right:  0;
+    top:  0;
+    bottom:  0;
+    background:  rgb(0, 95, 160);
+}
+
+#waitbar .wait-widget{
+    position:  fixed;
+    left:  50%;
+    top:  50%;
+    margin-left:  -70px;
+    margin-top:  -70px;
+    width:  140px;
+    height:  140px;
+    animation-name:  waitbar-base;
+    animation-duration: 2s;
+    animation-timing-function:  step-end;
+    animation-iteration-count:  infinite;
+    animation-delay:  0;
+}
+
+#waitbar .wait-circle{
+    position:  fixed;
+    left:  50%;
+    top:  50%;
+    margin-left:  -15px;
+    margin-top:  -15px;
+    border-radius:  50%;
+    width:  30px;
+    height:  30px;
+}
+
+#waitbar .wait-circle-1{
+    transform:  translateX(68px);
+    background:  rgb(255, 255, 255);
+}
+
+#waitbar .wait-circle-2{
+    transform:  rotate(-30deg) translateX(68px);
+    background:  rgb(232, 240, 246);
+}
+
+#waitbar .wait-circle-3{
+    transform:  rotate(-60deg) translateX(68px);
+    background:  rgb(208, 226, 238);
+}
+
+#waitbar .wait-circle-4{
+    transform:  rotate(-90deg) translateX(68px);
+    background:  rgb(185, 211, 229);
+}
+
+#waitbar .wait-circle-5{
+    transform:  rotate(-120deg) translateX(68px);
+    background:  rgb(162, 197, 220);
+}
+
+#waitbar .wait-circle-6{
+    transform:  rotate(-150deg) translateX(68px);
+    background:  rgb(139, 182, 212);
+}
+
+#waitbar .wait-circle-7{
+    transform:  rotate(-180deg) translateX(68px);
+    background:  rgb(116, 168, 203);
+}
+
+#waitbar .wait-circle-8{
+    transform:  rotate(-210deg) translateX(68px);
+    background:  rgb(93, 153, 195);
+}
+
+#waitbar .wait-circle-9{
+    transform:  rotate(-240deg) translateX(68px);
+    background:  rgb(70, 139, 186);
+}
+
+#waitbar .wait-circle-10{
+    transform:  rotate(-270deg) translateX(68px);
+    background:  rgb(46, 124, 177);
+}
+
+#waitbar .wait-circle-11{
+    transform:  rotate(-300deg) translateX(68px);
+    background:  rgb(23, 109, 169);
+}
+
+#waitbar .wait-circle-12{
+    transform:  rotate(-330deg) translateX(68px);
+    background:  rgb(0, 95, 160);
+}
+
+#waitbar .wait-line{
+    position:  fixed;
+    left:  50%;
+    top:  50%;
+    margin-left: -250px;
+    margin-top:  100px;
+    width:  500px;
+    text-align:  center;
+    font-size:  40px;
+    color:  #fff;
+}

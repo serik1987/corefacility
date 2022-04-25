@@ -26,7 +26,7 @@ def test_ui(request, n):
         x = int(data['x'])
         n = int(n)
         y = str(x**n)
-    except ValueError:
+    except Exception:
         y = -1
     context = {"y": y, "data": data}
     return render(request, "core/tests/test_ui.html", context)

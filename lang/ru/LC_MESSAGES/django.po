@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-21 16:13+0300\n"
+"POT-Creation-Date: 2022-04-25 18:08+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -227,6 +227,10 @@ msgstr "Ошибка"
 #: core/models/enums/log_level.py:13
 msgid "The system was down"
 msgstr "Сервер экстренно прекратил работу"
+
+#: core/templates/core/index.html:3
+msgid "Loading..."
+msgstr "Загрузка..."
 
 #: imaging/entity/map/map_set.py:15
 msgid "Functional map"
