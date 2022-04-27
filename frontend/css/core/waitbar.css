@@ -33,7 +33,7 @@
     width:  140px;
     height:  140px;
     animation-name:  waitbar-base;
-    animation-duration: 2s;
+    animation-duration: 1.5s;
     animation-timing-function:  step-end;
     animation-iteration-count:  infinite;
     animation-delay:  0;

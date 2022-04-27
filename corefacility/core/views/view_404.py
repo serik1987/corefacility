@@ -4,12 +4,13 @@ from rest_framework.exceptions import NotFound
 
 class View404(APIView):
     """
-    The API request to non-existent resource.
+    The API request to non-existent resource
     """
 
-    def dispatch(self, request, *args, **kwargs):
-        """
-        `.dispatch()` is pretty much the same as Django's regular dispatch,
-        but with extra hooks for startup, finalize, and exception handling.
-        """
-        raise NotFound()
+    def __getattr__(self, name):
+        if name in self.http_method_names:
+            def func(request, *args, **kwargs):
+                raise NotFound()
+            return func
+        else:
+            raise AttributeError("Not a valid HTTP method")

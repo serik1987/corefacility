@@ -94,3 +94,11 @@ class App(CorefacilityModule):
         :return: nothing
         """
         raise RootModuleDeleteException()
+
+    def get_max_password_symbols(self):
+        """
+        Returns the maximum number of symbols in the password
+
+        :return: maximum number of symbols in the password
+        """
+        return self.user_settings.get("max_password_symbols", 10)

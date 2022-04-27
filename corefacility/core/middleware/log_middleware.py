@@ -99,6 +99,6 @@ class LogMiddleware:
         :return: nothing
         """
         log.response_status = response.status_code
-        if not response.streaming:
+        if not response.streaming and log.response_body != "***":
             log.response_body = response.content.decode(encoding="utf-8")[:Log.TEXT_MAX_LENGTH]
         log.update()
