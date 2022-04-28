@@ -177,6 +177,16 @@ class CorefacilityConfiguration(Configuration):
         },
     ]
 
+    # Basic REST framework settings
+    REST_FRAMEWORK = {
+        "DEFAULT_AUTHENTICATION_CLASSES": [
+            "core.authentication.CoreAuthentication",
+        ],
+        "DEFAULT_PERMISSION_CLASSES": [
+            "rest_framework.permissions.IsAuthenticated"
+        ]
+    }
+
     @classmethod
     def pre_setup(cls):
         """

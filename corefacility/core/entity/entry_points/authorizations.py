@@ -1,5 +1,7 @@
-from .entry_point import EntryPoint
+from django.core.signing import Signer
+
 from core.entity import CorefacilityModule
+from .entry_point import EntryPoint
 
 
 class AuthorizationsEntryPoint(EntryPoint):
@@ -40,6 +42,48 @@ class AuthorizationModule(CorefacilityModule):
     interaction with the 'core' module
     """
 
+    _signer = None
+
+    @staticmethod
+    def get_signer():
+        """
+        Returns the module signer
+
+        :return: the module signer
+        """
+        if AuthorizationModule._signer is None:
+            AuthorizationModule._signer = Signer()
+        return AuthorizationModule._signer
+
+    @staticmethod
+    def issue_token(user):
+        """
+        Issues authentication token for a particular user
+
+        :param user: a user to which the token must be issued
+        :return: a string containing an authentication token
+        """
+        from core import App
+        from core.entity.authentication import Authentication
+
+        token = Authentication.issue(user, App().get_auth_token_lifetime())
+        signed_token = AuthorizationModule.get_signer().sign(token)
+        return signed_token
+
+    @staticmethod
+    def apply_token(token):
+        """
+        Recovers the user using the token
+
+        :param token: the token to be used
+        :return: a user recovered
+        """
+        from core.entity.authentication import Authentication
+
+        unsigned_token = AuthorizationModule.get_signer().unsign(token)
+        Authentication.apply(unsigned_token)
+        return Authentication.get_user()
+
     def get_parent_entry_point(self):
         """
         All authorization applications must be attached to the 'authorizations' entry point
@@ -56,3 +100,38 @@ class AuthorizationModule(CorefacilityModule):
         :return: always False
         """
         return False
+
+    def try_ui_authorization(self, request):
+        """
+        Performs the UI authorization.
+        The UI authorization will be performed automatically during the UI application loading. The authorization
+        routine will generate authentication token for a particular user and send it as AUTHORIZATION_TOKEN
+        Javascript constant.
+
+        :param request: The HTTP request that shall be authorized.
+        :return: an authorized user in case of successful authorization. None if authorization fails. The function
+        shall not generate authorization token, just return the user. The user if core.entity.user.User instance.
+        """
+        raise NotImplementedError("AuthorizationModule.try_ui_authorization")
+
+    def try_api_authorization(self, request):
+        """
+        Performs the API authorization.
+        The API authorization will be performed manually when the client send '/api/login/' request to the server.
+        This function shall process the request and find an appropriate user. There is not neccessity to generate
+        authentication token for this particular user.
+
+        :param request: REST framework request
+        :return: an authorized user in case of successful authorization. None if authorization fails.
+        """
+        raise NotImplementedError("AuthorizationModule.try_api_authorization")
+
+    def process_auxiliary_request(self, request):
+        """
+        Performs an auxiliary request processing.
+        The auxiliary request processing is required when the application shall be redirected to the 3rd party site.
+
+        :param request: REST framework request
+        :return: redirection URL
+        """
+        raise NotImplementedError("AuthorizationModule.process_auxiliary_request")

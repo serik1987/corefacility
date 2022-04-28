@@ -7,3 +7,4 @@ class CorefacilityAPIException(APIException):
     This is the base class for all API exceptions
     """
     pass
+

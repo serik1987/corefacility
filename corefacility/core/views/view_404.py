@@ -7,6 +7,8 @@ class View404(APIView):
     The API request to non-existent resource
     """
 
+    permission_classes = []
+
     def __getattr__(self, name):
         if name in self.http_method_names:
             def func(request, *args, **kwargs):

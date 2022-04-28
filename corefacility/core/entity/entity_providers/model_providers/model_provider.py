@@ -215,7 +215,10 @@ class ModelProvider(EntityProvider):
                 field_value = getattr(entity, '_' + field_name)
                 if isinstance(field_value, Entity):
                     field_value = field_value._wrapped
-                setattr(external_object, field_name, field_value)
+                try:
+                    setattr(external_object, field_name, field_value)
+                except ValueError:
+                    setattr(external_object, field_name + "_id", field_value.id)
 
     def attach_file(self, entity: Entity, name: str, value: File) -> None:
         """

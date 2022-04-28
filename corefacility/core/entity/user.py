@@ -15,6 +15,9 @@ class User(Entity):
     modification of access rights
     """
 
+    is_authenticated = False
+    """ This tag is added just for compatibility with REST Framework authenticators. This is absolutely useless.  """
+
     _entity_set_class = UserSet
 
     _entity_provider_list = [ModelProvider()]

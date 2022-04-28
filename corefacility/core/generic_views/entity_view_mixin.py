@@ -6,7 +6,8 @@ from ..entity.entity_exceptions import EntityNotFoundException
 
 class EntityViewMixin:
     """
-    This is the base mixin for all views the deal with entities and entity sets.
+    This is the base mixin for all views that provide CRUD (Create, Read, Update, Delete) operations with
+    entities and entity sets.
     """
 
     entity_set_class = None
@@ -33,7 +34,7 @@ class EntityViewMixin:
     @classmethod
     def get_entity_or_404(cls, entity_set, lookup_value):
         """
-        Returns the EntitySet instance or throws 404 error if no such instance exists
+        Returns the EntitySet instance or throws 404 exception if no such instance exists
 
         :param entity_set: the entity set where the instance shall be found.
         :param lookup_value: a characterized entity lookup value (ID, string or UUID).

@@ -4,6 +4,7 @@ from django.views.generic import TemplateView
 
 from core import App
 from core.entity.corefacility_module import CorefacilityModuleSet
+from core.entity.entry_points import AuthorizationsEntryPoint
 
 
 class MainWindow(TemplateView):
@@ -70,4 +71,14 @@ class MainWindow(TemplateView):
         return app.__module__
 
     def _authorize_user(self):
-        self.kwargs['authorization_token'] = None
+        entry_point = AuthorizationsEntryPoint()
+        auth_user = None
+        for auth_module in entry_point.modules():
+            auth_user = auth_module.try_ui_authorization(self.request)
+            if auth_user is not None:
+                break
+        if auth_user is not None:
+            token = auth_module.issue_token(auth_user)
+            self.kwargs['authorization_token'] = token
+        else:
+            self.kwargs['authorization_token'] = None

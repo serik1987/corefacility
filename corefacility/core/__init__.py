@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from .entity import CorefacilityModule
 from .entity.entity_exceptions import RootModuleDeleteException
 from .entity.entry_points import AuthorizationsEntryPoint, SynchronizationsEntryPoint, ProjectsEntryPoint, \
@@ -14,6 +16,9 @@ class App(CorefacilityModule):
     c) manages projects that are boxes where scientific data and application permissions contain
     d) manages user accounts, do administrative tasks, provides authentication but not authorization
     """
+
+    DEFAULT_MAX_PASSWORD_SYMBOLS = 10
+    DEFAULT_AUTH_TOKEN_LIFETIME = timedelta(minutes=30)
 
     def get_parent_entry_point(self):
         """
@@ -101,4 +106,12 @@ class App(CorefacilityModule):
 
         :return: maximum number of symbols in the password
         """
-        return self.user_settings.get("max_password_symbols", 10)
+        return self.user_settings.get("max_password_symbols", self.DEFAULT_MAX_PASSWORD_SYMBOLS)
+
+    def get_auth_token_lifetime(self):
+        """
+        Returns the authentication token lifetime
+
+        :return: the authentication token lifetime
+        """
+        return self.user_settings.get("auth_token_lifetime", self.DEFAULT_AUTH_TOKEN_LIFETIME)

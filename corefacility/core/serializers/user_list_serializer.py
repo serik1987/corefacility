@@ -1,3 +1,4 @@
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from . import EntitySerializer
@@ -11,6 +12,16 @@ class UserListSerializer(EntitySerializer):
 
     entity_class = User
 
-    id = serializers.IntegerField(read_only=True)
-    login = serializers.CharField(required=True, allow_blank=False, max_length=100)
-    name = serializers.CharField(required=False, allow_blank=True, max_length=100)
+    id = serializers.ReadOnlyField(label="Identification number")
+    login = serializers.SlugField(required=True, allow_blank=False, max_length=100,
+                                  label="Username (login)",
+                                  error_messages={
+                                      "invalid":
+                                          _('Enter a valid login consisting of letters, numbers, '
+                                            'underscores or hyphens.')
+                                  })
+    name = serializers.CharField(required=False, allow_blank=True, max_length=100,
+                                 label="First name")
+    surname = serializers.CharField(required=False, allow_blank=True, max_length=100,
+                                    label="Last name")
+    avatar = serializers.ReadOnlyField(source="avatar.url", label="Avatar URL")

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-25 18:08+0300\n"
+"POT-Creation-Date: 2022-04-27 22:00+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -227,6 +227,17 @@ msgstr "Ошибка"
 #: core/models/enums/log_level.py:13
 msgid "The system was down"
 msgstr "Сервер экстренно прекратил работу"
+
+#: core/serializers/user_detail_serializer.py:15
+msgid "Enter a valid phone number."
+msgstr "Введите корректный номер телефона."
+
+#: core/serializers/user_list_serializer.py:20
+msgid ""
+"Enter a valid login consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+"Введите корректное имя пользователя, состоящее из латинских букв, цифр, "
+"дефисов и знаков подчёркивания."
 
 #: core/templates/core/index.html:3
 msgid "Loading..."

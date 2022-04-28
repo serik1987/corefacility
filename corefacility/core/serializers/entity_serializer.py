@@ -42,5 +42,6 @@ class EntitySerializer(serializers.Serializer):
         """
         for key, value in validated_data.items():
             setattr(entity, key, value)
-        entity.update()
+        if entity.state == "changed":
+            entity.update()
         return entity
