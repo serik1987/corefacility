@@ -1,6 +1,6 @@
 from django.core.signing import BadSignature
 from rest_framework.authentication import BaseAuthentication
-from rest_framework.exceptions import NotAuthenticated
+from rest_framework.exceptions import AuthenticationFailed
 
 from core.entity.entry_points.authorizations import AuthorizationModule
 from core.entity.entity_exceptions import EntityNotFoundException
@@ -30,7 +30,7 @@ class CoreAuthentication(BaseAuthentication):
                     request.corefacility_log.user = user
                     return user, token
                 except (BadSignature, EntityNotFoundException):
-                    raise NotAuthenticated()
+                    raise AuthenticationFailed()
 
     def authenticate_header(self, request):
         """
