@@ -82,6 +82,16 @@ class EntitySet:
         Initializes the entity set
         """
         self._entity_filters = dict()
+    
+    @property
+    def ordered(self):
+        """
+        This property is created for the purpose of compatibility with Django paginators and imply
+        that all entities within the entity set must be ordered.
+
+        :return: always True
+        """
+        return True
 
     @property
     def entity_reader_class(self):
@@ -113,6 +123,14 @@ class EntitySet:
             raise ValueError("EntitySet.get: invalid lookup argument")
         provider = reader.get_entity_provider()
         return provider.wrap_entity(source)
+
+    def count(self):
+        """
+        Returns the total number of items in the entity set.
+
+        :return: total number of items in the entity set
+        """
+        return len(self)
 
     def __getitem__(self, index):
         """
