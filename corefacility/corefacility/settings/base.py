@@ -195,6 +195,8 @@ class CorefacilityConfiguration(Configuration):
         },
 
         "DEFAULT_PAGINATION_CLASS": "core.pagination.CorePagination",
+
+        "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.URLPathVersioning",
     }
 
     @classmethod

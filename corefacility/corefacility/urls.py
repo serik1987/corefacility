@@ -18,7 +18,7 @@ urlpatterns = [
     path('__test__/concurrent/', test_concurrent, name="test_concurrent"),
     path('__test__/logger/', test_logger, name="test_logger"),
 
-    path('api/', include(("core.api_urls", "core"))),
+    path('api/<version>/', include(("core.api_urls", "core"))),
     path('<path:path>/', MainWindow.as_view(), name="main_window"),
     path('', MainWindow.as_view(), {'path': ''}, name="main_window"),
 ]

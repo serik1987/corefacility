@@ -12,6 +12,7 @@ class MainWindow(TemplateView):
     Loading the application main window
     """
 
+    client_version = "v1"
     template_name = "core/index.html"
     css_name = "main.min.css"
     js_name = "main.min.js"
@@ -46,6 +47,7 @@ class MainWindow(TemplateView):
         css_name = "%s/%s" % (app, self.css_name)
         js_name = "%s/%s" % (app, self.js_name)
         self._authorize_user()
+        self._set_version()
         return super().get_context_data(javascript_vars=kwargs, css=css_name, js=js_name)
 
     def _split_application_path(self, path):
@@ -82,3 +84,6 @@ class MainWindow(TemplateView):
             self.kwargs['authorization_token'] = token
         else:
             self.kwargs['authorization_token'] = None
+
+    def _set_version(self):
+        self.kwargs['client_version'] = str(self.client_version)
