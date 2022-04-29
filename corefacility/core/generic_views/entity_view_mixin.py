@@ -49,10 +49,12 @@ class EntityViewMixin:
     @classmethod
     def standard_filter_function(cls, filter_param, filter_type):
         """
-        Returns a standard filter function
+        Returns a standard filter function.
+        Such function gets the filter parameter from the response query parameters and transforms it
+        using filter_type transformation function.
 
         :param filter_param: name of the filter_param in query_params array
-        :param filter_type: the filter type
+        :param filter_type: the filter type or conversion function to the appropriate filter type
         :return: a standard filter function
         """
         def filter_function(query_params):
@@ -61,6 +63,19 @@ class EntityViewMixin:
             else:
                 value = None
             return value
+        return filter_function
+
+    @classmethod
+    def default_filter_function(cls, filter_value):
+        """
+        Returns the default filter function.
+        Such a function always apply certain function to the filter
+
+        :param filter_value: the value to apply
+        :return: a filter function
+        """
+        def filter_function(query_params):
+            return filter_value
         return filter_function
 
     def get_serializer_class(self):

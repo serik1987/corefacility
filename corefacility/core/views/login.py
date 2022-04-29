@@ -1,3 +1,4 @@
+from rest_framework.exceptions import NotAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -28,6 +29,8 @@ class LoginView(APIView):
             user = auth_module.try_api_authorization(request)
             if user is not None:
                 break
+        if user is None:
+            raise NotAuthenticated()
         token = auth_module.issue_token(user)
         user_serializer = UserListSerializer(user)
         request.corefacility_log.response_body = "***"

@@ -46,6 +46,15 @@ class User(Entity):
 
     _required_fields = ["login"]
 
+    @property
+    def pk(self):
+        """
+        This property is added for compatibility with REST framework throttling facilities
+
+        :return: user ID
+        """
+        return self.id
+
     def create(self):
         """
         Creates new user

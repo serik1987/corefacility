@@ -6,12 +6,15 @@ from ..entity.user import UserSet
 from ..entity.entity_fields.field_managers.entity_password_manager import EntityPasswordManager
 from ..generic_views import EntityViewSet
 from ..serializers import UserListSerializer, UserDetailSerializer
+from ..permissions import AdminOnlyPermission
 
 
 class UserViewSet(EntityViewSet):
     """
     Deals with list of users.
     """
+
+    permission_classes = [AdminOnlyPermission]
 
     entity_set_class = UserSet
 
