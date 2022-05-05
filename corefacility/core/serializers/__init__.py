@@ -1,3 +1,4 @@
 from .entity_serializer import EntitySerializer
 from .user_list_serializer import UserListSerializer
 from .user_detail_serializer import UserDetailSerializer
+from .profile_serializer import ProfileSerializer
