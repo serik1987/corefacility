@@ -42,5 +42,4 @@ def exception_handler(exc, context):
     response = base_handler(exc, context)
     if hasattr(exc, "detail") and hasattr(exc.detail, "code") and exc.detail.code:
         response.data["code"] = str(exc.detail.code)
-    print(response.data)
     return response

@@ -27,7 +27,8 @@ class CoreAuthentication(BaseAuthentication):
                     token = authorization_header.split(self.AUTHORIZATION_HEADER_START, 1)[1]
                     user = AuthorizationModule.apply_token(token)
                     user.is_authenticated = True
-                    request.corefacility_log.user = user
+                    if hasattr(request, "corefacility_log"):
+                        request.corefacility_log.user = user
                     return user, token
                 except (BadSignature, EntityNotFoundException):
                     raise AuthenticationFailed()
