@@ -4,12 +4,12 @@ from rest_framework.response import Response
 from core import App
 from ..entity.user import UserSet
 from ..entity.entity_fields.field_managers.entity_password_manager import EntityPasswordManager
-from ..generic_views import EntityViewSet
+from ..generic_views import EntityViewSet, AvatarMixin
 from ..serializers import UserListSerializer, UserDetailSerializer
 from ..permissions import AdminOnlyPermission
 
 
-class UserViewSet(EntityViewSet):
+class UserViewSet(AvatarMixin, EntityViewSet):
     """
     Deals with list of users.
     """

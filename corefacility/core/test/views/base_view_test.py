@@ -94,3 +94,19 @@ class BaseViewTest(APITestCase):
         resource_name = self.get_resource()
         return "/api/{version}/{resource_name}/{lookup}/".format(
             version=self.API_VERSION, resource_name=resource_name, lookup=lookup)
+
+    def get_authorization_headers(self, token_id):
+        """
+        Calculates and returns authorization tokens
+
+        :param token_id: Authorization token is issued during the setUpTestData function and stored to "{id}_token"
+            public field where {id} is token_id. User "superuser" for superuser authentication and "ordinary_user"
+            for some unrelated ordinary user authentication. Also, use None for producing unauthenticated responses.
+        :return: headers to be substituted to the request.
+        """
+        if token_id is not None:
+            token = getattr(self, token_id + "_token")
+            extra = {"HTTP_AUTHORIZATION": "Token " + token}
+        else:
+            extra = {}
+        return extra

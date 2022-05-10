@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-27 22:00+0300\n"
+"POT-Creation-Date: 2022-05-06 02:34+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -81,6 +81,15 @@ msgstr "Проект"
 #: core/entity/entity_sets/user_set.py:11
 msgid "User"
 msgstr "Пользователь"
+
+#: core/generic_views/avatar_mixin.py:103
+#: core/generic_views/avatar_mixin.py:117
+msgid "This file type is not uploadable"
+msgstr "Невозможно загрузить данный тип файла"
+
+#: core/generic_views/avatar_mixin.py:120
+msgid "The image resolution is too small"
+msgstr "Разрешение изображения слишком мало"
 
 #: core/migrations/0002_fill.py:59
 msgid "Full access"

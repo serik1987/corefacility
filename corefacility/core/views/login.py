@@ -23,7 +23,6 @@ class LoginView(APIView):
         :param kwargs: keyword arguments
         :return: REST framework response
         """
-        print(request.version)
         auth_point = AuthorizationsEntryPoint()
         user = None
         for auth_module in auth_point.modules():
