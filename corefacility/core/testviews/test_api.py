@@ -2,13 +2,15 @@ import logging
 
 from django.views.generic.base import View
 from django.utils.module_loading import import_string
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.response import Response
 
 request_logger = logging.getLogger("django.corefacility.test")
 
 
 @api_view(View.http_method_names)
+@permission_classes([])
+@throttle_classes([])
 def test_api(request, n):
     """
     The API test request handler
@@ -38,6 +40,8 @@ def test_api(request, n):
 
 
 @api_view(['get', 'post'])
+@permission_classes([])
+@throttle_classes([])
 def test_logger(request):
     """
     The logger testing system

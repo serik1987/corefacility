@@ -66,7 +66,9 @@ class AuthorizationModule(CorefacilityModule):
         from core import App
         from core.entity.authentication import Authentication
 
-        token = Authentication.issue(user, App().get_auth_token_lifetime())
+        expiry_term = App().get_auth_token_lifetime()
+        Authentication.clear_all_expired_tokens()
+        token = Authentication.issue(user, expiry_term)
         signed_token = AuthorizationModule.get_signer().sign(token)
         return signed_token
 
@@ -78,10 +80,13 @@ class AuthorizationModule(CorefacilityModule):
         :param token: the token to be used
         :return: a user recovered
         """
+        from core import App
         from core.entity.authentication import Authentication
 
+        expiry_term = App().get_auth_token_lifetime()
         unsigned_token = AuthorizationModule.get_signer().unsign(token)
-        Authentication.apply(unsigned_token)
+        token_entity = Authentication.apply(unsigned_token)
+        token_entity.refresh(expiry_term)
         return Authentication.get_user()
 
     def get_parent_entry_point(self):

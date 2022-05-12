@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.entity.entry_points import AuthorizationsEntryPoint
+from core.entity.authentication import Authentication
 from core.serializers import UserListSerializer
 
 

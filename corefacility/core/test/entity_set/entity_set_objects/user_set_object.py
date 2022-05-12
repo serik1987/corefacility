@@ -56,7 +56,9 @@ class UserSetObject(EntitySetObject):
         if value == "" or value is None:
             return
         self._entities = list(filter(
-            lambda e: e.surname.find(value) != -1 or e.name.find(value) != -1 or e.login.find(value) != -1,
+            lambda e: (e.surname is not None and e.surname.find(value) != -1) or
+                      (e.name is not None and e.name.find(value) != -1) or
+                      (e.login is not None and e.login.find(value) != -1),
             self._entities
         ))
 
