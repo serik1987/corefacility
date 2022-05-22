@@ -78,12 +78,13 @@ class TestUser(BaseTestClass):
         :param desired_item: the item taken from the container
         :return: nothing
         """
+        description = "Actual user: %s. Desired user: %s" % (repr(actual_item), repr(desired_item))
         self.assertEquals(actual_item['id'], desired_item.id,
-                          "Item IDs are not the same for item " + repr(desired_item.login))
-        self.assertEquals(actual_item['login'], desired_item.login, "Item logins are not the same")
-        self.assertEquals(actual_item['avatar'], desired_item.avatar.url, "Item avatars are not the same")
-        self.assertEquals(actual_item['name'], desired_item.name, "Item names are not the same")
-        self.assertEquals(actual_item['surname'], desired_item.surname, "Item surnames are not the same")
+                          "Item IDs are not the same. " + description)
+        self.assertEquals(actual_item['login'], desired_item.login, "Item logins are not the same. " + description)
+        self.assertEquals(actual_item['avatar'], desired_item.avatar.url, "Item avatars are not the same. " + description)
+        self.assertEquals(actual_item['name'], desired_item.name, "Item names are not the same. " + description)
+        self.assertEquals(actual_item['surname'], desired_item.surname, "Item surnames are not the same. " + description)
 
 
 del BaseTestClass
