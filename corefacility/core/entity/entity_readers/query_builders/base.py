@@ -338,7 +338,7 @@ class QueryBuilder:
 
         :param col_name: column name in the resultant table under which the ordering shall be performed
         :param direction: ordering direction. Available option: QueryBuilder.ASC, QueryBuilder.DESC
-        :param null_direction: Defines how the MySQL engine will order NULL values for all SQL engines except MySQL.
+        :param null_direction: Defines how the SQL engine will order NULL values for all SQL engines except MySQL.
             Useless in MySQL. Available values: QueryBuilder.DEFAULT, QueryBuilder.NULLS_FIRST, QueryBuilder.NULLS_LAST
         :return: self
         """

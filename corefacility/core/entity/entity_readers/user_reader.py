@@ -35,8 +35,8 @@ class UserReader(SqlModelReader):
         """
 
         self.items_builder.add_data_source("core_user") \
-            .add_order_term("surname") \
-            .add_order_term("name") \
+            .add_order_term("surname", null_direction=self.items_builder.NULLS_FIRST) \
+            .add_order_term("name", null_direction=self.items_builder.NULLS_FIRST) \
             .add_order_term("login")
 
         self.count_builder.add_data_source("core_user") \
