@@ -34,7 +34,7 @@ class BaseTestClass(BaseViewTest):
         query_params = {key: value[0] for key, value in query_params.items()}
         return request_path, query_params
 
-    def _test_search(self, query_params, token_id, expected_status_code=status.HTTP_200_OK):
+    def _test_search(self, query_params, token_id: str, expected_status_code: int = status.HTTP_200_OK):
         """
         Tries the general field search
 

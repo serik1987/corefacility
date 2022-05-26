@@ -31,3 +31,11 @@ class NoSupportPermission(IsAuthenticated):
         :return: True if the user is allowed, False otherwise
         """
         return bool(super().has_permission(request, view) and not request.user.is_support)
+
+
+class GroupPermission(IsAuthenticated):
+    """
+    Defines all available permissions for the user group
+    """
+
+    pass
