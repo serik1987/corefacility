@@ -1,6 +1,7 @@
 from rest_framework import status
 from parameterized import parameterized
 
+from core.entity.user import UserSet
 from core.entity.entry_points.authorizations import AuthorizationModule
 from core.test.entity_set.entity_set_objects.user_set_object import UserSetObject
 from core.test.entity_set.entity_set_objects.group_set_object import GroupSetObject
@@ -327,6 +328,21 @@ class TestGroup(BaseTestClass):
             self.assertFalse(group.users.exists(user), "The user still exists in group after delete")
         if status.HTTP_400_BAD_REQUEST <= response.status_code < status.HTTP_500_INTERNAL_SERVER_ERROR:
             self.assertTrue(group.users.exists(user), "The user was suddenly deleted even after request was denied")
+
+    @parameterized.expand(security_read_provider())
+    def test_user_suggest(self, token_id, group_index, expected_status_code):
+        group = self.container[group_index]
+        path = self._detail_path % group.id + "user-suggest/"
+        headers = self.get_authorization_headers(token_id)
+        response = self.client.get(path, **headers)
+        self.assertEquals(response.status_code, expected_status_code, "Unexpected response status code")
+        user_set = UserSet()
+        user_set.is_support = False
+        if status.HTTP_200_OK <= response.status_code < status.HTTP_300_MULTIPLE_CHOICES:
+            for actual_user in response.data:
+                expected_user = user_set.get(actual_user['id'])
+                self.assert_user_equals(actual_user, expected_user)
+                self.assertFalse(group.users.exists(expected_user), "The suggested user exists in the group")
 
     def provide_security_filter(self, login):
         if login is None:

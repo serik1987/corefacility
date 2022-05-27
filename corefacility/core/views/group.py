@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 
+from ..pagination import CorePagination
 from ..generic_views import EntityViewSet
 from ..entity.group import GroupSet
 from ..entity.user import UserSet
@@ -49,6 +50,23 @@ class GroupViewSet(EntityViewSet):
         except EntityOperationNotPermitted:
             raise PermissionDenied()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(methods=["GET"], detail=True, url_path=r'user-suggest', url_name="user-suggest")
+    def suggest_user(self, request, *args, **kwargs):
+        group = self.get_object()
+        group_users = {user.id for user in group.users}
+        user_set = UserSet()
+        user_set.is_support = False
+        index = 0
+        user_list = []
+        for user in user_set:
+            if user.id not in group_users:
+                serializer = UserListSerializer(user, many=False)
+                user_list.append(serializer.data)
+                index += 1
+            if index >= CorePagination.PAGE_SIZES['light']:
+                break
+        return Response(user_list)
 
     def filter_queryset(self, queryset):
         """
