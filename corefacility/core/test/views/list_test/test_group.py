@@ -166,6 +166,7 @@ class TestGroup(BaseTestClass):
 
     _request_path = "/api/{version}/groups/".format(version=BaseTestClass.API_VERSION)
     _detail_path = "/api/{version}/groups/%d/".format(version=BaseTestClass.API_VERSION)
+    _user_list_path = "/api/{version}/groups/%d/users/".format(version=BaseTestClass.API_VERSION)
 
     superuser_required = True
     ordinary_user_required = True
@@ -230,6 +231,14 @@ class TestGroup(BaseTestClass):
         response = self.client.patch(path, data=self.name_update_data, format="json", **headers)
         self.assertEquals(response.status_code, expected_status_code, "Unexpected status code")
 
+    @parameterized.expand(security_read_provider())
+    def test_user_list_read(self, user_login, group_index, expected_status_code):
+        group = self.container[group_index]
+        path = self._user_list_path % group.id
+        headers = self.get_authorization_headers(user_login)
+        response = self.client.get(path, **headers)
+        self.assert_user_list_response(response, group, expected_status_code)
+
     def provide_security_filter(self, login):
         if login is None:
             return None
@@ -250,6 +259,46 @@ class TestGroup(BaseTestClass):
                           "Governor name was not transmitted")
         self.assertEquals(actual_item['governor']['surname'], desired_item.governor.surname,
                           "Governor surname was not transmitted")
+
+    def assert_user_list_response(self, response, group, expected_status_code):
+        """
+        Asserts that the actual user list returned by the response is the same as expected user list.
+        For responses 2xx actual and desired user lists will be compared one-by-one.
+
+        :param response: the response received by the group user list retrieve request.
+        :param group: a group for which the user list is requested
+        :param expected_status_code: status code to expect.
+        :return: nothing
+        """
+        self.assertEqual(response.status_code, expected_status_code, "Unexpected user list status code")
+        if expected_status_code == status.HTTP_200_OK:
+            self.assert_user_list(response.data, group.users)
+
+    def assert_user_list(self, response_output, user_list):
+        """
+        Asserts that two user lists were equal
+
+        :param response_output: the response body
+        :param user_list: expected user list
+        :return: nothing
+        """
+        self.assertEquals(response_output['count'], len(user_list), "Number of users in the user list is not the same "
+                                                                    "as expected")
+        if response_output['next'] is not None or response_output['previous'] is not None:
+            self.skipTest("assert_user_list function doesn't support multi-page responses")
+        self.assertEquals(response_output['count'], len(response_output['results']),
+                          "The 'count' property of the response doesn't reflect the returned number of items"
+                          " in the list")
+        for index in range(response_output['count']):
+            actual_user = response_output['results'][index]
+            desired_user = user_list[index]
+            self.assert_user_equals(actual_user, desired_user)
+
+    def assert_user_equals(self, actual_user, desired_user):
+        self.assertEquals(actual_user['id'], desired_user.id, "User IDs are not the same")
+        self.assertEquals(actual_user['login'], desired_user.login, "User logins are not the same")
+        self.assertEquals(actual_user['name'], desired_user.name, "User names are not the same")
+        self.assertEquals(actual_user['surname'], desired_user.surname, "User surnames are not the same")
 
 
 del BaseTestClass

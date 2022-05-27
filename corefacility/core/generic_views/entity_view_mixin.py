@@ -105,7 +105,7 @@ class EntityViewMixin:
         You may want to override this if you need to provide different
         querysets depending on the incoming request.
 
-        (Eg. return a list of items that is specific to the user)
+        (E.g. return a list of items that is specific to the user)
         """
         if not isinstance(self.entity_set_class, type) or not issubclass(self.entity_set_class, EntitySet):
             raise ValueError("The property 'entity_set_class' for the %s is undefined or invalid" %

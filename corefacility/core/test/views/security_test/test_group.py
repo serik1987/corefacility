@@ -2,7 +2,7 @@ from rest_framework import status
 from parameterized import parameterized
 
 from core.entity.group import Group
-from core.entity.user import User
+from core.entity.user import UserSet
 from core.entity.entry_points.authorizations import AuthorizationModule
 
 from .base_test_class import BaseTestClass
@@ -106,6 +106,15 @@ class TestGroup(BaseTestClass):
             self.assertEquals(response.data['name'], self.updated_entity_data['name'],
                               "Group name has not been written")
             self.assert_governors_equal(response, group.governor)
+
+    def test_group_for_support(self):
+        support_user = UserSet().get("support")
+        support_token = AuthorizationModule.issue_token(support_user)
+        headers = {"HTTP_AUTHORIZATION": "Token " + support_token}
+        response = self.client.post(self.get_entity_list_path(), data=self.sample_entity_data,
+                                    format="json", **headers)
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED,
+                          "Failed to create the group from the support user")
 
     def check_detail_info(self, actual_info, expected_info):
         """
