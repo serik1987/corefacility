@@ -146,6 +146,82 @@ def security_write_provider():
     ]
 
 
+def security_delete_provider():
+    def delete_user_provider(token_id, group_index, governor_index):
+        dataset = []
+        for user_index in range(1, 11):
+            status_code = status.HTTP_204_NO_CONTENT if user_index != governor_index else status.HTTP_403_FORBIDDEN
+            dataset.append((token_id, group_index, "user%d" % user_index, status_code))
+        return dataset
+    return [
+        *delete_user_provider("superuser", 3, 2),
+        *delete_user_provider("superuser", 2, 4),
+        *delete_user_provider("superuser", 4, 5),
+        *delete_user_provider("superuser", 0, 8),
+        *delete_user_provider("superuser", 1, 8),
+
+        ("user1", 3, "user1", status.HTTP_403_FORBIDDEN),
+        ("user1", 2, "user3", status.HTTP_403_FORBIDDEN),
+        ("user1", 4, "user4", status.HTTP_404_NOT_FOUND),
+        ("user1", 0, "user6", status.HTTP_404_NOT_FOUND),
+        ("user1", 1, "user10", status.HTTP_404_NOT_FOUND),
+
+        ("user2", 3, "user1", status.HTTP_204_NO_CONTENT),
+        ("user2", 2, "user3", status.HTTP_404_NOT_FOUND),
+        ("user2", 4, "user4", status.HTTP_404_NOT_FOUND),
+        ("user2", 0, "user6", status.HTTP_404_NOT_FOUND),
+        ("user2", 1, "user10", status.HTTP_404_NOT_FOUND),
+
+        ("user3", 3, "user1", status.HTTP_403_FORBIDDEN),
+        ("user3", 2, "user3", status.HTTP_403_FORBIDDEN),
+        ("user3", 4, "user4", status.HTTP_404_NOT_FOUND),
+        ("user3", 0, "user6", status.HTTP_404_NOT_FOUND),
+        ("user3", 1, "user10", status.HTTP_404_NOT_FOUND),
+
+        ("user4", 3, "user1", status.HTTP_404_NOT_FOUND),
+        ("user4", 2, "user3", status.HTTP_204_NO_CONTENT),
+        ("user4", 4, "user4", status.HTTP_403_FORBIDDEN),
+        ("user4", 0, "user6", status.HTTP_404_NOT_FOUND),
+        ("user4", 1, "user10", status.HTTP_404_NOT_FOUND),
+
+        ("user5", 3, "user1", status.HTTP_404_NOT_FOUND),
+        ("user5", 2, "user3", status.HTTP_403_FORBIDDEN),
+        ("user5", 4, "user4", status.HTTP_204_NO_CONTENT),
+        ("user5", 0, "user6", status.HTTP_404_NOT_FOUND),
+        ("user5", 1, "user10", status.HTTP_404_NOT_FOUND),
+
+        ("user6", 3, "user1", status.HTTP_403_FORBIDDEN),
+        ("user6", 2, "user3", status.HTTP_404_NOT_FOUND),
+        ("user6", 4, "user4", status.HTTP_403_FORBIDDEN),
+        ("user6", 0, "user6", status.HTTP_403_FORBIDDEN),
+        ("user6", 1, "user10", status.HTTP_404_NOT_FOUND),
+
+        ("user7", 3, "user1", status.HTTP_404_NOT_FOUND),
+        ("user7", 2, "user3", status.HTTP_404_NOT_FOUND),
+        ("user7", 4, "user4", status.HTTP_403_FORBIDDEN),
+        ("user7", 0, "user6", status.HTTP_403_FORBIDDEN),
+        ("user7", 1, "user10", status.HTTP_403_FORBIDDEN),
+
+        ("user8", 3, "user1", status.HTTP_404_NOT_FOUND),
+        ("user8", 2, "user3", status.HTTP_404_NOT_FOUND),
+        ("user8", 4, "user4", status.HTTP_404_NOT_FOUND),
+        ("user8", 0, "user6", status.HTTP_204_NO_CONTENT),
+        ("user8", 1, "user10", status.HTTP_204_NO_CONTENT),
+
+        ("user9", 3, "user1", status.HTTP_404_NOT_FOUND),
+        ("user9", 2, "user3", status.HTTP_404_NOT_FOUND),
+        ("user9", 4, "user4", status.HTTP_404_NOT_FOUND),
+        ("user9", 0, "user6", status.HTTP_403_FORBIDDEN),
+        ("user9", 1, "user10", status.HTTP_403_FORBIDDEN),
+
+        ("user10", 3, "user1", status.HTTP_404_NOT_FOUND),
+        ("user10", 2, "user3", status.HTTP_404_NOT_FOUND),
+        ("user10", 4, "user4", status.HTTP_404_NOT_FOUND),
+        ("user10", 0, "user6", status.HTTP_404_NOT_FOUND),
+        ("user10", 1, "user10", status.HTTP_403_FORBIDDEN),
+    ]
+
+
 def group_name_provider():
     return [
         (group_name, *other_data)
@@ -238,6 +314,19 @@ class TestGroup(BaseTestClass):
         headers = self.get_authorization_headers(user_login)
         response = self.client.get(path, **headers)
         self.assert_user_list_response(response, group, expected_status_code)
+
+    @parameterized.expand(security_delete_provider())
+    def test_user_list_delete(self, token_id, group_index, delete_user_login, expected_status_code):
+        headers = self.get_authorization_headers(token_id)
+        group = self.container[group_index]
+        request_path = self._detail_path % group.id + "users/%s/" % delete_user_login
+        response = self.client.delete(request_path, **headers)
+        self.assertEquals(response.status_code, expected_status_code)
+        user = self._user_set_object.get_by_alias(delete_user_login)
+        if status.HTTP_200_OK <= response.status_code < status.HTTP_300_MULTIPLE_CHOICES:
+            self.assertFalse(group.users.exists(user), "The user still exists in group after delete")
+        if status.HTTP_400_BAD_REQUEST <= response.status_code < status.HTTP_500_INTERNAL_SERVER_ERROR:
+            self.assertTrue(group.users.exists(user), "The user was suddenly deleted even after request was denied")
 
     def provide_security_filter(self, login):
         if login is None:
