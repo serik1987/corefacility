@@ -1,6 +1,7 @@
 from ..generic_views import EntityViewSet
 from ..entity.group import GroupSet
 from ..serializers import GroupSerializer
+from ..permissions import GroupPermission
 
 
 class GroupViewSet(EntityViewSet):
@@ -15,6 +16,7 @@ class GroupViewSet(EntityViewSet):
     entity_set_class = GroupSet
     list_serializer_class = GroupSerializer
     detail_serializer_class = GroupSerializer
+    permission_classes = [GroupPermission]
 
     def filter_queryset(self, queryset):
         """

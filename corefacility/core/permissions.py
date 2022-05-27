@@ -38,4 +38,7 @@ class GroupPermission(IsAuthenticated):
     Defines all available permissions for the user group
     """
 
-    pass
+    SAFE_METHODS = ["GET", "HEAD", "OPTIONS"]
+
+    def has_object_permission(self, request, view, group):
+        return request.method in self.SAFE_METHODS or group.governor.id == request.user.id or request.user.is_superuser

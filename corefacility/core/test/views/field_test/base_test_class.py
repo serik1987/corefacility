@@ -97,15 +97,17 @@ class BaseTestClass(BaseViewTest):
         response = self.client.post(input_path, data=input_data, **auth)
         self.assertEquals(response.status_code, status.HTTP_201_CREATED,
                           "The response must be successful even when you access to read-only fields")
-        self.assertEquals(response.data[name], default_value,
-                          "The read-only value '{name}' shall be unaffected by any request".format(name=name))
+        if default_value is not None:
+            self.assertEquals(response.data[name], default_value,
+                              "The read-only value '{name}' shall be unaffected by any request".format(name=name))
         entity_id = response.data[self.id_field]
         entity_path = self.get_entity_detail_path(entity_id)
         entity_response = self.client.get(entity_path, **auth)
         self.assertEquals(entity_response.status_code, status.HTTP_200_OK,
                           "The entity must be successfully read during this test")
-        self.assertEquals(entity_response.data[name], default_value,
-                          "The field must be unchanged during the data set")
+        if default_value is not None:
+            self.assertEquals(entity_response.data[name], default_value,
+                              "The field must be unchanged during the data set")
 
     def check_field_invalidated(self, response, name):
         """

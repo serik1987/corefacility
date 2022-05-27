@@ -18,3 +18,16 @@ class GroupSerializer(EntitySerializer):
     name = serializers.CharField(required=True, allow_null=False, allow_blank=False, max_length=256,
                                  label="Group login")
     governor = UserListSerializer(many=False, read_only=True, label="Group governor")
+
+    def create(self, data):
+        """
+        Creates new entity base on the validated data.
+        The entity will be automatically stored to the database.
+
+        This is highly important to attach the 'governor' field during the serialization.
+
+        :param data: The validated data.
+        :return: new entity
+        """
+        data['governor'] = self.context['request'].user
+        return super().create(data)

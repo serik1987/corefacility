@@ -18,6 +18,134 @@ def security_test_provider():
     ]
 
 
+def security_read_provider():
+    return [
+        ("user1", 3, status.HTTP_200_OK),
+        ("user1", 2, status.HTTP_200_OK),
+        ("user1", 4, status.HTTP_404_NOT_FOUND),
+        ("user1", 0, status.HTTP_404_NOT_FOUND),
+        ("user1", 1, status.HTTP_404_NOT_FOUND),
+
+        ("user2", 3, status.HTTP_200_OK),
+        ("user2", 2, status.HTTP_404_NOT_FOUND),
+        ("user2", 4, status.HTTP_404_NOT_FOUND),
+        ("user2", 0, status.HTTP_404_NOT_FOUND),
+        ("user2", 1, status.HTTP_404_NOT_FOUND),
+
+        ("user3", 3, status.HTTP_200_OK),
+        ("user3", 2, status.HTTP_200_OK),
+        ("user3", 4, status.HTTP_404_NOT_FOUND),
+        ("user3", 0, status.HTTP_404_NOT_FOUND),
+        ("user3", 1, status.HTTP_404_NOT_FOUND),
+
+        ("user4", 3, status.HTTP_404_NOT_FOUND),
+        ("user4", 2, status.HTTP_200_OK),
+        ("user4", 4, status.HTTP_200_OK),
+        ("user4", 0, status.HTTP_404_NOT_FOUND),
+        ("user4", 1, status.HTTP_404_NOT_FOUND),
+
+        ("user5", 3, status.HTTP_404_NOT_FOUND),
+        ("user5", 2, status.HTTP_200_OK),
+        ("user5", 4, status.HTTP_200_OK),
+        ("user5", 0, status.HTTP_404_NOT_FOUND),
+        ("user5", 1, status.HTTP_404_NOT_FOUND),
+
+        ("user6", 3, status.HTTP_200_OK),
+        ("user6", 2, status.HTTP_404_NOT_FOUND),
+        ("user6", 4, status.HTTP_200_OK),
+        ("user6", 0, status.HTTP_200_OK),
+        ("user6", 1, status.HTTP_404_NOT_FOUND),
+
+        ("user7", 3, status.HTTP_404_NOT_FOUND),
+        ("user7", 2, status.HTTP_404_NOT_FOUND),
+        ("user7", 4, status.HTTP_200_OK),
+        ("user7", 0, status.HTTP_200_OK),
+        ("user7", 1, status.HTTP_200_OK),
+
+        ("user8", 3, status.HTTP_404_NOT_FOUND),
+        ("user8", 2, status.HTTP_404_NOT_FOUND),
+        ("user8", 4, status.HTTP_404_NOT_FOUND),
+        ("user8", 0, status.HTTP_200_OK),
+        ("user8", 1, status.HTTP_200_OK),
+
+        ("user9", 3, status.HTTP_404_NOT_FOUND),
+        ("user9", 2, status.HTTP_404_NOT_FOUND),
+        ("user9", 4, status.HTTP_404_NOT_FOUND),
+        ("user9", 0, status.HTTP_200_OK),
+        ("user9", 1, status.HTTP_200_OK),
+
+        ("user10", 3, status.HTTP_404_NOT_FOUND),
+        ("user10", 2, status.HTTP_404_NOT_FOUND),
+        ("user10", 4, status.HTTP_404_NOT_FOUND),
+        ("user10", 0, status.HTTP_404_NOT_FOUND),
+        ("user10", 1, status.HTTP_200_OK),
+    ]
+
+
+def security_write_provider():
+    return [
+        ("user1", 3, status.HTTP_403_FORBIDDEN),
+        ("user1", 2, status.HTTP_403_FORBIDDEN),
+        ("user1", 4, status.HTTP_404_NOT_FOUND),
+        ("user1", 0, status.HTTP_404_NOT_FOUND),
+        ("user1", 1, status.HTTP_404_NOT_FOUND),
+
+        ("user2", 3, status.HTTP_200_OK),
+        ("user2", 2, status.HTTP_404_NOT_FOUND),
+        ("user2", 4, status.HTTP_404_NOT_FOUND),
+        ("user2", 0, status.HTTP_404_NOT_FOUND),
+        ("user2", 1, status.HTTP_404_NOT_FOUND),
+
+        ("user3", 3, status.HTTP_403_FORBIDDEN),
+        ("user3", 2, status.HTTP_403_FORBIDDEN),
+        ("user3", 4, status.HTTP_404_NOT_FOUND),
+        ("user3", 0, status.HTTP_404_NOT_FOUND),
+        ("user3", 1, status.HTTP_404_NOT_FOUND),
+
+        ("user4", 3, status.HTTP_404_NOT_FOUND),
+        ("user4", 2, status.HTTP_200_OK),
+        ("user4", 4, status.HTTP_403_FORBIDDEN),
+        ("user4", 0, status.HTTP_404_NOT_FOUND),
+        ("user4", 1, status.HTTP_404_NOT_FOUND),
+
+        ("user5", 3, status.HTTP_404_NOT_FOUND),
+        ("user5", 2, status.HTTP_403_FORBIDDEN),
+        ("user5", 4, status.HTTP_200_OK),
+        ("user5", 0, status.HTTP_404_NOT_FOUND),
+        ("user5", 1, status.HTTP_404_NOT_FOUND),
+
+        ("user6", 3, status.HTTP_403_FORBIDDEN),
+        ("user6", 2, status.HTTP_404_NOT_FOUND),
+        ("user6", 4, status.HTTP_403_FORBIDDEN),
+        ("user6", 0, status.HTTP_403_FORBIDDEN),
+        ("user6", 1, status.HTTP_404_NOT_FOUND),
+
+        ("user7", 3, status.HTTP_404_NOT_FOUND),
+        ("user7", 2, status.HTTP_404_NOT_FOUND),
+        ("user7", 4, status.HTTP_403_FORBIDDEN),
+        ("user7", 0, status.HTTP_403_FORBIDDEN),
+        ("user7", 1, status.HTTP_403_FORBIDDEN),
+
+        ("user8", 3, status.HTTP_404_NOT_FOUND),
+        ("user8", 2, status.HTTP_404_NOT_FOUND),
+        ("user8", 4, status.HTTP_404_NOT_FOUND),
+        ("user8", 0, status.HTTP_200_OK),
+        ("user8", 1, status.HTTP_200_OK),
+
+        ("user9", 3, status.HTTP_404_NOT_FOUND),
+        ("user9", 2, status.HTTP_404_NOT_FOUND),
+        ("user9", 4, status.HTTP_404_NOT_FOUND),
+        ("user9", 0, status.HTTP_403_FORBIDDEN),
+        ("user9", 1, status.HTTP_403_FORBIDDEN),
+
+        ("user10", 3, status.HTTP_404_NOT_FOUND),
+        ("user10", 2, status.HTTP_404_NOT_FOUND),
+        ("user10", 4, status.HTTP_404_NOT_FOUND),
+        ("user10", 0, status.HTTP_404_NOT_FOUND),
+        ("user10", 1, status.HTTP_403_FORBIDDEN),
+    ]
+
+
 def group_name_provider():
     return [
         (group_name, *other_data)
@@ -31,10 +159,13 @@ class TestGroup(BaseTestClass):
     Tests the user groups
     """
 
+    name_update_data = {"name": "Более приличное название группы..."}
+
     _user_set_object = None
     _group_set_object = None
 
     _request_path = "/api/{version}/groups/".format(version=BaseTestClass.API_VERSION)
+    _detail_path = "/api/{version}/groups/%d/".format(version=BaseTestClass.API_VERSION)
 
     superuser_required = True
     ordinary_user_required = True
@@ -82,6 +213,22 @@ class TestGroup(BaseTestClass):
         query_params = {"q": name, "profile": profile}
         self.container.filter_by_name(name)
         self._test_search(query_params, "superuser", status.HTTP_200_OK)
+
+    @parameterized.expand(security_read_provider())
+    def test_group_reveal(self, user_login, group_index, expected_status_code):
+        group = self.container[group_index]
+        headers = self.get_authorization_headers(user_login)
+        path = self._detail_path % group.id
+        response = self.client.get(path, **headers)
+        self.assertEquals(response.status_code, expected_status_code, "Unexpected status code")
+
+    @parameterized.expand(security_write_provider())
+    def test_group_update(self, user_login, group_index, expected_status_code):
+        group = self.container[group_index]
+        headers = self.get_authorization_headers(user_login)
+        path = self._detail_path % group.id
+        response = self.client.patch(path, data=self.name_update_data, format="json", **headers)
+        self.assertEquals(response.status_code, expected_status_code, "Unexpected status code")
 
     def provide_security_filter(self, login):
         if login is None:
