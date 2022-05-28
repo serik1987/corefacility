@@ -53,6 +53,8 @@ class TestGroup(BaseTestClass):
     _another_user = None
     _superuser_group = None
     _ordinary_user_group = None
+    _superuser_id = None
+    _ordinary_user_id = None
 
     @classmethod
     def setUpTestData(cls):
@@ -64,6 +66,8 @@ class TestGroup(BaseTestClass):
         cls._superuser_group.create()
         cls._ordinary_user_group = Group(name="The Ordinary User Group", governor=cls._ordinary_user)
         cls._ordinary_user_group.create()
+        cls._superuser_id = cls._superuser.id
+        cls._ordinary_user_id = cls._ordinary_user.id
 
     @parameterized.expand(standard_test_provider())
     def test_entity_create(self, data_id, token_id, expected_status_code):
@@ -115,6 +119,15 @@ class TestGroup(BaseTestClass):
                                     format="json", **headers)
         self.assertEquals(response.status_code, status.HTTP_201_CREATED,
                           "Failed to create the group from the support user")
+
+    @parameterized.expand(advanced_test_provider())
+    def test_user_add_advanced(self, token_id, user_id, expected_status_code):
+        group = self.get_user_group(user_id)
+        path = self.get_entity_detail_path(group.id) + "users/"
+        headers = self.get_authorization_headers(token_id)
+        data = {"user_id": getattr(self, "_" + user_id + "_id")}
+        response = self.client.post(path, data=data, format="json", **headers)
+        self.assertEquals(response.status_code, expected_status_code, "Unexpected status code")
 
     def check_detail_info(self, actual_info, expected_info):
         """

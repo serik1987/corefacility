@@ -344,6 +344,19 @@ class TestGroup(BaseTestClass):
                 self.assert_user_equals(actual_user, expected_user)
                 self.assertFalse(group.users.exists(expected_user), "The suggested user exists in the group")
 
+    @parameterized.expand(security_write_provider())
+    def test_user_list_add(self, token_id, group_index, expected_status_code):
+        group = self.container[group_index]
+        path = self._detail_path % group.id + "users/"
+        headers = self.get_authorization_headers(token_id)
+        data = {"user_id": self.ordinary_user.id}
+        response = self.client.post(path, data=data, format="json", **headers)
+        self.assertEquals(response.status_code, expected_status_code)
+        if status.HTTP_200_OK <= response.status_code < status.HTTP_300_MULTIPLE_CHOICES:
+            self.assertTrue(group.users.exists(self.ordinary_user), "The user was not actually added to the user list")
+        if status.HTTP_400_BAD_REQUEST <= response.status_code < status.HTTP_500_INTERNAL_SERVER_ERROR:
+            self.assertFalse(group.users.exists(self.ordinary_user), "The user was unexpectedly added to the user list")
+
     def provide_security_filter(self, login):
         if login is None:
             return None

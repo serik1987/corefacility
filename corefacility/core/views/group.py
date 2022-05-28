@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from ..pagination import CorePagination
 from ..generic_views import EntityViewSet
@@ -26,23 +26,53 @@ class GroupViewSet(EntityViewSet):
     detail_serializer_class = GroupSerializer
     permission_classes = [GroupPermission]
 
-    @action(methods=["GET"], detail=True, url_path="users", url_name="users")
+    @action(methods=["GET", "POST"], detail=True, url_path="users", url_name="users")
+    def users(self, request, *args, **kwargs):
+        """
+        Working with user list
+        """
+        if request.method == "GET":
+            return self.get_user_list(request, *args, **kwargs)
+        elif request.method == "POST":
+            return self.set_user_list(request, *args, **kwargs)
+
     def get_user_list(self, request, *args, **kwargs):
         """
         Retrieves list of all group members
-
-        :param request: information about the request processed
-        :param args: additional arguments extracted from the request path
-        :param kwargs: additional keyword arguments extracted from the request path
-        :return:
         """
         group = self.get_object()
         page = self.paginate_queryset(group.users)
         serializer = UserListSerializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
+    def set_user_list(self, request, *args, **kwargs):
+        """
+        Adds user to the group users.
+        """
+        group = self.get_object()
+        try:
+            user_id = int(request.data['user_id'])
+        except (KeyError, ValueError):
+            raise ValidationError(detail="The request body must contain the only field: 'user_id'. "
+                                         "The value of this field must be integer")
+        user = self.get_entity_or_404(UserSet(), user_id)
+        try:
+            group.users.add(user)
+        except EntityOperationNotPermitted:
+            raise PermissionDenied()
+        serializer = UserListSerializer(user, many=False)
+        return Response(serializer.data)
+
     @action(methods=["DELETE"], detail=True, url_path=r'users/(?P<user_lookup>\w+)', url_name="user-delete")
     def delete_user(self, request, *args, **kwargs):
+        """
+        Removes user from the group users
+
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
         group = self.get_object()
         user = self.get_entity_or_404(UserSet(), kwargs['user_lookup'])
         try:
@@ -53,6 +83,14 @@ class GroupViewSet(EntityViewSet):
 
     @action(methods=["GET"], detail=True, url_path=r'user-suggest', url_name="user-suggest")
     def suggest_user(self, request, *args, **kwargs):
+        """
+        Suggests the user for adding
+
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
         group = self.get_object()
         group_users = {user.id for user in group.users}
         user_set = UserSet()
