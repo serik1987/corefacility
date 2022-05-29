@@ -2,6 +2,8 @@ from rest_framework import status
 from parameterized import parameterized
 
 from core.entity.user import UserSet
+from core.entity.group import GroupSet
+from core.entity.entity_exceptions import EntityNotFoundException
 from core.entity.entry_points.authorizations import AuthorizationModule
 from core.test.entity_set.entity_set_objects.user_set_object import UserSetObject
 from core.test.entity_set.entity_set_objects.group_set_object import GroupSetObject
@@ -356,6 +358,23 @@ class TestGroup(BaseTestClass):
             self.assertTrue(group.users.exists(self.ordinary_user), "The user was not actually added to the user list")
         if status.HTTP_400_BAD_REQUEST <= response.status_code < status.HTTP_500_INTERNAL_SERVER_ERROR:
             self.assertFalse(group.users.exists(self.ordinary_user), "The user was unexpectedly added to the user list")
+
+    @parameterized.expand(security_write_provider())
+    def test_delete(self, token_id, group_index, expected_status_code):
+        if expected_status_code == status.HTTP_200_OK:
+            expected_status_code = status.HTTP_204_NO_CONTENT
+        group_id = self.container[group_index].id
+        path = self._detail_path % group_id
+        headers = self.get_authorization_headers(token_id)
+        response = self.client.delete(path, **headers)
+        self.assertEquals(response.status_code, expected_status_code, "Unexpected status code")
+        group_set = GroupSet()
+        if status.HTTP_200_OK <= response.status_code < status.HTTP_300_MULTIPLE_CHOICES:
+            with self.assertRaises(EntityNotFoundException, msg="The group delete status was ok but"
+                                                                "the group still exists"):
+                group_set.get(group_id)
+        if status.HTTP_400_BAD_REQUEST <= response.status_code < status.HTTP_500_INTERNAL_SERVER_ERROR:
+            group_set.get(group_id)
 
     def provide_security_filter(self, login):
         if login is None:

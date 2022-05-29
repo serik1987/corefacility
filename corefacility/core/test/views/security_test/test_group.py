@@ -129,6 +129,16 @@ class TestGroup(BaseTestClass):
         response = self.client.post(path, data=data, format="json", **headers)
         self.assertEquals(response.status_code, expected_status_code, "Unexpected status code")
 
+    @parameterized.expand(advanced_test_provider())
+    def test_group_delete(self, token_id, user_id, expected_status_code):
+        group = self.get_user_group(user_id)
+        path = self.get_entity_detail_path(group.id)
+        headers = self.get_authorization_headers(token_id)
+        response = self.client.delete(path, **headers)
+        if expected_status_code == status.HTTP_200_OK:
+            expected_status_code = status.HTTP_204_NO_CONTENT
+        self.assertEquals(response.status_code, expected_status_code, "Unexpected status code")
+
     def check_detail_info(self, actual_info, expected_info):
         """
         Checks whether actual_info contains the same information that exists in the expected_info
