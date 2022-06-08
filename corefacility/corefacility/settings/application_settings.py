@@ -1,3 +1,4 @@
+import sys
 from logging.handlers import SysLogHandler
 
 INSTALLED_APPS = [
@@ -89,3 +90,8 @@ LOGGING = {
         }
     }
 }
+
+if sys.platform.startswith("win32"):
+	del LOGGING["handlers"]["syslog_handler"]
+	LOGGING["loggers"]["django.corefacility"]["handlers"].remove("syslog_handler")
+	LOGGING["loggers"]["django.corefacility.log"]["handlers"].remove("syslog_handler")

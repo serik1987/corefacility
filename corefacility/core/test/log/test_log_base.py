@@ -135,7 +135,9 @@ class TestLogBase(TestCase):
                 self.assertEquals(log_number, 1, "This request must be logged")
                 log = self.__log_set[0]
                 ct = make_aware(datetime.now())
-                self.assertLess(log.request_date.get(), ct, "The request date must be less than current date")
+                if not (log.request_date.get() <= ct):
+                    print(log.request_date.get(), ct)
+                self.assertLessEqual(log.request_date.get(), ct, "The request date must be less than current date")
                 self.assertEquals(log.log_address, request_path.split("?")[0],
                                   "The request path must be stored correctly")
                 self.assertEquals(log.request_method.lower(), method.lower(),
