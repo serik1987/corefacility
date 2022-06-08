@@ -1,12 +1,13 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
-from .views import View404, UserViewSet, GroupViewSet, LoginView, ProfileView
+from .views import View404, UserViewSet, GroupViewSet, ProjectViewSet, LoginView, ProfileView
 from .views.profile_avatar import ProfileAvatarView
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet, basename="users")
 router.register(r'groups', GroupViewSet, basename="groups")
+router.register(r'projects', ProjectViewSet, basename="projects")
 
 urlpatterns = [
     path(r'login/', LoginView.as_view(), name="login"),

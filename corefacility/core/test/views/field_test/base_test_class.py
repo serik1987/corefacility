@@ -63,7 +63,7 @@ class BaseTestClass(BaseViewTest):
         initial_data = getattr(self, initial_data_id + "_data").copy()
         initial_data[name] = initial_value
         auth = {"HTTP_AUTHORIZATION": "Token " + self.superuser_token}
-        input_response = self.client.post(input_path, data=initial_data, **auth)
+        input_response = self.client.post(input_path, data=initial_data, format="json", **auth)
         if is_valid:
             self.assertEquals(input_response.status_code, status.HTTP_201_CREATED,
                               "The response status must be 201 CREATED for a field '{name}' filled correctly"
