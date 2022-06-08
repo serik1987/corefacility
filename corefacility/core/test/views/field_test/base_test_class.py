@@ -29,7 +29,7 @@ class BaseTestClass(BaseViewTest):
         list_path = self.get_entity_list_path()
         initial_data = getattr(self, initial_data_id + "_data").copy()
         auth = {"HTTP_AUTHORIZATION": "Token " + self.superuser_token}
-        response = self.client.post(list_path, data=initial_data, **auth)
+        response = self.client.post(list_path, data=initial_data, format="json", **auth)
         if is_required:
             self.check_field_invalidated(response, name)
         else:

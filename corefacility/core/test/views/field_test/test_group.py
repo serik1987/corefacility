@@ -46,7 +46,6 @@ class TestGroup(BaseTestClass):
         update_response = self.client.patch(update_path, data=self.standard_data, format="json", **headers)
         self.assertEquals(update_response.status_code, status.HTTP_400_BAD_REQUEST, "Unexpected response code")
         self.assertEquals(update_response.data['code'], 'EntityDuplicatedException', "YUnexpected error code")
-        print(update_response.data)
 
     def test_governor_read_only(self):
         self._test_read_only_field("name", "standard", None)

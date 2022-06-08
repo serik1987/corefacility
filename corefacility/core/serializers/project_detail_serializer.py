@@ -15,7 +15,7 @@ class ProjectDetailSerializer(ProjectListSerializer):
     """
 
     description = serializers.CharField(read_only=False, write_only=False, required=False, allow_null=True,
-                                        max_length=1024, label="Project name")
+                                        allow_blank=True, max_length=1024, label="Project name")
     root_group_id = serializers.IntegerField(read_only=False, write_only=True, required=False, allow_null=True,
                                              min_value=1, label="Governing group ID or null if the group shall be "
                                                                 "created automatically during the project create")
