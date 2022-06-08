@@ -36,7 +36,41 @@ class ProjectDetailSerializer(ProjectListSerializer):
         :param data: the serialized data received from the client
         :return: the project itself
         """
-        root_group_id = data['root_group_id']
+        try:
+            root_group_id = data['root_group_id']
+        except KeyError:
+            raise ValidationError({"root_group_id": "This field is mandatory in POST requests"})
+        self.calculate_root_group(data, root_group_id)
+        return super().create(data)
+
+    def update(self, project, validated_data):
+        """
+        Changes the project settings using the serialized data.
+
+        :param project: The project which settings shall be updated
+        :param validated_data: The data that will be used to update the project settings. The data itself were implied
+            to have been already validated
+        :return: the updated project instance
+        """
+        if "root_group_id" in validated_data:
+            self.calculate_root_group(validated_data, validated_data["root_group_id"])
+        elif "root_group_name" in validated_data:
+            del validated_data["root_group_name"]
+        return super().update(project, validated_data)
+
+    def calculate_root_group(self, data, root_group_id):
+        """
+        This function negotiates the POST, PUT and PATCH request input data and the Project object methods.
+        The main problem is the request specification requires 'root_group_id' and 'root_group_name' fields
+        to be set in proper manner while the 'root_group' field is ignored. On the other hands, the Project object
+        method requires the 'root_group' field to be set to a proper instance of the Group object. This method
+        solves such a problem
+
+        :param data: the input data to which the 'root_group' field shall be attached and 'root_group_id' and
+            'root_group_name' fields shall be deleted
+        :param root_group_id: appropriate root group id.
+        :return: nothing
+        """
         if root_group_id is None:
             user = self.context['request'].user
             try:
@@ -58,4 +92,3 @@ class ProjectDetailSerializer(ProjectListSerializer):
         for old_key in ("root_group_id", "root_group_name"):
             if old_key in data:
                 del data[old_key]
-        return super().create(data)
