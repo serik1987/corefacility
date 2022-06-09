@@ -21,3 +21,19 @@ class ProjectListSerializer(EntitySerializer):
     name = serializers.CharField(read_only=False, write_only=False, required=True, allow_null=False, max_length=64,
                                  label="Project name")
     root_group = GroupSerializer(read_only=True, many=False, label="Governing group")
+
+    def to_representation(self, project):
+        """
+        Converts the core.entity.project.Project instance to its serialized representation
+
+        :param project: the entity itself
+        :return: its serialized representation
+        """
+        representation = super().to_representation(project)
+        if self.context['request'].user.is_superuser:
+            representation["user_access_level"] = "full"
+            representation["is_user_governor"] = True
+        else:
+            representation["user_access_level"] = project.get_proper_access_level(project.user_access_level)
+            representation["is_user_governor"] = project.is_user_governor
+        return representation

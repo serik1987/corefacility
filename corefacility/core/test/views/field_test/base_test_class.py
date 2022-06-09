@@ -94,7 +94,7 @@ class BaseTestClass(BaseViewTest):
         input_data = getattr(self, initial_data_id + "_data").copy()
         input_data[name] = "some-value"
         auth = self.get_superuser_authorization()
-        response = self.client.post(input_path, data=input_data, **auth)
+        response = self.client.post(input_path, data=input_data, format="json", **auth)
         self.assertEquals(response.status_code, status.HTTP_201_CREATED,
                           "The response must be successful even when you access to read-only fields")
         if default_value is not None:

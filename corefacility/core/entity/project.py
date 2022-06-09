@@ -1,5 +1,5 @@
 from django.templatetags.static import static
-from .entity import Entity
+from .arbitrary_access_level_entity import ArbitraryAccessLevelEntity
 from .entity_fields.field_managers.project_permission_manager import ProjectPermissionManager
 from .entity_sets.project_set import ProjectSet
 from .entity_fields import EntityField, EntityAliasField, PublicFileManager, ManagedEntityField, ReadOnlyField, \
@@ -7,7 +7,7 @@ from .entity_fields import EntityField, EntityAliasField, PublicFileManager, Man
 from .entity_providers.model_providers.project_provider import ProjectProvider as ModelProvider
 
 
-class Project(Entity):
+class Project(ArbitraryAccessLevelEntity):
     """
     Project is a common operating-system independent workspace that allows several users to work on the same
     data
@@ -39,6 +39,23 @@ class Project(Entity):
         "is_user_governor": ReadOnlyField(
             description="Whether the user is governor for group with 'full' access (if applicable)")
     }
+
+    @classmethod
+    def get_access_level_hierarchy(cls):
+        """
+        Returns a dictionary containing access levels and their weights. If the user has two different access
+        levels to the same entity, this feature will select a level with the highest weight.
+
+        :return: a dictionary which keys are access level aliases and which values are access level weights
+        """
+        return {
+            "no_access": 0.0,
+            "data_view": 1.0,
+            "data_process": 2.0,
+            "data_add": 3.0,
+            "data_full": 4.0,
+            "full": 5.0,
+        }
 
     def __setattr__(self, name, value):
         """

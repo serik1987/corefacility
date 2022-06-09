@@ -73,7 +73,7 @@ class AuthorizationModule(CorefacilityModule):
         return signed_token
 
     @staticmethod
-    def apply_token(token):
+    def apply_token(token: str):
         """
         Recovers the user using the token
 

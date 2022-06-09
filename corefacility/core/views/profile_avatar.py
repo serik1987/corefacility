@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from core.generic_views import AvatarMixin, EntityViewMixin
 from core.entity.user import UserSet
 from core.serializers import UserDetailSerializer
+from core.permissions import NoSupportPermission
 
 
 class ProfileAvatarView(AvatarMixin, EntityViewMixin, APIView):
@@ -12,6 +13,7 @@ class ProfileAvatarView(AvatarMixin, EntityViewMixin, APIView):
 
     entity_set_class = UserSet
     detail_serializer_class = UserDetailSerializer
+    permission_classes = [NoSupportPermission]
 
     def patch(self, request, *args, **kwargs):
         """

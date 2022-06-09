@@ -330,6 +330,10 @@ class TestProject(BaseTestClass):
             self.assertEquals(project_modification_response.status_code, status.HTTP_400_BAD_REQUEST,
                               "This couple of data is considered to be invalid")
 
+    @parameterized.expand([("project_dir",), ("unix_group",)])
+    def test_all_read_only_fields(self, field_name):
+        self._test_read_only_field(field_name, "new_root_group", None)
+
     def check_response_duplication_error(self, response):
         """
         Checks whether the response notifies the client that duplication error was occured at the server side
@@ -379,3 +383,6 @@ class TestProject(BaseTestClass):
         self.assertEquals(response.data['governor']['surname'], root_group.governor.surname,
                           "Governor surname inconsistency")
         return root_group
+
+
+del BaseTestClass

@@ -8,17 +8,8 @@ from core.entity.entry_points.authorizations import AuthorizationModule
 from core.test.entity_set.entity_set_objects.user_set_object import UserSetObject
 from core.test.entity_set.entity_set_objects.group_set_object import GroupSetObject
 
+from . import security_test_provider
 from .base_test_class import BaseTestClass, profile_provider
-
-
-def security_test_provider():
-    return [
-        (None, status.HTTP_401_UNAUTHORIZED),
-        ("ordinary_user", status.HTTP_200_OK),
-        ("superuser", status.HTTP_200_OK),
-    ] + [
-        ("user%d" % user_index, status.HTTP_200_OK) for user_index in range(1, 11)
-    ]
 
 
 def security_read_provider():
