@@ -66,7 +66,7 @@ class AvatarMixin:
         processed_file = self.file_preprocessing(uploaded_file, content_type)
         entity = self.get_object()
         self.attach_file(entity, processed_file)
-        entity_serializer = self.detail_serializer_class(entity)
+        entity_serializer = self.detail_serializer_class(entity, context={"request": self.request})
         return Response(entity_serializer.data)
 
     def delete_avatar(self, request):
@@ -79,7 +79,7 @@ class AvatarMixin:
         entity = self.get_object()
         file_manager = getattr(entity, self.file_field)
         file_manager.detach_file()
-        entity_serializer = self.detail_serializer_class(entity)
+        entity_serializer = self.detail_serializer_class(entity, context={"request": self.request})
         return Response(entity_serializer.data)
 
     def get_file_from_request(self, request):

@@ -1,10 +1,10 @@
-from core.generic_views import EntityViewSet
+from core.generic_views import EntityViewSet, AvatarMixin
 from core.entity.project import ProjectSet
 from core.serializers import ProjectListSerializer, ProjectDetailSerializer
 from core.permissions import ProjectPermission
 
 
-class ProjectViewSet(EntityViewSet):
+class ProjectViewSet(AvatarMixin, EntityViewSet):
     """
     Dealing with projects
     """
@@ -18,6 +18,12 @@ class ProjectViewSet(EntityViewSet):
         "name": EntityViewSet.standard_filter_function("q", str)
     }
     """ Filters for the entity list """
+
+    desired_image_width = 300
+    """ The image will be cut to this width and next downsampled """
+
+    desired_image_height = 300
+    """ The image will be cut to this height and next downsampled """
 
     def filter_queryset(self, queryset):
         """
