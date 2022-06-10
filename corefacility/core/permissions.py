@@ -42,3 +42,24 @@ class GroupPermission(IsAuthenticated):
 
     def has_object_permission(self, request, view, group):
         return request.method in self.SAFE_METHODS or group.governor.id == request.user.id or request.user.is_superuser
+
+
+class ProjectPermission(IsAuthenticated):
+    """
+    Defines individual permissions for project CRUD operations as well as project avatar update.
+    """
+
+    SAFE_METHODS = ["GET", "HEAD", "OPTIONS"]
+
+    def has_object_permission(self, request, view, project):
+        """
+        Defines whether the client has an access to a particular project
+
+        :param request: the HTTP request sent by a particular client
+        :param view: an instance of the ProjectViewSet
+        :param project: a particular project which permissions shall be calculated
+        :return: True if the particular project operation is allowed, False if the operation is prohibited
+        """
+        return request.method in self.SAFE_METHODS or \
+            request.user.is_superuser or \
+            project.is_user_governor

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-06 02:34+0300\n"
+"POT-Creation-Date: 2022-06-10 16:21+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -82,12 +82,12 @@ msgstr "Проект"
 msgid "User"
 msgstr "Пользователь"
 
-#: core/generic_views/avatar_mixin.py:103
-#: core/generic_views/avatar_mixin.py:117
+#: core/generic_views/avatar_mixin.py:115
+#: core/generic_views/avatar_mixin.py:130
 msgid "This file type is not uploadable"
 msgstr "Невозможно загрузить данный тип файла"
 
-#: core/generic_views/avatar_mixin.py:120
+#: core/generic_views/avatar_mixin.py:133
 msgid "The image resolution is too small"
 msgstr "Разрешение изображения слишком мало"
 
@@ -236,6 +236,11 @@ msgstr "Ошибка"
 #: core/models/enums/log_level.py:13
 msgid "The system was down"
 msgstr "Сервер экстренно прекратил работу"
+
+#: core/serializers/project_detail_serializer.py:46
+msgid ""
+"You don't have permission to assign this group as the project root group"
+msgstr "У Вас нет достаточных полномочий, чтобы назначить этот коллектив в качестве управляющего коллектива проекта."
 
 #: core/serializers/user_detail_serializer.py:15
 msgid "Enter a valid phone number."

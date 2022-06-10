@@ -1,3 +1,4 @@
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -41,6 +42,9 @@ class ProjectDetailSerializer(ProjectListSerializer):
         except KeyError:
             raise ValidationError({"root_group_id": "This field is mandatory in POST requests"})
         self.calculate_root_group(data, root_group_id)
+        if data["root_group"].governor.id != self.context["request"].user.id:
+            raise ValidationError({"root_group": _("You don't have permission to assign this group as "
+                                                   "the project root group")})
         return super().create(data)
 
     def update(self, project, validated_data):

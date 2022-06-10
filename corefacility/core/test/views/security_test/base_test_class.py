@@ -108,7 +108,7 @@ class BaseTestClass(BaseViewTest):
         full_data.update(updated_data)
         good_response = self.client.put(path, data=full_data, **auth)
         self.assertEquals(good_response.status_code, expected_response_code, "PUTting")
-        self.check_entity_save(good_response, test_data)
+        self.check_entity_save(good_response, full_data)
         self.check_4xx_details(good_response)
 
     def _test_entity_partial_update(self, test_data_id, updated_data_id, token_id, expected_response_code):
@@ -138,7 +138,9 @@ class BaseTestClass(BaseViewTest):
         response = self.client.patch(entity_path, updated_data, **auth)
         self.assertEquals(response.status_code, expected_response_code,
                           "The response code is not the same as expected")
-        self.check_entity_save(response, updated_data)
+        full_data = test_data.copy()
+        full_data.update(updated_data)
+        self.check_entity_save(response, full_data)
         self.check_4xx_details(response)
 
     def _test_entity_destroy(self, test_data_id, token_id, expected_status_code):
@@ -228,7 +230,7 @@ class BaseTestClass(BaseViewTest):
         :param response: the 4xx response
         :return: nothing
         """
-        if response.status_code >= status.HTTP_400_BAD_REQUEST:
+        if response.status_code >= status.HTTP_401_UNAUTHORIZED:
             self.assertIn("detail", response.data)
 
     def get_actual_value(self, actual_info, key):

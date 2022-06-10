@@ -1,6 +1,7 @@
 from core.generic_views import EntityViewSet
 from core.entity.project import ProjectSet
 from core.serializers import ProjectListSerializer, ProjectDetailSerializer
+from core.permissions import ProjectPermission
 
 
 class ProjectViewSet(EntityViewSet):
@@ -11,6 +12,7 @@ class ProjectViewSet(EntityViewSet):
     entity_set_class = ProjectSet
     list_serializer_class = ProjectListSerializer
     detail_serializer_class = ProjectDetailSerializer
+    permission_classes = [ProjectPermission]
 
     list_filters = {
         "name": EntityViewSet.standard_filter_function("q", str)
