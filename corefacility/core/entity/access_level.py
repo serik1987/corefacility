@@ -16,7 +16,7 @@ class AccessLevel(Entity):
 
     _entity_set_class = AccessLevelSet
 
-    _entity_provider_list = [AccessLevelProvider()]  # TO-DO: define the access level provider
+    _entity_provider_list = [AccessLevelProvider()]
 
     _required_fields = ["type", "alias", "name"]
 
