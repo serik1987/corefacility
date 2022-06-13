@@ -1,13 +1,16 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
-from .views import View404, UserViewSet, GroupViewSet, ProjectViewSet, LoginView, ProfileView, AccessLevelView
+from .views import View404, UserViewSet, GroupViewSet, ProjectViewSet, LoginView, ProfileView, AccessLevelView, \
+    ProjectPermissionViewSet
 from .views.profile_avatar import ProfileAvatarView
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet, basename="users")
 router.register(r'groups', GroupViewSet, basename="groups")
 router.register(r'projects', ProjectViewSet, basename="projects")
+router.register(r'projects/(?P<project_lookup>\w+)/permissions', ProjectPermissionViewSet,
+                basename="project-permissions")
 
 urlpatterns = [
     path(r'login/', LoginView.as_view(), name="login"),
