@@ -1,5 +1,6 @@
 from rest_framework.request import Request
 
+from core.models.enums import LevelType
 from core.entity.entity_fields.field_managers.permission_manager import PermissionManager
 from core.permissions import ProjectSettingsPermission
 
@@ -11,6 +12,7 @@ class ProjectPermissionViewSet(PermissionViewSet):
     Returns the project permission
     """
 
+    access_level_type = LevelType.project_level
     permission_classes = [ProjectSettingsPermission]
 
     def get_permission_set(self, request: Request) -> PermissionManager:

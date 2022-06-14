@@ -1,7 +1,12 @@
+from typing import List, Tuple
+import random
+
 from rest_framework import status
 from rest_framework.response import Response
 
 from core.entity.access_level import AccessLevelSet
+from core.entity.group import Group
+from core.views.permission_viewset import PermissionViewSet
 
 from core.test.entity_set.entity_set_objects.user_set_object import UserSetObject
 from core.test.entity_set.entity_set_objects.group_set_object import GroupSetObject
@@ -75,6 +80,62 @@ class BasePermissionTest(BaseViewTest):
         for level in level_set:
             cls.access_levels[level.alias] = level
 
+    def setUp(self):
+        super().setUp()
+        PermissionViewSet.throttle_classes = []
+
+    def permission_list_response_to_permission_list(self, response: Response) -> list:
+        """
+        Converts the permission list response to the list of PermissionListItem's instances.
+        Assertion for response status code equal to 200 will also be performed
+
+        :param response: the response received
+        :return: list of permission items.
+        """
+        self.assertEquals(response.status_code, status.HTTP_200_OK, "An auxiliary response status code must be 200")
+        permission_list = []
+        for permission_info in response.data:
+            permission = self.PermissionListItem(group_id=permission_info['group_id'],
+                                                 group_name=permission_info['group_name'],
+                                                 level_alias=permission_info['access_level_alias'])
+            permission_list.append(permission)
+        return permission_list
+
+    def choose_permission_group(self, permission_list: List[PermissionListItem], group_mode: str,
+                                root_group: Group, group_add_allowed: bool = True) -> Tuple[int, int]:
+        """
+        Chooses a particular group and some random access level. Also, the function adds the selected permission to
+        the permission list
+
+        :param permission_list: permission list from which the group shall be chosen
+        :param group_mode: 'new_group' for selection for a group not presented in the permission_list,
+            'same_group' if the group shall be presented in the group list
+        :param root_group: a group that shall not be selected in any way
+        :param group_add_allowed: True if the group add is allowed by the routine, False otherwise
+        :return: Updated permission list item
+        """
+        group_set = {item.group_id for item in permission_list}
+        if group_mode == "new_group":
+            full_group_set = {group.id for group in self.group_set_object}
+            group_set = full_group_set - group_set - {root_group.id}
+        assert len(group_set) > 0
+        group_id = random.choice(list(group_set))
+        level_alias = random.choice(list(self.access_levels.keys()))
+        level_id = self.access_levels[level_alias].id
+        permission = None
+        for current_permission in permission_list:
+            if current_permission.group_id == group_id:
+                assert group_mode == "same_group"
+                permission = current_permission
+        if permission is None and group_add_allowed:
+            assert group_mode == "new_group"
+            group_name = self.group_set_object.get_by_id(group_id).name
+            permission = self.PermissionListItem(group_id=group_id, group_name=group_name, level_alias=level_alias)
+            permission_list.append(permission)
+        if permission is not None:
+            permission.level_alias = level_alias
+        return group_id, level_id
+
     def assert_permission_list_response(self, response: Response, expected_status_code: int,
                                         expected_permission_list: list):
         """
@@ -104,6 +165,32 @@ class BasePermissionTest(BaseViewTest):
                                   "Unexpected access level ID")
                 self.assertEquals(actual_permission['access_level_name'], expected_level.name,
                                   "Unexpected access level name")
+
+    def assert_permission_updated(self, permission_manager, expected_permission_list, root_group):
+        """
+        Asserts that a given permission has been updated.
+
+        :param permission_manager: permission manager to check whether a given permission is within the database
+        :param expected_permission_list: list of all permissions that are expected to be in the database
+        :param root_group: True for the root group, False otherwise
+        :return: nothing
+        """
+        for group in self.group_set_object:
+            if group.id == root_group.id:
+                self.assertEquals(permission_manager.get(group).alias, "full", "Full access shall be provided "
+                                                                         "for the root group")
+            else:
+                perm = None
+                for permission in expected_permission_list:
+                    if permission.group_id == group.id:
+                        perm = permission
+                        break
+                if perm is None:
+                    self.assertEquals(permission_manager.get(group).alias, "no_access",
+                                      "No access is expected to be provided for a group " + group.name)
+                else:
+                    self.assertEquals(permission_manager.get(group).alias, perm.level_alias,
+                                      "Unexpected access level for a group " + group.name)
 
 
 del BaseViewTest
