@@ -1,7 +1,7 @@
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 
 from core.entity.access_level import AccessLevel, AccessLevelSet
 from core.entity.permission import Permission
@@ -50,7 +50,7 @@ class PermissionViewSet(GenericViewSet):
         permission = self.get_permission_or_404(request, group)
         serializer = PermissionSerializer(permission, data=request.data)
         serializer.is_valid(raise_exception=True)
-        access_level = self.get_access_level_or_404(serializer.validated_data['access_level_id'])
+        access_level = self.get_access_level_or_400(serializer.validated_data['access_level_id'])
         self.get_permission_set(request).set(group, access_level)
         return Response({})
 
@@ -97,12 +97,15 @@ class PermissionViewSet(GenericViewSet):
                            "absent in the permission list. Please, use another method.")
         return Permission(group=group, access_level=access_level)
 
-    def get_access_level_or_404(self, level_id) -> AccessLevel:
+    def get_access_level_or_400(self, level_id) -> AccessLevel:
         if self.access_level_type is None:
             raise NotImplementedError("Please, set the value of access_level_type public property")
         level_set = AccessLevelSet()
         level_set.type = self.access_level_type
-        return level_set.get(level_id)
+        try:
+            return level_set.get(level_id)
+        except EntityNotFoundException:
+            raise ValidationError({"access_level_id": "No access level with such an ID."})
 
     def iterate_permission_set(self, request: Request):
         """
