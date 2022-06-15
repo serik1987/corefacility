@@ -8,8 +8,8 @@ from core.models.enums import LevelType
 from .base_test_class import BasePermissionTest
 from .expected_permission_list import ExpectedPermission, ExpectedPermissionList, PermissionListSimulator
 
-PERMISSION_UPDATE_FILE = Path(__file__).parent / "permission_update.csv"
-PERMISSON_ADD_FILE = Path(__file__).parent / "permission_add.csv"
+PERMISSON_ADD_FILE = Path(__file__).parent / "test_cases" / "project_permission_add.csv"
+PERMISSION_DELETE_FILE = Path(__file__).parent / "test_cases" / "project_permission_delete.csv"
 
 
 def permission_list_provider():
@@ -234,6 +234,42 @@ class TestProjectPermissions(BasePermissionTest):
         if project is not None:
             self.assert_permission_updated(project.permissions, permission_list)
 
+    @parameterized.expand(file_data_provider(PERMISSION_DELETE_FILE))
+    def test_permision_delete(self, token_id: str, project_alias: str, delete_mode: str, expected_status_code: int):
+        """
+        Tests whether project permission delete routine works OK
+
+        :param token_id: login of a user trying to delete the project permission
+        :param project_alias: alias of a project which permission shall be deleted
+        :param delete_mode: on of the following values:
+            "new_group" trying to delete a group that doesn't in the ACL
+            "same_group" trying to delete a group that presents in the ACL and is not root group
+            "root_group" trying to delete a root group
+            "no_group" trying to delete the non-existent group
+        :param expected_status_code: the response status code that shall be sent to the client application
+        :return: nothing
+        """
+        expected_status_code = int(expected_status_code)
+        retrieve_path = self.get_permission_list_path(project_alias)
+        superuser_headers = self.get_authorization_headers("superuser")
+        permission_list_response = self.client.get(retrieve_path, **superuser_headers)
+        self.assertEquals(permission_list_response.status_code, status.HTTP_200_OK, "Unexpected response code")
+        project = self.project_set_object.get_by_alias(project_alias)
+        permission_list = ExpectedPermissionList(permission_list_response, project.root_group)
+        simulator = PermissionListSimulator(
+            parent=self,
+            permission_list=permission_list,
+            group_mode=delete_mode,
+            group_add_allowed=True,
+            status_code_ok=expected_status_code == status.HTTP_204_NO_CONTENT
+        )
+        simulator.simulate_permission_delete()
+        path = self.get_permission_detail_path(project_alias, simulator.group_id)
+        headers = self.get_authorization_headers(token_id)
+        response = self.client.delete(path, **headers)
+        self.assertEquals(response.status_code, expected_status_code, "Unexpected status code")
+        self.assert_permission_updated(project.permissions, permission_list)
+
     def get_permission_list_path(self, project_alias):
         """
         Returns the permission path
@@ -248,7 +284,7 @@ class TestProjectPermissions(BasePermissionTest):
         Returns the permission detail path
 
         :param project_alias: the project alias
-        :param group_id: ID of the group which permission is editting
+        :param group_id: ID of the group which permission is editing
         :return: a string containing the permission path
         """
         return "/api/{version}/projects/{alias}/permissions/{group}/".format(

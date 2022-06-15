@@ -65,13 +65,32 @@ class ExpectedPermissionList:
         for expected_permission in self.container:
             yield expected_permission
 
+    def __str__(self) -> str:
+        """
+        Calculates string representation of the permission list
+
+        :return: the string representation
+        """
+        return ", ".join((str(permission) for permission in self))
+
     def append(self, item: ExpectedPermission) -> "ExpectedPermissionList":
         """
+        Adds one expected permission
 
         :param item: an item to append
         :return: self
         """
         self.container.append(item)
+        return self
+
+    def remove(self, item: ExpectedPermission) -> "ExpectedPermissionList":
+        """
+        Removes the expected permission from the permission list
+
+        :param item: expected permission to remove
+        :return: self
+        """
+        self.container.remove(item)
         return self
 
     def get_by_group_id(self, group_id: int) -> Union[ExpectedPermission, None]:

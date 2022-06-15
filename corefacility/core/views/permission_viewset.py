@@ -1,3 +1,4 @@
+from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
@@ -57,23 +58,43 @@ class PermissionViewSet(GenericViewSet):
         output_serializer = PermissionOutputSerializer(permission, many=False)
         return Response(output_serializer.data)
 
-    # def get_group_or_404(self, kwargs) -> Group:
-    #     """
-    #     Returns a group which ID is located in the group path.
-    #     If this is impossible to find such a group, raises exception 404.
-    #
-    #     :param kwargs: results of the path resolve
-    #     :return: an instance of core.entity.group.Group
-    #     """
-    #     try:
-    #         group_id = int(kwargs[self.lookup_url_kwarg])
-    #     except ValueError:
-    #         raise NotFound("No valid group ID has been provided")
-    #     try:
-    #         group = GroupSet().get(group_id)
-    #     except EntityNotFoundException:
-    #         raise NotFound("The user group with a given ID was not found")
-    #     return group
+    def destroy(self, request, *args, **kwargs):
+        """
+        Destroys existent permission from the permission set
+
+        :param request: the HTTP requrest sent by the client application
+        :param args: request path arguments
+        :param kwargs: request path keyword arguments
+        :return: the HTTP response that will be sent to the client application
+        """
+        group = self.get_group_or_404(kwargs)
+        if self.is_root_group(request, group):
+            raise PermissionDenied(detail="Removing the root group is denied.")
+        group_deleted = False
+        for current_group, _ in self.iterate_permission_set(request):
+            if current_group.id == group.id:
+                self.get_permission_set(request).delete(group)
+                group_deleted = True
+        code = status.HTTP_204_NO_CONTENT if group_deleted else status.HTTP_404_NOT_FOUND
+        return Response(status=code)
+
+    def get_group_or_404(self, kwargs) -> Group:
+        """
+        Returns a group which ID is located in the group path.
+        If this is impossible to find such a group, raises exception 404.
+
+        :param kwargs: results of the path resolve
+        :return: an instance of core.entity.group.Group
+        """
+        try:
+            group_id = int(kwargs[self.lookup_url_kwarg])
+        except ValueError:
+            raise NotFound("No valid group ID has been provided")
+        try:
+            group = GroupSet().get(group_id)
+        except EntityNotFoundException:
+            raise NotFound("The user group with a given ID was not found")
+        return group
 
     # def get_permission_or_404(self, request, group: Group) -> Permission:
     #     """
@@ -123,3 +144,13 @@ class PermissionViewSet(GenericViewSet):
         :return: value of the 'permissions' field for the corresponding entity
         """
         raise NotImplementedError("get_permission_set")
+
+    def is_root_group(self, request: Request, group: Group) -> bool:
+        """
+        Returns True if a given group is root group and False otherwise
+
+        :param request: the HTTP request received from the client
+        :param group: group to check
+        :return: True if the group shall be considered as root group, False otherwise
+        """
+        raise NotImplementedError("is_root_group")

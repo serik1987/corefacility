@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Union
 import random
 
 from .expected_permission_list import ExpectedPermission, ExpectedPermissionList
@@ -35,9 +35,9 @@ class PermissionListSimulator:
         if not condition:
             raise DataProviderError()
 
-    def __init__(self, parent: Any, permission_list: ExpectedPermissionList, group_mode: GroupMode,
+    def __init__(self, parent: Any, permission_list: ExpectedPermissionList, group_mode: Union[GroupMode, str],
                  group_add_allowed: bool = True, status_code_ok: bool = True,
-                 level_mode: LevelMode = LevelMode.ANY_LEVEL):
+                 level_mode: Union[LevelMode, str] = LevelMode.ANY_LEVEL):
         """
         Initializes the simulator. This is important for simulator to contain 'group_set_object' class
 
@@ -168,3 +168,15 @@ class PermissionListSimulator:
                 self.permission_list.append(self.permission)
             elif self.permission is not None:
                 self.permission.level_alias = self.access_level_alias
+
+    def simulate_permission_delete(self):
+        """
+        Deletes an arbitrary item from the ACL
+
+        :return: nothing
+        """
+        if self._status_code_ok and self.permission is not None:
+            try:
+                self.permission_list.remove(self.permission)
+            except ValueError:
+                raise DataProviderError()

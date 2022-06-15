@@ -20,3 +20,11 @@ class ExpectedPermission:
         self.group_id = group_id
         self.group_name = group_name
         self.level_alias = level_alias
+
+    def __str__(self):
+        """
+        Calculates string representation of the expected permission
+
+        :return: string representation of the expected permission
+        """
+        return "({group_name}, {level_alias})".format(group_name=self.group_name, level_alias=self.level_alias)
