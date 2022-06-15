@@ -4,11 +4,12 @@ from rest_framework import status
 from parameterized import parameterized
 
 from core.models.enums import LevelType
-from core.entity.project import ProjectSet
 
 from .base_test_class import BasePermissionTest
+from .expected_permission_list import ExpectedPermission, ExpectedPermissionList, PermissionListSimulator
 
 PERMISSION_UPDATE_FILE = Path(__file__).parent / "permission_update.csv"
+PERMISSON_ADD_FILE = Path(__file__).parent / "permission_add.csv"
 
 
 def permission_list_provider():
@@ -20,35 +21,33 @@ def permission_list_provider():
     empty_access_list = []
 
     cnl_access_list = [
-        BasePermissionTest.PermissionListItem(group_id=1, group_name="Своеобразные", level_alias="data_process")
+        ExpectedPermission(group_id=1, group_name="Своеобразные", level_alias="data_process")
     ]
 
     mnl_access_list = [
-        BasePermissionTest.PermissionListItem(group_id=0, group_name="Сёстры Райт", level_alias="data_full"),
-        BasePermissionTest.PermissionListItem(group_id=2, group_name="Управляемый хаос", level_alias="data_view"),
+        ExpectedPermission(group_id=0, group_name="Сёстры Райт", level_alias="data_full"),
+        ExpectedPermission(group_id=2, group_name="Управляемый хаос", level_alias="data_view"),
     ]
 
     mn_access_list = [
-        BasePermissionTest.PermissionListItem(group_id=0, group_name="Сёстры Райт", level_alias="data_add"),
-        BasePermissionTest.PermissionListItem(group_id=2, group_name="Управляемый хаос", level_alias="no_access"),
+        ExpectedPermission(group_id=0, group_name="Сёстры Райт", level_alias="data_add"),
+        ExpectedPermission(group_id=2, group_name="Управляемый хаос", level_alias="no_access"),
     ]
 
     nsw_access_list = [
-        BasePermissionTest.PermissionListItem(group_id=3, group_name="Изгибно-крутильный флаттер",
-                                              level_alias="data_add")
+        ExpectedPermission(group_id=3, group_name="Изгибно-крутильный флаттер", level_alias="data_add")
     ]
 
     n_access_list = [
-        BasePermissionTest.PermissionListItem(group_id=2, group_name="Управляемый хаос", level_alias="full")
+        ExpectedPermission(group_id=2, group_name="Управляемый хаос", level_alias="full")
     ]
 
     nl_access_list = [
-        BasePermissionTest.PermissionListItem(group_id=4, group_name="Революция сознания", level_alias="data_view")
+        ExpectedPermission(group_id=4, group_name="Революция сознания", level_alias="data_view")
     ]
 
     gcn_access_list = [
-        BasePermissionTest.PermissionListItem(group_id=3, group_name="Изгибно-крутильный флаттер",
-                                              level_alias="data_process")
+        ExpectedPermission(group_id=3, group_name="Изгибно-крутильный флаттер", level_alias="data_process")
     ]
 
     return [
@@ -161,9 +160,9 @@ def permission_list_provider():
     ]
 
 
-def permission_update_provider():
+def file_data_provider(filename):
     arg_list = []
-    with open(PERMISSION_UPDATE_FILE, "r") as arg_file:
+    with open(filename, "r") as arg_file:
         arg_reader = csv.reader(arg_file)
         for args in arg_reader:
             arg_list.append(tuple(args))
@@ -194,35 +193,46 @@ class TestProjectPermissions(BasePermissionTest):
         response = self.client.get(path, **headers)
         self.assert_permission_list_response(response, expected_status_code, expected_permission_list)
 
-    @parameterized.expand(permission_update_provider())
-    def test_permission_update(self, token_id, project_alias, group_mode, method, expected_response_code):
+    @parameterized.expand(file_data_provider(PERMISSON_ADD_FILE))
+    def test_permission_add(self, token_id, project_alias, add_mode, level_mode, expected_status_code):
         """
-        Tests the project permission modification
+        Testing permission add / change
 
-        :param token_id: a string that will be used for finding the user authorization token. The authorization
-            token shall be the value of <token_id>_token field
-        :param project_alias: alias for a particular project within the project set
-        :param group_mode: 'same_group' for a group in the list, 'new_group' for some new group
-        :param method: update method: 'put' or 'patch'
-        :param expected_response_code: response status code to be expected
+        :param token_id: login for a user that adds a permission
+        :param project_alias: project alias
+        :param add_mode: "new_group" to add new group to the permission list, "same_group" to change the permission
+            for existing group, "root_group" to try changing the permission for root group
+        :param level_mode: "same_level" to choose the same level, "other_level" to chhose another level,
+            "bad_level" to choose some non-existent level
+        :param expected_status_code: status code to be expected
         :return: nothing
         """
+        expected_status_code = int(expected_status_code)
+        path = self.get_permission_list_path(project_alias)
         superuser_headers = self.get_authorization_headers("superuser")
-        retrieve_path = self.get_permission_list_path(project_alias)
+        permission_list_response = self.client.get(path, **superuser_headers)
+        if permission_list_response.status_code == status.HTTP_200_OK:  # Project with such an alias was found
+            project = self.project_set_object.get_by_alias(project_alias)
+            permission_list = ExpectedPermissionList(permission_list_response, project.root_group)
+            simulator = PermissionListSimulator(
+                parent=self,
+                permission_list=permission_list,
+                group_mode=add_mode,
+                group_add_allowed=True,
+                status_code_ok=expected_status_code == status.HTTP_200_OK,
+                level_mode=level_mode
+            )
+            simulator.simulate_permission_set()
+            group_id, level_id = simulator.group_id, simulator.access_level_id
+        else:  # If no project with such alias was found
+            permission_list = []
+            project, group_id, level_id = None, 1, 1
         headers = self.get_authorization_headers(token_id)
-        expected_response_code = int(expected_response_code)
-        response = self.client.get(retrieve_path, **superuser_headers)
-        expected_permissions = self.permission_list_response_to_permission_list(response)
-        project = self.project_set_object.get_by_alias(project_alias)
-        root_group = project.root_group
-        group_id, level_id = self.choose_permission_group(expected_permissions, group_mode, root_group,
-                                                          group_add_allowed=False)
-        update_path = self.get_permission_detail_path(project_alias, group_id)
-        func = getattr(self.client, method)
-        response = func(update_path, data={"access_level_id": level_id}, format="json", **headers)
-        self.assertEquals(response.status_code, expected_response_code, "Unexpected status code")
-        if status.HTTP_200_OK <= expected_response_code < status.HTTP_300_MULTIPLE_CHOICES:
-            self.assert_permission_updated(project.permissions, expected_permissions, root_group)
+        data = {"group_id": group_id, "access_level_id": level_id}
+        response = self.client.post(path, data=data, format="json", **headers)
+        self.assertEquals(response.status_code, expected_status_code, "Unexpected status code")
+        if project is not None:
+            self.assert_permission_updated(project.permissions, permission_list)
 
     def get_permission_list_path(self, project_alias):
         """
