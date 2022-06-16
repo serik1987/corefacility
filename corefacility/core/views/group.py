@@ -115,6 +115,6 @@ class GroupViewSet(EntityViewSet):
         """
         queryset = super().filter_queryset(queryset)
         user = self.request.user
-        if not user.is_superuser:
+        if not user.is_superuser and "all" not in self.request.query_params:
             queryset.user = user
         return queryset

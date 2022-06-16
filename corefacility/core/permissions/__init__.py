@@ -42,7 +42,26 @@ class GroupPermission(IsAuthenticated):
 
     SAFE_METHODS = ["GET", "HEAD", "OPTIONS"]
 
+    def has_permission(self, request, view):
+        """
+        Checks for the global permissions
+
+        :param request: request received from the client application
+        :param view: view responsible for the request processing
+        :return: True if the operation is allowed, False if the operation is denied
+        """
+        no_all_condition = request.method in self.SAFE_METHODS or "all" not in request.query_params
+        return super().has_permission(request, view) and no_all_condition
+
     def has_object_permission(self, request, view, group):
+        """
+        Checks for a group permission (will be applied together with global permission checking)
+
+        :param request: the request received from the client
+        :param view: a view responsible for the request processing
+        :param group: some group the user is trying to perform operations
+        :return: True if particular operation is granted, False if the operation is denied
+        """
         return request.method in self.SAFE_METHODS or group.governor.id == request.user.id or request.user.is_superuser
 
 

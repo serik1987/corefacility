@@ -224,6 +224,14 @@ def group_name_provider():
     ]
 
 
+def security_avoid_test_provider():
+    return [
+        ("user%d" % user_index, group_index)
+        for user_index in range(1, 11)
+        for group_index in range(5)
+    ]
+
+
 class TestGroup(BaseTestClass):
     """
     Tests the user groups
@@ -273,6 +281,34 @@ class TestGroup(BaseTestClass):
         super().setUp()
         self._container = self._group_set_object.clone()
         self._container.sort()
+
+    @parameterized.expand(security_test_provider())
+    def test_list_all(self, token_id, expected_status_code):
+        """
+        Tests whether ?all key works properly.
+
+        :param token_id: login for a user trying to list all groups
+        :param expected_status_code: status code to be expected
+        :return: nothing
+        """
+        self._test_search({"profile": "basic", "all": ""}, token_id, expected_status_code)
+
+    @parameterized.expand(security_avoid_test_provider())
+    def test_security_avoid(self, token_id, group_index):
+        """
+        Tests whether ?all key can be used for security avoid.
+
+        :param token_id: loging for a user trying to change the group
+        :param group_index: index for a group to change
+        :return: nothing
+        """
+        group_id = self._group_set_object[group_index].id
+        path = self._detail_path % group_id
+        headers = self.get_authorization_headers(token_id)
+        headers.update({"QUERY_STRING": "all"})
+        response = self.client.patch(path, data={"name": "Some Other Name"}, format="json", **headers)
+        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN,
+                          "The user can probably use the ?all key to avoid current security policy")
 
     @parameterized.expand(security_test_provider())
     def test_security(self, token_id, expected_status_code):
