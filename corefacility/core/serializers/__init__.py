@@ -8,3 +8,5 @@ from .access_level_serializer import AccessLevelSerializer
 from .profile_serializer import ProfileSerializer
 from .permission_output_serializer import PermissionOutputSerializer
 from .permission_input_serializer import PermissionInputSerializer
+
+from .login_password_serializer import LoginPasswordSerializer

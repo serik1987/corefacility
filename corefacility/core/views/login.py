@@ -1,3 +1,4 @@
+from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import NotAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -30,8 +31,10 @@ class LoginView(APIView):
             user = auth_module.try_api_authorization(request)
             if user is not None:
                 break
+        if user is not None and user.is_locked:
+            user = None
         if user is None:
-            raise NotAuthenticated()
+            raise NotAuthenticated(_("Incorrect credentials."), code="authorization_failed")
         token = auth_module.issue_token(user)
         user_serializer = UserListSerializer(user)
         request.corefacility_log.response_body = "***"

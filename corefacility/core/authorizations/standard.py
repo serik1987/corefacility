@@ -1,7 +1,10 @@
-from core.entity.entry_points.authorizations import AuthorizationModule
+from core.entity.user import User, UserSet
+from core.entity.entity_exceptions import EntityNotFoundException
+
+from .login_password import LoginPasswordAuthorization
 
 
-class StandardAuthorization(AuthorizationModule):
+class StandardAuthorization(LoginPasswordAuthorization):
     """
     This is a pseudo-module responsible for the standard authorization process
 
@@ -33,21 +36,18 @@ class StandardAuthorization(AuthorizationModule):
         """
         return "Standard authorization"
 
-    def get_html_code(self):
+    def authorize(self, login: str, password: str) -> User:
         """
-        The authorization icons allows the user to select alternative authorization
-        methods, so the standard authorization method doesn't require any icons
+        Performs an immediate user's authorization
 
-        :return:
+        :param login: user's login
+        :param password: user's password
+        :return: the user authorized
         """
-        return None
-
-    def is_enabled_by_default(self):
-        """
-        By default, the user can enter to the application without any required authorization.
-        This allows the system administrator to automatically login as 'support' and then
-        adjust the authorization process
-
-        :return: always False
-        """
-        return False
+        try:
+            user_set = UserSet()
+            user_set.is_locked = False
+            user = user_set.get(login)
+        except EntityNotFoundException:
+            return None
+        return user if user.password_hash.check(password) else None

@@ -1,3 +1,6 @@
+import re
+from bs4 import BeautifulSoup
+from rest_framework import status
 from rest_framework.test import APITestCase
 
 from core.entity.user import User
@@ -9,6 +12,8 @@ class BaseViewTest(APITestCase):
     """
     This is the base class for all view tests.
     """
+
+    AUTHORIZATION_TOKEN_PATTERN = re.compile(r'const\s+AUTHORIZATION_TOKEN\s+=\s+[\'"]?(\w+)[\'"]?')
 
     id_field = "id"
     """ The entity identifier """
@@ -110,3 +115,17 @@ class BaseViewTest(APITestCase):
         else:
             extra = {}
         return extra
+
+    def get_token_from_ui_response(self, response):
+        """
+        Returns a token from the UI response
+
+        :param response: the UI response
+        :return: a token itself
+        """
+        self.assertEquals(response.status_code, status.HTTP_200_OK, "Unexpected status code")
+        content = BeautifulSoup(response.rendered_content, "html.parser")
+        token_script = content.head.find("script").text
+        match = self.AUTHORIZATION_TOKEN_PATTERN.search(token_script)
+        self.assertIsNotNone(match, "No information about the authorization token in the UI response")
+        return match.groups(1)[0]

@@ -83,4 +83,7 @@ class AutomaticAuthorization(AuthorizationModule):
         :param request: REST framework request
         :return: an authorized user in case of successful authorization. None if authorization fails.
         """
-        return self.try_ui_authorization(request)
+        user = None
+        if request.data is None or len(request.data) == 0:
+            user = self.try_ui_authorization(request)
+        return user

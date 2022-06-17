@@ -38,3 +38,12 @@ class App(AuthorizationModule):
         :return: False
         """
         return False
+
+    def try_ui_authorization(self, request):
+        pass
+
+    def try_api_authorization(self, request):
+        pass
+
+    def process_auxiliary_request(self, request):
+        pass

@@ -127,7 +127,8 @@ class AuthorizationModule(CorefacilityModule):
         authentication token for this particular user.
 
         :param request: REST framework request
-        :return: an authorized user in case of successful authorization. None if authorization fails.
+        :return: an authorized user in case of successful authorization. None if authorization fails. The function
+        shall not generate authorization token, just return the user. The user if core.entity.user.User instance.
         """
         raise NotImplementedError("AuthorizationModule.try_api_authorization")
 
