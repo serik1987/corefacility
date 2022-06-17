@@ -201,6 +201,12 @@ class CorefacilityConfiguration(Configuration):
         "EXCEPTION_HANDLER": "core.api_exceptions.exception_handler",
     }
 
+    COOKIE_NAME = "token"
+    """ Name of a cookie used for cookie-basd authorization """
+
+    COOKIE_FEATURES = {"samesite": "Strict"}
+    """ Any other cookie features """
+
     @classmethod
     def pre_setup(cls):
         """

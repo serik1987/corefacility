@@ -2,9 +2,10 @@ from rest_framework.exceptions import NotFound
 
 from ..entity.entity_sets.entity_set import EntitySet
 from ..entity.entity_exceptions import EntityNotFoundException
+from .set_cookie_mixin import SetCookieMixin
 
 
-class EntityViewMixin:
+class EntityViewMixin(SetCookieMixin):
     """
     This is the base mixin for all views that provide CRUD (Create, Read, Update, Delete) operations with
     entities and entity sets.

@@ -1,13 +1,15 @@
 from uuid import UUID
+import json
 
 from django.views.generic import TemplateView
 
 from core import App
 from core.entity.corefacility_module import CorefacilityModuleSet
 from core.entity.entry_points import AuthorizationsEntryPoint
+from core.generic_views import SetCookieMixin
 
 
-class MainWindow(TemplateView):
+class MainWindow(SetCookieMixin, TemplateView):
     """
     Loading the application main window
     """
@@ -48,7 +50,20 @@ class MainWindow(TemplateView):
         js_name = "%s/%s" % (app, self.js_name)
         self._authorize_user()
         self._set_version()
-        return super().get_context_data(javascript_vars=kwargs, css=css_name, js=js_name)
+        dump = json.dumps(kwargs)
+        return super().get_context_data(js_settings=dump, css=css_name, js=js_name)
+
+    def render_to_response(self, context, **response_kwargs):
+        """
+        Return a response, using the `response_class` for this view, with a
+        template rendered with the given context.
+        Also, sets the cookie to the response
+
+        Pass response_kwargs to the constructor of the response class.
+        """
+        response = super().render_to_response(context, **response_kwargs)
+        self.set_cookie(self.request, response, refresh=True)
+        return response
 
     def _split_application_path(self, path):
         routes = path.split("/apps/", 1)
@@ -78,6 +93,7 @@ class MainWindow(TemplateView):
         for auth_module in entry_point.modules():
             auth_user = auth_module.try_ui_authorization(self.request)
             if auth_user is not None:
+                self.request.user = auth_user
                 break
         if auth_user is not None:
             token = auth_module.issue_token(auth_user)

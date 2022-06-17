@@ -1,10 +1,10 @@
 from core.entity.user import User, UserSet
 
-from .base_test_class import BaseTestClass
+from .api_auth_test import ApiAuthTest
 from .decorators import enable_single_method, enable_all_methods
 
 
-class LoginPasswordAuthorization(BaseTestClass):
+class LoginPasswordAuthorization(ApiAuthTest):
     """
     This is the base class for testing all authorization methods that require login and password manually entered
     """
@@ -45,4 +45,4 @@ class LoginPasswordAuthorization(BaseTestClass):
         self.assert_ui_authorization(response, UserSet().get("support"))
 
 
-del BaseTestClass
+del ApiAuthTest

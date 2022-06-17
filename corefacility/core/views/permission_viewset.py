@@ -1,18 +1,18 @@
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet, ModelViewSet
-from rest_framework.exceptions import NotFound, ValidationError, PermissionDenied
+from rest_framework.viewsets import GenericViewSet
+from rest_framework.exceptions import NotFound, PermissionDenied
 
-from core.entity.access_level import AccessLevel, AccessLevelSet
 from core.entity.permission import Permission
 from core.entity.group import Group, GroupSet
 from core.entity.entity_fields.field_managers.permission_manager import PermissionManager
 from core.entity.entity_exceptions import EntityNotFoundException, EntityOperationNotPermitted
 from core.serializers import PermissionOutputSerializer, PermissionInputSerializer
+from core.generic_views import SetCookieMixin
 
 
-class PermissionViewSet(GenericViewSet):
+class PermissionViewSet(SetCookieMixin, GenericViewSet):
     """
     Base viewset for project and application permissions
     """

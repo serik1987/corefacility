@@ -1,3 +1,4 @@
+from .set_cookie_mixin import SetCookieMixin
 from .entity_view_mixin import EntityViewMixin
 from .avatar_mixin import AvatarMixin
 from .generics import EntityListView, EntityCreateView, EntityRetrieveView, EntityUpdateView, \

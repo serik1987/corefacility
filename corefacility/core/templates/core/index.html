@@ -14,13 +14,7 @@
     <!-- End of the download -->
     <link rel="stylesheet" type="text/css" href="{% static css %}">
     <script>
-        {% for key, value in javascript_vars.items %}
-        {% if value is None %}
-        const {{key.upper}} = null;
-        {% else %}
-        const {{key.upper}} = "{{value}}";
-        {% endif %}
-        {% endfor %}
+        const SETTINGS={{js_settings|safe}};
     </script>
 </head>
 <body>
