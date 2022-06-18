@@ -31,3 +31,19 @@ def enable_all_methods(test_function):
             auth_module.update()
         test_function(self, *args, **kwargs)
     return completed_test
+
+
+def disable_all_methods(test_function):
+    """
+    Runs the authorization test when all methods are disabled
+
+    :param test_function: tested function
+    :return: decorated function
+    """
+    @wraps(test_function)
+    def completed_test_function(self, *args, **kwargs):
+        for auth_module in self.auth_ep.modules():
+            auth_module.is_enabled = False
+            auth_module.update()
+        test_function(self, *args, **kwargs)
+    return completed_test_function

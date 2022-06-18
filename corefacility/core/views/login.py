@@ -29,10 +29,10 @@ class LoginView(SetCookieMixin, APIView):
         user = None
         for auth_module in auth_point.modules():
             user = auth_module.try_api_authorization(request)
+            if user is not None and user.is_locked:
+                user = None
             if user is not None:
                 break
-        if user is not None and user.is_locked:
-            user = None
         if user is None:
             raise NotAuthenticated(_("Incorrect credentials."), code="authorization_failed")
         token = auth_module.issue_token(user)

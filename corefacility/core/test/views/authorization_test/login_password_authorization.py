@@ -31,8 +31,7 @@ class LoginPasswordAuthorization(ApiAuthTest):
 
         :return: nothing
         """
-        response = self.client.get("/")
-        self.assert_no_ui_authorization(response)
+        self.assert_token_failed()
 
     @enable_all_methods
     def test_alternative_ui_authorization(self):
@@ -41,8 +40,7 @@ class LoginPasswordAuthorization(ApiAuthTest):
 
         :return: nothing
         """
-        response = self.client.get("/")
-        self.assert_ui_authorization(response, UserSet().get("support"))
+        self.assert_special_token_ok()
 
 
 del ApiAuthTest

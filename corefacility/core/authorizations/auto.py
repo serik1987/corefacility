@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from core.entity.entry_points.authorizations import AuthorizationModule
 from core.entity.user import UserSet
 
@@ -69,9 +71,11 @@ class AutomaticAuthorization(AuthorizationModule):
         :return: an authorized user in case of successful authorization. None if authorization fails. The function
         shall not generate authorization token, just return the user. The user if core.entity.user.User instance.
         """
-        user = UserSet().get("support")
-        if user.is_support and not user.is_locked:
-            return user
+        user = None
+        cookie_name = settings.COOKIE_NAME
+        if cookie_name not in request.COOKIES or len(request.COOKIES[cookie_name]) == 0:
+            user = self.authorize_support_user(request)
+        return user
 
     def try_api_authorization(self, request):
         """
@@ -85,5 +89,16 @@ class AutomaticAuthorization(AuthorizationModule):
         """
         user = None
         if request.data is None or len(request.data) == 0:
-            user = self.try_ui_authorization(request)
+            user = self.authorize_support_user(request)
         return user
+
+    def authorize_support_user(self, request):
+        """
+        Tries to authorize the 'support' user given that there is no conflict with any other users
+
+        :param request: the authorization request (both API and UI authorizations are OK)
+        :return: an authorized user in case of successful authorization. None if authorization fails.
+        """
+        user = UserSet().get("support")
+        if user.is_support and not user.is_locked:
+            return user

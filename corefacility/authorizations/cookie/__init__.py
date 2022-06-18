@@ -64,8 +64,11 @@ class App(AuthorizationModule):
         expiry_term = self.get_cookie_lifetime()
         token = request.get_signed_cookie(settings.COOKIE_NAME, default="", max_age=expiry_term)
         if token and refresh and not hasattr(request, "corefacility_cookie"):
-            token_object = Cookie.apply(token)
-            token_object.refresh(expiry_term)
+            try:
+                token_object = Cookie.apply(token)
+                token_object.refresh(expiry_term)
+            except EntityNotFoundException:
+                token = None
         if not token:
             token = Cookie.issue(request.user, expiry_term)
         response.set_signed_cookie(settings.COOKIE_NAME, token,

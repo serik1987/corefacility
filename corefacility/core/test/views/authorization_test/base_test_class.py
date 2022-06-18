@@ -5,6 +5,7 @@ from core.entity.entry_points.authorizations import AuthorizationsEntryPoint, Au
 from core.views import LoginView
 
 from ..base_view_test import BaseViewTest
+from ..page_object import PageObject
 
 
 def login_provider():
@@ -36,6 +37,7 @@ class BaseTestClass(BaseViewTest):
 
     authorization_path = "/api/{version}/login/".format(version=BaseViewTest.API_VERSION)
     profile_path = "/api/{version}/profile/".format(version=BaseViewTest.API_VERSION)
+    users_path = "/api/{version}/users/".format(version=BaseViewTest.API_VERSION)
     throttle_classes = None
 
     @classmethod
@@ -78,6 +80,47 @@ class BaseTestClass(BaseViewTest):
         """
         raise NotImplementedError("BaseTestClass.get_authorization_data")
 
+    def assert_token_ok(self, user):
+        """
+        Asserts that the UI authorization passed successfully and returns a valid authorization token
+
+        :param user: the user that shall be authorized automatically during the loading of the main page
+        :return: nothing
+        """
+        window_response = self.client.get("/")
+        window_page = PageObject(self, window_response)
+        token = window_page.get_option("authorization_token")
+        self.assert_profile_response(token, user)
+
+    def assert_special_token_ok(self):
+        """
+        Asserts that the UI authorization passed successfully and returns an authorization token corresponding
+        to the 'support' user
+
+        :return: nothing
+        """
+        window_response = self.client.get("/")
+        window_page = PageObject(self, window_response)
+        token = window_page.get_option("authorization_token")
+        self.assertIsNotNone(token, "The authorization token is expected")
+        headers = {"HTTP_AUTHORIZATION": "Token " + token}
+        response = self.client.get(self.users_path, **headers)
+        self.assertEquals(response.status_code, status.HTTP_200_OK, "The special token allows to list all users")
+        profile_response = self.client.get(self.profile_path, **headers)
+        self.assertEquals(profile_response.status_code, status.HTTP_403_FORBIDDEN,
+                          "The special token doesn't allow to view current user's profile")
+
+    def assert_token_failed(self):
+        """
+        Asserts that the UI authorization doesn't return any authorization token
+
+        :return: nothing
+        """
+        window_response = self.client.get("/")
+        window_page = PageObject(self, window_response)
+        token = window_page.get_option("authorization_token")
+        self.assertIsNone(token, "The failed token has been passed successfully")
+
     def assert_user_info(self, actual_info, expected_info: User, msg: str):
         """
         Asserts that the actual user info is the same as expected one
@@ -109,27 +152,6 @@ class BaseTestClass(BaseViewTest):
         self.assert_user_info(profile_response.data, expected_user,
                               "The authorization method returned a foreign token")
         return profile_response
-
-    def assert_ui_authorization(self, response, expected_user: User):
-        """
-        Asserts that the authorization was automatically applied during the UI
-
-        :param response: the response itself
-        :param expected_user: a user that shall be automatically authorized by this way
-        :return: nothing
-        """
-        token = self.get_token_from_ui_response(response)
-        self.assertNotEqual(token, "null", "Authorization token has not been presented")
-
-    def assert_no_ui_authorization(self, response):
-        """
-        Asserts that the UI response contains no authorization token
-
-        :param response: the response containing a Web page
-        :return: nothing
-        """
-        token = self.get_token_from_ui_response(response)
-        self.assertEquals(token, "null", "The authorization token was unexpectedly sent to the client during the UI")
 
 
 del BaseViewTest

@@ -92,6 +92,8 @@ class MainWindow(SetCookieMixin, TemplateView):
         auth_user = None
         for auth_module in entry_point.modules():
             auth_user = auth_module.try_ui_authorization(self.request)
+            if auth_user is not None and auth_user.is_locked:
+                auth_user = None
             if auth_user is not None:
                 self.request.user = auth_user
                 break
