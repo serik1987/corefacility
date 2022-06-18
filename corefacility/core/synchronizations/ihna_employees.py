@@ -28,3 +28,29 @@ class IhnaSynchronization(SynchronizationModule):
         :return: the synchronization name
         """
         return "IHNA RAS account synchronization"
+
+    def synchronize(self, **options):
+        """
+        Provides an account synchronization.
+
+        :param options: the synchronization options. The synchronization must be successfuly started and successfully
+            completed when no options are given.
+        :return: a dictionary that contains the following fields:
+            next_options - None if synchronization shall be completed. If synchronization has not been completed
+                this function shall be run repeatedly with the option mentioned in this field.
+                Please, note
+            details - some information about all completed actions. The information is useful to be printed out.
+        """
+        try:
+            stage = int(options['stage'])
+            if not 0 <= stage < 10:
+                stage = 0
+        except (KeyError, ValueError):
+            stage = 0
+        print("Synchronization is in process. Stage # " + str(stage))
+        stage += 1
+        if stage < 10:
+            next_options = {"stage": stage}
+        else:
+            next_options = None
+        return {"next_options": next_options, "details": None}

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-17 02:38+0300\n"
+"POT-Creation-Date: 2022-06-18 08:40+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -254,6 +254,11 @@ msgid ""
 msgstr ""
 "Введите корректное имя пользователя, состоящее из латинских букв, цифр, "
 "дефисов и знаков подчёркивания."
+
+#: core/synchronizations/exceptions.py:21
+msgid ""
+"Unable to perform synchronization because all synchronizers were switched off"
+msgstr "Невозможно осуществить синхронизацию, так как все модули синхронизации выключены"
 
 #: core/templates/core/index.html:3
 msgid "Loading..."

@@ -10,6 +10,25 @@ class SynchronizationsEntryPoint(EntryPoint):
     _is_parent_module_root = True
     """ The property is used during the autoloading """
 
+    @classmethod
+    def synchronize(cls, **options):
+        """
+        Chooses a proper synchronization module and provides the synchronization
+
+        :param options: the synchronization options. The synchronization must be successfuly started and successfully
+            completed when no options are given
+        :return: a dictionary that contains the following fields:
+            next_options - None if synchronization shall be completed. If synchronization has not been completed
+                this function shall be run repeatedly with the option mentioned in this field.
+                Please, note
+            details - some information about all completed actions. The information is useful to be printed out.
+        """
+        from core.synchronizations.exceptions import TeapotError
+        entry_point = SynchronizationsEntryPoint()
+        for module in entry_point.modules():
+            return module.synchronize(**options)
+        raise TeapotError()
+
     def get_alias(self):
         """
         Alias for this entry point is also the same: synchronizations
@@ -66,3 +85,18 @@ class SynchronizationModule(CorefacilityModule):
         :return: False
         """
         return False
+
+    def synchronize(self, **options):
+        """
+        Provides an account synchronization
+
+        :param options: the synchronization options. The synchronization must be successfuly started and successfully
+            completed when no options are given.
+        :return: a dictionary that contains the following fields:
+            next_options - None if synchronization shall be completed. If synchronization has not been completed
+                this function shall be run repeatedly with the option mentioned in this field.
+                Please, note that not all options can be passed back using the URL get parameters
+            details - some information about all completed actions. The information is useful to be printed out.
+        """
+        raise NotImplementedError("To complete the creation of synchronization module please,"
+                                  "implement the synchronize method")

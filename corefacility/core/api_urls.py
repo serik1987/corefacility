@@ -2,7 +2,7 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 from .views import View404, UserViewSet, GroupViewSet, ProjectViewSet, LoginView, ProfileView, AccessLevelView, \
-    ProjectPermissionViewSet
+    ProjectPermissionViewSet, SynchronizationView
 from .views.profile_avatar import ProfileAvatarView
 
 router = DefaultRouter()
@@ -17,6 +17,7 @@ urlpatterns = [
     path(r'profile/', ProfileView.as_view(), name="profile"),
     path(r'profile/avatar/', ProfileAvatarView.as_view(), name="profile-avatar"),
     path(r'access-levels/', AccessLevelView.as_view(), name="access-level"),
+    path(r'account-synchronization/', SynchronizationView.as_view(), name="account-synchronization"),
               ] + router.urls + [
     path(r'<path:path>/', View404.as_view(), name="view404"),
 ]
