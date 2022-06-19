@@ -17,19 +17,7 @@ class SynchronizationView(SetCookieMixin, APIView):
 
     permission_classes = [AdminOnlyPermission]
 
-    def get(self, request: Request, *args, **kwargs):
-        synchronization_options = {name: value for name, value in request.query_params.items()}
-        output = SynchronizationsEntryPoint.synchronize(**synchronization_options)
-        if output['next_options'] is not None:
-            next_url = reverse("core:account-synchronization", args=args, kwargs=kwargs) + "?" + \
-                       urllib.parse.urlencode(output['next_options'])
-        else:
-            next_url = None
-        return Response({
-            "next_url": next_url,
-            "details": output['details']
-        })
-
-    def do_something(self, *args, **kwargs):
-        print(args)
-        print(kwargs)
+    def post(self, request: Request, *args, **kwargs):
+        synchronization_options = request.data
+        output = SynchronizationsEntryPoint.synchronize(request.user, **synchronization_options)
+        return Response(output)

@@ -11,12 +11,13 @@ class SynchronizationsEntryPoint(EntryPoint):
     """ The property is used during the autoloading """
 
     @classmethod
-    def synchronize(cls, **options):
+    def synchronize(cls, user=None, **options):
         """
         Chooses a proper synchronization module and provides the synchronization
 
         :param options: the synchronization options. The synchronization must be successfuly started and successfully
             completed when no options are given
+        :param user: the user that has been currently logged in
         :return: a dictionary that contains the following fields:
             next_options - None if synchronization shall be completed. If synchronization has not been completed
                 this function shall be run repeatedly with the option mentioned in this field.
@@ -26,6 +27,7 @@ class SynchronizationsEntryPoint(EntryPoint):
         from core.synchronizations.exceptions import TeapotError
         entry_point = SynchronizationsEntryPoint()
         for module in entry_point.modules():
+            module.user = user
             return module.synchronize(**options)
         raise TeapotError()
 
@@ -55,6 +57,30 @@ class SynchronizationModule(CorefacilityModule):
 
     This allows more tight connection between the core functionality and particular module
     """
+
+    user = None
+    """ The user that has been currently logged in """
+
+    @staticmethod
+    def error_message(user_kwargs, action, exc):
+        """
+        This is a standard exception processor during the synchronization.
+        The processor shall process only such exceptions that will not terminate the synchronization process
+        but just warn user about the danger.
+
+        :param user_kwargs: a dictionary with 'login', 'name' and 'surname' arguments
+        :param action: 'add' for user add, 'update' for user update, 'delete' for user delete
+        :param exc: the exception risen
+        :return:
+        """
+        return {
+            "login": user_kwargs['login'] if 'login' in user_kwargs else '',
+            "name": user_kwargs['name'] if 'name' in user_kwargs else '',
+            "surname": user_kwargs['surname'] if 'surname' in user_kwargs else '',
+            "action": action,
+            "message_code": exc.__class__.__name__,
+            "message": str(exc)
+        }
 
     def get_parent_entry_point(self):
         return SynchronizationsEntryPoint()

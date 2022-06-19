@@ -1,5 +1,7 @@
 from rest_framework import status
 
+from core.entity.user import UserSet
+
 from ..base_view_test import BaseViewTest
 from .synchronization_client import SynchronizationClient
 
@@ -20,7 +22,7 @@ class TestSynchronization(BaseViewTest):
 
         :return: nothing
         """
-        response = self.client.get(self.synchronization_path)
+        response = self.client.post(self.synchronization_path)
         self.assertEquals(response.status_code, status.HTTP_401_UNAUTHORIZED, "Unexpected status code")
 
     def test_synchronization_forbidden(self):
@@ -30,7 +32,7 @@ class TestSynchronization(BaseViewTest):
         :return: nothing
         """
         headers = self.get_authorization_headers("ordinary_user")
-        response = self.client.get(self.synchronization_path, **headers)
+        response = self.client.post(self.synchronization_path, **headers)
         self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN, "Unexpected status code")
 
     def test_synchronization_teapot(self):
@@ -40,18 +42,22 @@ class TestSynchronization(BaseViewTest):
         :return: nothing
         """
         headers = self.get_authorization_headers("superuser")
-        response = self.client.get(self.synchronization_path, **headers)
-        self.assertEquals(response.status_code, status.HTTP_418_IM_A_TEAPOT, "unexpected status code")
+        response = self.client.post(self.synchronization_path, **headers)
+        self.assertEquals(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE, "unexpected status code")
 
     def test_synchronization_success(self):
         """
-        Provides a successful synchronization
+        Tests whether synchronization shall be successful when one of the synchronizing users is currently logged ins
 
         :return: nothing
         """
         self.enable_synchronization_module()
         sync_client = SynchronizationClient(self.client, self, self.get_authorization_headers("superuser"))
         sync_client.synchronize()
+        self.assertEquals(len(sync_client.details), 1, "There must be one error")
+        self.assertEquals(sync_client.details[0]['login'], "superuser", "The error must be about the superuser")
+        self.assertEquals(sync_client.details[0]['name'], "Superuser", "The user's name must be 'superuser'")
+        self.assertEquals(sync_client.details[0]['surname'], "Superuserov", "The user's surname must be 'Superuserov'")
 
     def enable_synchronization_module(self):
         """

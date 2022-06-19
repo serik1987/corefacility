@@ -14,6 +14,9 @@ class SynchronizationClient:
     client = None
     test_module = None
     headers = None
+    method = None
+
+    _details = None
 
     def __init__(self, client, test_module, headers):
         """
@@ -27,6 +30,13 @@ class SynchronizationClient:
         self.test_module = test_module
         self.headers = headers
 
+    @property
+    def details(self):
+        """
+        Details of the last synchronization
+        """
+        return self._details
+
     def synchronize(self):
         """
         Performs the synchronization process
@@ -34,21 +44,22 @@ class SynchronizationClient:
         :return: nothing
         """
         print("Synchronization test started.")
+        self._details = []
         sync_path = self.test_module.synchronization_path
+        sync_data = None
         requests = 0
-        while sync_path is not None:
-            response = self.client.get(sync_path, **self.headers)
+        sync_started = False
+        while not sync_started or sync_data is not None:
+            response = self.client.post(sync_path, data=sync_data, format="json", **self.headers)
+            sync_started = True
             self.test_module.assertEquals(response.status_code, status.HTTP_200_OK, "Unexpected status code")
-            self.test_module.assertIn("next_url", response.data, "The response body shall contain next_url field")
+            self.test_module.assertIn("next_options", response.data, "The response body shall contain next_url field")
             self.test_module.assertIn("details", response.data, "The response body shall contain details field")
-            self.process_synchronization_details(response.data['details'])
-            sync_path = response.data['next_url']
-            print("Next synchronization stage: " + str(sync_path))
+            self._details.extend(response.data['details'])
+            sync_data = response.data['next_options']
+            print("Next synchronization stage: " + str(sync_data))
             requests += 1
             if requests > self.MAX_REQUESTS:
                 self.test_module.fail("Maximum request number exceeded")
             sleep(self.SLEEP_TIME)
         print("Synchronization test completed.")
-
-    def process_synchronization_details(self, details):
-        print("Synchronization details received: " + str(details))
