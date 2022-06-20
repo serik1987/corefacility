@@ -17,14 +17,27 @@ class FullModeSynchronization(SynchronizationModule):
     DEFAULT_MAX_REMOVED_USERS = 20
     """ Default number of maximum removed users """
 
-    DEFAULT_AUTO_ADD = True
+    DEFAULT_AUTO_ADD = False
     """ The default value of the auto_add property """
 
-    DEFAULT_AUTO_UPDATE = True
+    DEFAULT_AUTO_UPDATE = False
     """ The default value of the auto_update property """
 
     DEFAULT_AUTO_REMOVE = True
     """ The default value of the auto_remove property """
+
+    _user_set = None
+    """ The updated user set """
+
+    @property
+    def user_set(self):
+        """
+        The user set to be updated
+        """
+        if self._user_set is None:
+            self._user_set = UserSet()
+            self._user_set.is_support = False
+        return self._user_set
 
     def get_auto_add(self):
         """
@@ -92,32 +105,14 @@ class FullModeSynchronization(SynchronizationModule):
         """
         if not isinstance(updated_users, list):
             updated_users = []
-        user_set = UserSet()
-        user_set.is_support = False
         raw_data = self.get_raw_data(**options)
         details = []
         for user_login, user_kwargs in self.find_user(raw_data, **options):
             try:
-                user = user_set.get(user_login)
-                if self.get_auto_update():
-                    update_required = False
-                    for name, value in user_kwargs.items():
-                        setattr(user, name, value)
-                        update_required = True
-                    if update_required:
-                        user.update()
-                    updated_users.append(user.id)
+                user = self.user_set.get(user_login)
+                self.update_user(user, user_kwargs, updated_users, details)
             except EntityNotFoundException:
-                try:
-                    if self.get_auto_add():
-                        user = User(**user_kwargs)
-                        user.create()
-                        updated_users.append(user.id)
-                except Exception as exc:
-                    details.append(self.error_message(user_kwargs, "add", exc))
-            except Exception as exc:
-                details.append(self.error_message(user_kwargs, "update", exc))
-        print(options)
+                self.create_user(user_kwargs, updated_users, details)
         next_options = self.get_next_options(raw_data, **options)
         if next_options is None:
             next_options = {"action": "inverse"}
@@ -160,39 +155,90 @@ class FullModeSynchronization(SynchronizationModule):
 
     def remove(self, **options):
         next_options = None
-        details = None
-        try:
-            removing_users = set(options['removing_users'])
-            print(removing_users)
-            user_set = UserSet()
-            user_set.is_support = False
-            details = []
-            counter = 0
-            while len(removing_users) > 0:
-                user_id = removing_users.pop()
-                user_kwargs = {}
-                try:
-                    user = user_set.get(user_id)
-                    user_kwargs = {
-                        "login": user.login,
-                        "name": user.name,
-                        "surname": user.surname
-                    }
-                    if isinstance(self.user, User) and self.user.id == user.id:
-                        raise UserRemoveConsistencyError()
-                    user.delete()
-                except EntityNotFoundException:
-                    pass
-                except Exception as exc:
-                    details.append(self.error_message(user_kwargs, "remove", exc))
-                counter += 1
-                if counter >= self.DEFAULT_MAX_REMOVED_USERS:
-                    break
-            if len(removing_users) > 0:
-                next_options = {"action": "remove", "removing_users": list(removing_users)}
-        except Exception as exc:
-            details = [self.error_message({}, "remove", exc)]
+        details = []
+        if self.get_auto_remove():
+            try:
+                removing_users = set(options['removing_users'])
+                counter = 0
+                while len(removing_users) > 0:
+                    self.remove_user(removing_users, details)
+                    counter += 1
+                    if counter >= self.DEFAULT_MAX_REMOVED_USERS:
+                        break
+                if len(removing_users) > 0:
+                    next_options = {"action": "remove", "removing_users": list(removing_users)}
+            except Exception as exc:
+                details = [self.error_message({}, "remove", exc)]
         return {"next_options": next_options, "details": details}
+
+    def create_user(self, user_kwargs, updated_users, details):
+        """
+        Creates new user according to the information received from the remote server
+        and saves the user to the database
+
+        :param user_kwargs: keyword arguments of a user to save
+        :param updated_users: list of IDs of updated users. ID of the currently created user will be attached
+            at the end of the user list
+        :param details: list of errors. When user add will be failed, an error message will be attached to the
+            end of details
+        :return: nothing
+        """
+        if self.get_auto_add():
+            try:
+                user = User(**user_kwargs)
+                user.create()
+                updated_users.append(user.id)
+            except Exception as exc:
+                details.append(self.error_message(user_kwargs, "add", exc))
+
+    def update_user(self, user, user_kwargs, updated_users, details):
+        """
+        Updates the user with new information received from the remote server
+
+        :param user: the user to be updated
+        :param user_kwargs: information received from the remote server
+        :param updated_users: list of IDs of updated users. ID of the updated user will be attached to the end of
+            the list during the successful update
+        :param details: list of error. The error will be added to the list if happened
+        :return: nothing
+        """
+        if self.get_auto_update():
+            try:
+                update_required = False
+                for name, value in user_kwargs.items():
+                    setattr(user, name, value)
+                    update_required = True
+                if update_required:
+                    user.update()
+            except Exception as exc:
+                details.append(self.error_message(user_kwargs, "update", exc))
+        updated_users.append(user.id)
+
+    def remove_user(self, removing_users, details):
+        """
+        Removes some random user from the user list
+
+        :param user_set: the user set from which the user shall be removed
+        :param removing_users: set of IDs of users that shall be removed
+        :param details: a list of all errors that will be made during the user removal
+        :return:
+        """
+        user_id = removing_users.pop()
+        user_kwargs = {}
+        try:
+            user = self.user_set.get(user_id)
+            user_kwargs = {
+                "login": user.login,
+                "name": user.name,
+                "surname": user.surname
+            }
+            if isinstance(self.user, User) and self.user.id == user.id:
+                raise UserRemoveConsistencyError()
+            user.delete()
+        except EntityNotFoundException:
+            pass
+        except Exception as exc:
+            details.append(self.error_message(user_kwargs, "remove", exc))
 
     def get_raw_data(self, **options):
         """

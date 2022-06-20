@@ -58,6 +58,7 @@ class SynchronizationClient:
             self._details.extend(response.data['details'])
             sync_data = response.data['next_options']
             print("Next synchronization stage: " + str(sync_data))
+            print("Synchronization details: " + str(self.details))
             requests += 1
             if requests > self.MAX_REQUESTS:
                 self.test_module.fail("Maximum request number exceeded")

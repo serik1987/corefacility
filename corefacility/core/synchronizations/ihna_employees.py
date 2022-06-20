@@ -19,7 +19,7 @@ class IhnaSynchronization(FullModeSynchronization):
     DEFAULT_PROFILE = "basic"
     DEFAULT_PAGE_LENGTH = 20
 
-    http_client = None
+    _http_client = None
     """ The urllib3 client """
 
     @staticmethod
@@ -32,12 +32,11 @@ class IhnaSynchronization(FullModeSynchronization):
             page_number = 0
         return page_number
 
-    def __init__(self):
-        """
-        Initializes the synchronization module
-        """
-        super().__init__()
-        self.http_client = urllib3.PoolManager()
+    @property
+    def http_client(self):
+        if self._http_client is None:
+            self._http_client = urllib3.PoolManager()
+        return self._http_client
 
     @property
     def app_class(self):
