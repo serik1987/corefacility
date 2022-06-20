@@ -47,6 +47,13 @@ class GroupGovernorConstraintFails(EntityException):
                            "Are you sure?"))
 
 
+class ProjectRootGroupConstraintFails(EntityException):
+    def __init__(self):
+        super().__init__(_("The group is a root group for at least one project. "
+                           "Its delete will automatically remove these projects and reflect another user rights. "
+                           "Are you sure?"))
+
+
 class LogException(EntityException):
     pass
 

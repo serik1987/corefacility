@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-19 08:25+0300\n"
+"POT-Creation-Date: 2022-06-20 17:42+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -52,11 +52,21 @@ msgstr ""
 "изменению прав доступа других пользователей к тому или иному функционалу. Вы "
 "желаете продолжить?"
 
-#: core/entity/entity_exceptions/__init__.py:131
+#: core/entity/entity_exceptions/__init__.py:52
+msgid ""
+"The group is a root group for at least one project. Its delete will "
+"automatically remove these projects and reflect another user rights. Are you "
+"sure?"
+msgstr ""
+"Эта группа является корневой группой как минимум для одного из проектов. Её "
+"удаление приведёт к автоматическому уничтожению этих проектов, а также "
+"изменит права доступа других пользователей к функционалу. Продолжить?"
+
+#: core/entity/entity_exceptions/__init__.py:138
 msgid "Error during installation of the module"
 msgstr "Ошибка в процессе установки модуля"
 
-#: core/entity/entity_exceptions/__init__.py:143
+#: core/entity/entity_exceptions/__init__.py:150
 msgid ""
 "This module has a parent module that have not been completely installed yet"
 msgstr ""
@@ -271,7 +281,8 @@ msgstr ""
 
 #: core/synchronizations/exceptions.py:41
 msgid "Failed to remove a user: the user has been currently logged in"
-msgstr "Невозможно удалить пользователя: этот пользователь только что залогинился"
+msgstr ""
+"Невозможно удалить пользователя: этот пользователь только что залогинился"
 
 #: core/templates/core/index.html:3
 msgid "Loading..."
@@ -280,6 +291,10 @@ msgstr "Загрузка..."
 #: core/views/login.py:37
 msgid "Incorrect credentials."
 msgstr "Неверные учётные данные."
+
+#: core/views/user.py:35
+msgid "You can't delete yourself."
+msgstr "Вы не можете удалить самого себя"
 
 #: imaging/entity/map/map_set.py:15
 msgid "Functional map"

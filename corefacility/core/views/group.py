@@ -63,6 +63,22 @@ class GroupViewSet(EntityViewSet):
         serializer = UserListSerializer(user, many=False)
         return Response(serializer.data)
 
+    def destroy(self, request, *args, **kwargs):
+        """
+        Destroys the object
+
+        :param request: the HTTP request received from the client
+        :param args: request path arguments
+        :param kwargs: request path keyword arguments
+        :return: nothing
+        """
+        group = self.get_object()
+        if "force" in request.query_params:
+            group.force_delete()
+        else:
+            group.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     @action(methods=["DELETE"], detail=True, url_path=r'users/(?P<user_lookup>\w+)', url_name="user-delete")
     def delete_user(self, request, *args, **kwargs):
         """

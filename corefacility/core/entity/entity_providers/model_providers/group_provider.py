@@ -1,9 +1,9 @@
 from django.db.models import Model
-from core.models import Group, GroupUser
+from core.models import Group, GroupUser, Project
 from .model_provider import ModelProvider
 from .user_provider import UserProvider
 from ...entity import Entity
-from ...entity_exceptions import EntityFieldInvalid
+from ...entity_exceptions import EntityFieldInvalid, ProjectRootGroupConstraintFails
 
 
 class GroupProvider(ModelProvider):
@@ -84,3 +84,14 @@ class GroupProvider(ModelProvider):
         governor = governor_provider.wrap_entity(governor_object)
         entity._governor = governor
         return entity
+
+    def delete_entity(self, group):
+        """
+        Tries to delete the user from the database
+
+        :param group: the user to delete
+        :return: nothing
+        """
+        if Project.objects.filter(root_group_id=group.id).count() > 0:
+            raise ProjectRootGroupConstraintFails()
+        super().delete_entity(group)

@@ -1,4 +1,6 @@
 from django.templatetags.static import static
+from django.db import transaction
+
 from .arbitrary_access_level_entity import ArbitraryAccessLevelEntity
 from .entity_fields.field_managers.project_permission_manager import ProjectPermissionManager
 from .entity_sets.project_set import ProjectSet
@@ -56,6 +58,15 @@ class Project(ArbitraryAccessLevelEntity):
             "data_full": 4.0,
             "full": 5.0,
         }
+
+    def force_delete(self):
+        """
+        Deletes the project with all its dependent instances
+
+        :return: nothing
+        """
+        with transaction.atomic():
+            self.delete()
 
     def __setattr__(self, name, value):
         """

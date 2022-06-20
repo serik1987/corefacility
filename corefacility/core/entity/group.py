@@ -1,3 +1,5 @@
+from django.db import transaction
+
 from .entity import Entity
 from .entity_sets.group_set import GroupSet
 from .entity_fields import EntityField, RelatedEntityField, ManagedEntityField
@@ -26,6 +28,20 @@ class Group(Entity):
         "users": ManagedEntityField(UserManager,
                                     description="Users containing in the group"),
     }
+
+    def force_delete(self):
+        """
+        Provides a force group delete
+
+        :return:
+        """
+        from core.entity.project import ProjectSet
+        with transaction.atomic():
+            project_set = ProjectSet()
+            project_set.root_group = self
+            for project in project_set:
+                project.force_delete()
+            self.delete()
 
     def __eq__(self, other):
         """

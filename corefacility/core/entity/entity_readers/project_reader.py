@@ -69,6 +69,18 @@ class ProjectReader(RawSqlQueryReader):
             builder.main_filter &= SearchQueryFilter("core_project.name", project_name,
                                                      is_prepared=True, must_start=True)
 
+    def apply_root_group_filter(self, root_group):
+        """
+        Changes the SQL query in such a way as it retrieves proejct which name starts from a given string
+
+        :param root_group: a root group to filter
+        :return: nothing
+        """
+        if root_group is None:
+            return None
+        for builder in [self.count_builder, self.items_builder]:
+            builder.main_filter &= StringQueryFilter("core_project.root_group_id=%s", root_group.id)
+
     def apply_user_filter(self, user):
         """
         Changes the SQL query in such a way as it retrieves projects where only certain user has an access

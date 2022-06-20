@@ -1,4 +1,5 @@
 from django.templatetags.static import static
+from django.db import transaction
 
 from .entity import Entity
 from .entity_sets.user_set import UserSet
@@ -77,8 +78,22 @@ class User(Entity):
         else:
             super().update()
 
+    def force_delete(self):
+        """
+        Deletes the user together with all group where the user is root and together with
+        all projects where the user is governor
+
+        :return: nothing
+        """
+        with transaction.atomic():
+            for group in self.groups:
+                if group.governor.id == self.id:
+                    group.force_delete()
+            self.delete()
+
     def delete(self):
         """
+        Deletes the user
 
         :return:
         """

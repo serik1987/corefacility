@@ -17,5 +17,6 @@ class ProjectSet(EntitySet):
     _entity_filter_list = {
         "name": [str, None],
         "user": ["core.entity.user.User", lambda user: user.state not in {"creating", "deleted"}],
-        "application": ["core.entity.corefacility_module.CorefacilityModule", lambda module: module.is_application]
+        "root_group": ["core.entity.group.Group", lambda group: group.state not in {"creating", "deleted"}],
+        "application": ["core.entity.corefacility_module.CorefacilityModule", lambda module: module.is_application],
     }
