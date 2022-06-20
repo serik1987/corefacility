@@ -17,10 +17,10 @@ class FullModeSynchronization(SynchronizationModule):
     DEFAULT_MAX_REMOVED_USERS = 20
     """ Default number of maximum removed users """
 
-    DEFAULT_AUTO_ADD = False
+    DEFAULT_AUTO_ADD = True
     """ The default value of the auto_add property """
 
-    DEFAULT_AUTO_UPDATE = False
+    DEFAULT_AUTO_UPDATE = True
     """ The default value of the auto_update property """
 
     DEFAULT_AUTO_REMOVE = True
@@ -103,22 +103,26 @@ class FullModeSynchronization(SynchronizationModule):
         :param options: another class-specific options
         :return: the output to be returned to the client
         """
-        if not isinstance(updated_users, list):
-            updated_users = []
-        raw_data = self.get_raw_data(**options)
+        next_options = None
         details = []
-        for user_login, user_kwargs in self.find_user(raw_data, **options):
-            try:
-                user = self.user_set.get(user_login)
-                self.update_user(user, user_kwargs, updated_users, details)
-            except EntityNotFoundException:
-                self.create_user(user_kwargs, updated_users, details)
-        next_options = self.get_next_options(raw_data, **options)
-        if next_options is None:
-            next_options = {"action": "inverse"}
-        else:
-            next_options['action'] = "download"
-        next_options["updated_users"] = updated_users
+        try:
+            if not isinstance(updated_users, list):
+                updated_users = []
+            raw_data = self.get_raw_data(**options)
+            for user_login, user_kwargs in self.find_user(raw_data, **options):
+                try:
+                    user = self.user_set.get(user_login)
+                    self.update_user(user, user_kwargs, updated_users, details)
+                except EntityNotFoundException:
+                    self.create_user(user_kwargs, updated_users, details)
+            next_options = self.get_next_options(raw_data, **options)
+            if next_options is None:
+                next_options = {"action": "inverse"}
+            else:
+                next_options['action'] = "download"
+            next_options["updated_users"] = updated_users
+        except Exception as exc:
+            details = [self.error_message({}, "download", exc)]
         return {
             "next_options": next_options,
             "details": details,
@@ -140,9 +144,7 @@ class FullModeSynchronization(SynchronizationModule):
         try:
             updated_users = set(options['updated_users'])
             all_users = set()
-            user_set = UserSet()
-            user_set.is_support = False
-            for user in user_set:
+            for user in self.user_set:
                 all_users.add(user.id)
             removing_users = all_users - updated_users
             next_options = {

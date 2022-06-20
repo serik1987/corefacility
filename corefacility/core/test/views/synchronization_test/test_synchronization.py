@@ -79,22 +79,6 @@ class TestSynchronization(BaseViewTest):
                                msg="Ordinary user shall be removed successfully"):
             user_set.get("user")
 
-    def test_synchronization_success(self):
-        user = User(login="leonid.alexandrov", name="Иван", surname="Иванов")
-        user.create()
-        self.enable_synchronization_module()
-        sync_client = SynchronizationClient(self.client, self, {
-            "HTTP_AUTHORIZATION": "Token %s" % self.support_token
-        })
-        sync_client.synchronize()
-        for user in UserSet():
-            print("{id}\t{login}\t{name}\t{surname}".format(
-                id=user.id,
-                login=user.login,
-                name=user.name,
-                surname=user.surname
-            ))
-
     def enable_synchronization_module(self):
         """
         Enables the synchronization module

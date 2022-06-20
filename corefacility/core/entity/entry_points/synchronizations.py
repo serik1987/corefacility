@@ -26,7 +26,7 @@ class SynchronizationsEntryPoint(EntryPoint):
         """
         from core.synchronizations.exceptions import TeapotError
         entry_point = SynchronizationsEntryPoint()
-        for module in entry_point.modules():
+        for module in entry_point.modules(is_enabled=False):
             module.user = user
             return module.synchronize(**options)
         raise TeapotError()
