@@ -11,9 +11,9 @@ class SetCookieMixin:
     """
 
     def get_cookie_app(self):
-        auth_app = AuthorizationsEntryPoint()
+        auth_ep = AuthorizationsEntryPoint()
         try:
-            return auth_app.module("cookie")
+            return auth_ep.module("cookie")
         except EntityNotFoundException:
             return None
 

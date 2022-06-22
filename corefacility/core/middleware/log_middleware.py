@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.http import RawPostDataException
 
 from ..entity.log import Log
 
@@ -23,7 +22,7 @@ class LogMiddleware:
 
     def __call__(self, request):
         """
-        Initializes creation of the request logs by filling the request detai
+        Initializes creation of the request logs by filling the request details
 
         :param request: the request to be filled
         :return: nothing

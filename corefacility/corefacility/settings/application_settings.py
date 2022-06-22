@@ -2,19 +2,19 @@ import sys
 from logging.handlers import SysLogHandler
 
 INSTALLED_APPS = [
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
-        'django.contrib.staticfiles',
-        'django.contrib.messages',
-        'rest_framework',
-        'core',
-        'authorizations.google',
-        'authorizations.mailru',
-        'authorizations.ihna',
-        'authorizations.cookie',
-        'imaging',
-        'roi',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.staticfiles',
+    'django.contrib.messages',
+    'rest_framework',
+    'core',
+    'authorizations.google',
+    'authorizations.mailru',
+    'authorizations.ihna',
+    'authorizations.cookie',
+    'imaging',
+    'roi',
 ]
 
 MIDDLEWARE = [
@@ -92,6 +92,6 @@ LOGGING = {
 }
 
 if sys.platform.startswith("win32"):
-	del LOGGING["handlers"]["syslog_handler"]
-	LOGGING["loggers"]["django.corefacility"]["handlers"].remove("syslog_handler")
-	LOGGING["loggers"]["django.corefacility.log"]["handlers"].remove("syslog_handler")
+    del LOGGING["handlers"]["syslog_handler"]
+    LOGGING["loggers"]["django.corefacility"]["handlers"].remove("syslog_handler")
+    LOGGING["loggers"]["django.corefacility.log"]["handlers"].remove("syslog_handler")
