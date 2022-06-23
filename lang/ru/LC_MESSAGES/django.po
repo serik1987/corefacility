@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-20 17:42+0300\n"
+"POT-Creation-Date: 2022-06-23 12:16+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -246,6 +246,13 @@ msgstr "Ошибка"
 #: core/models/enums/log_level.py:13
 msgid "The system was down"
 msgstr "Сервер экстренно прекратил работу"
+
+#: core/os/exceptions.py:29
+msgid ""
+"Please, login to the server using SSH, execute the commands listed below \n"
+"and press Continue to finish this action\n"
+"\n"
+msgstr "Пожалуйста, авторизуйтесь на сервере с использованием протокола SSH, выполните команды, перечисленные ниже,\n после чего нажмите Продолжить для завершения этого действия\n\n"
 
 #: core/serializers/project_detail_serializer.py:46
 msgid ""
