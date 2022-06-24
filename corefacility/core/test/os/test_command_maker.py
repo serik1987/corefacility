@@ -83,10 +83,11 @@ class TestCommandMaker(BaseViewTest):
             maker.clear_executor(self)
 
     def test_synchronicity_error(self):
-        maker = CommandMaker()
-        maker.initialize_executor(self)
-        maker.initialize_executor(list())
-        maker.initialize_command_queue()
-        maker.run_all_commands()
-        with self.assertRaises(os_exceptions.SynchronicityError, msg="The synchronicity check failed"):
-            maker.clear_executor(self)
+        with self.settings(CORE_UNIX_ADMINISTRATION=True, CORE_SUGGEST_ADMINISTRATION=False):
+            maker = CommandMaker()
+            maker.initialize_executor(self)
+            maker.initialize_executor(list())
+            maker.initialize_command_queue()
+            maker.run_all_commands()
+            with self.assertRaises(os_exceptions.SynchronicityError, msg="The synchronicity check failed"):
+                maker.clear_executor(self)
