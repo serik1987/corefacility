@@ -1,6 +1,7 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
+from .testviews.test_transaction import TestTransaction
 from .views import View404, UserViewSet, GroupViewSet, ProjectViewSet, LoginView, ProfileView, AccessLevelView, \
     ProjectPermissionViewSet, SynchronizationView
 from .views.profile_avatar import ProfileAvatarView
@@ -13,6 +14,7 @@ router.register(r'projects/(?P<project_lookup>\w+)/permissions', ProjectPermissi
                 basename="project-permissions")
 
 urlpatterns = [
+    path(r'__test__/transaction/<str:dirname>/', TestTransaction.as_view(), name="test-transaction"),
     path(r'login/', LoginView.as_view(), name="login"),
     path(r'profile/', ProfileView.as_view(), name="profile"),
     path(r'profile/avatar/', ProfileAvatarView.as_view(), name="profile-avatar"),

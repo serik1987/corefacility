@@ -62,7 +62,17 @@ class CommandMaker:
     _execution_queue = None
     """ The current execution queue """
 
+    _message_queue = None
+    """ The message queue. All commands will be stored in the message queue """
+
     _logger = logging.getLogger("django.corefacility.posix")
+
+    @property
+    def executor(self):
+        """
+        A current HTTP request or the server management command to which this maker has been attached
+        """
+        return self._executor
 
     def __new__(cls):
         """
@@ -78,8 +88,10 @@ class CommandMaker:
         """
         Initializes the internal fields of the command maker.
         """
-        self._execution_queue = dict()
-        self._mode = self.Mode.ASYNC
+        if self._execution_queue is None:
+            self._execution_queue = dict()
+        if self._mode is None:
+            self._mode = self.Mode.ASYNC
 
     def initialize_executor(self, executor):
         """
@@ -115,8 +127,9 @@ class CommandMaker:
         :param kwargs: Keyword arguments to the subprocess.run routine
         :return: nothing
         """
-        executor = self._get_executor(executor)
-        self._execution_queue[id(executor)].append({"args": args, "kwargs": kwargs})
+        if executor is not None or self._executor is not None:
+            executor = self._get_executor(executor)
+            self._execution_queue[id(executor)].append({"args": args, "kwargs": kwargs})
 
     def run_all_commands(self, executor=None):
         """
