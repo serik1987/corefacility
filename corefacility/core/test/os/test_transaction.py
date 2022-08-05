@@ -7,6 +7,7 @@ from core.entity.log import LogSet
 from core.entity.log_record import LogRecordSet
 from core.entity.entity_exceptions import EntityNotFoundException
 from core.transaction import CorefacilityTransaction
+from core.os import CommandMaker
 
 from ..views.base_view_test import BaseViewTest
 
@@ -43,6 +44,14 @@ class TestTransaction(BaseViewTest):
         headers = self.get_authorization_headers("superuser")
         response = self.client.post(self.get_test_request_path("."), **headers)
         log = self.check_log_existence()
+        if settings.CORE_UNIX_ADMINISTRATION:
+            self.assertEquals(response.status_code, status.HTTP_200_OK, "Unexpected status code")
+            self.check_group_existence(True, False)
+            self.assert_log_record(log)
+        if settings.CORE_SUGGEST_ADMINISTRATION:
+            self.assert_suggestion(response, ("ls -l .",))
+            self.check_group_existence(False, False)
+            self.check_no_log_records(log)
         if not settings.CORE_UNIX_ADMINISTRATION and not settings.CORE_SUGGEST_ADMINISTRATION:
             self.assertEquals(response.status_code, status.HTTP_200_OK, "Unexpected status code")
             self.check_group_existence(True, False)
@@ -57,6 +66,15 @@ class TestTransaction(BaseViewTest):
         headers = self.get_authorization_headers("superuser")
         response = self.client.post(self.get_test_request_path("some-nonexistent-dir"), **headers)
         log = self.check_log_existence()
+        if settings.CORE_UNIX_ADMINISTRATION:
+            self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST, "Unexpected status code")
+            self.assertEquals(response.data['code'], "posix_error", "Unexpected response body")
+            self.check_group_existence(False, False)
+            self.assert_log_record(log, level="ERR")
+        if settings.CORE_SUGGEST_ADMINISTRATION:
+            self.assert_suggestion(response, ("ls -l some-nonexistent-dir",))
+            self.check_group_existence(False, False)
+            self.check_no_log_records(log)
         if not settings.CORE_UNIX_ADMINISTRATION and not settings.CORE_SUGGEST_ADMINISTRATION:
             self.assertEquals(response.status_code, status.HTTP_200_OK, "Unexpected status code")
             self.check_group_existence(True, False)
@@ -75,6 +93,15 @@ class TestTransaction(BaseViewTest):
             log = self.check_log_existence()
         else:
             self.check_no_log()
+        if settings.CORE_UNIX_ADMINISTRATION:
+            self.assertEquals(response.status_code, status.HTTP_200_OK, "Unexpected status code")
+            self.check_group_existence(True, False)
+            if log:
+                self.assert_log_record(log)
+        if settings.CORE_SUGGEST_ADMINISTRATION:
+            self.assert_suggestion(response, ("ls -l .",))
+            self.check_group_existence(False, False)
+            self.check_no_log_records(log)
         if not settings.CORE_UNIX_ADMINISTRATION and not settings.CORE_SUGGEST_ADMINISTRATION:
             self.assertEquals(response.status_code, status.HTTP_200_OK, "Unexpected status code")
             self.check_group_existence(True, False)
@@ -90,6 +117,14 @@ class TestTransaction(BaseViewTest):
         headers = self.get_authorization_headers("superuser")
         response = self.client.put(self.get_test_request_path("."), **headers)
         log = self.check_log_existence()
+        if settings.CORE_UNIX_ADMINISTRATION:
+            self.assertEquals(response.status_code, status.HTTP_200_OK, "Unexpected status code")
+            self.check_group_existence(True, False)
+            self.check_no_log_records(log)
+        if settings.CORE_SUGGEST_ADMINISTRATION:
+            self.assertEquals(response.status_code, status.HTTP_200_OK, "Unexpected status code")
+            self.check_group_existence(True, False)
+            self.check_no_log_records(log)
         if not settings.CORE_UNIX_ADMINISTRATION and not settings.CORE_SUGGEST_ADMINISTRATION:
             self.assertEquals(response.status_code, status.HTTP_200_OK, "Unexpected status code")
             self.check_group_existence(True, False)
@@ -97,13 +132,21 @@ class TestTransaction(BaseViewTest):
 
     def test_closed_transaction(self):
         """
-        Tests the possibility for the closed transaction
+        Tests the possibility for the enclosed transaction (that is, transaction inside another transaction)
 
         :return: nothing
         """
         headers = self.get_authorization_headers("superuser")
         response = self.client.patch(self.get_test_request_path("."), **headers)
         log = self.check_log_existence()
+        if settings.CORE_UNIX_ADMINISTRATION:
+            self.assertEquals(response.status_code, status.HTTP_200_OK, "Unexpected status code")
+            self.check_group_existence(True, True)
+            self.check_two_log_records(log)
+        if settings.CORE_SUGGEST_ADMINISTRATION:
+            self.assert_suggestion(response, ("ls -l .", "ls -l /var/log"))
+            self.check_group_existence(False, False)
+            self.check_no_log_records(log)
         if not settings.CORE_UNIX_ADMINISTRATION and not settings.CORE_SUGGEST_ADMINISTRATION:
             self.assertEquals(response.status_code, status.HTTP_200_OK, "Unexpected status code")
             self.check_group_existence(True, True)
@@ -117,7 +160,10 @@ class TestTransaction(BaseViewTest):
         """
         headers = self.get_authorization_headers("ordinary_user")
         response = self.client.post(self.get_test_request_path("."), **headers)
+        log = self.check_log_existence()
         self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.check_group_existence(False, False)
+        self.check_no_log_records(log)
 
     def test_another_failure(self):
         """
@@ -125,6 +171,7 @@ class TestTransaction(BaseViewTest):
 
         :return: nothing
         """
+        CommandMaker().initialize_executor(self)
         with self.assertRaises(NameError):
             with CorefacilityTransaction():
                 user = User(login="sergei.kozhukhov", name="Sergei", surname="Kozhukhov")
@@ -133,6 +180,8 @@ class TestTransaction(BaseViewTest):
         with self.assertRaises(EntityNotFoundException,
                                msg="The transaction has not been aborted when exception occured"):
             UserSet().get("sergei.kozhukhov")
+        CommandMaker().clear_executor(self)
+
 
     def get_test_request_path(self, test_value):
         """
@@ -194,6 +243,28 @@ class TestTransaction(BaseViewTest):
         records = LogRecordSet()
         records.log = log
         self.assertEquals(len(records), 0, "There must be no log record during this test")
+
+    def assert_log_record(self, log, level="INF"):
+        records = LogRecordSet()
+        records.log = log
+        self.assertEquals(len(records), 1, "There must be one record during this test")
+        for record in records:
+            self.assertEquals(record.level, level, "Wrong record level")
+            self.assertGreater(len(record.message), 0, "The record message must not be empty")
+
+    def assert_suggestion(self, response, command_list):
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST, "Unexpected status code")
+        self.assertEquals(response.data['code'], "action_required", "The error reason must be 'action_required'")
+        for command in command_list:
+            self.assertIn(command, response.data['detail'], "Command '%s' has not been mentioned in the error message" % command)
+
+    def check_two_log_records(self, log):
+        records = LogRecordSet()
+        records.log = log
+        self.assertEquals(len(records), 2, "There must be exactly two log records during this test")
+        for record in records:
+            self.assertEquals(record.level, "INF", "Wrong record level")
+            self.assertGreater(len(record.message), 0, "The record message must be non-empty")
 
 
 del BaseViewTest

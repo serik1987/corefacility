@@ -131,7 +131,7 @@ class CommandMaker:
             executor = self._get_executor(executor)
             self._execution_queue[id(executor)].append({"args": args, "kwargs": kwargs})
 
-    def run_all_commands(self, executor=None):
+    def run_all_commands(self, executor=None, flush_message_queue=True):
         """
         Run commands that are added previously to the executor
 
@@ -141,6 +141,7 @@ class CommandMaker:
         """
         executor = self._get_executor(executor)
         execution_queue = self._execution_queue[id(executor)]
+        self._message_queue = list()
         if not self.test_flag:
             if settings.CORE_UNIX_ADMINISTRATION:
                 for command in execution_queue:
@@ -148,6 +149,14 @@ class CommandMaker:
             if settings.CORE_SUGGEST_ADMINISTRATION:
                 raise OsConfigurationSuggestion(execution_queue)
         self._execution_queue[id(executor)] = list()
+        if flush_message_queue:
+            self.flush_message_queue(executor)
+
+    def flush_message_queue(self, executor):
+        if hasattr(self.executor, "corefacility_log"):
+            for message in self._message_queue:
+                executor.corefacility_log.add_record(message['level'], message['message'])
+        self._message_queue = list()
 
     def clear_executor(self, executor):
         if self._mode == self.Mode.SYNC and executor is not self._executor:
@@ -186,11 +195,9 @@ class CommandMaker:
         kwargs.update(capture_output=True, check=True)
         try:
             result = subprocess.run(*args, **kwargs)
-            if isinstance(executor, HttpRequest):
-                self._logger.info(result.stdout.decode("utf-8"))
+            self._message_queue.append({"level": "INF", "message": result.stdout.decode("utf-8")})
         except subprocess.CalledProcessError as err:
             msg = "The command '%s' has been returned with status code %d. Reason: %s" % \
                   (err.cmd, err.returncode, err.stderr.decode("utf-8"))
-            if isinstance(executor, HttpRequest):
-                self._logger.error(msg)
+            self._message_queue.append({"level": "ERR", "message": msg})
             raise OsCommandFailedError(msg)

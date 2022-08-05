@@ -12,19 +12,17 @@ class SynchronicityError(Exception):
 
 class OsCommandFailedError(APIException):
 
-    status = status.HTTP_400_BAD_REQUEST
-    code = "posix_error"
-    detail = None
+    status_code = status.HTTP_400_BAD_REQUEST
 
     def __init__(self, detail):
-        self.detail = detail
+        self.detail = {"code": "posix_error", "detail": detail}
 
 
 class OsConfigurationSuggestion(APIException):
 
-    status = status.HTTP_400_BAD_REQUEST
-    code = "action_required"
-    detail = None
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_code = "action_required"
+    default_detail = None
 
     MESSAGE = _("Please, login to the server using SSH, execute the commands listed below \n"
                 "and press Continue to finish this action\n\n")
@@ -33,4 +31,5 @@ class OsConfigurationSuggestion(APIException):
         commands = []
         for command in command_list:
             commands.append(" ".join(command['args'][0]))
-        self.detail = self.MESSAGE + "\n".join(commands)
+        detail = self.MESSAGE + "\n".join(commands)
+        self.detail = {"code": "action_required", "detail": detail}

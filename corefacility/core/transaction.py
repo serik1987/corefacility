@@ -21,6 +21,8 @@ class CorefacilityTransaction:
 
     _database_transaction = None
 
+    _closure_level = None
+
     def __new__(cls):
         """
         During the first call this method creates an instance of the CorefacilityTransaction.
@@ -29,6 +31,7 @@ class CorefacilityTransaction:
         """
         if cls._instance is None:
             cls._instance = super(CorefacilityTransaction, cls).__new__(cls)
+            cls._closure_level = 0
         return cls._instance
 
     @property
@@ -43,10 +46,12 @@ class CorefacilityTransaction:
 
         :return: nothing
         """
-        self.database_transaction.__enter__()
-        maker = CommandMaker()
-        if settings.CORE_SUGGEST_ADMINISTRATION or settings.CORE_UNIX_ADMINISTRATION:
-            maker.initialize_command_queue()
+        if self._closure_level == 0:
+            self.database_transaction.__enter__()
+            maker = CommandMaker()
+            if settings.CORE_SUGGEST_ADMINISTRATION or settings.CORE_UNIX_ADMINISTRATION:
+                maker.initialize_command_queue()
+        self._closure_level += 1
         return TransactionObject()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -58,16 +63,21 @@ class CorefacilityTransaction:
         :param exc_tb: the exception traceback
         :return: nothing
         """
-        if exc_type is None:
-            try:
-                maker = CommandMaker()
-                if maker.executor is not None:
-                    maker.run_all_commands()
-                self.database_transaction.__exit__(None, None, None)
-            except Exception as exc:
-                self.database_transaction.__exit__(exc.__class__.__name__, exc, exc.__traceback__)
-        else:
-            self.database_transaction.__exit__(exc_type, exc_val, exc_tb)
+        self._closure_level -= 1
+        if self._closure_level == 0:
+            if exc_type is None:
+                try:
+                    maker = CommandMaker()
+                    if maker.executor is not None:
+                        maker.run_all_commands(flush_message_queue=False)
+                    self.database_transaction.__exit__(None, None, None)
+                    maker.flush_message_queue(maker.executor)
+                except Exception as exc:
+                    self.database_transaction.__exit__(exc.__class__.__name__, exc, exc.__traceback__)
+                    maker.flush_message_queue(maker.executor)
+                    raise
+            else:
+                self.database_transaction.__exit__(exc_type, exc_val, exc_tb)
 
 
 class TransactionObject:
