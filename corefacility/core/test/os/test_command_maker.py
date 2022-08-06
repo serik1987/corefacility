@@ -83,6 +83,11 @@ class TestCommandMaker(BaseViewTest):
             maker.clear_executor(self)
 
     def test_synchronicity_error(self):
+        """
+        Tests whether synchronicity error will be risen when normal command flow has been interrupted
+
+        :return:
+        """
         with self.settings(CORE_UNIX_ADMINISTRATION=True, CORE_SUGGEST_ADMINISTRATION=False):
             maker = CommandMaker()
             maker.initialize_executor(self)

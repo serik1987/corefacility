@@ -182,7 +182,6 @@ class TestTransaction(BaseViewTest):
             UserSet().get("sergei.kozhukhov")
         CommandMaker().clear_executor(self)
 
-
     def get_test_request_path(self, test_value):
         """
         Gets the test request path
@@ -245,6 +244,13 @@ class TestTransaction(BaseViewTest):
         self.assertEquals(len(records), 0, "There must be no log record during this test")
 
     def assert_log_record(self, log, level="INF"):
+        """
+        Asserts that a certain record has been attached to the log
+
+        :param log: the log which records shall be checked
+        :param level: desired record level
+        :return: nothing
+        """
         records = LogRecordSet()
         records.log = log
         self.assertEquals(len(records), 1, "There must be one record during this test")
@@ -253,12 +259,26 @@ class TestTransaction(BaseViewTest):
             self.assertGreater(len(record.message), 0, "The record message must not be empty")
 
     def assert_suggestion(self, response, command_list):
+        """
+        Asserts that the HTTP response asks the client user to log in using SSH and run proper commands
+
+        :param response: the HTTP response to be asserted
+        :param command_list: commands that are required to be mentioned in the response body
+        :return: nothing
+        """
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST, "Unexpected status code")
         self.assertEquals(response.data['code'], "action_required", "The error reason must be 'action_required'")
         for command in command_list:
-            self.assertIn(command, response.data['detail'], "Command '%s' has not been mentioned in the error message" % command)
+            self.assertIn(command, response.data['detail'],
+                          "Command '%s' has not been mentioned in the error message" % command)
 
     def check_two_log_records(self, log):
+        """
+        Asserts that two log records were attached to a given log
+
+        :param log: the log which records shall be checked
+        :return: nothing
+        """
         records = LogRecordSet()
         records.log = log
         self.assertEquals(len(records), 2, "There must be exactly two log records during this test")
