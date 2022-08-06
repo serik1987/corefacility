@@ -8,6 +8,14 @@ class TestCommandMaker(BaseViewTest):
     Provides the command maker tests
     """
 
+    @staticmethod
+    def is_posix():
+        try:
+            import posix
+            return True
+        except ImportError:
+            return False
+
     def test_singleton(self):
         """
         Tests that the command maker class is singleton
@@ -25,6 +33,8 @@ class TestCommandMaker(BaseViewTest):
 
         :return: nothing
         """
+        if not self.is_posix():
+            self.skipTest("This test is for UNIX operating systems only")
         with self.settings(CORE_UNIX_ADMINISTRATION=True, CORE_SUGGEST_ADMINISTRATION=False):
             maker = CommandMaker()
             maker.initialize_executor(self)
@@ -39,6 +49,8 @@ class TestCommandMaker(BaseViewTest):
 
         :return: nothing
         """
+        if not self.is_posix():
+            self.skipTest("This is for UNIX operating systems only")
         with self.settings(CORE_UNIX_ADMINISTRATION=True, CORE_SUGGEST_ADMINISTRATION=False):
             maker = CommandMaker()
             maker.initialize_executor(self)
