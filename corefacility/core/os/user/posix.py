@@ -3,6 +3,7 @@ import csv
 
 from .abstract import AbstractUser
 from .exceptions import OperatingSystemUserNotFoundException
+from .. import CommandMaker
 
 
 class PosixUser(AbstractUser):
@@ -22,7 +23,7 @@ class PosixUser(AbstractUser):
     SHELL_POSITION = 6
 
     MINIMUM_UID = 1000
-    GECOS_FORMAT = re.compile(r'^(\w+)\s+(\w+),(.+),(.+),(.+)$')
+    GECOS_FORMAT = re.compile(r'^(\w+)\s+(\w+),(.*),(.*),(.*)$')
     GECOS_NAME_POSITION = 1
     GECOS_SURNAME_POSITION = 2
     GECOS_PHONE_POSITION = 5
@@ -31,6 +32,7 @@ class PosixUser(AbstractUser):
     _uid = None
     _gid = None
     _login_shell = None
+    _initial_login = None
 
     @staticmethod
     def extract_gecos_information(gecos_information):
@@ -78,6 +80,7 @@ class PosixUser(AbstractUser):
                         phone=phone
                     )
                     user._registered = True
+                    user._initial_login = user.login
                     user._password_information = user_info[cls.PASSWORD_PLACEHOLDER_POSITION]
                     user._uid = int(user_info[cls.UID_POSITION])
                     user._gid = int(user_info[cls.GID_POSITION])
@@ -111,7 +114,7 @@ class PosixUser(AbstractUser):
         """
         super().__init__(login=login, name=name, surname=surname, email=email, phone=phone,
                          home_directory=home_directory)
-        self._login_shell = login_shell
+        self.login_shell = login_shell
 
     def __str__(self):
         """
@@ -161,3 +164,98 @@ class PosixUser(AbstractUser):
         The default shell to be used when the user will be logged in using SSH
         """
         return self._login_shell
+
+    @login_shell.setter
+    def login_shell(self, value):
+        if isinstance(value, str):
+            self._login_shell = value
+        else:
+            raise ValueError("Error in POSIX login shell")
+
+    def create(self):
+        """
+        Creates a user record in the operating system using the information passed as constructor arguments
+
+        :return: nothing
+        """
+        CommandMaker().add_command(("useradd",
+            "-c", self._get_gecos_information(),  # Specify the GECOS information
+            "-d", self.home_dir,                  # Specify home directory
+            "-U",                                 # Always create group with the same name as user
+            "-s", self.login_shell,               # Specify default login shell
+            self.login))
+        self._registered = True
+        self._initial_login = self.login
+
+    def update(self):
+        if not self.registered or self._initial_login is None:
+            raise RuntimeError("Please, find the user in the database to modify it")
+        CommandMaker().add_command(("usermod",
+            "-c", self._get_gecos_information(),
+            "-m", "-d", self.home_dir,
+            "-l", self.login,
+            "-s", self.login_shell,
+            self._initial_login
+        ))
+        self._initial_login = self.login
+
+    def delete(self):
+        """
+        Deletes a user record from the operating system
+
+        :return: nothing
+        """
+        if not self.registered or self._initial_login is None:
+            raise RuntimeError("Please, find the user in the database to delete it")
+        CommandMaker().add_command(("userdel", "-rf", self._initial_login))
+        self._initial_login = None
+        self._registered = False
+
+    def set_password(self, password):
+        """
+        Sets the user password
+
+        :param password: a non-encrypted password to be set
+        :return: nothing
+        """
+        if not self.registered:
+            raise RuntimeError("Please, add the user to be able to set password")
+        CommandMaker().add_command(("passwd", self.login),
+            input="{0}\n{0}\n".format(password).encode("utf-8"))
+
+    def clear_password(self):
+        """
+        Clears the user password
+
+        :return: nothing
+        """
+        if not self.registered:
+            raise RuntimeError("Please, add the user to be able to clear password")
+        CommandMaker().add_command(("passwd", "-d", self.login))
+
+    def lock(self):
+        """
+        Locks the user
+
+        :return: nothing
+        """
+        if not self.registered:
+            raise RuntimeError("Please, add user to be able to lock it")
+        CommandMaker().add_command(("passwd", "-l", self.login))
+
+    def unlock(self):
+        """
+        Unlocks the user
+
+        :return: nothing
+        """
+        if not self.registered:
+            raise RuntimeError("Please, add user to be able to unlock it")
+        CommandMaker().add_command(("passwd", "-u", self.login))
+
+    def _get_gecos_information(self):
+        return "{name} {surname},,,{phone}".format(
+            name=self.name,
+            surname=self.surname,
+            phone=self.phone
+        )

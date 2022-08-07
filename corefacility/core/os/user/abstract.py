@@ -61,11 +61,11 @@ class AbstractUser:
         :param home_directory: home directory
         """
         self.login = login
-        self._name = name
-        self._surname = surname
-        self._email = email
-        self._phone = phone
-        self._home_directory = home_directory
+        self.name = name
+        self.surname = surname
+        self.email = email
+        self.phone = phone
+        self.home_dir = home_directory
 
     @property
     def login(self):
@@ -91,28 +91,56 @@ class AbstractUser:
         """
         User's first name
         """
-        return self._name
+        return self._name if self._name is not None else ""
+
+    @name.setter
+    def name(self, value):
+        if isinstance(value, str) or value is None:
+            self._name = value
+        else:
+            raise ValueError("Error in POSIX user name")
 
     @property
     def surname(self):
         """
         User's surname
         """
-        return self._surname
+        return self._surname if self._surname is not None else ""
+
+    @surname.setter
+    def surname(self, value):
+        if isinstance(value, str) or value is None:
+            self._surname = value
+        else:
+            raise ValueError("Error in POSIX user surname")
 
     @property
     def email(self):
         """
         User's e-mail
         """
-        return self._email
+        return self._email if self._email is not None else ""
+
+    @email.setter
+    def email(self, value):
+        if isinstance(value, str) or value is None:
+            self._email = value
+        else:
+            raise ValueError("Error in POSIX email")
 
     @property
     def phone(self):
         """
         User's phone
         """
-        return self._phone
+        return self._phone if self._phone is not None else ""
+
+    @phone.setter
+    def phone(self, value):
+        if isinstance(value, str) or value is None:
+            self._phone = value
+        else:
+            raise ValueError("Error in POSIX phone")
 
     @property
     def home_dir(self):
@@ -120,6 +148,13 @@ class AbstractUser:
         User's home directory
         """
         return self._home_directory
+
+    @home_dir.setter
+    def home_dir(self, value):
+        if isinstance(value, str) or value is None:
+            self._home_directory = value
+        else:
+            raise ValueError("Home directory is not correct")
 
     @property
     def registered(self):
@@ -135,6 +170,9 @@ class AbstractUser:
         :return: nothing
         """
         raise NotImplementedError("create")
+
+    def update(self):
+        raise NotImplementedError("update")
 
     def delete(self):
         """
@@ -175,3 +213,4 @@ class AbstractUser:
 
         :return: nothing
         """
+        raise NotImplementedError("unlock")
