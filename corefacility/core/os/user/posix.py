@@ -3,7 +3,7 @@ import csv
 
 from .abstract import AbstractUser
 from .exceptions import OperatingSystemUserNotFoundException
-from .. import CommandMaker
+from .. import CommandMaker, _check_os_posix
 
 
 class PosixUser(AbstractUser):
@@ -44,10 +44,10 @@ class PosixUser(AbstractUser):
         """
         try:
             extracted_information = PosixUser.GECOS_FORMAT.match(gecos_information)
-            return extracted_information[PosixUser.GECOS_NAME_POSITION], \
-                extracted_information[PosixUser.GECOS_SURNAME_POSITION], \
-                None, \
-                extracted_information[PosixUser.GECOS_PHONE_POSITION]
+            return (extracted_information[PosixUser.GECOS_NAME_POSITION],
+                    extracted_information[PosixUser.GECOS_SURNAME_POSITION],
+                    None,
+                    extracted_information[PosixUser.GECOS_PHONE_POSITION])
         except Exception:
             return None, None, None, None
 
@@ -112,6 +112,7 @@ class PosixUser(AbstractUser):
         :param home_directory: home directory
         :param login_shell: The shell to be run when the user try to log in using SSH
         """
+        _check_os_posix()
         super().__init__(login=login, name=name, surname=surname, email=email, phone=phone,
                          home_directory=home_directory)
         self.login_shell = login_shell
@@ -123,19 +124,19 @@ class PosixUser(AbstractUser):
         return "core.os.user.PosixUser(login={login}, name={name}, surname={surname}, email={email}, phone={phone}, " \
                "UID={uid}, GID={gid}, home_directory={home_directory}, login_shell={login_shell}, " \
                "password_information={password_information}, registered={registered})" \
-        .format(
-            login=self.login,
-            name=self.name,
-            surname=self.surname,
-            email=self.email,
-            phone=self.phone,
-            uid=self.uid,
-            gid=self.gid,
-            home_directory=self.home_dir,
-            login_shell=self.login_shell,
-            password_information=self.password_information,
-            registered=self.registered
-        )
+            .format(
+                login=self.login,
+                name=self.name,
+                surname=self.surname,
+                email=self.email,
+                phone=self.phone,
+                uid=self.uid,
+                gid=self.gid,
+                home_directory=self.home_dir,
+                login_shell=self.login_shell,
+                password_information=self.password_information,
+                registered=self.registered
+            )
 
     @property
     def password_information(self):
@@ -179,11 +180,11 @@ class PosixUser(AbstractUser):
         :return: nothing
         """
         CommandMaker().add_command(("useradd",
-            "-c", self._get_gecos_information(),  # Specify the GECOS information
-            "-d", self.home_dir,                  # Specify home directory
-            "-U",                                 # Always create group with the same name as user
-            "-s", self.login_shell,               # Specify default login shell
-            self.login))
+                                    "-c", self._get_gecos_information(),  # Specify the GECOS information
+                                    "-d", self.home_dir,  # Specify home directory
+                                    "-U",  # Always create group with the same name as user
+                                    "-s", self.login_shell,  # Specify default login shell
+                                    self.login))
         self._registered = True
         self._initial_login = self.login
 
@@ -191,12 +192,12 @@ class PosixUser(AbstractUser):
         if not self.registered or self._initial_login is None:
             raise RuntimeError("Please, find the user in the database to modify it")
         CommandMaker().add_command(("usermod",
-            "-c", self._get_gecos_information(),
-            "-m", "-d", self.home_dir,
-            "-l", self.login,
-            "-s", self.login_shell,
-            self._initial_login
-        ))
+                                    "-c", self._get_gecos_information(),
+                                    "-m", "-d", self.home_dir,
+                                    "-l", self.login,
+                                    "-s", self.login_shell,
+                                    self._initial_login
+                                    ))
         self._initial_login = self.login
 
     def delete(self):
@@ -214,14 +215,13 @@ class PosixUser(AbstractUser):
     def set_password(self, password):
         """
         Sets the user password
-
         :param password: a non-encrypted password to be set
         :return: nothing
         """
         if not self.registered:
             raise RuntimeError("Please, add the user to be able to set password")
         CommandMaker().add_command(("passwd", self.login),
-            input="{0}\n{0}\n".format(password).encode("utf-8"))
+                                   input="{0}\n{0}\n".format(password).encode("utf-8"))
 
     def clear_password(self):
         """

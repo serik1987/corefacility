@@ -172,6 +172,11 @@ class AbstractUser:
         raise NotImplementedError("create")
 
     def update(self):
+        """
+        Writes all account changes to the operating system account record
+
+        :return: nothing
+        """
         raise NotImplementedError("update")
 
     def delete(self):
