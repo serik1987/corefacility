@@ -81,7 +81,7 @@ class AbstractUser:
         :param new_login: new login value to be set
         :return: nothing
         """
-        if isinstance(new_login, str) and 0 < len(new_login) < self.get_max_login_chars():
+        if isinstance(new_login, str) and 0 < len(new_login) <= self.get_max_login_chars():
             self._login = new_login
         else:
             raise OperatingSystemUserLoginTooLarge(new_login)

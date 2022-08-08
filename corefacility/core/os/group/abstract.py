@@ -6,6 +6,9 @@ class AbstractGroup:
     Base class for any group information.
     """
 
+    MAX_GROUP_NAME_LENGTH = -1
+    """ Defines maximum number of characters in the group name """
+
     _name = None
     _registered = None
 
@@ -52,7 +55,7 @@ class AbstractGroup:
         :param value: the group name
         :return: nothing
         """
-        if isinstance(value, str):
+        if isinstance(value, str) and 0 < len(value) <= self.MAX_GROUP_NAME_LENGTH:
             self._name = value
         else:
             raise ValueError("'%s' is incorrect value for the group name" % value)

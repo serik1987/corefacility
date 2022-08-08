@@ -2,13 +2,16 @@ import csv
 
 from .abstract import AbstractGroup
 from .exceptions import OperatingSystemGroupNotFound
-from .. import _check_os_posix
+from .. import CommandMaker, _check_os_posix
 
 
 class PosixGroup(AbstractGroup):
     """
     Represents the group information for POSIX-compatible operating system
     """
+
+    MAX_GROUP_NAME_LENGTH = 32
+    """ Defines maximum number of characters in the group name """
 
     GROUP_LIST_FILE = "/etc/group"
     """ Any POSIX-compliant operating system has list of all groups stored in this file """
@@ -17,6 +20,7 @@ class PosixGroup(AbstractGroup):
     GID_POSITION = 2
     GROUP_MEMBERS_POSITION = 3
 
+    _initial_group_name = None
     _gid = None
     _user_list = None
 
@@ -33,6 +37,7 @@ class PosixGroup(AbstractGroup):
                 group = cls(name=group_info[cls.GROUP_NAME_POSITION])
                 group._registered = True
                 group._gid = int(group_info[cls.GID_POSITION])
+                group._initial_group_name = group.name
                 group_members = group_info[cls.GROUP_MEMBERS_POSITION]
                 if len(group_members) > 0:
                     group._user_list = group_members.split(",")
@@ -82,3 +87,37 @@ class PosixGroup(AbstractGroup):
         List of logins of all group members
         """
         return self._user_list
+
+    def create(self):
+        """
+        Adds the group record to the operating system
+
+        :return: nothing
+        """
+        if self.registered:
+            raise RuntimeError("Can't create the duplicated group")
+        CommandMaker().add_command(("groupadd", "-f", self.name))
+        self._registered = True
+        self._initial_group_name = self._name
+
+    def update(self):
+        """
+        Changes information about the group in the operating system
+
+        :return: nothing
+        """
+        if not self.registered or self._initial_group_name is None:
+            raise RuntimeError("To change the group name please, find the group using iterate() function")
+        CommandMaker().add_command(("groupmod", "-n", self.name, self._initial_group_name))
+        self._initial_group_name = self._name
+
+    def delete(self):
+        """
+        Deletes the group
+
+        :return: nothing
+        """
+        if not self.registered:
+            raise RuntimeError("Can't delete the group if it is still not added")
+        CommandMaker().add_command(("groupdel", self.name))
+        self._registered = False

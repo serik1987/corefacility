@@ -1,10 +1,10 @@
 from django.conf import settings
-from django.test import TestCase
 from parameterized import parameterized
 
-from core.os import CommandMaker
 from core.os.user.exceptions import OperatingSystemUserNotFoundException
 from core.os.user import PosixUser
+
+from .base_command_test import BaseOsFeatureTest
 
 
 def common_data_provider():
@@ -44,47 +44,13 @@ def create_user_provider():
            ]
 
 
-class TestPosixUser(TestCase):
-    _maker = None
+class TestPosixUser(BaseOsFeatureTest):
     _initial_users = None
-
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-        cls._maker = CommandMaker()
-        cls._maker.initialize_executor(TestPosixUser)
 
     def setUp(self):
         if not settings.CORE_MANAGE_UNIX_USERS or not settings.CORE_UNIX_ADMINISTRATION:
             self.skipTest("The test is not required for a given configuration")
         super().setUp()
-        self._maker.initialize_command_queue()
-        self.save_initial_users()
-
-    def tearDown(self):
-        self._maker.run_all_commands()
-        self.restore_initial_users()
-        super().tearDown()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls._maker.clear_executor(TestPosixUser)
-        super().tearDownClass()
-
-    def save_initial_users(self):
-        self._initial_users = []
-        for user in PosixUser.iterate():
-            self._initial_users.append(user.uid)
-
-    def restore_initial_users(self):
-        deleting_users = []
-        for user in PosixUser.iterate():
-            if user.uid not in self._initial_users:
-                deleting_users.append(user)
-        for user in deleting_users:
-            user.delete()
-        self._initial_users = None
-        self._maker.run_all_commands()
 
     @parameterized.expand(create_user_provider())
     def test_create(self, login, name, surname, email, phone, home_dir, is_success=True):
@@ -147,3 +113,6 @@ class TestPosixUser(TestCase):
             self.assertEquals(another_user.phone, phone, "Incorrect user phone")
         if home_dir is not None:
             self.assertEquals(another_user.home_dir, home_dir, "Incorrect home directory")
+
+
+del BaseOsFeatureTest
