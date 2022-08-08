@@ -4,6 +4,7 @@ import csv
 from .abstract import AbstractUser
 from .exceptions import OperatingSystemUserNotFoundException
 from .. import CommandMaker, _check_os_posix
+from ..group import PosixGroup
 
 
 class PosixUser(AbstractUser):
@@ -209,6 +210,8 @@ class PosixUser(AbstractUser):
         if not self.registered or self._initial_login is None:
             raise RuntimeError("Please, find the user in the database to delete it")
         CommandMaker().add_command(("userdel", "-rf", self._initial_login))
+        primary_group = PosixGroup.find_by_gid(self.gid)
+        CommandMaker().add_command(("sh", "-c", "groupdel %s || echo" % primary_group.name))
         self._initial_login = None
         self._registered = False
 
