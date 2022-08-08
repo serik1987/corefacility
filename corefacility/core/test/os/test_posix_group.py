@@ -71,7 +71,8 @@ class TestPosixGroup(BaseOsFeatureTest):
         group2.delete()
         self._maker.run_all_commands()
         self.assertFalse(group2.registered, "The group shall be marked as 'unregistered' after its delete")
-        with self.assertRaises(OperatingSystemGroupNotFound, msg="The group is still present in the system even after its delete"):
+        with self.assertRaises(OperatingSystemGroupNotFound,
+                               msg="The group is still present in the system even after its delete"):
             PosixGroup.find_by_name("some")
 
     def test_update_group(self):
@@ -83,7 +84,8 @@ class TestPosixGroup(BaseOsFeatureTest):
         group2.update()
         self._maker.run_all_commands()
         group3 = PosixGroup.find_by_name("group2")
-        self.assertEquals(group3.gid, group2.gid, "The group GID has been suddenly changed when changing the group name")
+        self.assertEquals(group3.gid, group2.gid,
+                          "The group GID has been suddenly changed when changing the group name")
         group3.delete()
         self._maker.run_all_commands()
 

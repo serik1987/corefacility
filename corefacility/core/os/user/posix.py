@@ -253,6 +253,23 @@ class PosixUser(AbstractUser):
             raise RuntimeError("Please, add user to be able to unlock it")
         CommandMaker().add_command(("passwd", "-u", self.login))
 
+    def set_groups(self, group_list, is_add=False):
+        """
+        Sets the group where the user is mentioned
+        :param group_list: any iterable of the core.os.group.Group objects or group names
+        :param is_add: True if the group list must be added to an existent group list, False if it must be replaced
+        :return: nothing
+        """
+        option = "-aG" if is_add else "-G"
+        group_names = []
+        for group in group_list:
+            if hasattr(group, "name"):
+                group_names.append(group.name)
+            else:
+                group_names.append(group)
+        groups = ",".join(group_names)
+        CommandMaker().add_command(("usermod", option, groups, self.login))
+
     def _get_gecos_information(self):
         return "{name} {surname},,,{phone}".format(
             name=self.name,
