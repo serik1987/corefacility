@@ -151,7 +151,7 @@ class AbstractUser:
 
     @home_dir.setter
     def home_dir(self, value):
-        if isinstance(value, str) or value is None:
+        if isinstance(value, str):
             self._home_directory = value
         else:
             raise ValueError("Home directory is not correct")

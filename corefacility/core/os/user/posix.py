@@ -23,7 +23,7 @@ class PosixUser(AbstractUser):
     SHELL_POSITION = 6
 
     MINIMUM_UID = 1000
-    GECOS_FORMAT = re.compile(r'^(\w+)\s+(\w+),(.*),(.*),(.*)$')
+    GECOS_FORMAT = re.compile(r'^(\w*)\s+(\w*),(.*),(.*),(.*)$')
     GECOS_NAME_POSITION = 1
     GECOS_SURNAME_POSITION = 2
     GECOS_PHONE_POSITION = 5
