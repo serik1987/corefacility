@@ -56,7 +56,7 @@ class TestSynchronization(BaseViewTest):
 
     def test_synchronization_partial_fail(self):
         """
-        Tests whether synchronization shall be successful when one of the synchronizing users is currently logged ins
+        Tests whether synchronization shall be successful when one of the synchronizing users is currently logged in
 
         :return: nothing
         """

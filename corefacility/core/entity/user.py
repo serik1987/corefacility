@@ -8,6 +8,7 @@ from .entity_fields import EntityField, EntityAliasField, ManagedEntityField, Re
 from core.entity.entity_fields.field_managers.group_manager import GroupManager
 from .entity_exceptions import EntityFieldInvalid
 from .entity_providers.model_providers.user_provider import UserProvider as ModelProvider
+from .entity_providers.posix_providers.user_provider import UserProvider as PosixProvider
 
 
 class User(Entity):
@@ -21,7 +22,7 @@ class User(Entity):
 
     _entity_set_class = UserSet
 
-    _entity_provider_list = [ModelProvider()]
+    _entity_provider_list = [PosixProvider(), ModelProvider()]
 
     _public_field_description = {
         "login": EntityAliasField(max_length=100),

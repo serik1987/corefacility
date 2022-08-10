@@ -22,11 +22,9 @@ class EntityProvider:
         The method checks that the entity has already been loaded from the database.
         EntityProviders shall use the entity 'id' or '_wrapped' properties of the corresponding
         entity.
-
         The entity 'id' field is a unique entity number given by the database system. The entity
         id doesn't relate to UID, GID or PID values given to entities by the Unix-like operating
         systems
-
         :param entity: the entity to load
         :return: the entity value
         """
@@ -35,8 +33,7 @@ class EntityProvider:
     def create_entity(self, entity: Entity):
         """
         Creates the entity in a certain entity source and changes the entity's _id and _wrapped properties
-        according to how the entity changes its status.
-
+        according to how the entity changes its status
         :param entity: The entity to be created on this entity source
         :return: nothing but entity provider must fill necessary entity fields
         """
@@ -128,7 +125,6 @@ class EntityProvider:
     def detach_file(self, entity: Entity, name: str) -> None:
         """
         Detaches a file from the entity representation located at external entity source
-
         :param entity: the entity from which the file shall be detached
         :param name: the field name from which the file should be detached
         :return: nothing
