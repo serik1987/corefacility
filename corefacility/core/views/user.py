@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework import status
 from rest_framework.decorators import action
@@ -5,7 +6,11 @@ from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 
 from core import App
+from core.os import CommandMaker
+from core.os.user import PosixUser
+from core.transaction import CorefacilityTransaction
 from ..entity.user import UserSet
+from ..entity.entity_providers.posix_providers.user_provider import UserProvider as PosixProvider
 from ..entity.entity_fields.field_managers.entity_password_manager import EntityPasswordManager
 from ..generic_views import EntityViewSet, AvatarMixin
 from ..serializers import UserListSerializer, UserDetailSerializer
@@ -48,10 +53,19 @@ class UserViewSet(AvatarMixin, EntityViewSet):
         :param kwargs: dictionary arguments
         :return: REST framework response
         """
-        user = self.get_object()
-        symbol_alphabet = EntityPasswordManager.SMALL_LATIN_LETTERS + EntityPasswordManager.DIGITS
-        max_symbols = App().get_max_password_symbols()
-        new_password = user.password_hash.generate(symbol_alphabet, max_symbols)
-        request.corefacility_log.response_body = "***"
-        user.update()
+        with CorefacilityTransaction():
+            user = self.get_object()
+            symbol_alphabet = EntityPasswordManager.SMALL_LATIN_LETTERS + EntityPasswordManager.DIGITS
+            max_symbols = App().get_max_password_symbols()
+            new_password = user.password_hash.generate(symbol_alphabet, max_symbols)
+            if PosixProvider().is_provider_on() and not settings.CORE_SUGGEST_ADMINISTRATION:
+                try:
+                    posix_user = PosixUser.find_by_login(user.unix_group)
+                    posix_user.set_password(new_password)
+                    if user.is_locked:
+                        posix_user.lock()
+                except OperatingSystemUserNotFoundException:
+                    pass
+            request.corefacility_log.response_body = "***"
+            user.update()
         return Response({"password": new_password})

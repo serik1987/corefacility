@@ -46,6 +46,32 @@ def arbitrary_string_provider(empty_string_ok, max_string_length):
         ("1290749*&&^^&", True),
     ]
 
+def email_provider():
+    return [
+        ("", True),
+        ("mail@host.ru", True),
+        ("mail@host", False),
+        ("sergei.kozhukhov@ihna.ru", True),
+        ("sergei_kozhukhov@ihna.ru", True),
+        ("sergei-kozhukhov@my-mail.online", True),
+        ("мой-аккаунт@домен.рф", False),
+        ("my-account", False),
+        ("my-account@ihna-ru", False),
+    ]
+
+def phone_provider():
+    return [
+        ("", True),
+        ("123", True),
+        ("+70000000000", True),
+        ("+7 000 000 00 00", True),
+        ("+7(000)000-00-00", True),
+        ("+7(000) 000 - 0000", True),
+        ("kughffd", False),
+        ("http:123", False),
+        ("+7 123 fkllf", False),
+    ]
+
 
 def boolean_provider():
     """

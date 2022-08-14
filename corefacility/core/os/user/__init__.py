@@ -7,5 +7,5 @@ operating system commands and send them to the core.os.CommandMaker component, a
 results, send such results to the application modules.
 """
 
-from .posix import PosixUser
+from .posix import PosixUser, LockStatus
 from .exceptions import OperatingSystemUserNotFoundException, OperatingSystemUserLoginTooLarge

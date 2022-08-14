@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.utils.module_loading import import_string
+
 from .entity_exceptions import EntityOperationNotPermitted, EntityProvidersNotDefined, EntityFieldInvalid
 
 
@@ -192,7 +193,7 @@ class Entity:
         for field in self._required_fields:
             if field not in self._public_fields:
                 raise EntityFieldInvalid(field)
-        with transaction.atomic():
+        with self._get_transaction_mechanism():
             for provider in self._entity_provider_list:
                 another_entity = provider.load_entity(self)
                 if another_entity is None:
@@ -213,7 +214,7 @@ class Entity:
         if self.state != "changed":
             raise EntityOperationNotPermitted()
         self.check_entity_providers_defined()
-        with transaction.atomic():
+        with self._get_transaction_mechanism():
             for provider in self._entity_provider_list:
                 provider.update_entity(self)
         self._edited_fields = set()
@@ -230,7 +231,7 @@ class Entity:
         if self.state == "creating" or self.state == "deleted":
             raise EntityOperationNotPermitted()
         self.check_entity_providers_defined()
-        with transaction.atomic():
+        with self._get_transaction_mechanism():
             for provider in self._entity_provider_list:
                 provider.delete_entity(self)
             self._id = None
@@ -339,3 +340,6 @@ class Entity:
         self._edited_fields.add(field_name)
         if self.__state != "creating":
             self.__state = "changed"
+
+    def _get_transaction_mechanism(self):
+        return transaction.atomic()

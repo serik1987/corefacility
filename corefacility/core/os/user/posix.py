@@ -1,10 +1,18 @@
 import re
 import csv
+from subprocess import run, PIPE
+from enum import Enum
 
 from .abstract import AbstractUser
 from .exceptions import OperatingSystemUserNotFoundException
 from .. import CommandMaker, _check_os_posix
 from ..group import PosixGroup
+
+
+class LockStatus(Enum):
+    LOCKED = "L"
+    PASSWORD_NOT_SET = "NP"
+    PASSWORD_SET = "P"
 
 
 class PosixUser(AbstractUser):
@@ -13,10 +21,14 @@ class PosixUser(AbstractUser):
     """
 
     USER_LIST_FILE = "/etc/passwd"
+    """ Any POSIX-compliant operating system contains csv-like file where all users were stored """
+
+    PASSWORD_LIST_FILE = "/etc/shadow"
     """ Any POSIX-compliant operating system contains csv-like file where all passwords were stored """
 
     LOGIN_POSITION = 0
     PASSWORD_PLACEHOLDER_POSITION = 1
+    LOCK_STATUS_POSITION = 1
     UID_POSITION = 2
     GID_POSITION = 3
     GECOS_POSITION = 4
@@ -255,6 +267,16 @@ class PosixUser(AbstractUser):
         if not self.registered:
             raise RuntimeError("Please, add user to be able to unlock it")
         CommandMaker().add_command(("passwd", "-u", self.login))
+
+    def is_locked(self):
+        if not self.registered:
+            raise RuntimeError("Please, add user to find its lock status")
+        result = run(("passwd", "-S", self.login), stdout=PIPE)
+        if result.returncode != 0:
+            raise RuntimeError("Unable to find the user locking status")
+        output = result.stdout.decode("utf-8")
+        lock_info = output.split()[self.LOCK_STATUS_POSITION]
+        return LockStatus(lock_info)
 
     def set_groups(self, group_list, is_add=False):
         """

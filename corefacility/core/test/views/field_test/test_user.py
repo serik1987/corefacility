@@ -4,7 +4,8 @@ from rest_framework import status
 from core.entity.user import UserSet
 
 from .base_test_class import BaseTestClass
-from .data_providers import slug_provider, arbitrary_string_provider, boolean_provider
+from .data_providers import slug_provider, arbitrary_string_provider, boolean_provider, \
+    email_provider, phone_provider
 
 
 class TestUser(BaseTestClass):
@@ -134,34 +135,14 @@ class TestUser(BaseTestClass):
     def test_email_required(self):
         self._test_field_required("email", "login", False, True, None)
 
-    @parameterized.expand([
-        ("", True),
-        ("mail@host.ru", True),
-        ("mail@host", False),
-        ("sergei.kozhukhov@ihna.ru", True),
-        ("sergei_kozhukhov@ihna.ru", True),
-        ("sergei-kozhukhov@my-mail.online", True),
-        ("мой-аккаунт@домен.рф", False),
-        ("my-account", False),
-        ("my-account@ihna-ru", False),
-    ])
+    @parameterized.expand(email_provider())
     def test_email(self, value, is_valid):
         self._test_field_value("email", "login", value, is_valid, True, value)
 
     def test_phone_required(self):
         self._test_field_required("phone", "login", False, True, None)
 
-    @parameterized.expand([
-        ("", True),
-        ("123", True),
-        ("+70000000000", True),
-        ("+7 000 000 00 00", True),
-        ("+7(000)000-00-00", True),
-        ("+7(000) 000 - 0000", True),
-        ("kughffd", False),
-        ("http:123", False),
-        ("+7 123 fkllf", False),
-    ])
+    @parameterized.expand(phone_provider())
     def test_phone(self, value, is_valid):
         self._test_field_value("phone", "login", value, is_valid, True, value)
 

@@ -1,6 +1,8 @@
 from django.templatetags.static import static
 from django.db import transaction
 
+from core.transaction import CorefacilityTransaction
+
 from .entity import Entity
 from .entity_sets.user_set import UserSet
 from .entity_fields import EntityField, EntityAliasField, ManagedEntityField, ReadOnlyField, \
@@ -86,7 +88,7 @@ class User(Entity):
 
         :return: nothing
         """
-        with transaction.atomic():
+        with self._get_transaction_mechanism():
             for group in self.groups:
                 if group.governor.id == self.id:
                     group.force_delete()
@@ -147,3 +149,6 @@ class User(Entity):
             return True
         else:
             return False
+
+    def _get_transaction_mechanism(self):
+        return CorefacilityTransaction()

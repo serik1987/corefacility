@@ -1,7 +1,10 @@
+import os
 import hashlib
 from django.conf import settings
 
-from core.os.user import PosixUser
+from core.os.user import PosixUser, LockStatus
+from core.os.group import PosixGroup
+from core.os.user.exceptions import OperatingSystemUserNotFoundException
 
 from .posix_provider import PosixProvider
 
@@ -24,6 +27,10 @@ class UserProvider(PosixProvider):
         else:
             return user_login
 
+    @classmethod
+    def _get_home_directory(cls, login):
+        return os.path.join(settings.CORE_PROJECT_BASEDIR, login)
+
     def load_entity(self, user):
         """
         Loads the user from the POSIX record
@@ -31,7 +38,12 @@ class UserProvider(PosixProvider):
         :return: the PosixUser instance if the user exists or None otherwise
         """
         if self.is_provider_on():
-            raise NotImplementedError("load_entity")
+            login = self._get_posix_login(user.login)
+            try:
+                posix_user = PosixUser.find_by_login(login)
+                return posix_user
+            except OperatingSystemUserNotFoundException:
+                return None
 
     def create_entity(self, user):
         """
@@ -40,7 +52,7 @@ class UserProvider(PosixProvider):
         :return: nothing
         """
         if self.is_provider_on():
-            raise NotImplementedError("create_entity")
+            self._create_posix_user(user)
 
     def resolve_conflict(self, given_user, posix_user):
         """
@@ -48,14 +60,18 @@ class UserProvider(PosixProvider):
         exists in this entity source.
 
         The aim of this function is to resolve the underlying conflict and probably call the
-        'create_entity' function again
+        'create_entity' function again.
 
         :param given_user: the entity the user tries to save
         :param posix_user: the entity duplicate that has already been present on given entity source
         :return: nothing but must throw an exception when such entity can't be created
         """
         if self.is_provider_on():
-            raise NotImplementedError("resolve_conflict")
+            self._update_gecos_information(given_user, posix_user)
+            given_user._home_dir = posix_user.home_dir
+            given_user.notify_field_changed("home_dir")
+            given_user._unix_group = posix_user.login
+            given_user.notify_field_changed("unix_group")
 
     def update_entity(self, user):
         """
@@ -65,7 +81,16 @@ class UserProvider(PosixProvider):
         :return: nothing
         """
         if self.is_provider_on():
-            raise NotImplementedError("update_entity")
+            try:
+                if user.unix_group == "" or user.unix_group is None:
+                    login = self._get_posix_login(user.login)
+                else:
+                    login = user.unix_group
+                posix_user = PosixUser.find_by_login(login)
+                self._update_gecos_information(user, posix_user)
+                self._update_lock_status(user, posix_user)
+            except OperatingSystemUserNotFoundException:
+                self._create_posix_user(user)
 
     def delete_entity(self, user):
         """
@@ -75,7 +100,12 @@ class UserProvider(PosixProvider):
         :return: nothing
         """
         if self.is_provider_on():
-            raise NotImplementedError("delete_entity")
+            login = self._get_posix_login(user.login)
+            try:
+                posix_user = PosixUser.find_by_login(login)
+                posix_user.delete()
+            except OperatingSystemUserNotFoundException:
+                pass
 
     def wrap_entity(self, external_object):
         """
@@ -105,3 +135,32 @@ class UserProvider(PosixProvider):
         :return: True if the provider is enabled, False otherwise.
         """
         return not self.force_disable and settings.CORE_MANAGE_UNIX_USERS
+
+    def _create_posix_user(self, user):
+        login = self._get_posix_login(user.login)
+        home_directory = self._get_home_directory(login)
+        posix_user = PosixUser(login=login, name=user.name, surname=user.surname,
+            email=user.email, phone=user.phone, home_directory=home_directory)
+        posix_user.create()
+        user._home_dir = home_directory
+        user.notify_field_changed("home_dir")
+        user._unix_group = login
+        user.notify_field_changed("unix_group")
+
+    def _update_gecos_information(self, given_user, posix_user):
+        account_details_changed = False
+        for attr in ("name", "surname", "phone"):
+            desired_value = getattr(given_user, attr) or ""
+            actual_value = getattr(posix_user, attr) or ""
+            if actual_value != desired_value:
+                setattr(posix_user, attr, desired_value)
+                account_details_changed = True
+        if account_details_changed:
+            posix_user.update()
+
+    def _update_lock_status(self, given_user, posix_user):
+        is_password = len(repr(given_user.password_hash)) > 0
+        if is_password and given_user.is_locked and posix_user.is_locked() != LockStatus.LOCKED:
+            posix_user.lock()
+        if is_password and not given_user.is_locked and posix_user.is_locked() != LockStatus.PASSWORD_SET:
+            posix_user.unlock()

@@ -155,6 +155,8 @@ class CommandMaker:
     def flush_message_queue(self, executor):
         if hasattr(self.executor, "corefacility_log"):
             for message in self._message_queue:
+                if message['message'] == '' or message['message'] is None:
+                    message['message'] = "The command has been printed no new messages!"
                 executor.corefacility_log.add_record(message['level'], message['message'])
         self._message_queue = list()
 

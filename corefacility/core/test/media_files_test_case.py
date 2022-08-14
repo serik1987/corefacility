@@ -1,5 +1,7 @@
 from django.test import TestCase
 
+from core.entity.entity_providers.posix_providers.posix_provider import PosixProvider
+
 from .media_files_mixin import MediaFilesMixin
 
 
@@ -11,8 +13,13 @@ class MediaFilesTestCase(MediaFilesMixin, TestCase):
     Use super() if you want to override them in your derived class.
     """
 
+    posix_disabled = True
+    """ True if POSIX features are not going to be tested, False otherwise """
+
     @classmethod
     def setUpTestData(cls):
+        if cls.posix_disabled:
+            PosixProvider.force_disable = True
         super().setUpTestData()
         cls.create_media_root_backup()
 
@@ -24,3 +31,4 @@ class MediaFilesTestCase(MediaFilesMixin, TestCase):
     def tearDownClass(cls):
         cls.restore_media_root_backup()
         super().tearDownClass()
+        PosixProvider.force_disable = False
