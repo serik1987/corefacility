@@ -1,12 +1,15 @@
 from django.templatetags.static import static
 from django.db import transaction
 
+from core.transaction import CorefacilityTransaction
+
 from .arbitrary_access_level_entity import ArbitraryAccessLevelEntity
 from .entity_fields.field_managers.project_permission_manager import ProjectPermissionManager
 from .entity_sets.project_set import ProjectSet
 from .entity_fields import EntityField, EntityAliasField, PublicFileManager, ManagedEntityField, ReadOnlyField, \
     RelatedEntityField, ProjectApplicationManager
 from .entity_providers.model_providers.project_provider import ProjectProvider as ModelProvider
+from .entity_providers.posix_providers.project_provider import ProjectProvider as PosixProvider
 
 
 class Project(ArbitraryAccessLevelEntity):
@@ -17,7 +20,7 @@ class Project(ArbitraryAccessLevelEntity):
 
     _entity_set_class = ProjectSet
 
-    _entity_provider_list = [ModelProvider()]
+    _entity_provider_list = [PosixProvider(), ModelProvider()]
 
     _required_fields = ["alias", "name", "root_group"]
 
@@ -85,7 +88,6 @@ class Project(ArbitraryAccessLevelEntity):
     def __eq__(self, other):
         """
         Compares two projects (to be used for the debugging purpose)
-
         :param other: the other project to compare to
         :return: nothing
         """
@@ -102,3 +104,10 @@ class Project(ArbitraryAccessLevelEntity):
         if self.root_group != other.root_group:
             return False
         return True
+
+    def _get_transaction_mechanism(self):
+        """
+        Returns a transaction mechanism that will be used for the project CRUD operations
+        :return: always CorefacilityTransaction
+        """
+        return CorefacilityTransaction()
