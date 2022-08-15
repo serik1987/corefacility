@@ -3,7 +3,6 @@ import hashlib
 from django.conf import settings
 
 from core.os.user import PosixUser, LockStatus
-from core.os.group import PosixGroup
 from core.os.user.exceptions import OperatingSystemUserNotFoundException
 
 from .posix_provider import PosixProvider
@@ -18,7 +17,6 @@ class UserProvider(PosixProvider):
     def _get_posix_login(cls, user_login):
         """
         Transforms the user login to 32-symbol POSIX login
-
         :param user_login: the user's login
         :return: POSIX-compatible login
         """
@@ -76,7 +74,6 @@ class UserProvider(PosixProvider):
     def update_entity(self, user):
         """
         Sets information to the user
-
         :param user: the user to which the information shall be set
         :return: nothing
         """
@@ -95,7 +92,6 @@ class UserProvider(PosixProvider):
     def delete_entity(self, user):
         """
         Deletes the entity from the external entity source
-
         :param user: the entity to be deleted
         :return: nothing
         """
@@ -137,10 +133,15 @@ class UserProvider(PosixProvider):
         return not self.force_disable and settings.CORE_MANAGE_UNIX_USERS
 
     def _create_posix_user(self, user):
+        """
+        Immediately creates the POSIX user and stores it as operating system account
+        :param user: the user to be created
+        :return: nothing
+        """
         login = self._get_posix_login(user.login)
         home_directory = self._get_home_directory(login)
         posix_user = PosixUser(login=login, name=user.name, surname=user.surname,
-            email=user.email, phone=user.phone, home_directory=home_directory)
+                               email=user.email, phone=user.phone, home_directory=home_directory)
         posix_user.create()
         user._home_dir = home_directory
         user.notify_field_changed("home_dir")
@@ -148,6 +149,12 @@ class UserProvider(PosixProvider):
         user.notify_field_changed("unix_group")
 
     def _update_gecos_information(self, given_user, posix_user):
+        """
+        Updates the GECOS information. Does nothing if such information has already been updated
+        :param given_user: User entity that shall be used to update GECOS information
+        :param posix_user: the user's record within the operating system which GECOS information has to be updated
+        :return: nothing
+        """
         account_details_changed = False
         for attr in ("name", "surname", "phone"):
             desired_value = getattr(given_user, attr) or ""
@@ -159,6 +166,13 @@ class UserProvider(PosixProvider):
             posix_user.update()
 
     def _update_lock_status(self, given_user, posix_user):
+        """
+        Updates the user's lock status. This means that the method locks the POSIX user if the User entity is locked
+        and unlocks the POSIX user if the User entity is unlocked
+        :param given_user: the User entity
+        :param posix_user: the POSIX user that shall be locked or unlocked
+        :return: nothing
+        """
         is_password = len(repr(given_user.password_hash)) > 0
         if is_password and given_user.is_locked and posix_user.is_locked() != LockStatus.LOCKED:
             posix_user.lock()
