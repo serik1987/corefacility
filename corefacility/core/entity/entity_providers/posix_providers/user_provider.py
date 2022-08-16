@@ -2,8 +2,10 @@ import os
 import hashlib
 from django.conf import settings
 
+from core.os import CommandMaker
 from core.os.user import PosixUser, LockStatus
 from core.os.user.exceptions import OperatingSystemUserNotFoundException
+from core.os.group import PosixGroup
 
 from .posix_provider import PosixProvider
 
@@ -86,6 +88,7 @@ class UserProvider(PosixProvider):
                 posix_user = PosixUser.find_by_login(login)
                 self._update_gecos_information(user, posix_user)
                 self._update_lock_status(user, posix_user)
+                self._update_user_login(user, posix_user)
             except OperatingSystemUserNotFoundException:
                 self._create_posix_user(user)
 
@@ -147,6 +150,25 @@ class UserProvider(PosixProvider):
         user.notify_field_changed("home_dir")
         user._unix_group = login
         user.notify_field_changed("unix_group")
+
+    def _update_user_login(self, user, posix_user):
+        if "login" in user._edited_fields:
+            posix_login = self._get_posix_login(user.login)
+            old_home_dir = user._home_dir
+            new_home_dir = self._get_home_directory(posix_login)
+            posix_group = PosixGroup.find_by_gid(posix_user.gid)
+            maker = CommandMaker()
+            posix_user.login = posix_login
+            posix_user.home_dir = new_home_dir
+            posix_user.update()
+            user._unix_group = posix_login
+            user.notify_field_changed("unix_group")
+            posix_group.name = posix_login
+            posix_group.update()
+            if os.path.isdir(old_home_dir) and old_home_dir != new_home_dir:
+                maker.add_command(("mv", old_home_dir, new_home_dir))
+            user._home_dir = new_home_dir
+            user.notify_field_changed("home_dir")
 
     def _update_gecos_information(self, given_user, posix_user):
         """

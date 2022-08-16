@@ -1,6 +1,7 @@
+import zlib
 from django.conf import settings
 
-from core.os.group import PosixGroup
+from core.os.group import PosixGroup, OperatingSystemGroupNotFound
 
 from .posix_provider import PosixProvider
 from ...entity import Entity
@@ -11,6 +12,16 @@ class ProjectProvider(PosixProvider):
     Allows to create, modify or delete POSIX groups depending on what projects are created, modified or deleted.
     """
 
+    MAX_GROUP_NAME_LENGTH = 10
+
+    @staticmethod
+    def _get_posix_group_name(alias):
+        if len(alias) > ProjectProvider.MAX_GROUP_NAME_LENGTH:
+            return "p" + str(zlib.crc32(alias.encode("utf-8")))[:11]
+        else:
+            return alias
+
+
     def load_entity(self, project):
         """
         Loads the group from the operating system record
@@ -18,7 +29,11 @@ class ProjectProvider(PosixProvider):
         :return: a PosixGroup connecting to the project
         """
         if self.is_provider_on():
-            raise NotImplementedError("load_entity")
+            group_name = self._get_posix_group_name(project.alias)
+            try:
+                return PosixGroup.find_by_name(group_name)
+            except OperatingSystemGroupNotFound:
+                return None
 
     def create_entity(self, project):
         """
@@ -27,7 +42,7 @@ class ProjectProvider(PosixProvider):
         :return: nothing
         """
         if self.is_provider_on():
-            raise NotImplementedError("create_entity")
+            self._create_posix_group(project)
 
     def resolve_conflict(self, project, posix_group):
         """
@@ -37,7 +52,8 @@ class ProjectProvider(PosixProvider):
         :return: nothing
         """
         if self.is_provider_on():
-            raise NotImplementedError("resolve_conflict")
+            project._unix_group = posix_group.name
+            project.notify_field_changed("unix_group")
 
     def update_entity(self, project):
         """
@@ -46,7 +62,11 @@ class ProjectProvider(PosixProvider):
         :return: nothing
         """
         if self.is_provider_on():
-            raise NotImplementedError("update_entity")
+            try:
+                posix_group = self.unwrap_entity(project)
+                self._update_posix_group(project, posix_group)
+            except OperatingSystemGroupNotFound:
+                self._create_posix_group(project)
 
     def delete_entity(self, project):
         """
@@ -55,7 +75,8 @@ class ProjectProvider(PosixProvider):
         :return: nothing
         """
         if self.is_provider_on():
-            raise NotImplementedError("delete_entity")
+            posix_group = self.unwrap_entity(project)
+            posix_group.delete()
 
     def wrap_entity(self, external_object):
         """
@@ -71,7 +92,11 @@ class ProjectProvider(PosixProvider):
         :param project: a project which POSIX group shall be found
         :return: a given POSIX group
         """
-        raise NotImplementedError("unwrap_entity")
+        if project.unix_group == "" or project.unix_group is None:
+            group_alias = self._get_posix_group_name(project.alias)
+        else:
+            group_alias = project.unix_group
+        return PosixGroup.find_by_name(group_alias)
 
     def is_provider_on(self):
         """"
@@ -79,3 +104,19 @@ class ProjectProvider(PosixProvider):
         :return: True if the provider routines will be applied, False otherwise
         """
         return not self.force_disable and settings.CORE_MANAGE_UNIX_GROUPS
+
+    def _create_posix_group(self, project):
+        group_name = self._get_posix_group_name(project.alias)
+        posix_group = PosixGroup(name=group_name)
+        posix_group.create()
+        project._unix_group = group_name
+        project.notify_field_changed("unix_group")
+
+    def _update_posix_group(self, project, posix_group):
+        actual_group_name = posix_group.name
+        desired_group_name = self._get_posix_group_name(project.alias)
+        if actual_group_name != desired_group_name:
+            posix_group.name = desired_group_name
+            posix_group.update()
+            project._unix_group = desired_group_name
+            project.notify_field_changed("unix_group")

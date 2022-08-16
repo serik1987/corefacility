@@ -42,7 +42,7 @@ class ProjectDetailSerializer(ProjectListSerializer):
         except KeyError:
             raise ValidationError({"root_group_id": "This field is mandatory in POST requests"})
         self.calculate_root_group(data, root_group_id)
-        if data["root_group"].governor.id != self.context["request"].user.id:
+        if data["root_group"].governor.id != self.context["request"].user.id and not self.context["request"].user.is_superuser:
             raise ValidationError({"root_group": _("You don't have permission to assign this group as "
                                                    "the project root group")})
         return super().create(data)
