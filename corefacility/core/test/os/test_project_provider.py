@@ -84,7 +84,7 @@ class TestProjectProvider(APITestCase):
         PosixGroup.find_by_name(group_name)
         self._delete_project(project_data['id'])
         with self.assertRaises(OperatingSystemGroupNotFound,
-            msg="The POSIX group has not been deleted when the project has been deleted"):
+                               msg="The POSIX group has not been deleted when the project has been deleted"):
             PosixGroup.find_by_name(group_name)
 
     @parameterized.expand(input_data_provider())
@@ -102,6 +102,11 @@ class TestProjectProvider(APITestCase):
 
     @parameterized.expand(change_login_provider())
     def test_update_project(self, new_login):
+        """
+        Tests for the project update
+        :param new_login: login that must be changed
+        :return: nothing
+        """
         project_arguments = base_project_provider()
         project_arguments['root_group_id'] = self.group_id
         project_data = self._create_project(project_arguments)
@@ -112,6 +117,11 @@ class TestProjectProvider(APITestCase):
 
     @parameterized.expand(change_login_provider())
     def test_recreate_group(self, new_login):
+        """
+        Tests whether the project can be successfully updated when corresponding POSIX group has been suddenly deleted
+        :param new_login: login that must be changed
+        :return: nothing
+        """
         project_arguments = base_project_provider()
         project_arguments['root_group_id'] = self.group_id
         project_data = self._create_project(project_arguments)
@@ -124,12 +134,22 @@ class TestProjectProvider(APITestCase):
 
     @classmethod
     def login(cls, client):
+        """
+        Does authorization
+        :param client: the APIClient instance
+        :return: nothing
+        """
         login_result = client.post(cls.LOGIN_REQUEST_PATH)
         token = login_result.data['token']
         cls.auth_headers = {"HTTP_AUTHORIZATION": "Token " + token}
 
     @classmethod
     def create_users(cls, client):
+        """
+        Creates tested users
+        :param client: the APIClient instance
+        :return: nothing
+        """
         cls.user_logins = {}
         for user_info in cls.users_provider():
             result = client.post(cls.USER_LIST_PATH, user_info, format="json", **cls.auth_headers)
@@ -138,12 +158,22 @@ class TestProjectProvider(APITestCase):
 
     @classmethod
     def create_group(cls, client):
+        """
+        Creates the tested group
+        :param client: the APIClient instance
+        :return: nothing
+        """
         result = client.post(cls.GROUP_LIST_PATH, cls.group_provider(), format="json", **cls.auth_headers)
         assert result.status_code == status.HTTP_201_CREATED
         cls.group_id = result.data['id']
 
     @classmethod
     def delete_users(cls, client):
+        """
+        Deletes the tested users
+        :param client: the APIClient
+        :return: nothing
+        """
         for login, user_id in cls.user_logins.items():
             result = client.delete(cls.USER_DETAIL_PATH % user_id, **cls.auth_headers)
             assert result.status_code == status.HTTP_204_NO_CONTENT
@@ -151,6 +181,11 @@ class TestProjectProvider(APITestCase):
 
     @classmethod
     def delete_group(cls, client):
+        """
+        Deletes the tested group
+        :param client: the APIClient
+        :return: nothing
+        """
         result = client.delete(cls.GROUP_DETAIL_PATH % cls.group_id, **cls.auth_headers)
         assert result.status_code == status.HTTP_204_NO_CONTENT
 
@@ -178,6 +213,7 @@ class TestProjectProvider(APITestCase):
                 "surname": "Соловьёва",
             }
         ]
+
     @classmethod
     def group_provider(cls):
         return {
@@ -186,18 +222,34 @@ class TestProjectProvider(APITestCase):
         }
 
     def _create_project(self, project_data):
+        """
+        Creates the project
+        :param project_data: the input data for the request body
+        :return: the output data from the response body
+        """
         result = self.client.post(self.PROJECT_LIST_PATH, project_data, format="json", **self.auth_headers)
         self.assertEquals(result.status_code, status.HTTP_201_CREATED,
-            "Unexpected status code during the project create")
+                          "Unexpected status code during the project create")
         return result.data
 
     def _update_project(self, project_id, new_login):
+        """
+        Updates the project
+        :param project_id: the project ID
+        :param new_login: new login to be set
+        :return: the output data for the project
+        """
         result = self.client.patch(self.PROJECT_DETAIL_PATH % project_id, data={"alias": new_login},
-            format="json", **self.auth_headers)
+                                   format="json", **self.auth_headers)
         self.assertEquals(result.status_code, status.HTTP_200_OK, "Unexpected status code during the project update")
         return result.data
 
     def _delete_project(self, project_id):
+        """
+        Deletes the project
+        :param project_id: the project ID
+        :return: nothing
+        """
         result = self.client.delete(self.PROJECT_DETAIL_PATH % project_id, **self.auth_headers)
         self.assertEquals(result.status_code, status.HTTP_204_NO_CONTENT,
-            "Unexpected status code during the project delete")
+                          "Unexpected status code during the project delete")

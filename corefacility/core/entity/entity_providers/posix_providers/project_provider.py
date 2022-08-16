@@ -21,7 +21,6 @@ class ProjectProvider(PosixProvider):
         else:
             return alias
 
-
     def load_entity(self, project):
         """
         Loads the group from the operating system record
@@ -106,13 +105,25 @@ class ProjectProvider(PosixProvider):
         return not self.force_disable and settings.CORE_MANAGE_UNIX_GROUPS
 
     def _create_posix_group(self, project):
+        """
+        Creates the UNIX group based on a given project
+        :param project: a project which group must be created
+        :return: corresponding UNIX group
+        """
         group_name = self._get_posix_group_name(project.alias)
         posix_group = PosixGroup(name=group_name)
         posix_group.create()
         project._unix_group = group_name
         project.notify_field_changed("unix_group")
+        return posix_group
 
     def _update_posix_group(self, project, posix_group):
+        """
+        Changes the UNIX group name if this is necessary
+        :param project: a corresponding project entity
+        :param posix_group: POSIX group which name must be changed
+        :return: nothing
+        """
         actual_group_name = posix_group.name
         desired_group_name = self._get_posix_group_name(project.alias)
         if actual_group_name != desired_group_name:
