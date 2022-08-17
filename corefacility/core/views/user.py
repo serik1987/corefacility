@@ -6,8 +6,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 
 from core import App
-from core.os import CommandMaker
-from core.os.user import PosixUser
+from core.os.user import PosixUser, OperatingSystemUserNotFoundException
 from core.transaction import CorefacilityTransaction
 from ..entity.user import UserSet
 from ..entity.entity_providers.posix_providers.user_provider import UserProvider as PosixProvider

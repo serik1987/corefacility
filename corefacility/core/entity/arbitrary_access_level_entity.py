@@ -34,7 +34,7 @@ class ArbitraryAccessLevelEntity(Entity):
             for access_level in access_level_list:
                 weight = hierarchy[access_level]
                 if weight == current_weight:
-                    raise ValueError("all weight shall have clearly different weights!")
+                    raise ValueError("all access levels shall have clearly different weights!")
                 if weight > current_weight:
                     current_weight = weight
                     current_access_level = access_level
