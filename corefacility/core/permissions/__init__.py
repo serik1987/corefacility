@@ -74,7 +74,7 @@ class ProjectPermission(IsAuthenticated):
 
     def has_object_permission(self, request, view, project):
         """
-        Defines whether the client has an access to a particular project
+        Defines whether the client has access to a particular project
 
         :param request: the HTTP request sent by a particular client
         :param view: an instance of the ProjectViewSet

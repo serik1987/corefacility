@@ -39,21 +39,28 @@ class TestPermissionProvider(APITestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        EntityViewMixin.throttle_classes = []
-        PermissionViewSet.throttle_classes = []
-        client = APIClient()
-        cls.load_access_levels()
-        cls.login(client)
-        cls.create_users(client)
-        cls.create_groups(client)
-        cls.create_projects(client)
+        if cls.is_tests_applicable():
+            EntityViewMixin.throttle_classes = []
+            PermissionViewSet.throttle_classes = []
+            client = APIClient()
+            cls.load_access_levels()
+            cls.login(client)
+            cls.create_users(client)
+            cls.create_groups(client)
+            cls.create_projects(client)
+
+    def setUp(self):
+        super().setUp()
+        if not self.is_tests_applicable():
+            self.skipTest("The tests can't be run under a given configuration")
 
     @classmethod
     def tearDownClass(cls):
-        client = APIClient()
-        cls.delete_projects(client)
-        cls.delete_groups(client)
-        cls.delete_users(client)
+        if cls.is_tests_applicable():
+            client = APIClient()
+            cls.delete_projects(client)
+            cls.delete_groups(client)
+            cls.delete_users(client)
         super().tearDownClass()
 
     def test_base(self):

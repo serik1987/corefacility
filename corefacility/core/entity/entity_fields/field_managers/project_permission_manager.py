@@ -2,7 +2,6 @@ from core.models.enums import LevelType
 
 from .permission_manager import PermissionManager
 from ...entity_exceptions import EntityOperationNotPermitted
-from ...entity_readers.model_emulators import ModelEmulator
 from ...group import Group
 
 
