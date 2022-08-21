@@ -1,4 +1,5 @@
 from core.models.enums import LevelType
+from core.transaction import CorefacilityTransaction
 
 from .permission_manager import PermissionManager
 from ...entity_exceptions import EntityOperationNotPermitted
@@ -23,6 +24,7 @@ class ProjectPermissionManager(PermissionManager):
     """ Accepted access level type """
 
     _full_access = None
+    _permission_provider = None
 
     @property
     def full_access(self):
@@ -30,6 +32,13 @@ class ProjectPermissionManager(PermissionManager):
             from core.entity.entity_sets.access_level_set import AccessLevelSet
             self._full_access = AccessLevelSet.project_level("full")
         return self._full_access
+
+    @property
+    def permission_provider(self):
+        if self._permission_provider is None:
+            from core.entity.entity_providers.posix_providers.permission_provider import PermissionProvider
+            self._permission_provider = PermissionProvider()
+        return self._permission_provider
 
     def __iter__(self):
         """
@@ -51,7 +60,10 @@ class ProjectPermissionManager(PermissionManager):
         if self.is_root_group(group):
             raise EntityOperationNotPermitted()
         else:
-            super().set(group, access_level)
+            with CorefacilityTransaction():
+                super().set(group, access_level)
+                if access_level.alias != "no_access":
+                    self.permission_provider.insert_group(self.entity, group)
 
     def get(self, group):
         """
@@ -79,7 +91,9 @@ class ProjectPermissionManager(PermissionManager):
         if self.is_root_group(group):
             raise EntityOperationNotPermitted()
         else:
-            super().delete(group)
+            with CorefacilityTransaction():
+                super().delete(group)
+                self.permission_provider.remove_group(self.entity, group)
 
     def is_root_group(self, group):
         """

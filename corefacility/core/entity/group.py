@@ -4,6 +4,7 @@ from .entity import Entity
 from .entity_sets.group_set import GroupSet
 from .entity_fields import EntityField, RelatedEntityField, ManagedEntityField
 from core.entity.entity_fields.field_managers.user_manager import UserManager
+from core.transaction import CorefacilityTransaction
 from .entity_providers.model_providers.group_provider import GroupProvider as ModelProvider
 
 
@@ -36,7 +37,7 @@ class Group(Entity):
         :return:
         """
         from core.entity.project import ProjectSet
-        with transaction.atomic():
+        with self._get_transaction_mechanism():
             project_set = ProjectSet()
             project_set.root_group = self
             for project in project_set:

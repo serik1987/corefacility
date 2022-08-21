@@ -1,12 +1,58 @@
 from django.conf import settings
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
+from parameterized import parameterized
 
 from core.models.enums import LevelType
 from core.entity.access_level import AccessLevelSet
+from core.entity.entity_providers.posix_providers.permission_provider import PermissionProvider
+from core.entity.user import UserSet
+from core.entity.project import ProjectSet
 from core.generic_views import EntityViewMixin
 from core.views.permission_viewset import PermissionViewSet
 from core.os.user import PosixUser
+from core.os.group import PosixGroup
+
+
+def posix_groups_provider():
+    return [
+        ("support", set()),
+        ("ekaterina_mironova", {"hhna", "cnl", "mnl", "mn"}),
+        ("polina_zolotova", {"hhna", "cnl", "mnl", "mn"}),
+        ("maria_orekhova", {"hhna", "cnl", "mnl", "mn"}),
+        ("ilja_pavlov", {"cnl", "mnl", "mn", "nsw", "n"}),
+        ("leon_tsvetkov", {"cnl", "mnl", "mn", "nsw", "n"}),
+        ("daria_solovieva", {"hhna", "cnl", "mnl", "mn", "nsw", "n", "nl", "gcn"}),
+        ("artem_komarov", {"mnl", "nsw", "n", "nl", "gcn", "aphhna", "cr"}),
+        ("ilja_dmitriev", {"nsw", "n", "nl", "gcn", "aphhna", "cr"}),
+        ("anastasia_spiridonova", {"nsw", "n", "nl", "gcn", "aphhna", "cr"}),
+        ("alexander_sytchov", {"nl", "gcn", "aphhna", "cr"})
+    ]
+
+def group_users_provider():
+    return [
+        ("hhna", {"ekaterina_mironova", "polina_zolotova", "maria_orekhova", "daria_solovieva"}),
+        ("cnl", {"ekaterina_mironova", "polina_zolotova", "maria_orekhova", "ilja_pavlov", "leon_tsvetkov", "daria_solovieva"}),
+        ("mnl", {"ekaterina_mironova", "polina_zolotova", "maria_orekhova", "ilja_pavlov", "leon_tsvetkov", "daria_solovieva", "artem_komarov"}),
+        ("mn", {"ekaterina_mironova", "polina_zolotova", "maria_orekhova", "ilja_pavlov", "leon_tsvetkov", "daria_solovieva"}),
+        ("nsw", {"ilja_pavlov", "leon_tsvetkov", "daria_solovieva", "artem_komarov", "ilja_dmitriev", "anastasia_spiridonova"}),
+        ("n", {"ilja_pavlov", "leon_tsvetkov", "daria_solovieva", "artem_komarov", "ilja_dmitriev", "anastasia_spiridonova"}),
+        ("nl", {"daria_solovieva", "artem_komarov", "ilja_dmitriev", "anastasia_spiridonova", "alexander_sytchov"}),
+        ("gcn", {"daria_solovieva", "artem_komarov", "ilja_dmitriev", "anastasia_spiridonova", "alexander_sytchov"}),
+        ("aphhna", {"artem_komarov", "ilja_dmitriev", "anastasia_spiridonova", "alexander_sytchov"}),
+        ("cr", {"artem_komarov", "ilja_dmitriev", "anastasia_spiridonova", "alexander_sytchov"}),
+    ]
+
+def project_users_provider():
+    return {project_name: project_users for project_name, project_users in group_users_provider()}
+
+def group_exclude_provider():
+    return [
+        ("artem_komarov", 2, {"nsw", "n", "nl", "gcn", "aphhna", "cr"}),
+        ("artem_komarov", 3, {"mnl", "nsw", "n", "nl", "gcn", "aphhna", "cr"}),
+        ("artem_komarov", 4, {"mnl", "nsw", "n", "nl", "gcn"})
+    ]
+
 
 
 class TestPermissionProvider(APITestCase):
@@ -21,9 +67,11 @@ class TestPermissionProvider(APITestCase):
     GROUP_LIST_PATH = "/api/{version}/groups/".format(version=API_VERSION)
     GROUP_DETAIL_PATH = "/api/{version}/groups/%d/".format(version=API_VERSION)
     USER_ADD_PATH = "/api/{version}/groups/%d/users/".format(version=API_VERSION)
+    USER_REMOVE_PATH = "/api/{version}/groups/%d/users/%s/".format(version=API_VERSION)
     PROJECT_LIST_PATH = "/api/{version}/projects/".format(version=API_VERSION)
     PROJECT_DETAIL_PATH = "/api/{version}/projects/%d/".format(version=API_VERSION)
     PROJECT_PERMISSION_LIST_PATH = "/api/{version}/projects/%d/permissions/".format(version=API_VERSION)
+    PROJECT_PERMISSION_DETAIL_PATH = "/api/{version}/projects/%d/permissions/%d/".format(version=API_VERSION)
 
     access_levels = None
     auth_headers = None
@@ -85,16 +133,155 @@ class TestPermissionProvider(APITestCase):
                 self.assertIsNotNone(level_alias, "The project permission was not presented in the list")
                 self.assertEquals(level_alias, access_level_alias, "Unexpected access level alias")
 
+    @parameterized.expand(posix_groups_provider())
+    def test_calculate_posix_groups(self, user_login, group_login_set):
+        """
+        Tests whether PermissionProvider can calculate all projects for the user
+        """
+        user = UserSet().get(user_login)
+        group_set = PermissionProvider().calculate_posix_groups(user)
+        self.assertEquals(group_set, group_login_set, "Unexpected group list")
+
+    @parameterized.expand(group_users_provider())
+    def test_iterate_over_project_users(self, project_alias, group_users):
+        """
+        Tests whether PermissionProvider can calculate all users related to the project
+        """
+        project = ProjectSet().get(project_alias)
+        actual_group_users = set()
+        for user in PermissionProvider().iterate_project_users(project):
+            actual_group_users.add(user.login)
+        self.assertEquals(actual_group_users, group_users, "Related users were inccorrectly correlated")
+
     def test_operating_system_level_permissions(self):
         """
         Tests whether permissions were set at the operating system level
         """
+        desired_groups = project_users_provider()
         all_users_found = set()
         for user in PosixUser.iterate():
             if user.login in self.user_logins.keys():
                 all_users_found.add(user.login)
         self.assertEquals(len(all_users_found), len(self.user_logins),
                           "Some tested users were not saved at the level of the operating system")
+        all_groups_found = set()
+        for group in PosixGroup.iterate():
+            if group.name in desired_groups.keys():
+                self.assertEquals(set(group.user_list), set(desired_groups[group.name]),
+                    "The user list is not correct for a group " + group.name)
+                all_groups_found.add(group.name)
+        self.assertEquals(len(all_groups_found), len(desired_groups.keys()),
+            "Some tested projects are not saved at the level of the operating system")
+
+    def test_delete_user(self):
+        """
+        Testing automatic assignment delete when the user is deleted
+        """
+        detail_path = self.USER_DETAIL_PATH % UserSet().get("ekaterina_mironova").id
+        result = self.client.delete(detail_path, **self.auth_headers)
+        self.assertEquals(result.status_code, status.HTTP_204_NO_CONTENT)
+        desired_groups = project_users_provider()
+        all_groups = set()
+        for group in PosixGroup.iterate():
+            if group.name in desired_groups.keys():
+                actual_users = set(group.user_list)
+                desired_users = desired_groups[group.name]
+                self.assertEquals(actual_users, desired_users - {'ekaterina_mironova'},
+                    "The POSIX user did not excluded from all its groups before delete")
+        user_create_result = self.client.post(self.USER_LIST_PATH, {
+            "login": "ekaterina_mironova",
+            "name": "Екатерина",
+            "surname": "Миронова",
+        }, format="json", **self.auth_headers)
+        self.assertEquals(user_create_result.status_code, status.HTTP_201_CREATED, "Unable to create ekaterina_mironova")
+        user_id = user_create_result.data['id']
+        for group_id in self.group_list[:2]:
+            user_add_path = self.USER_ADD_PATH % group_id
+            user_add_result = self.client.post(user_add_path, {"user_id": user_id}, format="json",
+                **self.auth_headers)
+            self.assertEquals(user_add_result.status_code, status.HTTP_200_OK)
+
+    @parameterized.expand(group_exclude_provider())
+    def test_group_exclude(self, user_login, group_index, desired_posix_groups):
+        """
+        Testing whether POSIX groups can be updated upon exclusion
+        """
+        user_id = UserSet().get(user_login).id
+        group_id = self.group_list[group_index]
+        group_remove_path = self.USER_REMOVE_PATH % (group_id, user_id)
+        group_remove_result = self.client.delete(group_remove_path, **self.auth_headers)
+        self.assertEquals(group_remove_result.status_code, status.HTTP_204_NO_CONTENT, "Unable to remove user from group")
+        actual_posix_groups = set()
+        for group in PosixGroup.iterate():
+            if group.user_list is not None and user_login in group.user_list:
+                actual_posix_groups.add(group.name)
+        self.assertEquals(actual_posix_groups, desired_posix_groups,
+            "POSIX groups were incorrectly updated during the group list update")
+        group_add_path = self.USER_ADD_PATH % group_id
+        group_add_result = self.client.post(group_add_path, {"user_id": user_id}, format="json",
+            **self.auth_headers)
+        self.assertEquals(group_add_result.status_code, status.HTTP_200_OK, "Unable to add user to group")
+
+    def test_project_delete(self):
+        """
+        Tests whether POSIX groups are properly updated upon the project delete
+        """
+        project_delete_path = self.PROJECT_DETAIL_PATH % ProjectSet().get("mn").id
+        project_delete_result = self.client.delete(project_delete_path, **self.auth_headers)
+        self.assertEquals(project_delete_result.status_code, status.HTTP_204_NO_CONTENT,
+            "Unable to delete the project - incorrect response status code")
+        desired_user_lists = project_users_provider()
+        actual_group_list = set()
+        desired_group_list = set(desired_user_lists.keys()) - {"mn"}
+        for posix_group in PosixGroup.iterate():
+            if posix_group.name in desired_user_lists.keys():
+                actual_user_list = set(posix_group.user_list)
+                desired_user_list = set(desired_user_lists[posix_group.name])
+                self.assertEquals(actual_user_list, desired_user_list,
+                    "Unexpected user list for group " + posix_group.name)
+                actual_group_list.add(posix_group.name)
+        self.assertEquals(actual_group_list, desired_group_list, "POSIX group lists are not the same")
+        project_create_result = self.client.post(self.PROJECT_LIST_PATH, {
+            "alias": "mn",
+            "name": "Молекулярная нейробиология",
+            "root_group_id": self.group_list[1]
+        }, format="json", **self.auth_headers)
+        self.assertEquals(project_create_result.status_code, status.HTTP_201_CREATED,
+            "Unable to create the project - incorrect response status code")
+        project_id = project_create_result.data['id']
+        desired_project_permissions = {
+            self.group_list[0]: self.access_levels["data_add"],
+            self.group_list[2]: self.access_levels["no_access"],
+        }
+        for group_id, access_level_id in desired_project_permissions.items():
+            permission_list_path = self.PROJECT_PERMISSION_LIST_PATH % project_id
+            permission_set_result = self.client.post(permission_list_path,
+                {"group_id": group_id, "access_level_id": access_level_id},
+                format="json", **self.auth_headers)
+            self.assertEquals(permission_set_result.status_code, status.HTTP_200_OK,
+                "Unable to add project permission - incorrect response status code")
+
+    def test_permission_delete(self):
+        """
+        Tests when the user can be detached from the POSIX group when certain permission has been withdrawn
+        """
+        project_id = self.project_aliases['nsw']
+        group_id = self.group_list[3]
+        permission_delete_path = self.PROJECT_PERMISSION_DETAIL_PATH % (project_id, group_id)
+        permission_delete_result = self.client.delete(permission_delete_path, **self.auth_headers)
+        self.assertEquals(permission_delete_result.status_code, status.HTTP_204_NO_CONTENT,
+            "Unable to delete permission - incorrect response status code")
+        posix_group = PosixGroup.find_by_name("nsw")
+        desired_users = {"ilja_pavlov", "leon_tsvetkov", "daria_solovieva", "artem_komarov"}
+        actual_users = set(posix_group.user_list)
+        self.assertEquals(actual_users, desired_users,
+            "The POSIX group was not properly detached from the users")
+        permission_add_path = self.PROJECT_PERMISSION_LIST_PATH % project_id
+        permission_add_data = {"group_id":group_id, "access_level_id": self.access_levels["data_add"]}
+        permission_add_result = self.client.post(permission_add_path, permission_add_data, format="json",
+            **self.auth_headers)
+        self.assertEquals(permission_add_result.status_code, status.HTTP_200_OK,
+            "Unable to add permission - incorrect response status code")
 
     @classmethod
     def load_access_levels(cls):

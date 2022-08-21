@@ -90,7 +90,11 @@ class GroupViewSet(EntityViewSet):
         :return:
         """
         group = self.get_object()
-        user = self.get_entity_or_404(UserSet(), kwargs['user_lookup'])
+        try:
+            user_lookup = int(kwargs['user_lookup'])
+        except ValueError:
+            user_lookup = kwargs['user_lookup']
+        user = self.get_entity_or_404(UserSet(), user_lookup)
         try:
             group.users.remove(user)
         except EntityOperationNotPermitted:

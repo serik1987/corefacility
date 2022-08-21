@@ -1,7 +1,10 @@
+from django.conf import settings
+
 from core.entity.entity_fields.field_managers.entity_value_manager import EntityValueManager
 from core.entity.entity_exceptions import EntityOperationNotPermitted
 from core.entity.entity_sets.user_set import UserSet
 from core.models import GroupUser
+from core.transaction import CorefacilityTransaction
 
 
 class UserManager(EntityValueManager):
@@ -12,6 +15,15 @@ class UserManager(EntityValueManager):
     Use UserSet for reading facilities
     """
 
+    _permission_provider = None
+
+    @property
+    def permission_provider(self):
+        if self._permission_provider is None:
+            from core.entity.entity_providers.posix_providers.permission_provider import PermissionProvider
+            self._permission_provider = PermissionProvider()
+        return self._permission_provider
+
     def add(self, user):
         """
         Adds the user to the group given that the main group source is database
@@ -21,8 +33,10 @@ class UserManager(EntityValueManager):
         """
         self._check_system_permissions(user)
         if not self.exists(user):
-            group_user = GroupUser(is_governor=False, group_id=self.entity.id, user_id=user.id)
-            group_user.save()
+            with CorefacilityTransaction():
+                group_user = GroupUser(is_governor=False, group_id=self.entity.id, user_id=user.id)
+                group_user.save()
+                self.permission_provider.update_group_list(user)
 
     def remove(self, user):
         """
@@ -34,10 +48,12 @@ class UserManager(EntityValueManager):
         self._check_system_permissions(user)
         if user.id == self.entity.governor.id:
             raise EntityOperationNotPermitted()
-        try:
-            GroupUser.objects.get(group_id=self.entity.id, user_id=user.id).delete()
-        except GroupUser.DoesNotExist:
-            pass
+        with CorefacilityTransaction():
+            try:
+                GroupUser.objects.get(group_id=self.entity.id, user_id=user.id).delete()
+                self.permission_provider.update_group_list(user)
+            except GroupUser.DoesNotExist:
+                pass
 
     def exists(self, user):
         """

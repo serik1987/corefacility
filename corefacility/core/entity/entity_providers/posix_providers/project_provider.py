@@ -1,10 +1,10 @@
 import zlib
 from django.conf import settings
 
+from core.os.user import PosixUser
 from core.os.group import PosixGroup, OperatingSystemGroupNotFound
 
 from .posix_provider import PosixProvider
-from ...entity import Entity
 
 
 class ProjectProvider(PosixProvider):
@@ -14,12 +14,21 @@ class ProjectProvider(PosixProvider):
 
     MAX_GROUP_NAME_LENGTH = 10
 
+    _permission_provider = None
+
     @staticmethod
     def _get_posix_group_name(alias):
         if len(alias) > ProjectProvider.MAX_GROUP_NAME_LENGTH:
             return "p" + str(zlib.crc32(alias.encode("utf-8")))[:11]
         else:
             return alias
+
+    @property
+    def permission_provider(self):
+        if self._permission_provider is None:
+            from .permission_provider import PermissionProvider
+            self._permission_provider = PermissionProvider()
+        return self._permission_provider
 
     def load_entity(self, project):
         """
@@ -41,7 +50,8 @@ class ProjectProvider(PosixProvider):
         :return: nothing
         """
         if self.is_provider_on():
-            self._create_posix_group(project)
+            posix_group = self._create_posix_group(project)
+            self.permission_provider.register_root_group(project, posix_group)
 
     def resolve_conflict(self, project, posix_group):
         """
@@ -53,6 +63,7 @@ class ProjectProvider(PosixProvider):
         if self.is_provider_on():
             project._unix_group = posix_group.name
             project.notify_field_changed("unix_group")
+            self.permission_provider.register_root_group(project, posix_group)
 
     def update_entity(self, project):
         """
@@ -74,8 +85,11 @@ class ProjectProvider(PosixProvider):
         :return: nothing
         """
         if self.is_provider_on():
-            posix_group = self.unwrap_entity(project)
-            posix_group.delete()
+            try:
+                posix_group = self.unwrap_entity(project)
+                posix_group.delete()
+            except OperatingSystemGroupNotFound:
+                pass
 
     def wrap_entity(self, external_object):
         """
