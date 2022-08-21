@@ -6,13 +6,27 @@ from core.os.group import PosixGroup
 
 from .posix_provider import PosixProvider
 
+
 class PermissionProvider(PosixProvider):
+	"""
+	Adds POSIX users to the group or removes POSIX users from the group connected with some permission changes
+	"""
 
 	def is_provider_on(self):
+		"""
+		True if the provider routines shall be applied, False otherwise
+		:return:
+		"""
 		return not self.force_disable and settings.CORE_MANAGE_UNIX_USERS and \
 			settings.CORE_MANAGE_UNIX_GROUPS
 
-	def calculate_posix_groups(self, user):
+	@staticmethod
+	def calculate_posix_groups(user):
+		"""
+		Calculate names of all POSIX groups where the user shall be present in
+		:param user: the user that shall be present in certain POSIX groups
+		:return: a set containing these POSIX groups
+		"""
 		project_set = ProjectSet()
 		project_set.user = user
 		project_groups = [
@@ -21,13 +35,25 @@ class PermissionProvider(PosixProvider):
 		]
 		return set(project_groups)
 
-	def iterate_project_users(self, project):
+	@staticmethod
+	def iterate_project_users(project):
+		"""
+		Iterates over all users that have access to a particular project
+		:param project: the project to iterate over
+		:return: generator. Use the function result in the for loop to reveal the list of users
+		"""
 		for group, access_level in project.permissions:
 			if access_level.alias != "no_access":
 				for user in group.users:
 					yield user
 
 	def register_root_group(self, project, posix_group=None):
+		"""
+		Adds all users from the root group to the project
+		:param project: the project which users shall be registered
+		:param posix_group: POSIX group related to the project or None if you want to calculate the group automatically
+		:return: nothing
+		"""
 		if not self.is_provider_on():
 			return
 		if posix_group is None:
@@ -45,6 +71,12 @@ class PermissionProvider(PosixProvider):
 				posix_user.set_groups([project.unix_group], True)
 
 	def insert_group(self, project, group):
+		"""
+		Provides all POSIX-level operations related to adding some project permission
+		:param project: project which permission is intended to be added (an entity)
+		:param group: scientific group related to such permission (an entity)
+		:return: nothing
+		"""
 		if project.unix_group is None or project.unix_group == "" or \
 			not self.is_provider_on():
 			return
@@ -57,6 +89,12 @@ class PermissionProvider(PosixProvider):
 					posix_user.set_groups([project.unix_group], True)
 
 	def remove_group(self, project, group):
+		"""
+		Provides all POSIX-level operations related to removing some project permissions
+		:param project: project which permission is intended to be added (an entity)
+		:param group: scientific group related to such permission (an entity)
+		:return: nothing
+		"""
 		if project.unix_group is None or project.unix_group == "" or \
 			not self.is_provider_on():
 			return
@@ -71,6 +109,11 @@ class PermissionProvider(PosixProvider):
 						posix_user.set_groups(desired_posix_groups, False)
 
 	def update_group_list(self, user):
+		"""
+		Updates a group list for a particular user
+		:param user: a user which group list must be updated
+		:return: nothing
+		"""
 		if user.unix_group is None or user.unix_group == "" or not self.is_provider_on():
 			return
 		posix_user = PosixUser.find_by_login(user.unix_group)
