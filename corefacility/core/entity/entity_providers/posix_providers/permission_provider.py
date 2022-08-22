@@ -101,12 +101,11 @@ class PermissionProvider(PosixProvider):
 		posix_group = PosixGroup.find_by_name(project.unix_group)
 		group_users = posix_group.user_list or list()
 		for user in group.users:
-			if user.unix_group != "" and user.unix_group is not None:
-				if user.unix_group in group_users:
-					desired_posix_groups = self.calculate_posix_groups(user)
-					if posix_group.name not in desired_posix_groups:
-						posix_user = PosixUser.find_by_login(user.unix_group)
-						posix_user.set_groups(desired_posix_groups, False)
+			if user.unix_group != "" and user.unix_group is not None and user.unix_group in group_users:
+				desired_posix_groups = self.calculate_posix_groups(user)
+				if posix_group.name not in desired_posix_groups:
+					posix_user = PosixUser.find_by_login(user.unix_group)
+					posix_user.set_groups(desired_posix_groups, False)
 
 	def update_group_list(self, user):
 		"""
