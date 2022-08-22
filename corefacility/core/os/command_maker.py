@@ -146,7 +146,7 @@ class CommandMaker:
             if settings.CORE_UNIX_ADMINISTRATION:
                 for command in execution_queue:
                     self._execute(executor, *command["args"], **command["kwargs"])
-            if settings.CORE_SUGGEST_ADMINISTRATION:
+            if settings.CORE_SUGGEST_ADMINISTRATION and len(execution_queue) > 0:
                 raise OsConfigurationSuggestion(execution_queue)
         self._execution_queue[id(executor)] = list()
         if flush_message_queue:

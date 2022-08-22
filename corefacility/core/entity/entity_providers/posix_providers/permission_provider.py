@@ -61,6 +61,8 @@ class PermissionProvider(PosixProvider):
 		actual_users = posix_group.user_list
 		if actual_users is None:
 			actual_users = set()
+		else:
+			actual_users = set(actual_users)
 		desired_users = {
 			user.unix_group for user in project.root_group.users
 			if user.unix_group is not None and user.unix_group != ""

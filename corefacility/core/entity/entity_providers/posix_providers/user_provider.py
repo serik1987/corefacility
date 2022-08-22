@@ -85,7 +85,10 @@ class UserProvider(PosixProvider):
                     login = self._get_posix_login(user.login)
                 else:
                     login = user.unix_group
-                posix_user = PosixUser.find_by_login(login)
+                try:
+                    posix_user = PosixUser.find_by_login(login)
+                except:
+                    posix_user = PosixUser.find_by_login(self._get_posix_login(user.login))
                 self._update_gecos_information(user, posix_user)
                 self._update_lock_status(user, posix_user)
                 self._update_user_login(user, posix_user)
@@ -158,13 +161,15 @@ class UserProvider(PosixProvider):
             new_home_dir = self._get_home_directory(posix_login)
             posix_group = PosixGroup.find_by_gid(posix_user.gid)
             maker = CommandMaker()
-            posix_user.login = posix_login
-            posix_user.home_dir = new_home_dir
-            posix_user.update()
+            if posix_user.login != posix_login or posix_user.home_dir != new_home_dir:
+                posix_user.login = posix_login
+                posix_user.home_dir = new_home_dir
+                posix_user.update()
             user._unix_group = posix_login
             user.notify_field_changed("unix_group")
-            posix_group.name = posix_login
-            posix_group.update()
+            if posix_group.name != posix_login:
+                posix_group.name = posix_login
+                posix_group.update()
             if os.path.isdir(old_home_dir) and old_home_dir != new_home_dir:
                 maker.add_command(("mv", old_home_dir, new_home_dir))
             user._home_dir = new_home_dir

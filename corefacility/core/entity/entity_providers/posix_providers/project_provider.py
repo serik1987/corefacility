@@ -109,7 +109,10 @@ class ProjectProvider(PosixProvider):
             group_alias = self._get_posix_group_name(project.alias)
         else:
             group_alias = project.unix_group
-        return PosixGroup.find_by_name(group_alias)
+        try:
+            return PosixGroup.find_by_name(group_alias)
+        except OperatingSystemGroupNotFound:
+            return PosixGroup.find_by_name(self._get_posix_group_name(project.alias))
 
     def is_provider_on(self):
         """"

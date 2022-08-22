@@ -3,6 +3,9 @@ from django.conf import settings
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
+from core.entity.user import UserSet
+from core.entity.group import GroupSet
+from core.entity.project import ProjectSet
 from core.generic_views import EntityViewMixin
 from core.views.permission_viewset import PermissionViewSet
 
@@ -68,14 +71,21 @@ class TestAllProvidersPartial(APITestCase):
         :param surname: user's surname
         :return: nothing
         """
+        posix_result = subprocess.run(("useradd",
+            "-c", "%s %s,,," % (name, surname),
+            "-d", "/home/%s" % login,
+            "-U", "-s", "/bin/bash",
+            login))
         user_data = {"login": login, "name": name, "surname": surname}
         result = client.post(cls.USER_LIST_PATH, user_data, format="json", **cls.auth_headers)
+        if result.status_code != status.HTTP_201_CREATED:
+            print(result.status_code, result.data)
         assert result.status_code == status.HTTP_201_CREATED
         user_id = result.data['id']
         cls.user_ids[login] = user_id
 
     @classmethod
-    def change_user_surname(cls, api_client, login, new_surname):
+    def change_user_surname(cls, api_client, login, new_surname, command_clue=None):
         """
         Changes surname for a single user
         :param api_client: the API client that will be used for the user's surname change
@@ -83,10 +93,14 @@ class TestAllProvidersPartial(APITestCase):
         :param new_surname: new surname of the user
         :return: nothing
         """
+        if command_clue is not None:
+            subprocess.run(command_clue)
         user_id = cls.user_ids[login]
         change_surname_path = cls.USER_DETAIL_PATH % user_id
         change_surname_data = {"surname": new_surname}
         result = api_client.patch(change_surname_path, change_surname_data, format="json", **cls.auth_headers)
+        if result.status_code != status.HTTP_200_OK:
+            print(result, result.data)
         assert result.status_code == status.HTTP_200_OK
 
     @classmethod
@@ -98,10 +112,14 @@ class TestAllProvidersPartial(APITestCase):
         :param new_login: new user login
         :return: nothing
         """
+        subprocess.run(("usermod", "-m", "-d" "/home/" + new_login, "-l", new_login, login))
+        subprocess.run(("groupmod", "-n", new_login, login))
         user_id = cls.user_ids[login]
         change_login_path = cls.USER_DETAIL_PATH % user_id
         change_login_data = {"login": new_login}
         change_login_result = api_client.patch(change_login_path, change_login_data, format="json", **cls.auth_headers)
+        if change_login_result.status_code != status.HTTP_200_OK:
+            print(change_login_result, change_login_result.data)
         assert change_login_result.status_code == status.HTTP_200_OK
         del cls.user_ids[login]
         cls.user_ids[change_login_result.data['login']] = change_login_result.data['id']
@@ -114,8 +132,12 @@ class TestAllProvidersPartial(APITestCase):
         :param login: the user ID
         :return: nothing
         """
+        subprocess.run(("userdel", "-rf", login), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        subprocess.run(("sh", "-c", "groupdel %s || echo" % login), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         delete_path = cls.USER_DETAIL_PATH % cls.user_ids[login]
         result = api_client.delete(delete_path, **cls.auth_headers)
+        if result.status_code != status.HTTP_204_NO_CONTENT:
+            print(result, result.data)
         assert result.status_code == status.HTTP_204_NO_CONTENT
         del cls.user_ids[login]
 
@@ -134,7 +156,7 @@ class TestAllProvidersPartial(APITestCase):
         cls.group_ids.append(group_id)
 
     @classmethod
-    def attach_user(cls, api_client, group_index, user_login):
+    def attach_user(cls, api_client, group_index, user_login, command_queue=None):
         """
         Adds the user to the group
         :param api_client: the API client that shall be used to create the group
@@ -142,15 +164,19 @@ class TestAllProvidersPartial(APITestCase):
         :param user_login: login of the user to add
         :return: nothing
         """
+        if command_queue is not None:
+            subprocess.run(command_queue)
         group_id = cls.group_ids[group_index]
         user_id = cls.user_ids[user_login]
         user_add_path = cls.USER_ADD_PATH % group_id
         user_add_data = {"user_id": user_id}
         result = api_client.post(user_add_path, user_add_data, format="json", **cls.auth_headers)
+        if result.status_code != status.HTTP_200_OK:
+            print(result, result.data)
         assert result.status_code == status.HTTP_200_OK
 
     @classmethod
-    def detach_user(cls, api_client, group_index, user_login):
+    def detach_user(cls, api_client, group_index, user_login, command_queue=None):
         """
         Removes the user from the group
         :param api_client: the API client that shall be used for such removal
@@ -158,10 +184,14 @@ class TestAllProvidersPartial(APITestCase):
         :param user_login: login of the user to add
         :return: nothing
         """
+        if command_queue is not None:
+            subprocess.run(command_queue)
         group_id = cls.group_ids[group_index]
         user_id = cls.user_ids[user_login]
         user_detach_path = cls.USER_REMOVE_PATH % (group_id, user_id)
         result = api_client.delete(user_detach_path, **cls.auth_headers)
+        if result.status_code != status.HTTP_204_NO_CONTENT:
+            print(result, result.data)
         assert result.status_code == status.HTTP_204_NO_CONTENT
 
     @classmethod
@@ -187,8 +217,15 @@ class TestAllProvidersPartial(APITestCase):
         :param root_group_index: desired root group index
         :return: nothing
         """
-        project_data = {"alias": alias, "name": name, "root_group_id": cls.group_ids[root_group_index]}
+        group_id = cls.group_ids[root_group_index]
+        group = GroupSet().get(group_id)
+        subprocess.run(("groupadd", "-f", alias))
+        for user in group.users:
+            subprocess.run(("usermod", "-aG", alias, user.unix_group))
+        project_data = {"alias": alias, "name": name, "root_group_id": group_id}
         result = api_client.post(cls.PROJECT_LIST_PATH, project_data, format="json", **cls.auth_headers)
+        if result.status_code != status.HTTP_201_CREATED:
+            print(result, result.data)
         assert result.status_code == status.HTTP_201_CREATED
         cls.project_ids[alias] = result.data['id']
 
@@ -201,10 +238,13 @@ class TestAllProvidersPartial(APITestCase):
         :param new_alias: new project alias
         :return: nothing
         """
+        subprocess.run(("groupmod", "-n", new_alias, alias))
         project_id = cls.project_ids[alias]
         alias_change_path = cls.PROJECT_DETAIL_PATH % project_id
         alias_change_data = {"alias": new_alias}
         result = api_client.patch(alias_change_path, alias_change_data, format="json", **cls.auth_headers)
+        if result.status_code != status.HTTP_200_OK:
+            print(result, result.data)
         assert result.status_code == status.HTTP_200_OK
         del cls.project_ids[alias]
         cls.project_ids[result.data['alias']] = result.data['id']
@@ -217,8 +257,11 @@ class TestAllProvidersPartial(APITestCase):
         :param alias: desired project alias
         :return: nothing
         """
+        subprocess.run(("groupdel", alias))
         project_delete_path = cls.PROJECT_DETAIL_PATH % cls.project_ids[alias]
         result = api_client.delete(project_delete_path, **cls.auth_headers)
+        if result.status_code != status.HTTP_204_NO_CONTENT:
+            print(result, result.data)
         assert result.status_code == status.HTTP_204_NO_CONTENT
         del cls.project_ids[alias]
 
@@ -232,16 +275,23 @@ class TestAllProvidersPartial(APITestCase):
         :param access_level_alias: alias of the access level that gain all group members, including the group governor
         :return: nothing
         """
+        group_id = cls.group_ids[group_index]
+        if access_level_alias != "no_access":
+            group = GroupSet().get(group_id)
+            for user in group.users:
+                subprocess.run(("usermod", "-aG", project_alias, user.unix_group))
         set_permission_path = cls.PERMISSION_LIST_PATH % cls.project_ids[project_alias]
         permission_data = {
-            "group_id": cls.group_ids[group_index],
+            "group_id": group_id,
             "access_level_id": cls.access_level_ids[access_level_alias]
         }
         result = api_client.post(set_permission_path, permission_data, format="json", **cls.auth_headers)
+        if result.status_code != status.HTTP_200_OK:
+            print(result.status_code, result.data)
         assert result.status_code == status.HTTP_200_OK
 
     @classmethod
-    def delete_permission(cls, api_client, project_alias, group_index):
+    def delete_permission(cls, api_client, project_alias, group_index, command_clues=None):
         """
         Deletes permission from the project
         :param api_client: API client that shall be used to delete a permission
@@ -249,10 +299,15 @@ class TestAllProvidersPartial(APITestCase):
         :param group_index: index of a group that shall be detached from the project
         :return: nothing
         """
+        if command_clues is not None:
+            for clue in command_clues:
+                subprocess.run(clue)
         project_id = cls.project_ids[project_alias]
         group_id = cls.group_ids[group_index]
         permission_delete_path = cls.PERMISSION_DETAIL_PATH % (project_id, group_id)
         result = api_client.delete(permission_delete_path, **cls.auth_headers)
+        if result.status_code != status.HTTP_204_NO_CONTENT:
+            print(result, result.data)
         assert result.status_code == status.HTTP_204_NO_CONTENT
 
     @classmethod
@@ -415,21 +470,29 @@ class TestAllProvidersPartial(APITestCase):
         super().tearDownClass()
 
     def test_user_info_change(self):
-        self.change_user_surname(self.client, "ekaterina_mironova", "Иванова")
-        self.change_user_surname(self.client, "ekaterina_mironova", "Миронова")
+        self.change_user_surname(self.client, "ekaterina_mironova", "Иванова",
+            command_clue=("usermod", "-c", "Екатерина Иванова,,,", "ekaterina_mironova"))
+        self.change_user_surname(self.client, "ekaterina_mironova", "Миронова",
+            command_clue=("usermod", "-c", "Екатерина Миронова,,,", "ekaterina_mironova"))
 
     def test_user_login_change(self):
         self.change_user_login(self.client, "ekaterina_mironova", "user10")
         self.change_user_login(self.client, "user10", "ekaterina_mironova")
 
     def test_detach_user(self):
-        self.detach_user(self.client, 0, "ekaterina_mironova")
-        self.attach_user(self.client, 0, "ekaterina_mironova")
+        self.detach_user(self.client, 0, "ekaterina_mironova",
+            command_queue=("usermod", "-G", "cnl,mnl,mn", "ekaterina_mironova"))
+        self.attach_user(self.client, 0, "ekaterina_mironova",
+            command_queue=("usermod", "-G", "hhna,mnl,mn,cnl", "ekaterina_mironova"))
 
     def test_project_update(self):
         self.change_project_alias(self.client, "hhna", "project1")
         self.change_project_alias(self.client, "project1", "hhna")
 
     def test_permission_delete(self):
-        self.delete_permission(self.client, "nsw", 3)
+        self.delete_permission(self.client, "nsw", 3,
+            command_clues=[
+                ("usermod", "-G", "cr,gcn,aphhna,n,nl", "ilja_dmitriev"),
+                ("usermod", "-G", "cr,gcn,aphhna,n,nl", "anastasia_spiridonova")
+            ])
         self.set_permission(self.client, "nsw", 3, "data_add")
