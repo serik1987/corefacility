@@ -70,7 +70,7 @@ class TestProjectProvider(APITestCase):
             client = APIClient()
             cls.delete_group(client)
             cls.delete_users(client)
-            super().tearDownClass()
+        super().tearDownClass()
 
     @parameterized.expand(input_data_provider())
     def test_create_project(self, project_arguments):

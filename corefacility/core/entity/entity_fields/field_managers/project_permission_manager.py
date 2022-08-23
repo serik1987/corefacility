@@ -1,3 +1,5 @@
+from django.db import transaction
+
 from core.models.enums import LevelType
 from core.transaction import CorefacilityTransaction
 
@@ -60,7 +62,7 @@ class ProjectPermissionManager(PermissionManager):
         if self.is_root_group(group):
             raise EntityOperationNotPermitted()
         else:
-            with CorefacilityTransaction():
+            with self._get_transaction_mechanism():
                 super().set(group, access_level)
                 if access_level.alias != "no_access":
                     self.permission_provider.insert_group(self.entity, group)
@@ -91,7 +93,7 @@ class ProjectPermissionManager(PermissionManager):
         if self.is_root_group(group):
             raise EntityOperationNotPermitted()
         else:
-            with CorefacilityTransaction():
+            with self._get_transaction_mechanism():
                 super().delete(group)
                 self.permission_provider.remove_group(self.entity, group)
 
@@ -106,3 +108,6 @@ class ProjectPermissionManager(PermissionManager):
         return isinstance(group, Group) and \
             self.entity.root_group is not None and \
             group.id == self.entity.root_group.id
+
+    def _get_transaction_mechanism(self):
+        return CorefacilityTransaction() if not self.permission_provider.force_disable else transaction.atomic()

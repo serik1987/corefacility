@@ -99,6 +99,9 @@ class TestGroup(BaseTestClass):
 
     @parameterized.expand(update_provider())
     def test_change_name(self, method_name, token_id, user_id, expected_status_code):
+        """
+        Tests whether the user name can be changed correctly
+        """
         group = self.get_user_group(user_id)
         path = self.get_entity_detail_path(lookup=group.id)
         headers = self.get_authorization_headers(token_id)

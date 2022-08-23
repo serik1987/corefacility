@@ -33,7 +33,7 @@ def project_add_provider():
     return [
         ("superuser", "new_project_new_group", None, status.HTTP_201_CREATED),
         ("superuser", "new_project_current_group", "superuser", status.HTTP_201_CREATED),
-        ("superuser", "new_project_current_group", "ordinary_user", status.HTTP_400_BAD_REQUEST),
+        ("superuser", "new_project_current_group", "ordinary_user", status.HTTP_201_CREATED),
         ("ordinary_user", "new_project_new_group", None, status.HTTP_201_CREATED),
         ("ordinary_user", "new_project_current_group", "superuser", status.HTTP_400_BAD_REQUEST),
         ("ordinary_user", "new_project_current_group", "ordinary_user", status.HTTP_201_CREATED),

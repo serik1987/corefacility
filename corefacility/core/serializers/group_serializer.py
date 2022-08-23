@@ -39,6 +39,7 @@ class GroupSerializer(EntitySerializer):
             data['governor'] = self.context['request'].user
         return super().create(data)
 
-    def update(self, data):
-        del data['governor_id']
-        return super().update(data)
+    def update(self, instance, data):
+        if "governor_id" in data:
+            del data['governor_id']
+        return super().update(instance, data)

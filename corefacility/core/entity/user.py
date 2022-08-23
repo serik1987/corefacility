@@ -1,4 +1,5 @@
 from django.templatetags.static import static
+from django.conf import settings
 from django.db import transaction
 
 from core.transaction import CorefacilityTransaction
@@ -151,4 +152,4 @@ class User(Entity):
             return False
 
     def _get_transaction_mechanism(self):
-        return CorefacilityTransaction()
+        return CorefacilityTransaction() if not PosixProvider.force_disable else transaction.atomic()

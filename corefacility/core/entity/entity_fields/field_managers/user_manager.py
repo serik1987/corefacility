@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db import transaction
 
 from core.entity.entity_fields.field_managers.entity_value_manager import EntityValueManager
 from core.entity.entity_exceptions import EntityOperationNotPermitted
@@ -33,7 +34,7 @@ class UserManager(EntityValueManager):
         """
         self._check_system_permissions(user)
         if not self.exists(user):
-            with CorefacilityTransaction():
+            with self._get_transaction_mechanism():
                 group_user = GroupUser(is_governor=False, group_id=self.entity.id, user_id=user.id)
                 group_user.save()
                 self.permission_provider.update_group_list(user)
@@ -48,7 +49,7 @@ class UserManager(EntityValueManager):
         self._check_system_permissions(user)
         if user.id == self.entity.governor.id:
             raise EntityOperationNotPermitted()
-        with CorefacilityTransaction():
+        with self._get_transaction_mechanism():
             try:
                 GroupUser.objects.get(group_id=self.entity.id, user_id=user.id).delete()
                 self.permission_provider.update_group_list(user)
@@ -116,3 +117,6 @@ class UserManager(EntityValueManager):
             raise EntityOperationNotPermitted()
         if user is not None and user.state in ['creating', 'deleted']:
             raise EntityOperationNotPermitted()
+
+    def _get_transaction_mechanism(self):
+        return CorefacilityTransaction() if not self.permission_provider.force_disable else transaction.atomic()

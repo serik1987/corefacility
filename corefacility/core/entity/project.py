@@ -110,4 +110,4 @@ class Project(ArbitraryAccessLevelEntity):
         Returns a transaction mechanism that will be used for the project CRUD operations
         :return: always CorefacilityTransaction
         """
-        return CorefacilityTransaction()
+        return CorefacilityTransaction() if not PosixProvider.force_disable else transaction.atomic()
