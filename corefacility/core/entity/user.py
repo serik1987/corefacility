@@ -1,5 +1,4 @@
 from django.templatetags.static import static
-from django.conf import settings
 from django.db import transaction
 
 from core.transaction import CorefacilityTransaction
@@ -12,6 +11,7 @@ from core.entity.entity_fields.field_managers.group_manager import GroupManager
 from .entity_exceptions import EntityFieldInvalid
 from .entity_providers.model_providers.user_provider import UserProvider as ModelProvider
 from .entity_providers.posix_providers.user_provider import UserProvider as PosixProvider
+from .entity_providers.file_providers.user_files_provider import UserFilesProvider
 
 
 class User(Entity):
@@ -25,7 +25,7 @@ class User(Entity):
 
     _entity_set_class = UserSet
 
-    _entity_provider_list = [PosixProvider(), ModelProvider()]
+    _entity_provider_list = [PosixProvider(), UserFilesProvider(), ModelProvider()]
 
     _public_field_description = {
         "login": EntityAliasField(max_length=100),

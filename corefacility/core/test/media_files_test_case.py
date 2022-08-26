@@ -1,6 +1,7 @@
 from django.test import TestCase
 
 from core.entity.entity_providers.posix_providers.posix_provider import PosixProvider
+from core.entity.entity_providers.file_providers.files_provider import FilesProvider
 
 from .media_files_mixin import MediaFilesMixin
 
@@ -20,6 +21,7 @@ class MediaFilesTestCase(MediaFilesMixin, TestCase):
     def setUpTestData(cls):
         if cls.posix_disabled:
             PosixProvider.force_disable = True
+            FilesProvider.force_disable = True
         super().setUpTestData()
         cls.create_media_root_backup()
 
@@ -32,3 +34,4 @@ class MediaFilesTestCase(MediaFilesMixin, TestCase):
         cls.restore_media_root_backup()
         super().tearDownClass()
         PosixProvider.force_disable = False
+        FilesProvider.force_disable = False

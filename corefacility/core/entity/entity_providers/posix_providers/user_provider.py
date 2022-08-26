@@ -87,7 +87,7 @@ class UserProvider(PosixProvider):
                     login = user.unix_group
                 try:
                     posix_user = PosixUser.find_by_login(login)
-                except:
+                except OperatingSystemUserNotFoundException:
                     posix_user = PosixUser.find_by_login(self._get_posix_login(user.login))
                 self._update_gecos_information(user, posix_user)
                 self._update_lock_status(user, posix_user)

@@ -1,6 +1,8 @@
 from django.test import TestCase
 
 from core.entity.user import User
+from core.entity.entity_providers.posix_providers.posix_provider import PosixProvider
+from core.entity.entity_providers.file_providers.files_provider import FilesProvider
 from authorizations.ihna.entity import AuthorizationToken
 from authorizations.ihna.entity.authorization_token.mock_provider import MockProvider
 
@@ -12,7 +14,16 @@ class TestAuthorizationToken(TestCase):
 
     @classmethod
     def setUpTestData(cls):
+        super().setUpTestData()
+        PosixProvider.force_disable = True
+        FilesProvider.force_disable = True
         User(login="sergei.kozhukhov").create()
+
+    @classmethod
+    def tearDownClass(cls):
+        PosixProvider.force_disable = False
+        FilesProvider.force_disable = False
+        super().tearDownClass()
 
     def test_token_create(self):
         token = AuthorizationToken(code=MockProvider.generate_mock_code("authorization code"))

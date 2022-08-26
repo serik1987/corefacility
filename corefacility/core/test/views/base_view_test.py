@@ -5,6 +5,7 @@ from rest_framework.test import APITestCase
 
 from core.entity.user import User
 from core.entity.entity_providers.posix_providers.posix_provider import PosixProvider
+from core.entity.entity_providers.file_providers.files_provider import FilesProvider
 from core.entity.entry_points.authorizations import AuthorizationModule
 from core.generic_views.entity_view_mixin import EntityViewMixin
 
@@ -56,6 +57,7 @@ class BaseViewTest(APITestCase):
     @classmethod
     def setUpTestData(cls):
         PosixProvider.force_disable = True
+        FilesProvider.force_disable = True
         super().setUpTestData()
         if cls.superuser_required:
             cls.superuser_token = cls.create_user_and_token("superuser", "Superuser", "Superuserov", True)
@@ -73,8 +75,9 @@ class BaseViewTest(APITestCase):
 
     @classmethod
     def tearDownClass(cls):
-        super().tearDownClass()
         PosixProvider.force_disable = False
+        FilesProvider.force_disable = False
+        super().tearDownClass()
 
     def get_entity_list_path(self):
         """

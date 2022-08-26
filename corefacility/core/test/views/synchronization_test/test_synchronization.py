@@ -1,6 +1,6 @@
 from rest_framework import status
 
-from core.entity.user import User, UserSet
+from core.entity.user import UserSet
 from core.entity.entity_exceptions import EntityNotFoundException
 from core.entity.entry_points.authorizations import AuthorizationModule
 
