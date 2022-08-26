@@ -93,7 +93,12 @@ class UserProvider(PosixProvider):
                 self._update_lock_status(user, posix_user)
                 self._update_user_login(user, posix_user)
             except OperatingSystemUserNotFoundException:
+                old_home_dir = user.home_dir
                 self._create_posix_user(user)
+                new_home_dir = user.home_dir
+                if os.path.isdir(old_home_dir) and old_home_dir != new_home_dir:
+                    maker = CommandMaker()
+                    maker.add_command(("mv", old_home_dir, new_home_dir))
 
     def delete_entity(self, user):
         """
@@ -170,8 +175,7 @@ class UserProvider(PosixProvider):
             if posix_group.name != posix_login:
                 posix_group.name = posix_login
                 posix_group.update()
-            if os.path.isdir(old_home_dir) and old_home_dir != new_home_dir:
-                maker.add_command(("mv", old_home_dir, new_home_dir))
+            # The user's home dir will be moved automatically during the update of the home_dir field (see -m option for details)
             user._home_dir = new_home_dir
             user.notify_field_changed("home_dir")
 

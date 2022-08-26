@@ -1,6 +1,10 @@
 import os
+import stat
 
 from django.conf import settings
+
+from core.os.user import PosixUser, OperatingSystemUserNotFoundException
+from core.os.group import PosixGroup, OperatingSystemGroupNotFound
 
 from .files_provider import FilesProvider
 
@@ -9,6 +13,8 @@ class UserFilesProvider(FilesProvider):
     """
     Creates, modifies or destroys the user's home directory in response to create, modify or destroy the user itself
     """
+
+    HOME_DIRECTORY_MODE = 0o4750
 
     @property
     def is_provider_on(self):
@@ -23,6 +29,27 @@ class UserFilesProvider(FilesProvider):
         True if permissions set are switched on, False otherwise
         """
         return not self.force_disable and settings.CORE_MANAGE_UNIX_USERS
+
+    def change_dir_permissions(self, maker, user, dir_name):
+        try:
+            stat_info = os.stat(dir_name)
+            posix_user = PosixUser.find_by_login(user.unix_group)
+            posix_group = PosixGroup.find_by_gid(posix_user.gid)
+            uid_ok = posix_user.uid == stat_info.st_uid
+            owner = posix_user.login
+            gid_ok = posix_user.gid == stat_info.st_gid
+            owner_group = posix_group.name
+            permissions_ok = stat.S_IMODE(stat_info.st_mode) == self.HOME_DIRECTORY_MODE
+        except (FileNotFoundError, OperatingSystemUserNotFoundException, OperatingSystemGroupNotFound):
+            uid_ok = False
+            owner = user.unix_group
+            gid_ok = False
+            owner_group = user.unix_group
+            permissions_ok = False
+        if not uid_ok or not gid_ok:
+            maker.add_command(("chown", "%s:%s" % (owner, owner_group), dir_name))
+        if not permissions_ok:
+            maker.add_command(("chmod", "0%o" % self.HOME_DIRECTORY_MODE, dir_name))
 
     def update_entity(self, user):
         """

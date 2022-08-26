@@ -2,6 +2,7 @@ import os
 import shutil
 
 from core.entity.entity import Entity
+from core.os import CommandMaker
 
 from ..entity_provider import EntityProvider
 
@@ -57,7 +58,9 @@ class FilesProvider(EntityProvider):
         if self.is_provider_on:
             dir_name = self.unwrap_entity(entity)
             if self.is_permission_on:
-                raise NotImplementedError("EntityProvider.create_entity is not implemented")
+                maker = CommandMaker()
+                maker.add_command(("mkdir", dir_name))
+                self.change_dir_permissions(maker, entity, dir_name)
             else:
                 os.mkdir(dir_name)
             self.update_dir_info(entity, dir_name)
@@ -75,8 +78,12 @@ class FilesProvider(EntityProvider):
         """
         if self.is_provider_on:
             if self.is_permission_on:
-                raise NotImplementedError("EntityProvider.resolve_conflict is not implemented")
+                maker = CommandMaker()
+                self.change_dir_permissions(maker, given_entity, contained_entity)
             self.update_dir_info(given_entity, contained_entity)
+
+    def change_dir_permissions(self, maker, entity, dir_name):
+        raise NotImplementedError("FilesProvider.change_dir_right is not implemented")
 
     def update_entity(self, entity: Entity):
         """
@@ -96,8 +103,9 @@ class FilesProvider(EntityProvider):
         if self.is_provider_on:
             dir_name = self.unwrap_entity(entity)
             if self.is_permission_on:
-                print(dir_name)
-                raise NotImplementedError("EntityProvider.delete_entity is not implemented")
+                if os.path.isdir(dir_name):
+                    maker = CommandMaker()
+                    maker.add_command(("rm", "-rf", dir_name))
             else:
                 if os.path.isdir(dir_name):
                     shutil.rmtree(dir_name)

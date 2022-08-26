@@ -199,7 +199,10 @@ class CommandMaker:
             result = subprocess.run(*args, **kwargs)
             self._message_queue.append({"level": "INF", "message": result.stdout.decode("utf-8")})
         except subprocess.CalledProcessError as err:
+            cmd = err.cmd
+            if isinstance(cmd, list) or isinstance(cmd, tuple):
+                cmd = " ".join(cmd)
             msg = "The command '%s' has been returned with status code %d. Reason: %s" % \
-                  (err.cmd, err.returncode, err.stderr.decode("utf-8"))
+                  (cmd, err.returncode, err.stderr.decode("utf-8"))
             self._message_queue.append({"level": "ERR", "message": msg})
             raise OsCommandFailedError(msg)

@@ -1,3 +1,6 @@
+import os
+from pathlib import Path
+
 from .base import CorefacilityConfiguration
 
 
@@ -8,7 +11,7 @@ class VirtualServerConfiguration(CorefacilityConfiguration):
     """
 
     # The base directory where all project and user files were located
-    CORE_PROJECT_BASEDIR = "~/.research"
+    CORE_PROJECT_BASEDIR = os.path.join(Path.home(), ".research")
 
     # Whether the application can manage UNIX groups
     CORE_MANAGE_UNIX_GROUPS = False

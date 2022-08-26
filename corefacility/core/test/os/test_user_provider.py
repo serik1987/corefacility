@@ -1,3 +1,5 @@
+import os
+import stat
 import hashlib
 from subprocess import run
 
@@ -77,6 +79,9 @@ class TestUserProvider(APITestCase):
     USER_DETAIL_PATH = "/api/{version}/users/%d/".format(version=API_VERSION)
     PASSWORD_RESET_PATH = "/api/{version}/users/%d/password-reset/".format(version=API_VERSION)
 
+    TEST_FILENAME = "test.txt"
+    TEST_FILE_CONTENT = "Hello, World!"
+
     auth_headers = None
 
     @classmethod
@@ -101,10 +106,10 @@ class TestUserProvider(APITestCase):
         self._assert_gecos_information(input_data, result.data, posix_user)
         self.assertNotEqual(posix_user.is_locked(), LockStatus.PASSWORD_SET,
                             "The password must not be turned to SET")
+        self._assert_home_directory(result.data, posix_user)
         self._delete_user(result.data['id'])
-        with self.assertRaises(OperatingSystemUserNotFoundException,
-                               msg="The user record is still presented in the operating system even after its delete"):
-            PosixUser.find_by_login(result.data['unix_group'])
+        self._assert_user_delete(result)
+        self._assert_no_home_directory(result.data)
 
     @parameterized.expand(input_data_provider())
     def test_double_create(self, input_data):
@@ -115,7 +120,9 @@ class TestUserProvider(APITestCase):
         result = self._create_user(input_data)
         posix_user = PosixUser.find_by_login(result.data['unix_group'])
         self._assert_gecos_information(input_data, result.data, posix_user)
+        self._assert_home_directory(result.data, posix_user)
         self._delete_user(result.data['id'])
+        self._assert_user_delete(result)
 
     @parameterized.expand(partial_update_provider())
     def test_partial_update(self, field_name, field_value):
@@ -127,11 +134,15 @@ class TestUserProvider(APITestCase):
         user_id = preliminary_result.data['id']
         result = self.client.patch(self.USER_DETAIL_PATH % user_id,
                                    {field_name: field_value}, format="json", **self.auth_headers)
+        if result.status_code != status.HTTP_200_OK:
+            print(result, result.data)
         self.assertEquals(result.status_code, status.HTTP_200_OK, "Unexpected status code")
         initial_data[field_name] = field_value
         posix_user = PosixUser.find_by_login(result.data['unix_group'])
         self._assert_gecos_information(initial_data, result.data, posix_user)
+        self._assert_home_directory(result.data, posix_user)
         self._delete_user(result.data['id'])
+        self._assert_user_delete(result)
 
     @parameterized.expand(partial_update_provider())
     def test_extra_update(self, field_name, field_value):
@@ -148,7 +159,10 @@ class TestUserProvider(APITestCase):
         initial_data[field_name] = field_value
         posix_user = PosixUser.find_by_login(result.data['unix_group'])
         self._assert_gecos_information(initial_data, result.data, posix_user)
+        self._assert_home_directory(result.data, posix_user)
         self._delete_user(result.data['id'])
+        self._assert_user_delete(result)
+        self._assert_no_home_directory(result.data)
 
     def test_password_and_locked(self):
         """
@@ -178,6 +192,7 @@ class TestUserProvider(APITestCase):
         self.assertEquals(posix_user.is_locked(), LockStatus.PASSWORD_SET,
                           "Unable to unlock the POSIX user")
         self._delete_user(user_id)
+        self._assert_user_delete(unlocking_result)
 
     def _create_user(self, input_data):
         """
@@ -187,9 +202,25 @@ class TestUserProvider(APITestCase):
 		"""
         result = self.client.post(self.USER_LIST_PATH, input_data, format="json",
                                   **self.auth_headers)
+        if result.status_code != status.HTTP_201_CREATED:
+            print(result, result.data)
         self.assertEquals(result.status_code, status.HTTP_201_CREATED,
                           "Unexpected status code")
         return result
+
+    def _assert_home_directory(self, user_info, posix_user):
+        home_dir = user_info['home_dir']
+        self.assertTrue(os.path.isdir(home_dir))
+        stat_info = os.stat(home_dir)
+        self.assertEquals(stat_info.st_uid, posix_user.uid, "The home directory owner doesn't correspond to its user")
+        self.assertEquals(stat_info.st_gid, posix_user.gid, "The home directory's owning group doesn't correspond to the owner's primary group")
+        self.assertEquals(stat.S_IMODE(stat_info.st_mode), 0o4750, "The permission rights for the user's home directory are not appropriate")
+        with open(self.TEST_FILENAME, "w") as test_file:
+            test_file.write(self.TEST_FILE_CONTENT)
+
+    def _assert_no_home_directory(self, user_info):
+        home_dir = user_info['home_dir']
+        self.assertFalse(os.path.isdir(home_dir), "The user's home directory has not been deleted together with the user's delete")
 
     def _assert_gecos_information(self, input_data, output_data, posix_user):
         """
@@ -216,6 +247,11 @@ class TestUserProvider(APITestCase):
         final_result = self.client.delete(self.USER_DETAIL_PATH % user_id, **self.auth_headers)
         self.assertEquals(final_result.status_code, status.HTTP_204_NO_CONTENT,
                           "The user can't be deleted successfully after all assertions")
+
+    def _assert_user_delete(self, result):
+        with self.assertRaises(OperatingSystemUserNotFoundException,
+                               msg="The user record is still presented in the operating system even after its delete"):
+            PosixUser.find_by_login(result.data['unix_group'])
 
     def _create_posix_user(self, user_login):
         """
