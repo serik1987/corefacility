@@ -1,6 +1,12 @@
 import os
+import stat
 
 from django.conf import settings
+
+from core.entity.user import UserSet
+from core.os import CommandMaker
+from core.os.user import PosixUser, OperatingSystemUserNotFoundException
+from core.os.group import PosixGroup, OperatingSystemGroupNotFound
 
 from .files_provider import FilesProvider
 
@@ -10,6 +16,8 @@ class ProjectFilesProvider(FilesProvider):
     Creates, modifies or deletes the project directory in response to creating, modifying or deleting the project
     itself
     """
+
+    DESIRED_PERMISSIONS = 0o2750
 
     @staticmethod
     def project_directory_name_from_alias(alias):
@@ -34,18 +42,54 @@ class ProjectFilesProvider(FilesProvider):
         """
         return not self.force_disable and settings.CORE_MANAGE_UNIX_GROUPS
 
+    def change_dir_permissions(self, maker, project, dir_name):
+        posix_user_name = project.governor.unix_group
+        if posix_user_name is None:
+            posix_user_name = UserSet().get(project.governor.id).unix_group
+        try:
+            posix_user = PosixUser.find_by_login(posix_user_name)
+            owner_user = posix_user.login
+            owner_uid = posix_user.uid
+        except OperatingSystemUserNotFoundException:
+            owner_user = "root"
+            owner_uid = 0
+        try:
+            posix_group = PosixGroup.find_by_name(project.unix_group)
+            owner_group = posix_group.name
+            owner_gid = posix_group.gid
+        except OperatingSystemGroupNotFound:  # the group will be created after CorefacilityTransaction completion
+            owner_group = project.unix_group
+            owner_gid = -1  # GID for some non-existent group
+        try:
+            directory_info = os.stat(dir_name)
+            owner_change = directory_info.st_uid != owner_uid
+            group_change = directory_info.st_gid != owner_gid
+            permission_change = stat.S_IMODE(directory_info.st_mode) != self.DESIRED_PERMISSIONS
+        except FileNotFoundError:
+            owner_change = True
+            group_change = True
+            owner_group = project.unix_group
+            permission_change = True
+        maker = CommandMaker()
+        if owner_change or group_change:
+            maker.add_command(("chown", "%s:%s" % (owner_user, owner_group), dir_name))
+        if permission_change:
+            maker.add_command(("chmod", "0%o" % self.DESIRED_PERMISSIONS, dir_name))
+
     def update_entity(self, project):
         """
         Updates the project's directory in response to the directory update
         :param project: the project which directory shall be updated
         :return: nothing
         """
-        if self.is_permission_on:
-            raise NotImplementedError("EntityProvider.update_entity is not implemented")
-        elif self.is_provider_on:
+        if self.is_provider_on:
             old_project_dir = project.project_dir
             new_project_dir = self.project_directory_name_from_alias(project.alias)
-            os.rename(old_project_dir, new_project_dir)
+            if self.is_permission_on:
+                maker = CommandMaker()
+                maker.add_command(("mv", old_project_dir, new_project_dir))
+            else:
+                os.rename(old_project_dir, new_project_dir)
             self.update_dir_info(project, new_project_dir)
 
     def unwrap_entity(self, project):

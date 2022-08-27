@@ -1,9 +1,13 @@
+import os
+import stat
+
 import subprocess
 from django.conf import settings
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 from parameterized import parameterized
 
+from core.os.user import PosixUser, OperatingSystemUserNotFoundException
 from core.os.group import PosixGroup, OperatingSystemGroupNotFound
 from core.entity.entity_providers.posix_providers.project_provider import ProjectProvider
 from core.test.views.field_test.data_providers import slug_provider
@@ -50,6 +54,9 @@ class TestProjectProvider(APITestCase):
     user_logins = None
     group_id = None
 
+    TEST_FILENAME = "test.txt"
+    TEST_FILE_CONTENT = "Hello, World!"
+
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -79,13 +86,11 @@ class TestProjectProvider(APITestCase):
         """
         project_arguments['root_group_id'] = self.group_id
         project_data = self._create_project(project_arguments)
-        group_name = project_data['unix_group']
-        self.assertIsNotNone(group_name, "The unix_group field must be present in the output result")
-        PosixGroup.find_by_name(group_name)
+        self._assert_posix_group_created(project_data)
+        self._assert_project_directory(project_data)
         self._delete_project(project_data['id'])
-        with self.assertRaises(OperatingSystemGroupNotFound,
-                               msg="The POSIX group has not been deleted when the project has been deleted"):
-            PosixGroup.find_by_name(group_name)
+        self._assert_no_unix_group(project_data)
+        self._assert_no_project_directory(project_data)
 
     @parameterized.expand(input_data_provider())
     def test_precreate_project(self, project_arguments):
@@ -96,9 +101,11 @@ class TestProjectProvider(APITestCase):
         unix_group = ProjectProvider._get_posix_group_name(project_arguments['alias'])
         subprocess.run(("groupadd", unix_group))
         project_data = self._create_project(project_arguments)
-        group_name = project_data['unix_group']
-        PosixGroup.find_by_name(group_name)
+        self._assert_posix_group_created(project_data)
+        self._assert_project_directory(project_data)
         self._delete_project(project_data['id'])
+        self._assert_no_unix_group(project_data)
+        self._assert_no_project_directory(project_data)
 
     @parameterized.expand(change_login_provider())
     def test_update_project(self, new_login):
@@ -111,9 +118,11 @@ class TestProjectProvider(APITestCase):
         project_arguments['root_group_id'] = self.group_id
         project_data = self._create_project(project_arguments)
         new_project_data = self._update_project(project_data['id'], new_login)
-        group_name = new_project_data['unix_group']
-        PosixGroup.find_by_name(group_name)
+        self._assert_posix_group_created(new_project_data)
+        self._assert_project_directory(new_project_data)
         self._delete_project(project_data['id'])
+        self._assert_no_unix_group(new_project_data)
+        self._assert_no_project_directory(new_project_data)
 
     @parameterized.expand(change_login_provider())
     def test_recreate_group(self, new_login):
@@ -128,9 +137,11 @@ class TestProjectProvider(APITestCase):
         group_name = project_data['unix_group']
         subprocess.run(("groupdel", group_name))
         new_project_data = self._update_project(project_data['id'], new_login)
-        group_name = new_project_data['unix_group']
-        PosixGroup.find_by_name(group_name)
+        self._assert_posix_group_created(new_project_data)
+        self._assert_project_directory(new_project_data)
         self._delete_project(project_data['id'])
+        self._assert_no_unix_group(new_project_data)
+        self._assert_no_project_directory(new_project_data)
 
     @classmethod
     def login(cls, client):
@@ -253,3 +264,36 @@ class TestProjectProvider(APITestCase):
         result = self.client.delete(self.PROJECT_DETAIL_PATH % project_id, **self.auth_headers)
         self.assertEquals(result.status_code, status.HTTP_204_NO_CONTENT,
                           "Unexpected status code during the project delete")
+
+    def _assert_posix_group_created(self, project_data):
+        group_name = project_data['unix_group']
+        self.assertIsNotNone(group_name, "The unix_group field must be present in the output result")
+        try:
+            PosixGroup.find_by_name(group_name)
+        except OperatingSystemGroupNotFound:
+            self.fail("Unable to find the unix group related to the project")
+
+    def _assert_project_directory(self, project_data):
+        project_directory = project_data['project_dir']
+        self.assertIsNotNone(project_directory,
+            "The 'project_dir' field of the project must be full path of the valid project directory")
+        self.assertTrue(os.path.isdir(project_directory), "The project directory must exist in the filesystem")
+        directory_info = os.stat(project_directory)
+        directory_rights = stat.S_IMODE(directory_info.st_mode)
+        governor_login = project_data['governor']['login']
+        try:
+            posix_user = PosixUser.find_by_login(governor_login)
+        except OperatingSystemUserNotFoundException:
+            self.fail("Unable to find the unix user related to the project's governor")
+        posix_group = PosixGroup.find_by_name(project_data['unix_group'])
+        self.assertEquals(directory_info.st_uid, posix_user.uid, "The project governor must be an owner of the project directory")
+        self.assertEquals(directory_info.st_gid, posix_group.gid, "The owning group of the project directory must be a project's UNIX group")
+        self.assertEquals(directory_rights, 0o2750, "Inproper project directory rights")
+
+    def _assert_no_unix_group(self, project_data):
+        with self.assertRaises(OperatingSystemGroupNotFound,
+                               msg="The POSIX group has not been deleted when the project has been deleted"):
+            PosixGroup.find_by_name(project_data['unix_group'])
+
+    def _assert_no_project_directory(self, project_data):
+        self.assertFalse(os.path.isdir(project_data['project_dir']), "The project has been destroyed but the project directory still exists")
