@@ -29,6 +29,8 @@ class TestAllProvidersPartial(APITestCase):
     PERMISSION_LIST_PATH = "/api/{version}/projects/%d/permissions/".format(version=API_VERSION)
     PERMISSION_DETAIL_PATH = "/api/{version}/projects/%d/permissions/%d/".format(version=API_VERSION)
 
+    GROUP_GOVERNORS = ["polina_zolotova", "ilja_pavlov", "leon_tsvetkov", "ilja_dmitriev", "ilja_dmitriev"]
+
     auth_headers = None
     """ Authorization headers to be placed to each HTTP request """
 
@@ -71,11 +73,15 @@ class TestAllProvidersPartial(APITestCase):
         :param surname: user's surname
         :return: nothing
         """
-        posix_result = subprocess.run(("useradd",
+        subprocess.run(("useradd",
             "-c", "%s %s,,," % (name, surname),
             "-d", "/home/%s" % login,
             "-U", "-s", "/bin/bash",
             login))
+        directory_name = "/home/%s" % login
+        subprocess.run(("mkdir", directory_name))
+        subprocess.run(("chown", "{0}:{0}".format(login), directory_name))
+        subprocess.run(("chmod", "04750", directory_name))
         user_data = {"login": login, "name": name, "surname": surname}
         result = client.post(cls.USER_LIST_PATH, user_data, format="json", **cls.auth_headers)
         if result.status_code != status.HTTP_201_CREATED:
@@ -222,6 +228,11 @@ class TestAllProvidersPartial(APITestCase):
         subprocess.run(("groupadd", "-f", alias))
         for user in group.users:
             subprocess.run(("usermod", "-aG", alias, user.unix_group))
+        governor_login = cls.GROUP_GOVERNORS[root_group_index]
+        project_directory = "/home/proj.%s" % alias
+        subprocess.run(("mkdir", project_directory))
+        subprocess.run(("chown", "%s:%s" % (governor_login, alias), project_directory))
+        subprocess.run(("chmod", "02750", project_directory))
         project_data = {"alias": alias, "name": name, "root_group_id": group_id}
         result = api_client.post(cls.PROJECT_LIST_PATH, project_data, format="json", **cls.auth_headers)
         if result.status_code != status.HTTP_201_CREATED:
@@ -239,6 +250,7 @@ class TestAllProvidersPartial(APITestCase):
         :return: nothing
         """
         subprocess.run(("groupmod", "-n", new_alias, alias))
+        subprocess.run(("mv", "/home/proj.%s" % alias, "/home/proj.%s" % new_alias))
         project_id = cls.project_ids[alias]
         alias_change_path = cls.PROJECT_DETAIL_PATH % project_id
         alias_change_data = {"alias": new_alias}
@@ -257,7 +269,9 @@ class TestAllProvidersPartial(APITestCase):
         :param alias: desired project alias
         :return: nothing
         """
+        project_directory = "/home/proj.%s" % alias
         subprocess.run(("groupdel", alias))
+        subprocess.run(("rm", "-rf", project_directory))
         project_delete_path = cls.PROJECT_DETAIL_PATH % cls.project_ids[alias]
         result = api_client.delete(project_delete_path, **cls.auth_headers)
         if result.status_code != status.HTTP_204_NO_CONTENT:

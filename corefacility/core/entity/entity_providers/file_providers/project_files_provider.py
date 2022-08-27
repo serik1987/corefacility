@@ -85,11 +85,12 @@ class ProjectFilesProvider(FilesProvider):
         if self.is_provider_on:
             old_project_dir = project.project_dir
             new_project_dir = self.project_directory_name_from_alias(project.alias)
-            if self.is_permission_on:
-                maker = CommandMaker()
-                maker.add_command(("mv", old_project_dir, new_project_dir))
-            else:
-                os.rename(old_project_dir, new_project_dir)
+            if old_project_dir != new_project_dir and os.path.isdir(old_project_dir):
+                if self.is_permission_on:
+                    maker = CommandMaker()
+                    maker.add_command(("mv", old_project_dir, new_project_dir))
+                else:
+                    os.rename(old_project_dir, new_project_dir)
             self.update_dir_info(project, new_project_dir)
 
     def unwrap_entity(self, project):
