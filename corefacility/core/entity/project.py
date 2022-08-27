@@ -10,6 +10,7 @@ from .entity_fields import EntityField, EntityAliasField, PublicFileManager, Man
     RelatedEntityField, ProjectApplicationManager
 from .entity_providers.model_providers.project_provider import ProjectProvider as ModelProvider
 from .entity_providers.posix_providers.project_provider import ProjectProvider as PosixProvider
+from .entity_providers.file_providers.project_files_provider import ProjectFilesProvider
 
 
 class Project(ArbitraryAccessLevelEntity):
@@ -20,7 +21,7 @@ class Project(ArbitraryAccessLevelEntity):
 
     _entity_set_class = ProjectSet
 
-    _entity_provider_list = [PosixProvider(), ModelProvider()]
+    _entity_provider_list = [PosixProvider(), ProjectFilesProvider(), ModelProvider()]
 
     _required_fields = ["alias", "name", "root_group"]
 

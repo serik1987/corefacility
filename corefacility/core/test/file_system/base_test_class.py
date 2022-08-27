@@ -1,6 +1,8 @@
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
+from core.generic_views import EntityViewMixin
+
 
 class TestFileSystem(APITestCase):
     """
@@ -13,7 +15,7 @@ class TestFileSystem(APITestCase):
     """ Path for downloading the entity list or creating new entity """
 
     ENTITY_DETAIL_PATH = None
-    """ Path for entity read, mofify or delete operations, Use %d placeholder to mark the entity ID """
+    """ Path for entity read, modify or delete operations, Use %d placeholder to mark the entity ID """
 
     ENTITY_CREATE_DATA = None
     """ Data to be used for the entity create """
@@ -30,7 +32,7 @@ class TestFileSystem(APITestCase):
     @classmethod
     def is_test_applicable(cls):
         """
-        Defines a conditions where all tests shall be run
+        Defines conditions where all tests shall be run under
         :return: True if all tests shall be run, False if they shall be skipped
         """
         raise NotImplementedError("Please, define the is_test_applicable class method")
@@ -74,12 +76,19 @@ class TestFileSystem(APITestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
+        EntityViewMixin.throttle_classes = []
         if cls.is_test_applicable():
             client = APIClient()
             result = client.post(cls.LOGIN_PATH)
             assert result.status_code == status.HTTP_200_OK
             token = result.data['token']
             cls.auth_headers = {"HTTP_AUTHORIZATION": "Token " + token}
+
+    @classmethod
+    def tearDownClass(cls):
+        if hasattr(EntityViewMixin, "throttle_classes"):
+            del EntityViewMixin.throttle_classes
+        super().tearDownClass()
 
     def setUp(self):
         super().setUp()

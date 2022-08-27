@@ -83,7 +83,7 @@ class FilesProvider(EntityProvider):
             self.update_dir_info(given_entity, contained_entity)
 
     def change_dir_permissions(self, maker, entity, dir_name):
-        raise NotImplementedError("FilesProvider.change_dir_right is not implemented")
+        raise NotImplementedError("FilesProvider.change_dir_permission is not implemented")
 
     def update_entity(self, entity: Entity):
         """
