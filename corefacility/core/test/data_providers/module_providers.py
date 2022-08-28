@@ -1,6 +1,5 @@
 from core import App as CoreApp
-from core.authorizations import AutomaticAuthorization, PasswordRecoveryAuthorization, StandardAuthorization, \
-    UnixAuthorization
+from core.authorizations import AutomaticAuthorization, PasswordRecoveryAuthorization, StandardAuthorization
 from authorizations.cookie import App as CookieAuthorization
 from authorizations.ihna import App as IhnaAuthorization
 from authorizations.mailru import App as MailruAuthorization
@@ -20,7 +19,7 @@ def module_provider():
     return [
         (module_class,)
         for module_class in (
-            CoreApp, AutomaticAuthorization, PasswordRecoveryAuthorization, StandardAuthorization, UnixAuthorization,
+            CoreApp, AutomaticAuthorization, PasswordRecoveryAuthorization, StandardAuthorization,
             CookieAuthorization, IhnaAuthorization, MailruAuthorization, GoogleAuthorization, IhnaSynchronization,
             ImagingApp, RoiApp
         )
@@ -33,7 +32,7 @@ def entry_point_provider():
             "entry_point": AuthorizationsEntryPoint,
             "base_module_class": AuthorizationModule,
             "expected_module_list": [
-                AutomaticAuthorization, UnixAuthorization, PasswordRecoveryAuthorization, StandardAuthorization,
+                AutomaticAuthorization, PasswordRecoveryAuthorization, StandardAuthorization,
                 CookieAuthorization, GoogleAuthorization, MailruAuthorization, IhnaAuthorization
             ]
         },

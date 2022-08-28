@@ -113,9 +113,6 @@ class Migration(migrations.Migration):
         Module(parent_entry_point=authorizations, alias="mailru", name=_("Authorization through Mail.ru"),
                html_code="<div class='auth mailru'></div>", app_class="authorizations.mailru.App", user_settings=dict(),
                is_application=False, is_enabled=False).save()
-        Module(parent_entry_point=authorizations, alias="unix", name=_("Authorization through UNIX account"),
-               html_code=None, app_class="core.authorizations.UnixAuthorization", user_settings=dict(),
-               is_application=False, is_enabled=False).save()
         Module(parent_entry_point=authorizations, alias="cookie", name=_("Authorization through Cookie"),
                html_code=None, app_class="authorizations.cookie.App", user_settings=dict(),
                is_application=False, is_enabled=False).save()

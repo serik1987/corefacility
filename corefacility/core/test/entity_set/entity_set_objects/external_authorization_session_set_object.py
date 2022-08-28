@@ -1,7 +1,6 @@
 from datetime import timedelta
 
-from core.authorizations import StandardAuthorization, AutomaticAuthorization, PasswordRecoveryAuthorization, \
-    UnixAuthorization
+from core.authorizations import StandardAuthorization, AutomaticAuthorization, PasswordRecoveryAuthorization
 from core.entity.external_authorization_session import ExternalAuthorizationSession
 from core.entity.entity_fields.field_managers.entity_password_manager import EntityPasswordManager
 
@@ -39,7 +38,6 @@ class ExternalAuthorizationSessionSetObject(EntitySetObject):
             (StandardAuthorization, 1),
             (AutomaticAuthorization, 2),
             (PasswordRecoveryAuthorization, 1),
-            (UnixAuthorization, 2),
         ]
 
     def filter_by_authorization_module(self, authorization_module):

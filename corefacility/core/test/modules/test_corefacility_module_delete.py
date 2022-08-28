@@ -11,8 +11,7 @@ from core.entity.entity_exceptions import RootModuleDeleteException, ModuleConst
 from core.entity.entity_fields.field_managers.module_settings_manager import ModuleSettingsManager
 from core.entity.entity_sets.corefacility_module_set import CorefacilityModuleSet
 from core.entity.entry_points.entry_point_set import EntryPointSet
-from core.authorizations import AutomaticAuthorization, PasswordRecoveryAuthorization, StandardAuthorization, \
-    UnixAuthorization
+from core.authorizations import AutomaticAuthorization, PasswordRecoveryAuthorization, StandardAuthorization
 
 from authorizations.cookie import App as CookieAuthorization
 from authorizations.ihna import App as IhnaAuthorization
@@ -29,7 +28,6 @@ def module_delete_provider():
         (AutomaticAuthorization, None),
         (PasswordRecoveryAuthorization, None),
         (StandardAuthorization, None),
-        (UnixAuthorization, None),
         (CookieAuthorization, None),
         (IhnaAuthorization, None),
         (MailruAuthorization, None),

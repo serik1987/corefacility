@@ -13,6 +13,41 @@ from core.models import Module, EntryPoint, ExternalAuthorizationSession, User
 AUTHORIZATION_MODULE_LIST = ["ihna", "google", "mailru"]
 
 
+def widget_list_provider():
+    return [
+        (["core", "authorizations"],  [
+            ("standard", None),
+            ("ihna", "<div class='auth ihna'></div>"),
+            ("google", "<div class='auth google'></div>"),
+            ("mailru", "<div class='auth mailru'></div>"),
+            ("cookie", None),
+            ("password_recovery", None),
+            ("auto", None),
+        ]),
+        (["core", "synchronizations"], [
+            ("ihna_employees", None),
+        ]),
+        (["core", "projects"], [
+            ("imaging", None),
+        ]),
+        (["core", "projects", "imaging", "processors"], [
+            ("roi", None),
+        ]),
+    ]
+
+
+def module_list_provider():
+    return [
+        ("standard", "core.authorizations.StandardAuthorization"),
+        ("ihna", "authorizations.ihna.App"),
+        ("google", "authorizations.google.App"),
+        ("mailru", "authorizations.mailru.App"),
+        ("cookie", "authorizations.cookie.App"),
+        ("password_recovery", "core.authorizations.PasswordRecoveryAuthorization"),
+        ("auto", "core.authorizations.AutomaticAuthorization"),
+    ]
+
+
 class TestApplicationProcess(TestCase):
 
     PASSWORD_LENGTH = 25
@@ -46,28 +81,7 @@ class TestApplicationProcess(TestCase):
         for apps_used in ['imaging', 'roi']:
             cls.uuid_list[apps_used] = Module.objects.get(alias=apps_used).uuid
 
-
-    @parameterized.expand([
-        (["core", "authorizations"],  [
-            ("standard", None),
-            ("ihna", "<div class='auth ihna'></div>"),
-            ("google", "<div class='auth google'></div>"),
-            ("mailru", "<div class='auth mailru'></div>"),
-            ("unix", None),
-            ("cookie", None),
-            ("password_recovery", None),
-            ("auto", None),
-        ]),
-        (["core", "synchronizations"], [
-            ("ihna_employees", None),
-        ]),
-        (["core", "projects"], [
-            ("imaging", None),
-        ]),
-        (["core", "projects", "imaging", "processors"], [
-            ("roi", None),
-        ]),
-    ])
+    @parameterized.expand(widget_list_provider())
     def test_widgets_show(self, route, expected_widget_list):
         app = None
         entry_point = None
@@ -103,16 +117,7 @@ class TestApplicationProcess(TestCase):
             self.assertTrue(expected_widget_found, "the module '%s' is not within the list of expected modules" %
                             alias)
 
-    @parameterized.expand([
-        ("standard", "core.authorizations.StandardAuthorization"),
-        ("ihna", "authorizations.ihna.App"),
-        ("google", "authorizations.google.App"),
-        ("mailru", "authorizations.mailru.App"),
-        ("unix", "core.authorizations.UnixAuthorization"),
-        ("cookie", "authorizations.cookie.App"),
-        ("password_recovery", "core.authorizations.PasswordRecoveryAuthorization"),
-        ("auto", "core.authorizations.AutomaticAuthorization"),
-    ])
+    @parameterized.expand(module_list_provider())
     def test_authorization_modules(self, alias, expected_authorization_module):
         authorization_app = Module.objects.get(parent_entry_point__alias="authorizations", alias=alias)
         authorization_module = authorization_app.app_class

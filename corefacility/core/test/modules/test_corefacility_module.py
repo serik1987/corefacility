@@ -126,8 +126,8 @@ class TestCorefacilityModule(BaseAppsTest):
 
         (BaseAppsTest.TEST_FIND_BY_INDEX, -1, BaseAppsTest.NEGATIVE_TEST_CASE),
         (BaseAppsTest.TEST_FIND_BY_INDEX, 0, BaseAppsTest.POSITIVE_TEST_CASE),
-        (BaseAppsTest.TEST_FIND_BY_INDEX, 11, BaseAppsTest.POSITIVE_TEST_CASE),
-        (BaseAppsTest.TEST_FIND_BY_INDEX, 12, BaseAppsTest.NEGATIVE_TEST_CASE),
+        (BaseAppsTest.TEST_FIND_BY_INDEX, 10, BaseAppsTest.POSITIVE_TEST_CASE),
+        (BaseAppsTest.TEST_FIND_BY_INDEX, 11, BaseAppsTest.NEGATIVE_TEST_CASE),
 
         (BaseAppsTest.TEST_SLICING, (3, 7, 1), BaseAppsTest.POSITIVE_TEST_CASE),
         (BaseAppsTest.TEST_SLICING, (10, 20, 1), BaseAppsTest.POSITIVE_TEST_CASE),
@@ -138,8 +138,8 @@ class TestCorefacilityModule(BaseAppsTest):
             self._test_all_access_features(*args)
 
     @parameterized.expand([
-        (True, 1),
-        (False, 11)
+        (True, 1),  # We have just one root module
+        (False, 10)  # We have 10 non-root modules
     ])
     def test_filter_is_root_module_count(self, filter_value, module_count):
         module_set = CorefacilityModuleSet()
