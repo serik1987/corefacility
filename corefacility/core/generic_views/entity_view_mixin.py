@@ -1,4 +1,10 @@
-from rest_framework.exceptions import NotFound
+from ipaddress import ip_address
+
+import dateutil.parser
+from rest_framework.exceptions import NotFound, ValidationError
+
+from core.entity.user import UserSet
+from core.entity.entity_exceptions import EntityNotFoundException
 
 from ..entity.entity_sets.entity_set import EntitySet
 from ..entity.entity_exceptions import EntityNotFoundException
@@ -64,6 +70,70 @@ class EntityViewMixin(SetCookieMixin):
             else:
                 value = None
             return value
+        return filter_function
+
+    @classmethod
+    def date_filter_function(cls, filter_param):
+        """
+        Returns a filter function that finds for an appropriate filter parameter and transforms it to the naive
+        or aware datetime depending of whether timezone is figures our in the filter parameter or not
+        :param filter_param: the query filter parameter
+        :return: the filter function
+        """
+        base_filter_function = cls.standard_filter_function(filter_param, str)
+
+        def filter_function(query_params):
+            value = base_filter_function(query_params)
+            if value == "":
+                value = None
+            if value is not None:
+                try:
+                    value = dateutil.parser.parse(value)
+                except dateutil.parser.ParserError:
+                    raise ValidationError({filter_param: "The value is not recognized as correct datetime."},
+                                          code="invalid")
+            return value
+        return filter_function
+
+    @classmethod
+    def ip_address_function(cls, filter_param):
+        """
+        Builds a filter function that accepts a valid IP address only
+        :param filter_param: the query parameter used for the filter
+        :return: the filter function
+        """
+        base_filter_function = cls.standard_filter_function(filter_param, str)
+
+        def filter_function(query_params):
+            value = base_filter_function(query_params)
+            if value == "":
+                value = None
+            if value is not None:
+                try:
+                    value = str(ip_address(value))
+                except ValueError:
+                    raise ValidationError({filter_param: "The value should be equal to correct IP address value"},
+                                          code="invalid")
+            return value
+        return filter_function
+
+    @classmethod
+    def user_function(cls, filter_param):
+        """
+        Builds a filter function that accepts a valid user ID and returns a valid user
+        :param filter_param: the query parameter used for the filter
+        :return: the filter function
+        """
+        base_filter_function = cls.standard_filter_function(filter_param, int)
+
+        def filter_function(query_params):
+            try:
+                value = base_filter_function(query_params)
+                if value is not None:
+                    value = UserSet().get(value)
+                return value
+            except (EntityNotFoundException, ValueError):
+                raise ValidationError({filter_param: "The value is not a valid user ID"})
         return filter_function
 
     @classmethod

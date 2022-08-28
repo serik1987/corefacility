@@ -22,8 +22,7 @@ class BaseTestClass(BaseViewTest):
 
     def _test_entity_create(self, test_data_id, token_id, expected_status_code):
         """
-        Testing the create action for entity views.
-
+        Tests creating action for entity views
         :param test_data_id: The test data contains in the public field "{id}_data" where {id} is test_data_id
         :param token_id: Authorization token is issued during the setUpTestData function and stored to "{id}_token"
             public field where {id} is token_id. User "superuser" for superuser authentication and "ordinary_user"

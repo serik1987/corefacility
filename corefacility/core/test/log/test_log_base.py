@@ -8,67 +8,13 @@ from parameterized import parameterized
 
 from core.entity.entity_sets.log_set import LogSet
 from core.entity.entity_sets.log_record_set import LogRecordSet
+from core.test.sample_log_mixin import log_provider, SampleLogMixin
 
 
-def log_provider():
-    return [
-        # debug     interface   method      data_index  response_type
-        (True,      "api",      "post",     1,          403),
-        (False,     "api",      "head",     0,          500),
-        (True,      "api",      "post",     0,          200),
-        (False,     "api",      "put",      1,          400),
-        (True,      "ui",       "get",      0,          400),
-        (True,      "api",      "delete",   1,          500),
-        (True,      "api",      "put",      0,          403),
-        (False,     "api",      "post",     1,          404),
-        (False,     "api",      "patch",    1,          200),
-        (True,      "api",      "patch",    0,          500),
-        (False,     "ui",       "get",      1,          200),
-        (True,      "api",      "head",     1,          403),
-        (True,      "ui",       "get",      1,          500),
-        (True,      "api",      "post",     1,          400),
-        (False,     "api",      "delete",   0,          404),
-        (True,      "api",      "put",      0,          200),
-        (False,     "ui",       "get",      1,          403),
-        (True,      "api",      "get",      1,          404),
-        (False,     "api",      "patch",    0,          400),
-        (False,     "api",      "head",     0,          400),
-        (False,     "api",      "patch",    0,          403),
-        (False,     "api",      "head",     0,          200),
-        (False,     "api",      "delete",   1,          403),
-        (False,     "api",      "delete",   1,          200),
-        (True,      "api",      "put",      1,          404),
-        (True,      "api",      "delete",   1,          400),
-        (True,      "api",      "post",     1,          500),
-        (True,      "api",      "put",      1,          500),
-        (False,     "api",      "head",     0,          404),
-        (True,      "api",      "patch",    0,          404),
-        (False,     "ui",       "get",      0,          404),
-
-    ]
-
-
-class TestLogBase(TestCase):
+class TestLogBase(SampleLogMixin, TestCase):
     """
     Provides the base testing facility for the log system.
     """
-
-    REQUEST_PATH = "/__test__/{interface}/{power}/"
-
-    ALL_POWERS = (3, 10)
-
-    ALL_DATA = (
-        {"x": 2, "y": 10},
-        {"x": 10, "y": 100},
-    )
-
-    ALL_EXCEPTIONS = {
-        200: None,
-        400: "django.core.exceptions.BadRequest",
-        403: "django.core.exceptions.PermissionDenied",
-        404: "django.http.Http404",
-        500: "django.core.exceptions.ObjectDoesNotExist",
-    }
 
     TEST_RECORDS = [
         {"level": "CRI", "message": "This is a critical test message"},
@@ -96,20 +42,20 @@ class TestLogBase(TestCase):
     def tearDown(self):
         logger = logging.getLogger("django.request")
         logger.setLevel(self.previous_level)
+        super().tearDown()
 
     @parameterized.expand(log_provider())
     def test_base(self, debug_mode, interface, method, data_index, response_type):
         """
-        Provides the base testing features.
-
+        Provides the base testing features
         :param debug_mode: Forces certain debug mode (either True or False)
         :param interface: either 'ui' for testing the UI interface or 'api' for testing the API interface
         :param method: the request method
         :param data_index: either 0 or 1 depending on corresponding data
         :param response_type: HTTP response code (200, 400, 403, 404, 500)
-        :return:
         """
         with self.settings(DEBUG=debug_mode):
+            """
             power = self.ALL_POWERS[data_index]
             request_path = self.REQUEST_PATH.format(interface=interface, power=power)
             request_function = getattr(self.__client, method.lower())
@@ -126,6 +72,9 @@ class TestLogBase(TestCase):
                 if exception is not None:
                     request_path += "?exception=" + exception
             response = request_function(request_path, **request_kwargs)
+            """
+            request_path = self.REQUEST_PATH.format(interface=interface, power=self.ALL_POWERS[data_index])
+            response = self.make_test_request(self.__client, interface, method, data_index, response_type)
             self.assertEquals(response.status_code, response_type,
                               "There is an internal error in the testing request: %s" % str(response.exc_info))
             log_number = len(self.__log_set)

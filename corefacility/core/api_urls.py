@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from .testviews.test_transaction import TestTransaction
 from .views import View404, UserViewSet, GroupViewSet, ProjectViewSet, LoginView, ProfileView, AccessLevelView, \
-    ProjectPermissionViewSet, SynchronizationView
+    ProjectPermissionViewSet, SynchronizationView, LogViewSet
 from .views.profile_avatar import ProfileAvatarView
 
 router = DefaultRouter()
@@ -12,6 +12,7 @@ router.register(r'groups', GroupViewSet, basename="groups")
 router.register(r'projects', ProjectViewSet, basename="projects")
 router.register(r'projects/(?P<project_lookup>\w+)/permissions', ProjectPermissionViewSet,
                 basename="project-permissions")
+router.register(r'logs', LogViewSet, basename="logs")
 
 urlpatterns = [
     path(r'__test__/transaction/<str:dirname>/', TestTransaction.as_view(), name="test-transaction"),

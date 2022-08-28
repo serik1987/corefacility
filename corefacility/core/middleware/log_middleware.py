@@ -23,7 +23,6 @@ class LogMiddleware:
     def __call__(self, request):
         """
         Initializes creation of the request logs by filling the request details
-
         :param request: the request to be filled
         :return: nothing
         """
