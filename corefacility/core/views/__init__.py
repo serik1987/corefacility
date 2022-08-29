@@ -9,4 +9,5 @@ from .login import LoginView
 from .profile import ProfileView
 from .synchronization_view import SynchronizationView
 from .log import LogViewSet
+from .log_record import LogRecordViewSet
 from .view_404 import View404

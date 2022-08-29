@@ -3,9 +3,8 @@ from rest_framework.test import APIClient
 from parameterized import parameterized
 
 from core.entity.log import Log, LogSet
-from core.test.sample_log_mixin import SampleLogMixin
 
-from .base_test_class import BaseTestClass
+from .base_log_test import BaseLogTest
 
 
 def log_retrieve_provider():
@@ -44,7 +43,7 @@ def log_modify_provider():
     ]
 
 
-class SecurityTest(SampleLogMixin, BaseTestClass):
+class TestLog(BaseLogTest):
     """
     Provides security tests for the logs and log lists
     """
@@ -61,9 +60,6 @@ class SecurityTest(SampleLogMixin, BaseTestClass):
     resource_name = "logs"
     """ The URL path segment between the '/api/{version}/' and '/{resource-id}/' parts. """
 
-    superuser_required = True
-    ordinary_user_required = True
-
     log_create_data = {
         "log_address": "/path/to/file",
         "request_method": "post",
@@ -78,10 +74,10 @@ class SecurityTest(SampleLogMixin, BaseTestClass):
     entity_id_list = None
     """ List of all entity IDs created during the setup """
 
-    CREATE_USER_PATH = "/api/{version}/users/".format(version=BaseTestClass.API_VERSION)
+    CREATE_USER_PATH = "/api/{version}/users/".format(version=BaseLogTest.API_VERSION)
     """ Path to create a single user """
 
-    DELETE_USER_PATH = "/api/{version}/users/%d/".format(version=BaseTestClass.API_VERSION)
+    DELETE_USER_PATH = "/api/{version}/users/%d/".format(version=BaseLogTest.API_VERSION)
     """ Path to delete a single user """
 
     user_id = None
@@ -267,4 +263,4 @@ class SecurityTest(SampleLogMixin, BaseTestClass):
         self.assertEquals(actual_entity['output_data'], expected_entity.output_data, "Unexpected output data")
 
 
-del BaseTestClass
+del BaseLogTest

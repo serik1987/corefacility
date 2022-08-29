@@ -55,24 +55,6 @@ class TestLogBase(SampleLogMixin, TestCase):
         :param response_type: HTTP response code (200, 400, 403, 404, 500)
         """
         with self.settings(DEBUG=debug_mode):
-            """
-            power = self.ALL_POWERS[data_index]
-            request_path = self.REQUEST_PATH.format(interface=interface, power=power)
-            request_function = getattr(self.__client, method.lower())
-            request_data = self.ALL_DATA[data_index].copy()
-            exception = self.ALL_EXCEPTIONS[response_type]
-            request_kwargs = {"data": request_data, "secure": False}
-            if method.lower() in ["get", "head"] and exception is not None:
-                request_kwargs['data']['exception'] = exception
-            else:
-                if interface == "ui":
-                    request_kwargs['content_type'] = client.MULTIPART_CONTENT
-                if interface == "api":
-                    request_kwargs['content_type'] = "application/json"
-                if exception is not None:
-                    request_path += "?exception=" + exception
-            response = request_function(request_path, **request_kwargs)
-            """
             request_path = self.REQUEST_PATH.format(interface=interface, power=self.ALL_POWERS[data_index])
             response = self.make_test_request(self.__client, interface, method, data_index, response_type)
             self.assertEquals(response.status_code, response_type,

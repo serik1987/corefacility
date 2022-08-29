@@ -104,8 +104,6 @@ class TestLogRecord(BaseTestClass):
     def test_field_level(self, *args):
         self._test_field("level", *args, self.TEST_CREATE_AND_LOAD)
 
-
-
     def _check_default_fields(self, log_record):
         """
         Checks whether the default fields were properly stored.
