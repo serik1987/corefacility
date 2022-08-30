@@ -203,16 +203,4 @@ class Migration(migrations.Migration):
             name='entrypoint',
             unique_together={('alias', 'belonging_module')},
         ),
-        migrations.CreateModel(
-            name='AppPermission',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('access_level', models.ForeignKey(help_text='A certain access level', on_delete=django.db.models.deletion.CASCADE, to='core.accesslevel')),
-                ('application', models.ForeignKey(help_text='The application which permissions are described here', on_delete=django.db.models.deletion.CASCADE, related_name='permissions', to='core.module')),
-                ('group', models.ForeignKey(editable=False, help_text='The user group that also has an access to the project', null=True, on_delete=django.db.models.deletion.CASCADE, to='core.group')),
-            ],
-            options={
-                'unique_together': {('group', 'application')},
-            },
-        ),
     ]

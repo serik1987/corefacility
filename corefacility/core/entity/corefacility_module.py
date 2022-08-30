@@ -8,7 +8,6 @@ from .entity import Entity
 from .entity_sets.corefacility_module_set import CorefacilityModuleSet
 from .entity_providers.model_providers.corefacility_module_provider import CorefacilityModuleProvider
 from .entity_fields import EntityField, ReadOnlyField, ManagedEntityField
-from .entity_fields.field_managers.app_permission_manager import AppPermissionManager
 from .entity_fields.field_managers.module_settings_manager import ModuleSettingsManager
 from .entity_exceptions import ModuleUuidNotGuessedException, \
     CorefacilityModuleDamagedException, EntityNotFoundException, ModuleInstallationStateException, \
@@ -47,9 +46,6 @@ class CorefacilityModule(Entity):
                                             description="The user-controlled module settings"),
         "is_application": ReadOnlyField(description="Is module an application"),
         "is_enabled": EntityField(bool, description="Is module enabled"),
-        "permissions": ManagedEntityField(AppPermissionManager,
-                                          description="Application permissions"),
-        "user_access_level": ReadOnlyField(description="Access level list"),
     }
 
     _module_installation = False
@@ -140,18 +136,6 @@ class CorefacilityModule(Entity):
         return "%s.%s" % (self.__module__, self.__class__.__name__)
 
     @property
-    def permissions(self):
-        """
-        Defines the application permissions if applicable
-
-        :return: application permissions, if the module is application, None otherwise
-        """
-        if self.is_application:
-            return super().permissions
-        else:
-            return None
-
-    @property
     def user_settings(self):
         """
         Defines the module user settings
@@ -229,8 +213,8 @@ class CorefacilityModule(Entity):
         the application functionality.
 
         An example of applications:
-        'Optical Imaging', 'ROI' - the superuser can define additional restrictions for using this application, in
-        addition to the project restrictions
+        'Optical Imaging', 'ROI' - the use can use the application if and only if the application will be added
+        to the project. The application can be added by either superuser or user
 
         If the module is not an "application" all users will have the same access to the application
         Example of such modules:

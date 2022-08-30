@@ -77,10 +77,6 @@ class Migration(migrations.Migration):
             AccessLevel(type=app_permission, alias="add", name=_("Add application")),
             AccessLevel(type=app_permission, alias="permission_required",
                         name=_("Add application (superuser permission required)")),
-            AccessLevel(type=app_permission, alias="usage",
-                        name=_("Application usage")),
-            AccessLevel(type=app_permission, alias="no_access",
-                        name=_("No access"))
         ])
 
     @staticmethod

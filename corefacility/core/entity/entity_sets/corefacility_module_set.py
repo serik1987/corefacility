@@ -22,7 +22,6 @@ class CorefacilityModuleSet(EntitySet):
         "entry_point": ("core.entity.entry_points.entry_point.EntryPoint", None),
         "is_enabled": (bool, None),
         "is_application": (bool, None),
-        "user": ("core.entity.user.User", None),
         "project": ("core.entity.project.Project", None),
         "uuid": (UUID, None)
     }

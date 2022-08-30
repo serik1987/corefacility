@@ -97,31 +97,8 @@ class CorefacilityModuleReader(RawSqlQueryReader):
                                          "core_projectapplication.is_enabled)")
             builder.main_filter &= StringQueryFilter("core_projectapplication.project_id=%s", project.id)
 
-    def apply_user_filter(self, user):
-        for builder in (self.items_builder, self.count_builder):
-            builder.data_source \
-                .add_join(builder.JoinType.LEFT, SqlTable("core_apppermission", "acl"),
-                          "ON (acl.application_id=core_module.uuid)") \
-                .add_join(builder.JoinType.LEFT, SqlTable("core_accesslevel", "acl_value"),
-                          "ON (acl_value.id=acl.access_level_id AND acl_value.alias != 'no_access')") \
-                .add_join(builder.JoinType.LEFT, SqlTable("core_groupuser", "acl_user"),
-                          "ON (acl_user.group_id=acl.group_id AND acl_user.user_id=%s)" % int(user.id))
-
-            builder.main_filter &= \
-                StringQueryFilter("acl.group_id IS NULL") | StringQueryFilter("acl_user.user_id IS NOT NULL")
-            builder.main_filter &= \
-                StringQueryFilter("acl_value.alias IS NOT NULL")
-
-        self.count_builder.select_expression = \
-            self.count_builder.select_total_count("core_module.uuid", distinct=True)
-
-        self.items_builder \
-            .add_select_expression(self.items_builder.agg_string_concat("acl_value.alias")) \
-            .add_group_term("core_module.uuid") \
-            .add_group_term("core_entrypoint.id")
-
     def create_external_object(self, uuid, alias, name, html_code, app_class, user_settings,
-                               is_application, is_enabled, access_control_list=None):
+                               is_application, is_enabled):
         """
         Creates an external object that in turn will be transformed to the corefacility module
 
@@ -133,13 +110,8 @@ class CorefacilityModuleReader(RawSqlQueryReader):
         :param user_settings: specific module settings
         :param is_application: defines whether the module is application
         :param is_enabled: defines whether the module is enabled
-        :param access_control_list: the access control list is applicable
         :return: an external object that will be transformed by the CorefacilityModuleProvider to an appropriate module.
         """
-        if access_control_list is None:
-            access_control_list = set()
-        else:
-            access_control_list = set(access_control_list.split(","))
         if isinstance(user_settings, str):
             try:
                 user_settings = json.loads(user_settings)
@@ -157,6 +129,5 @@ class CorefacilityModuleReader(RawSqlQueryReader):
             user_settings=user_settings,
             is_application=bool(is_application),
             is_enabled=bool(is_enabled),
-            user_access_level=access_control_list,
         )
         return emulator

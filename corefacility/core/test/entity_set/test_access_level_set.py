@@ -18,8 +18,6 @@ APPLICATION_ACCESS_LEVELS = [
     ("add", "Add application", "Добавление приложения в проект"),
     ("permission_required", "Add application (superuser permission required)",
         "Добавление приложения в проект (с согласия суперпользователя)"),
-    ("usage", "Application usage", "Использование приложения"),
-    ("no_access", "No access", "Доступ закрыт"),
 ]
 
 LANGUAGE_CODES = [

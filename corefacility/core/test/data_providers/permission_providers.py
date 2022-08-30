@@ -20,10 +20,6 @@ def access_level_provider():
         ("no_access", "No access", "en-GB", prj),
         ("add", "Добавление приложения в проект", "ru-RU", app),
         ("permission_required", "Добавление приложения в проект (с согласия суперпользователя)", "ru-RU", app),
-        ("usage", "Использование приложения", "ru-RU", app),
-        ("no_access", "Доступ закрыт", "ru-RU", app),
         ("add", "Add application", "en-GB", app),
         ("permission_required", "Add application (superuser permission required)", "en-GB", app),
-        ("usage", "Application usage", "en-GB", app),
-        ("no_access", "No access", "en-GB", app),
     ]

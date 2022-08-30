@@ -1,7 +1,7 @@
 from django.utils.translation import gettext
 from django.db.models.deletion import RestrictedError
 from parameterized import parameterized
-from core.models import Project, Module, ProjectPermission, AppPermission, AccessLevel
+from core.models import Project, ProjectPermission, AccessLevel
 from core.models.enums import LevelType
 from core.test.data_providers.permission_providers import access_level_provider
 from .many_group_test import ManyGroupTest
@@ -22,13 +22,21 @@ class TestPermissions(ManyGroupTest):
         cls.project.save()
 
     @parameterized.expand(access_level_provider())
-    def test_project_access_level_list(self, level_slug, expected_level_name, language_code, level_type):
+    def test_access_level_list(self, level_slug, expected_level_name, language_code, level_type):
+        """
+        Tests the entire access level list
+        :param level_slug: alias for the access level
+        :param expected_level_name: expected name for the access level
+        :param language_code: do you want to check 'ru-RU' or 'en-GB' language?
+        :param level_type: either project or application access level
+        :return:
+        """
         with self.settings(LANGUAGE_CODE=language_code):
             level = AccessLevel.objects.get(type=level_type.value, alias=level_slug)
             level_name = gettext(level.name)
             self.assertEquals(level_name, expected_level_name)
 
-    @parameterized.expand([(prj, 6), (app, 5)])
+    @parameterized.expand([(prj, 6), (app, 3)])
     def test_access_level_count(self, level_type, expected_level_count):
         level_count = AccessLevel.objects.filter(type=level_type.value).count()
         self.assertEquals(level_count, expected_level_count)
@@ -48,19 +56,3 @@ class TestPermissions(ManyGroupTest):
         self.assertEquals(self.project.permissions.count(), 1,
                           "Initially we had two permissions, we deleted a single group, the permission related to this "
                           "group shall also be deleted. Why didn't it happen?")
-
-    def test_app_level_permission(self):
-        sample_app = Module.objects.all()[3]
-        AppPermission(application=sample_app, group=self.group_list[0],
-                      access_level=AccessLevel.objects.get(type="app", alias="add")).save()
-        AppPermission(application=sample_app, group=self.group_list[1],
-                      access_level=AccessLevel.objects.get(type="app", alias="permission_required")).save()
-        AppPermission(application=sample_app, group=self.group_list[2],
-                      access_level=AccessLevel.objects.get(type="app", alias="another")).save()
-        AppPermission(application=sample_app, group=self.group_list[3],
-                      access_level=AccessLevel.objects.get(type="app", alias="usage")).save()
-        AppPermission(application=sample_app, group=self.group_list[4],
-                      access_level=AccessLevel.objects.get(type="app", alias="no_access")).save()
-        self.assertEquals(sample_app.permissions.count(), 5)
-        self.group_list[3].delete()
-        self.assertEquals(sample_app.permissions.count(), 4)

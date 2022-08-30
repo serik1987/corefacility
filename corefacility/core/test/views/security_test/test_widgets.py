@@ -47,7 +47,7 @@ class TestWidgets(BaseTestClass):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        CoreApp().reset()  # Because core module's UUID has been changed during the repeating migration
+        CoreApp.reset()  # Because core module's UUID has been changed during the repeating migration
 
     @parameterized.expand(entry_point_provider())
     def test_widgets_normal(self, entry_point_class, token_id, expected_status_code):
@@ -76,6 +76,22 @@ class TestWidgets(BaseTestClass):
         headers = self.get_authorization_headers("superuser")
         response = self.client.get(widget_list_path, **headers)
         self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND, "Unexpected response status")
+
+    def test_enability(self):
+        """
+        Tests that all widgets are printed correctly when all widgets are enabled
+        """
+        from core.entity.entry_points.authorizations import AuthorizationsEntryPoint
+        auth = AuthorizationsEntryPoint()
+        module_uuid = str(CoreApp().uuid)
+        path = self.WIDGET_LIST_PATH % (module_uuid, auth.alias)
+        for module in auth.modules(False):
+            module.is_enabled = True
+            module.update()
+        headers = self.get_authorization_headers("superuser")
+        response = self.client.get(path, **headers)
+        self.assertEquals(response.status_code, status.HTTP_200_OK, "Unexpected response status")
+        self.assert_result(response.data, auth.widgets(False))
 
     def assert_result(self, actual_result, expected_result):
         expected_result = [

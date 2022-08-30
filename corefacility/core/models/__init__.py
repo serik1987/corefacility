@@ -6,7 +6,6 @@ from .authentication import Authentication
 from .access_level import AccessLevel
 from .permission import Permission
 from .project_permission import ProjectPermission
-from .app_permission import AppPermission
 from .entry_point import EntryPoint
 from .module import Module
 from .external_authorization_session import ExternalAuthorizationSession
