@@ -1,18 +1,7 @@
 from django.test import TestCase
 from parameterized import parameterized
 
-from core.test.data_providers.module_providers import module_provider, entry_point_provider
-from core.test.data_providers.entity_sets import filter_data_provider
-
-
-def modules_method_provider():
-    return filter_data_provider(
-        (True, False),
-        [
-            (entry_point_info['entry_point'], entry_point_info['expected_module_list'])
-            for entry_point_info in entry_point_provider()
-        ]
-    )
+from core.test.data_providers.module_providers import module_provider, entry_point_provider, modules_method_provider
 
 
 class TestHighLevelFunctions(TestCase):
@@ -62,11 +51,14 @@ class TestHighLevelFunctions(TestCase):
         expected_module_info = {}
         for expected_module_class in expected_module_list:
             expected_module = expected_module_class()
-            expected_module_info[expected_module.uuid] = {
-                "alias": expected_module.alias,
-                "name": expected_module.get_entity_class_name(),
-                "html_code": expected_module.html_code
-            }
+            if not expected_module.is_application:
+                expected_module_info[expected_module.uuid] = {
+                    "alias": expected_module.alias,
+                    "name": expected_module.get_entity_class_name(),
+                    "html_code": expected_module.html_code
+                }
+        expected_module_number = len(expected_module_info)
+        actual_module_number = 0
         for uuid, alias, name, html_code in entry_point_class().widgets(is_enabled):
             self.assertIn(uuid, expected_module_info, "The uuid retrieved must be within the list of expected UUIDs")
             self.assertEquals(alias, expected_module_info[uuid]['alias'],
@@ -75,3 +67,6 @@ class TestHighLevelFunctions(TestCase):
                               "The module name must be retrieved correctly")
             self.assertEquals(html_code, expected_module_info[uuid]['html_code'],
                               "The module html code must be retrieved correctly")
+            actual_module_number += 1
+        self.assertEquals(actual_module_number, expected_module_number,
+                          "Some corefacility modules were not found in the module list")

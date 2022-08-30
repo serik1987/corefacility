@@ -62,7 +62,7 @@ class PermissionViewSet(SetCookieMixin, GenericViewSet):
         """
         Destroys existent permission from the permission set
 
-        :param request: the HTTP requrest sent by the client application
+        :param request: the HTTP request sent by the client application
         :param args: request path arguments
         :param kwargs: request path keyword arguments
         :return: the HTTP response that will be sent to the client application

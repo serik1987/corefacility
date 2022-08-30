@@ -25,7 +25,7 @@ class CorefacilityModule(Entity):
     Any corefacility module must contain an App class that is:
     a) a subclass of core.entity.CorefacilityModule class
     b) is a singleton
-    c) must contains in the package's __init__.py file
+    c) must contain in the package's __init__.py file
     d) the package where the App class contains must be a valid Django applications
     e) all methods marked here as NotImplementedError must be implemented
     """

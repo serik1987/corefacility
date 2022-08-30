@@ -68,8 +68,13 @@ class MainWindow(SetCookieMixin, TemplateView):
     def _split_application_path(self, path):
         routes = path.split("/apps/", 1)
         if len(routes) == 2:
-            self.kwargs['frontend_route'] = routes[0]
-            self.kwargs['iframe_route'] = routes[1]
+            another_routes = routes[1].split("/", 1)
+            if len(another_routes) == 2:
+                self.kwargs['frontend_route'] = routes[0] + "/apps/" + another_routes[0]
+                self.kwargs['iframe_route'] = another_routes[1]
+            else:
+                self.kwargs['frontend_route'] = routes[0] + "/apps/" + another_routes[0]
+                self.kwargs['iframe_route'] = ""
         else:
             self.kwargs['frontend_route'] = path
             self.kwargs['iframe_route'] = ""

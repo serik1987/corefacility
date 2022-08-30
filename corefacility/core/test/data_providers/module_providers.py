@@ -14,6 +14,8 @@ from core.entity.entry_points.settings import SettingsModule, SettingsEntryPoint
 from core.entity.entry_points.synchronizations import SynchronizationModule, SynchronizationsEntryPoint
 from imaging.entity.entry_points.processors import ProcessorsEntryPoint, ImagingProcessor
 
+from core.test.data_providers.entity_sets import filter_data_provider
+
 
 def module_provider():
     return [
@@ -57,3 +59,16 @@ def entry_point_provider():
             "expected_module_list": [RoiApp]
         }
     ]
+
+
+def modules_method_provider():
+    """
+    Provides the data in the following manner: is_enabled, entry_point_class, expected_module_list
+    """
+    return filter_data_provider(
+        (True, False),
+        [
+            (entry_point_info['entry_point'], entry_point_info['expected_module_list'])
+            for entry_point_info in entry_point_provider()
+        ]
+    )

@@ -363,6 +363,7 @@ class EntryPoint(Entity):
             .add_data_source("core_module")\
             .set_main_filter(AndQueryFilter())
         query_builder.main_filter &= StringQueryFilter("parent_entry_point_id=%s", self.id)
+        query_builder.main_filter &= ~StringQueryFilter("is_application")
         if is_enabled:
             query_builder.main_filter &= StringQueryFilter("is_enabled")
         query = query_builder.build()

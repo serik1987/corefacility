@@ -10,4 +10,5 @@ from .profile import ProfileView
 from .synchronization_view import SynchronizationView
 from .log import LogViewSet
 from .log_record import LogRecordViewSet
+from .widgets import WidgetsView
 from .view_404 import View404

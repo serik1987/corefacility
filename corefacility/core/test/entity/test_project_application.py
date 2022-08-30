@@ -77,8 +77,8 @@ class TestProjectApplication(BaseTestClass):
                          application=ImagingApp(), is_enabled=True)
 
     @parameterized.expand(application_provider())
-    def test_aplication(self, test_name, shall_uninstall_app, initial_app_class, changed_app_class, exception_to_throw,
-                        route_number):
+    def test_application(self, test_name, shall_uninstall_app, initial_app_class, changed_app_class, exception_to_throw,
+                         route_number):
         if isinstance(initial_app_class, str):
             initial_app = self._sample_project
         else:

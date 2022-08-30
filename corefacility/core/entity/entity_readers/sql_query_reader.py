@@ -144,7 +144,6 @@ class SqlQueryReader(EntityReader):
         Looks for a single entity in the entity source. If entity exists it returns the entity
         itself. If entity doesn't exist, it shall throw the following exception:
         core.entity.entity_exceptions.EntityNotFoundException
-
         :param kwargs: They depend on how the entity_set is used
         entity_set.get(ID) will call entity_reader.get(id=ID)
         entity_set.get("some_alias") will call entity_reader.get(alias="some_alias")

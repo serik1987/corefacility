@@ -147,7 +147,7 @@ class CorefacilityModuleReader(RawSqlQueryReader):
                 user_settings = {}
         if isinstance(uuid, str):
             uuid = UUID(uuid)
-        return ModelEmulator(
+        emulator = ModelEmulator(
             id=None,
             uuid=uuid,
             alias=alias,
@@ -159,3 +159,4 @@ class CorefacilityModuleReader(RawSqlQueryReader):
             is_enabled=bool(is_enabled),
             user_access_level=access_control_list,
         )
+        return emulator
