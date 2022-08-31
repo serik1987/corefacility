@@ -2,7 +2,7 @@ from parameterized import parameterized
 
 from core.test.entity_set.base_test_class import BaseTestClass
 
-from .entity_objects.map_set_object import MapSetObject
+from imaging.tests.data_providers.entity_objects.map_set_object import MapSetObject
 
 
 class TestMapSet(BaseTestClass):

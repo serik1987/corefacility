@@ -1,5 +1,5 @@
 from core.entity.entity import Entity
-from core.entity.entity_fields import EntityField
+from core.entity.entity_fields.related_entity_field import RelatedEntityField
 from core.entity.entity_fields.choice_entity_field import ChoiceEntityField
 from core.entity.entity_fields.float_field import FloatField
 from core.entity.entity_fields.read_only_field import ReadOnlyField
@@ -18,7 +18,7 @@ class Map(Entity):
 
     _entity_provider_list = [MapProvider()]
 
-    _required_fields = ["alias", "type"]
+    _required_fields = ["alias", "type", "project"]
 
     _entity_set_class = MapSet
     
@@ -30,6 +30,7 @@ class Map(Entity):
         "resolution_y": ReadOnlyField(description="Map resolution, Y"),
         "width": FloatField(min_value=0.0, min_value_included=False, description="Map width, um"),
         "height": FloatField(min_value=0.0, min_value_included=False, description="Map height, um"),
+        "project": RelatedEntityField("core.entity.project.Project", description="Related project")
     }
 
     def __eq__(self, other):

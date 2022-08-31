@@ -13,10 +13,10 @@ class MapObject(EntityObject):
 
     _default_create_kwargs = {
         "alias": "c022_X210",
-        "type": MapType.orientation
+        "type": MapType.orientation,
     }
 
     _default_change_kwargs = {
         "alias": "c023_X210",
-        "type": MapType.direction
+        "type": MapType.direction,
     }

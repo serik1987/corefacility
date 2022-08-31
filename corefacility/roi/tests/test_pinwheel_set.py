@@ -2,7 +2,7 @@ from parameterized import parameterized
 
 from core.test.entity_set.base_test_class import BaseTestClass
 from core.test.data_providers.entity_sets import filter_data_provider
-from imaging.tests.entity_objects.map_set_object import MapSetObject
+from imaging.tests.data_providers.entity_objects import MapSetObject
 
 from .entity_objects.pinwheel_set_object import PinwheelSetObject
 

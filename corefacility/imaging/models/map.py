@@ -1,4 +1,7 @@
 from django.db import models
+
+from core.models.project import Project
+
 from .enums import MapType
 
 
@@ -14,3 +17,6 @@ class Map(models.Model):
     resolution_y = models.PositiveIntegerField(help_text="Map height, px", null=True, blank=True)
     width = models.FloatField(help_text="Map width, um", null=True, blank=True)
     height = models.FloatField(help_text="Map height, um", null=True, blank=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="imaging_maps",
+                                null=False)
+
