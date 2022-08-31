@@ -11,5 +11,6 @@ from .permission_input_serializer import PermissionInputSerializer
 from .log_list_serializer import LogListSerializer
 from .log_detail_serializer import LogDetailSerializer
 from .log_record_serializer import LogRecordSerializer
+from .module_serializer import ModuleSerializer
 
 from .login_password_serializer import LoginPasswordSerializer

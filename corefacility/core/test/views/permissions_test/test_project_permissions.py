@@ -4,6 +4,7 @@ from rest_framework import status
 from parameterized import parameterized
 
 from core.models.enums import LevelType
+from core.test.data_providers.file_data_provider import file_data_provider
 
 from .base_test_class import BasePermissionTest
 from .expected_permission_list import ExpectedPermission, ExpectedPermissionList, PermissionListSimulator
@@ -158,15 +159,6 @@ def permission_list_provider():
             for login in ("user1", "user2", "user3", "user4", "user5", "user6")
         ]
     ]
-
-
-def file_data_provider(filename):
-    arg_list = []
-    with open(filename, "r") as arg_file:
-        arg_reader = csv.reader(arg_file)
-        for args in arg_reader:
-            arg_list.append(tuple(args))
-    return arg_list
 
 
 class TestProjectPermissions(BasePermissionTest):

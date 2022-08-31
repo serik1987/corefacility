@@ -49,7 +49,7 @@ class ProjectRelatedPermission(IsAuthenticated):
         return self.has_project_permission(request, view, request.project, request.project_access_level,
                                            request.is_project_superuser)
 
-    def has_project_permission(self, request, view, project, access_level, is_user_superuser):
+    def has_project_permission(self, request, view, project, access_level, is_project_superuser):
         """
         Checks whether the user can deal with a certain particular project
 
@@ -57,7 +57,9 @@ class ProjectRelatedPermission(IsAuthenticated):
         :param view: an API view responsible for processing the request
         :param project: a project the user is trying to work on
         :param access_level: a project access level calculated for a particular user
-        :param is_user_superuser: True if the user has superuser rights for the project, False otherwise
+        :param is_project_superuser: True given that at least one of the following conditions are True:
+            - the user is project governor;
+            - the user is governor of the group which project permissions are set to 'full'
         :return: True if the access shall be granted. False if the access shall be denied.
         """
         return True
