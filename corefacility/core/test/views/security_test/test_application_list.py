@@ -4,23 +4,17 @@ from django.utils.translation import gettext
 from rest_framework import status
 from parameterized import parameterized
 
-from core.models.enums import LevelType
-from core.entity.access_level import AccessLevelSet
-from core.entity.entry_points.authorizations import AuthorizationModule
 from core.test.data_providers.file_data_provider import file_data_provider
-from core.test.entity_set.entity_set_objects.user_set_object import UserSetObject
-from core.test.entity_set.entity_set_objects.group_set_object import GroupSetObject
-from core.test.entity_set.entity_set_objects.project_set_object import ProjectSetObject
-from core.test.entity_set.entity_set_objects.project_application_set_object import ProjectApplicationSetObject
 
 from imaging import App as ImagingApp
 
 from .base_test_class import BaseTestClass
+from ..permissions_test.base_project_data_test import ProjectDataTestMixin
 
-TEST_CASE_LIST_FILE = Path(__file__).parent.parent / "permissions_test/test_cases/processors.csv"
+TEST_CASE_LIST_FILE = Path(__file__).parent.parent / "permissions_test/test_cases/ep_imaging.csv"
 
 
-class TestApplicationList(BaseTestClass):
+class TestApplicationList(ProjectDataTestMixin, BaseTestClass):
     """
     Provides security tests for the ApplicationListView
     """
@@ -29,42 +23,13 @@ class TestApplicationList(BaseTestClass):
     PROCESSORS_APPLICATION_LIST_PATH = "/api/{version}/core/projects/{project_lookup}/imaging/processors/{data_lookup}/"
     SETTINGS_APPLICATION_LIST_PATH = "/api/{version}/settings/"
 
-    _access_levels = None
-    _user_set_object = None
-    _group_set_object = None
-    _project_set_object = None
-    _project_application_set_object = None
-
-    superuser_required = True
-    ordinary_user_required = True
-
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls._load_access_levels()
-        cls._user_set_object = UserSetObject()
-        cls._group_set_object = GroupSetObject(cls._user_set_object.clone())
-        cls._project_set_object = ProjectSetObject(cls._group_set_object.clone())
-        cls._project_application_set_object = ProjectApplicationSetObject(cls._project_set_object.clone())
-        cls.issue_tokens()
-
-    @classmethod
-    def _load_access_levels(cls):
-        level_set = AccessLevelSet()
-        level_set.type = LevelType.app_level
-        cls._access_levels = {}
-        for level in level_set:
-            cls._access_levels[level.alias] = level
-
-    @classmethod
-    def issue_tokens(cls):
-        for user in cls._user_set_object:
-            token = AuthorizationModule.issue_token(user)
-            setattr(cls, "%s_token" % user.login, token)
+        cls.create_project_data_environment()
 
     @parameterized.expand(file_data_provider(TEST_CASE_LIST_FILE))
-    def test_projects_list(self, login="user1", project="hhna", processors_mode="none",
-                           expected_status_code=status.HTTP_200_OK, module_count=1):
+    def test_projects_list(self, login, project, processors_mode, expected_status_code, module_count):
         """
         Tests whether application list related to a single project is correctly resolved
         :param login: particular user's login
@@ -86,22 +51,6 @@ class TestApplicationList(BaseTestClass):
             self.assertEquals(len(response_data['module_list']), module_count, "Unexpected number of modules")
             if module_count == 1:
                 self.assert_module_detail(response_data['module_list'][0], ImagingApp())
-
-    def change_modules_enability(self, project_alias, processors_mode):
-        """
-        Makes all modules either enabled or disabled
-        :param project_alias: project's alias
-        :param processors_mode: 'all_enabled', 'all_disabled' or 'none' depending on the action
-        :return: nothing
-        """
-        for project_application_record in self._project_application_set_object:
-            if project_application_record.project.alias == project_alias:
-                if processors_mode == "all_enabled":
-                    project_application_record.is_enabled = True
-                    project_application_record.update()
-                if processors_mode == "all_disabled":
-                    project_application_record.is_enabled = False
-                    project_application_record.update()
 
     def make_test_request(self, login, module_list_path, expected_status_code):
         """

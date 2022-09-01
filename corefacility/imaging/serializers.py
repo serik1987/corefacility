@@ -26,8 +26,10 @@ class MapSerializer(EntitySerializer):
                                    help_text="'ori' for orientation maps, 'dir' for directional maps")
     resolution_x = serializers.ReadOnlyField(help_text="Map width in pixels")
     resolution_y = serializers.ReadOnlyField(help_text="map height in pixels")
-    width = serializers.FloatField(min_value=0, validators=[non_zero_validator], help_text="Map width in um")
-    height = serializers.FloatField(min_value=0, validators=[non_zero_validator], help_text="Map height in um")
+    width = serializers.FloatField(min_value=0, required=False, allow_null=True, validators=[non_zero_validator],
+                                   help_text="Map width in um")
+    height = serializers.FloatField(min_value=0, required=False, allow_null=True, validators=[non_zero_validator],
+                                    help_text="Map height in um")
 
     def create(self, data):
         """
