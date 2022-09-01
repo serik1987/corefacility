@@ -13,3 +13,8 @@ class MapSet(EntitySet):
     _entity_reader_class = MapReader
 
     _entity_name = _("Functional map")
+
+    _entity_filter_list = {
+        # filter_name: [filter_type, additional_constraint]
+        "project": ["core.entity.project.Project", None]
+    }

@@ -25,6 +25,10 @@ class MapSetObject(EntitySetObject):
     def project2(self):
         return self._project2
 
+    @property
+    def all_projects(self):
+        return [self._project1, self.project2]
+
     def __init__(self, _entity_list=None):
         """
         Initializes a set of certain custom entity objects and adds such objects to the database.
@@ -42,6 +46,14 @@ class MapSetObject(EntitySetObject):
             self._project2.create()
         super().__init__(_entity_list)
 
+    def filter_by_project(self, project: Project):
+        """
+        Filters all data by the project
+        :param project: the project itself
+        :return: nothing
+        """
+        self._entities = list(filter(lambda functional_map: functional_map.project.id == project.id, self._entities))
+
     def data_provider(self):
         """
         Defines properties of custom entity objects created in the constructor.
@@ -56,3 +68,13 @@ class MapSetObject(EntitySetObject):
             dict(alias="c040_X100", type=MapType.orientation, project=self.project2),
             dict(alias="c040_X101", type=MapType.direction, project=self.project2),
         ]
+
+    def clone(self):
+        """
+        Creates a copy of self
+        :return: another instance of the MapSetObject
+        """
+        map_set_object = super().clone()
+        map_set_object._project1 = self._project1
+        map_set_object._project2 = self._project2
+        return map_set_object
