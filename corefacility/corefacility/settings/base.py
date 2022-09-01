@@ -184,7 +184,7 @@ class CorefacilityConfiguration(Configuration):
         ],
 
         "DEFAULT_PERMISSION_CLASSES": [
-            "rest_framework.permissions.IsAuthenticated"
+            "core.permissions.ProjectDataPermission"
         ],
 
         "DEFAULT_THROTTLE_CLASSES": [

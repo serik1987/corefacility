@@ -1,6 +1,7 @@
 from rest_framework.permissions import IsAuthenticated
 
 from .project_related_permission import ProjectRelatedPermission
+from .project_data_permission import ProjectDataPermission
 
 
 class AdminOnlyPermission(IsAuthenticated):
@@ -11,7 +12,6 @@ class AdminOnlyPermission(IsAuthenticated):
     def has_permission(self, request, view):
         """
         Checks whether the user is allowed to perform administrative functions
-
         :param request: the request
         :param view: the view
         :return: True if the user is allowed, False otherwise
@@ -26,8 +26,7 @@ class NoSupportPermission(IsAuthenticated):
 
     def has_permission(self, request, view):
         """
-        Permission check to be done before the immediate request execution.
-
+        Permission check to be done before the immediate request execution
         :param request: the request
         :param view: the view
         :return: True if the user is allowed, False otherwise
@@ -45,7 +44,6 @@ class GroupPermission(IsAuthenticated):
     def has_permission(self, request, view):
         """
         Checks for the global permissions
-
         :param request: request received from the client application
         :param view: view responsible for the request processing
         :return: True if the operation is allowed, False if the operation is denied
@@ -56,7 +54,6 @@ class GroupPermission(IsAuthenticated):
     def has_object_permission(self, request, view, group):
         """
         Checks for a group permission (will be applied together with global permission checking)
-
         :param request: the request received from the client
         :param view: a view responsible for the request processing
         :param group: some group the user is trying to perform operations
@@ -75,7 +72,6 @@ class ProjectPermission(IsAuthenticated):
     def has_object_permission(self, request, view, project):
         """
         Defines whether the client has access to a particular project
-
         :param request: the HTTP request sent by a particular client
         :param view: an instance of the ProjectViewSet
         :param project: a particular project which permissions shall be calculated
@@ -94,7 +90,6 @@ class ProjectSettingsPermission(ProjectRelatedPermission):
     def has_project_permission(self, request, view, project, access_level, is_user_superuser):
         """
         Checks whether the user can deal with a certain particular project
-
         :param request: a currently processing request
         :param view: an API view responsible for processing the request
         :param project: a project the user is trying to work on

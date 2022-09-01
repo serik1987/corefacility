@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-23 12:16+0300\n"
+"POT-Creation-Date: 2022-09-01 13:48+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -121,7 +121,7 @@ msgstr "Только обработка данных"
 msgid "Viewing the data"
 msgstr "Только просмотр данных"
 
-#: core/migrations/0002_fill.py:64 core/migrations/0002_fill.py:83
+#: core/migrations/0002_fill.py:64
 msgid "No access"
 msgstr "Доступ закрыт"
 
@@ -133,75 +133,67 @@ msgstr "Добавление приложения в проект"
 msgid "Add application (superuser permission required)"
 msgstr "Добавление приложения в проект (с согласия суперпользователя)"
 
-#: core/migrations/0002_fill.py:81
-msgid "Application usage"
-msgstr "Использование приложения"
-
-#: core/migrations/0002_fill.py:95
+#: core/migrations/0002_fill.py:91
 msgid "Core functionality"
 msgstr "Базовый функционал"
 
-#: core/migrations/0002_fill.py:100
+#: core/migrations/0002_fill.py:96
 msgid "Authorization methods"
 msgstr "Способы авторизации"
 
-#: core/migrations/0002_fill.py:104
+#: core/migrations/0002_fill.py:100
 msgid "Standard authorization"
 msgstr "Стандартная авторизация"
 
-#: core/migrations/0002_fill.py:107
+#: core/migrations/0002_fill.py:103
 msgid "Authorization through IHNA website"
 msgstr "Авторизация через сайт ИВНД и НФ РАН"
 
-#: core/migrations/0002_fill.py:110
+#: core/migrations/0002_fill.py:106
 msgid "Authorization through Google"
 msgstr "Авторизация через Google"
 
-#: core/migrations/0002_fill.py:113
+#: core/migrations/0002_fill.py:109
 msgid "Authorization through Mail.ru"
 msgstr "Авторизация через Mail.ru"
 
-#: core/migrations/0002_fill.py:116
-msgid "Authorization through UNIX account"
-msgstr "Авторизация через операционную систему"
-
-#: core/migrations/0002_fill.py:119
+#: core/migrations/0002_fill.py:112
 msgid "Authorization through Cookie"
 msgstr "Авторизация через Cookie"
 
-#: core/migrations/0002_fill.py:122
+#: core/migrations/0002_fill.py:115
 msgid "Password recovery function"
 msgstr "Функция восстановления пароля"
 
-#: core/migrations/0002_fill.py:125
+#: core/migrations/0002_fill.py:118
 msgid "Automatic authorization"
 msgstr "Автоматическая авторизация"
 
-#: core/migrations/0002_fill.py:130
+#: core/migrations/0002_fill.py:123
 msgid "Account synchronization"
 msgstr "Синхронизация учётных записей"
 
-#: core/migrations/0002_fill.py:135
+#: core/migrations/0002_fill.py:128
 msgid "IHNA RAS account synchronization"
 msgstr "Синхронизация с сайтом ИВНД и НФ РАН"
 
-#: core/migrations/0002_fill.py:139
+#: core/migrations/0002_fill.py:132
 msgid "Project applications"
 msgstr "Работа с научными проектами"
 
-#: core/migrations/0002_fill.py:144
+#: core/migrations/0002_fill.py:137
 msgid "Basic functional maps processing"
 msgstr "Базовая обработка функциональных карт"
 
-#: core/migrations/0002_fill.py:149
+#: core/migrations/0002_fill.py:142
 msgid "Imaging processors"
 msgstr "Обработка функциональных карт"
 
-#: core/migrations/0002_fill.py:152
+#: core/migrations/0002_fill.py:145
 msgid "ROI definition"
 msgstr "Выделение ROI"
 
-#: core/migrations/0002_fill.py:155
+#: core/migrations/0002_fill.py:148
 msgid "Other settings"
 msgstr "Прочие настройки"
 
@@ -247,12 +239,16 @@ msgstr "Ошибка"
 msgid "The system was down"
 msgstr "Сервер экстренно прекратил работу"
 
-#: core/os/exceptions.py:29
+#: core/os/exceptions.py:27
 msgid ""
 "Please, login to the server using SSH, execute the commands listed below \n"
 "and press Continue to finish this action\n"
 "\n"
-msgstr "Пожалуйста, авторизуйтесь на сервере с использованием протокола SSH, выполните команды, перечисленные ниже,\n после чего нажмите Продолжить для завершения этого действия\n\n"
+msgstr ""
+"Пожалуйста, авторизуйтесь на сервере с использованием протокола SSH, "
+"выполните команды, перечисленные ниже,\n"
+" после чего нажмите Продолжить для завершения этого действия\n"
+"\n"
 
 #: core/serializers/project_detail_serializer.py:46
 msgid ""
@@ -299,7 +295,7 @@ msgstr "Загрузка..."
 msgid "Incorrect credentials."
 msgstr "Неверные учётные данные."
 
-#: core/views/user.py:35
+#: core/views/user.py:39
 msgid "You can't delete yourself."
 msgstr "Вы не можете удалить самого себя"
 
@@ -315,6 +311,10 @@ msgstr "Карта ориентационной настройки"
 msgid "Direction map"
 msgstr "Карта дирекциональной настройки"
 
+#: imaging/serializers.py:10
+msgid "This value shall not be zero"
+msgstr "Данное значение не должно быть равно нулю"
+
 #: roi/entity/pinwheel/pinwheel_set.py:14
 msgid "Pinwheel"
 msgstr "Центр ориентационной гиперколонки"
@@ -322,6 +322,12 @@ msgstr "Центр ориентационной гиперколонки"
 #: roi/entity/rectangular_roi/rectangular_roi_set.py:13
 msgid "Rectangular ROI"
 msgstr "Прямоугольная область интереса"
+
+#~ msgid "Application usage"
+#~ msgstr "Использование приложения"
+
+#~ msgid "Authorization through UNIX account"
+#~ msgstr "Авторизация через операционную систему"
 
 #, fuzzy
 #~| msgid "Application usage"

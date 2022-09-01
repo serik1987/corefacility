@@ -15,7 +15,7 @@ class BaseTestClass(BaseViewTest):
     """
 
     _tested_entity = None
-    """ Entity to test """
+    """ Class of the entity to test """
 
     alias_field = "alias"
     """ Alias field or None if not applicable """

@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from .testviews.test_transaction import TestTransaction
@@ -19,6 +19,7 @@ urlpatterns = [
     path(r'__test__/transaction/<str:dirname>/', TestTransaction.as_view(), name="test-transaction"),
 
     path(r'core/projects/<str:project_lookup>/', ProjectModulesListView.as_view(), name="module-list-projects"),
+    path(r'core/projects/<str:project_lookup>/', include(("core.entity.ep_urls.projects", "projects"))),
 
     path(r'login/', LoginView.as_view(), name="login"),
     path(r'profile/', ProfileView.as_view(), name="profile"),
