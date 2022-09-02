@@ -18,6 +18,6 @@ class ProjectDataProvider(ModelProvider):
         entity_model = entity._wrapped
         if not isinstance(entity_model, self.entity_model):
             entity_model = self.entity_model.objects.get(pk=entity.id)  # + 1 EXTRA QUERY!
-        file_field = getattr(entity_model, name)
-        file_field.save(value.name, value, save=True)
-        setattr(entity, "_" + name, file_field)
+        setattr(entity_model, name, value.name)
+        entity_model.save()
+        setattr(entity, "_" + name, getattr(entity_model, name))

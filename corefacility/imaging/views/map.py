@@ -92,14 +92,6 @@ class MapViewSet(FileUploadMixin, EntityViewSet):
         :return: nothing
         """
         super().attach_file(functional_map, attaching_file)
-        source_file = os.path.join(settings.MEDIA_ROOT, functional_map.data.url)
-        target_file = os.path.join(self.request.project.project_dir, functional_map.data.url)
-        try:
-            if os.path.isfile(target_file):
-                os.remove(target_file)
-            if os.path.isdir(target_file):
-                shutil.rmtree(target_file)
-            if os.path.isfile(source_file):
-                shutil.move(source_file, target_file)
-        except OSError as err:
-            raise OperatingSystemException(err)
+        filename = os.path.join(self.request.project.project_dir, functional_map.data.url)
+        with open(filename, "wb") as file_object:
+            file_object.write(attaching_file.file.getbuffer())
