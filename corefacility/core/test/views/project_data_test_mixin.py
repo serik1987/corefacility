@@ -23,7 +23,7 @@ class ProjectDataTestMixin:
     ordinary_user_required = True
 
     @classmethod
-    def create_project_data_environment(cls):
+    def create_project_data_environment(cls, create_project_application_set=False):
         cls._load_access_levels()
         cls._user_set_object = UserSetObject()
         cls._group_set_object = GroupSetObject(cls._user_set_object.clone())

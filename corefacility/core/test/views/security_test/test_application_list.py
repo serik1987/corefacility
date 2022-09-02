@@ -9,7 +9,7 @@ from core.test.data_providers.file_data_provider import file_data_provider
 from imaging import App as ImagingApp
 
 from .base_test_class import BaseTestClass
-from ..permissions_test.base_project_data_test import ProjectDataTestMixin
+from ..project_data_test_mixin import ProjectDataTestMixin
 
 TEST_CASE_LIST_FILE = Path(__file__).parent.parent / "permissions_test/test_cases/ep_imaging.csv"
 

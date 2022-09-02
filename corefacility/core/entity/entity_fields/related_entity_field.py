@@ -1,4 +1,5 @@
 from django.utils.module_loading import import_string
+from core.entity.entity_exceptions import EntityFieldInvalid
 from .entity_field import EntityField
 
 
@@ -30,7 +31,7 @@ class RelatedEntityField(EntityField):
         if isinstance(self._entity_class, str):
             self._entity_class = import_string(self._entity_class)
         if not isinstance(value, self._entity_class):
-            raise ValueError("RelatedEntityField.correct: attempting to assign the incorrect entity type")
+            raise EntityFieldInvalid("The value is not a proper entity")
         if value.state == "creating" or value.state == "deleted":
-            raise ValueError("RelatedEntityField.correct: the value is not create()'d before assigning")
+            raise RuntimeError("Incorrect of the attaching entity")
         return value

@@ -20,7 +20,7 @@ class MapSerializer(EntitySerializer):
     entity_class = Map
 
     id = serializers.ReadOnlyField(help_text="Map ID")
-    alias = serializers.SlugField(required=True, allow_null=False, help_text="Map string ID")
+    alias = serializers.SlugField(max_length=50, required=True, allow_null=False, help_text="Map string ID")
     data = serializers.ReadOnlyField(help_text="Map data URL", source="data.url")
     type = serializers.ChoiceField(("ori", "dir"), required=True, allow_null=False,
                                    help_text="'ori' for orientation maps, 'dir' for directional maps")

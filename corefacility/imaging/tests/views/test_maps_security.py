@@ -2,6 +2,7 @@ from rest_framework import status
 from parameterized import parameterized
 
 from core.test.views import BaseProjectDataSecurityTest
+from imaging import App
 from imaging.entity import Map
 
 
@@ -32,6 +33,9 @@ class TestMapsSecurity(BaseProjectDataSecurityTest):
     """
     Defines the status code when the user tries to post, put or patch the data under 'data_process' permission
     """
+
+    application = App()
+    """ Application to be tested """
 
     def create_entity_for_test(self, test_data):
         """
