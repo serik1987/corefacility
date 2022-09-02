@@ -1,8 +1,8 @@
-from core.entity.entity_providers.model_providers.model_provider import ModelProvider
+from core.entity.entity_providers.model_providers.project_data_provider import ProjectDataProvider
 from core.entity.entity_readers.model_emulators import ModelEmulator
 
 
-class MapProvider(ModelProvider):
+class MapProvider(ProjectDataProvider):
     """
     Exchanges information and control between the map entity and the map model
     """

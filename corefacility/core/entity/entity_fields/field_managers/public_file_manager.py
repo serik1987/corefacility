@@ -17,12 +17,23 @@ class PublicFileManager(EntityValueManager):
     (d) doesn't require the corefacility application to be downloaded (i.e., they will be downloaded faster).
     """
 
+    _include_media_root = None
+
+    def __init__(self, value, default_value=None, include_media_root: bool = True):
+        """
+        Initializes the public file manager
+        :param value: Internal value of the field (must be an instance of django.core.files.File class)
+        :param default_value: value of the property when value doesn't refer to any file
+        :param include_media_root: True to include media URL to the file URL, False otherwise
+        """
+        super().__init__(value, default_value)
+        self._include_media_root = include_media_root
+
     def attach_file(self, file: File) -> None:
         """
-        Attaches external file to tje entity.
+        Attaches external file to tje entity
         No any additional save/retrieve is needed but the entity state must be either 'loaded' or 'saved'.
         The function does not validate or process the file: this is a view responsibility to do this
-
         :param file: an instance of django.core.files.File object containing the attached file
         :return: nothing
         """
@@ -67,10 +78,12 @@ class PublicFileManager(EntityValueManager):
         Returns the file URL
         """
         if self.is_detached:
-            return self._default_value
+            filename = self._default_value
         else:
             filename = self._field_value.name
-            return settings.MEDIA_URL + filename
+            if self._include_media_root:
+                filename = settings.MEDIA_URL + filename
+        return filename
 
     def __eq__(self, other):
         """

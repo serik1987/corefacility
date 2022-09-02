@@ -1,13 +1,15 @@
+import os
+import shutil
 from io import BytesIO
 
+from django.conf import settings
 from django.core.files import File
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
 import numpy
 from numpy.lib.npyio import NpzFile
 
 from core.generic_views import EntityViewSet, FileUploadMixin
-from core.api_exceptions import FileFormatException
+from core.api_exceptions import FileFormatException, OperatingSystemException
 from imaging import App
 from imaging.entity import MapSet
 from imaging.serializers import MapSerializer
@@ -48,6 +50,7 @@ class MapViewSet(FileUploadMixin, EntityViewSet):
         map_set.project = self.request.project
         return map_set
 
+    # noinspection PyTypeChecker
     def file_preprocessing(self, map_entity, uploaded_file, content_type):
         """
         Ensures that the file have proper (NPZ) type
@@ -70,7 +73,33 @@ class MapViewSet(FileUploadMixin, EntityViewSet):
         if not isinstance(imaging_data, numpy.ndarray) or imaging_data.ndim != 2 or imaging_data.size == 0 or \
                 not str(imaging_data.dtype).startswith("complex"):
             raise NotAMapException()
+        resolution_y, resolution_x = imaging_data.shape
+        map_entity._resolution_x = resolution_x
+        map_entity._resolution_y = resolution_y
+        map_entity.notify_field_changed("resolution_x")
+        map_entity.notify_field_changed("resolution_y")
+        map_entity.update()
         imaging_data_stream = BytesIO()
         numpy.save(imaging_data_stream, imaging_data)
         processed_file = File(imaging_data_stream, name="%s.npy" % map_entity.alias)
         return processed_file
+
+    def attach_file(self, functional_map, attaching_file):
+        """
+        Saves file to the hard disk drive or to the database
+        :param functional_map: the entity to which the file shall be attached
+        :param attaching_file: file to attach (a django.core.files.File instance)
+        :return: nothing
+        """
+        super().attach_file(functional_map, attaching_file)
+        source_file = os.path.join(settings.MEDIA_ROOT, functional_map.data.url)
+        target_file = os.path.join(self.request.project.project_dir, functional_map.data.url)
+        try:
+            if os.path.isfile(target_file):
+                os.remove(target_file)
+            if os.path.isdir(target_file):
+                shutil.rmtree(target_file)
+            if os.path.isfile(source_file):
+                shutil.move(source_file, target_file)
+        except OSError as err:
+            raise OperatingSystemException(err)

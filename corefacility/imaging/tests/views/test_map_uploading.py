@@ -1,5 +1,8 @@
+import os
 from pathlib import Path
 
+
+from django.conf import settings
 from core.test.views.project_data_test_mixin_small import ProjectDataTestMixinSmall
 from core.test.views.field_test.base_test_class import BaseTestClass
 from imaging import App
@@ -18,7 +21,7 @@ class TestMapUploading(ProjectDataTestMixinSmall, BaseTestClass):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.create_test_environment()
-        cls.functional_map = Map(alias="c023_X210", type="ori", project=cls.project)
+        cls.functional_map = Map(alias="c023_X210", type="ori", project=cls.project, width=12400, height=12400)
         cls.functional_map.create()
 
     def test_sample(self):
@@ -27,4 +30,9 @@ class TestMapUploading(ProjectDataTestMixinSmall, BaseTestClass):
         with open(filename, "rb") as fp:
             detail_path = "/api/v1/core/projects/test_project/imaging/data/c023_X210/npy/"
             response = self.client.patch(detail_path, {"file": fp}, format="multipart", **headers)
-            print(response, response.data)
+            print(response)
+            print(response.data)
+            print(settings.MEDIA_ROOT)
+            print(os.listdir(settings.MEDIA_ROOT))
+            reading_response = self.client.get("/api/v1/core/projects/test_project/imaging/data/c023_X210/", **headers)
+            print(reading_response.data)

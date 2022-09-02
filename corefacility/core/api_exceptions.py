@@ -29,6 +29,20 @@ class EntityProcessingException(CorefacilityAPIException):
     status_code = status.HTTP_400_BAD_REQUEST
 
 
+class OperatingSystemException(EntityProcessingException):
+    """
+    Raises at any operating system exceptions
+    """
+    status_code = status.HTTP_400_BAD_REQUEST
+
+    def __init__(self, os_error):
+        """
+        Initializes the exception
+        :param os_error: another_exception
+        """
+        super().__init__(code="os_error", detail=str(os_error))
+
+
 class FileFormatException(CorefacilityAPIException):
     """
     Raises when bad file format has been uploaded

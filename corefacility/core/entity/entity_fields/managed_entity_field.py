@@ -12,26 +12,27 @@ class ManagedEntityField(ReadOnlyField):
     """
 
     _field_manager_class = None
+    _field_manager_kwargs = None
 
-    def __init__(self, field_manager_class, description=None, default=None):
+    def __init__(self, field_manager_class, description=None, default=None, **kwargs):
         """
         Initializes the managed entity field
-
-        :param field_manager_class: the field manager class.
+        :param field_manager_class: the field manager class
         :param description: the field description as usual
-        :param default: the default value that have to be used internally by the manager
+        :param kwargs: additional keyword arguments
+        :param default: the default value that will be passed to the field manager constructor
         """
         super().__init__(description=description, default=default)
         self._field_manager_class = field_manager_class
+        self._field_manager_kwargs = kwargs
 
     def proofread(self, value) -> EntityValueManager:
         """
         Provides the indirect reading access to that entity field
-
         :param value: the field values stored inside the entity
         :return: the field value manager that the user can use
         """
-        return self._field_manager_class(value, self._default)
+        return self._field_manager_class(value, self._default, **self._field_manager_kwargs)
 
     @property
     def default(self):

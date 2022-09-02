@@ -24,7 +24,7 @@ class Map(Entity):
     
     _public_field_description = {
         "alias": EntityAliasField(max_length=50),
-        "data": ManagedEntityField(PublicFileManager, "Imaging map file"),
+        "data": ManagedEntityField(PublicFileManager, "Imaging map file", include_media_root=False),
         "type": ChoiceEntityField("imaging.models.enums.MapType", description="Functional map type"),
         "resolution_x": ReadOnlyField(description="Map resolution, X"),
         "resolution_y": ReadOnlyField(description="Map resolution, Y"),
