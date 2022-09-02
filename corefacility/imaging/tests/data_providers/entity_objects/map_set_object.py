@@ -14,6 +14,7 @@ class MapSetObject(EntitySetObject):
 
     _entity_class = Map
 
+    _user = None
     _project1 = None
     _project2 = None
 

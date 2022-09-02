@@ -3,7 +3,7 @@ from django.conf import settings
 from core.models.enums import LevelType
 from core.entity.user import User
 from core.entity.group import Group
-from core.entity.project import Project
+from core.entity.project import Project, ProjectSet
 from core.entity.project_application import ProjectApplication
 from core.entity.access_level import AccessLevelSet
 from core.entity.entity_providers.posix_providers.posix_provider import PosixProvider
@@ -35,29 +35,41 @@ class ProjectDataTestMixinSmall:
     project = None
     """ The testing project """
 
+    projects = None
+
     application = None
     """ Application to be tested """
 
     @classmethod
-    def create_test_environment(cls):
+    def create_test_environment(cls, project_number=1):
         """
-        Creates a proper test environment
+        Creates the test environment
+        :param project_number: number of projects to create
         """
         if not settings.CORE_SUGGEST_ADMINISTRATION:
             PosixProvider.force_disable = False
             FilesProvider.force_disable = False
         cls.load_access_levels()
         cls.create_users_and_groups()
-        cls.create_project()
+        cls.create_projects(project_number)
         cls.attach_application()
+
+    def initialize_projects(self):
+        """
+        If you use projects array, please, call this method at test's setUp
+        """
+        project_set = ProjectSet()
+        self.projects = [project_set.get(project_id) for project_id in self.projects]
 
     @classmethod
     def destroy_test_environment(cls):
         """
         Destroys the test environment
         """
-        if cls.project is not None:
-            cls.project.delete()
+        for project in cls.projects:
+            if not isinstance(project, Project):
+                project = ProjectSet().get(project)
+            project.delete()
         cls.delete_users_and_groups()
 
     @classmethod
@@ -100,23 +112,33 @@ class ProjectDataTestMixinSmall:
             user.delete()
 
     @classmethod
-    def create_project(cls):
+    def create_projects(cls, project_number=1):
         """
-        Creates the test projects and sets its proper permissions
+        Creates test project and sets proper permissions
+        :param project_number: total number of projects
+        :return: nothing
         """
-        cls.project = Project(alias="test_project", name="The Test Project", root_group=cls.group_list['full'])
-        cls.project.create()
-        for login, group in cls.group_list.items():
-            if login not in ("superuser", "full", "ordinary_user"):
-                cls.project.permissions.set(group, cls.access_levels[login])
+        cls.projects = []
+        for project_index in range(project_number):
+            project_alias = "test_project%d" % project_index if project_index > 0 else "test_project"
+            project = Project(alias=project_alias, name=project_alias, root_group=cls.group_list['full'])
+            project.create()
+            for login, group in cls.group_list.items():
+                if login not in ("superuser", "full", "ordinary_user"):
+                    project.permissions.set(group, cls.access_levels[login])
+            if project_index == 0:
+                cls.project = project
+            cls.projects.append(project.id)
 
     @classmethod
     def attach_application(cls):
         """
         Attaches application to the project
         """
-        project_application = ProjectApplication(application=cls.application, project=cls.project, is_enabled=True)
-        project_application.create()
+        for project_id in cls.projects:
+            project = ProjectSet().get(project_id)
+            project_application = ProjectApplication(application=cls.application, project=project, is_enabled=True)
+            project_application.create()
 
     @classmethod
     def get_users_info(cls):

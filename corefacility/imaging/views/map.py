@@ -14,3 +14,13 @@ class MapViewSet(EntityViewSet):
     entity_set_class = MapSet
     list_serializer_class = MapSerializer
     detail_serializer_class = MapSerializer
+
+    def filter_queryset(self, map_set):
+        """
+        Applies additional filtration to the map set
+        :param map_set: the map set before filtration
+        :return: the map set after filtration
+        """
+        map_set = super().filter_queryset(map_set)
+        map_set.project = self.request.project
+        return map_set
