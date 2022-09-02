@@ -24,7 +24,7 @@ class ProfileAvatarView(AvatarMixin, EntityViewMixin, APIView):
         :param kwargs: function keyword arguments
         :return: nothing
         """
-        return self.upload_avatar(request)
+        return self.upload_file(request)
 
     def delete(self, request, *args, **kwargs):
         """
@@ -35,7 +35,7 @@ class ProfileAvatarView(AvatarMixin, EntityViewMixin, APIView):
         :param kwargs: function keyword arguments
         :return: nothing
         """
-        return self.delete_avatar(request)
+        return self.delete_file(request)
 
     def get_object(self):
         """

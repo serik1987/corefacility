@@ -29,6 +29,28 @@ class EntityProcessingException(CorefacilityAPIException):
     status_code = status.HTTP_400_BAD_REQUEST
 
 
+class FileFormatException(CorefacilityAPIException):
+    """
+    Raises when bad file format has been uploaded
+    """
+
+    status_code = status.HTTP_400_BAD_REQUEST
+
+    def __init__(self):
+        super().__init__(code="file_upload_error", detail=_("This file type is not uploadable"))
+
+
+class AvatarResolutionTooSmallException(CorefacilityAPIException):
+    """
+    Raises when the user tries to upload too small avatar
+    """
+
+    status_code = status.HTTP_400_BAD_REQUEST
+
+    def __init__(self):
+        super().__init__(code="file_upload_error", detail=_("The image resolution is too small"))
+
+
 def exception_handler(exc, context):
     """
     Defines standard exception handler for all corefacility project.
