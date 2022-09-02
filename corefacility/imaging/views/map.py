@@ -1,10 +1,9 @@
 import os
-import shutil
 from io import BytesIO
 
-from django.conf import settings
 from django.core.files import File
 from rest_framework.decorators import action
+from rest_framework.response import Response
 import numpy
 from numpy.lib.npyio import NpzFile
 
@@ -95,3 +94,17 @@ class MapViewSet(FileUploadMixin, EntityViewSet):
         filename = os.path.join(self.request.project.project_dir, functional_map.data.url)
         with open(filename, "wb") as file_object:
             file_object.write(attaching_file.file.getbuffer())
+
+    def delete_file(self, request):
+        """
+        Deletes the file
+        :param request: The REST framework request
+        :return: the REST framework response
+        """
+        functional_map = self.get_object()
+        if functional_map.data.url is not None:
+            filename = os.path.join(self.request.project.project_dir, functional_map.data.url)
+            os.remove(filename)
+        functional_map.data.detach_file()
+        map_serializer = self.detail_serializer_class(functional_map, context={"request": self.request})
+        return Response(map_serializer.data)

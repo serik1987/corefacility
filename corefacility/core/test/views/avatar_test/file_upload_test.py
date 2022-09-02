@@ -102,23 +102,24 @@ class FileUploadTest(MediaFilesMixin, BaseViewTest):
         self.assert_file_exists([])
         self.assert_not_in_database(response)
 
-    def _test_security(self, token_id, expected_status_code):
+    def _test_security(self, token_id, expected_status_code, delete_status_code=None):
         """
         Provides a security test
-
         :param token_id: ID of the authorization token or None for unauthorized responses
         :param expected_status_code: status code to expect
+        :param delete_status_code: special status code for the entity delete
         :return: nothing
         """
+        if delete_status_code is None:
+            delete_status_code = expected_status_code
         upload_file = self.get_sample_file()
-        headers = self.get_authorization_headers(token_id)
         upload_response = self.upload(upload_file, expected_status_code, token_id)
-        self.assertEquals(upload_response.status_code, expected_status_code,
-                          "Unexpected upload status code")
+        self.assertEquals(upload_response.status_code, expected_status_code)
         delete_function = self.get_delete_request_function()
         delete_path = self.get_special_delete_path()
+        headers = self.get_authorization_headers(token_id)
         delete_response = delete_function(delete_path, **headers)
-        self.assertEquals(delete_response.status_code, expected_status_code, "Unexpected delete status code")
+        self.assertEquals(delete_response.status_code, delete_status_code, "Unexpected delete status code")
 
     def _test_valid_upload_type(self, filename, expected_status_code):
         response = self.upload(filename, expected_status_code)
@@ -189,7 +190,6 @@ class FileUploadTest(MediaFilesMixin, BaseViewTest):
     def assert_database(self, response):
         """
         Asserts that the file has been presented in the database
-
         :param response: the response received
         :return: full path to the file
         """
@@ -198,7 +198,6 @@ class FileUploadTest(MediaFilesMixin, BaseViewTest):
     def assert_not_in_database(self, response):
         """
         Asserts that the file has not been presented in the database
-
         :param response: the response received by the file delete request
         :return: nothing
         """
@@ -281,7 +280,6 @@ class FileUploadTest(MediaFilesMixin, BaseViewTest):
     def get_update_path(self, response):
         """
         Returns path of the GET response the updates the file uploading information
-
         :param response: the response which body shall be updated
         :return: path of the updating response
         """
