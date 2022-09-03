@@ -4,7 +4,7 @@ from core.test.entity.base_test_class import BaseTestClass
 from core.test.data_providers.field_value_providers import integer_provider, put_stages_in_provider
 from imaging.entity import Map
 
-from .entity_objects.rectangular_roi_object import RectangularRoiObject
+from roi.tests.entity_objects.rectangular_roi_object import RectangularRoiObject
 
 
 def map_provider():

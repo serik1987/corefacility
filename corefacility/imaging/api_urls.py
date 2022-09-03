@@ -9,5 +9,6 @@ router = DefaultRouter()
 router.register(r'data', MapViewSet, basename="functional-map")
 
 urlpatterns = [
-    path(r'processors/<str:map_lookup>/', ProcessorsListView.as_view(), name="module-list-processors")
+    path(r'processors/<str:map_lookup>/', ProcessorsListView.as_view(), name="module-list-processors"),
+    path(r'processors/<str:map_lookup>/', include(("imaging.entity.ep_urls.processors", "processors"))),
               ] + router.urls

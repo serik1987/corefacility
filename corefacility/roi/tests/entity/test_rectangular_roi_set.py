@@ -5,7 +5,7 @@ from core.test.entity_set.base_test_class import BaseTestClass
 
 from imaging.tests.data_providers.entity_objects import MapSetObject
 
-from .entity_objects.rectangular_roi_set_object import RectangularRoiSetObject
+from roi.tests.entity_objects.rectangular_roi_set_object import RectangularRoiSetObject
 
 
 def general_search_provider():

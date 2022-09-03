@@ -17,4 +17,7 @@ class PinwheelSet(EntitySet):
 
     _entity_filter_list = {
         "map": ("imaging.entity.Map", None),
+        "map_id": (int, None),
+        "map_alias": (str, None),
+        "project_id": (int, None),
     }

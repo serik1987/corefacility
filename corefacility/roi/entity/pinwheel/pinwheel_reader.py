@@ -41,14 +41,27 @@ class PinwheelReader(RawSqlQueryReader):
             .add_select_expression("imaging_map.resolution_y") \
             .add_select_expression("imaging_map.width") \
             .add_select_expression("imaging_map.height") \
+            .add_select_expression("imaging_map.project_id") \
             .add_order_term("roi_pinwheel.id")
 
     def apply_map_filter(self, imaging_map):
         for builder in (self.items_builder, self.count_builder):
             builder.main_filter &= StringQueryFilter("imaging_map.id=%s", imaging_map.id)
 
+    def apply_map_id_filter(self, map_id):
+        for builder in (self.items_builder, self.count_builder):
+            builder.main_filter &= StringQueryFilter("imaging_map.id=%s", map_id)
+
+    def apply_map_alias_filter(self, map_alias):
+        for builder in (self.items_builder, self.count_builder):
+            builder.main_filter &= StringQueryFilter("imaging_map.alias=%s", map_alias)
+
+    def apply_project_id_filter(self, project_id):
+        for builder in (self.items_builder, self.count_builder):
+            builder.main_filter &= StringQueryFilter("imaging_map.project_id=%s", project_id)
+
     def create_external_object(self, pinwheel_id, pinwheel_x, pinwheel_y, map_id, map_alias, map_data, map_type,
-                               map_resolution_x, map_resolution_y, map_width, map_height):
+                               map_resolution_x, map_resolution_y, map_width, map_height, project_id=None):
         from imaging.models.enums import MapType
         return ModelEmulator(
             id=pinwheel_id,
@@ -62,6 +75,7 @@ class PinwheelReader(RawSqlQueryReader):
                 resolution_x=map_resolution_x,
                 resolution_y=map_resolution_y,
                 width=map_width,
-                height=map_height
+                height=map_height,
+                project_id=project_id
             )
         )

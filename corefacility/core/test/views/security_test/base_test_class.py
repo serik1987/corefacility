@@ -244,6 +244,7 @@ class BaseTestClass(BaseViewTest):
         if isinstance(actual_info, Entity):
             actual_value = getattr(actual_info, key)
         else:
+            self.assertIn(key, actual_info, "The '%s' key is expected to be a valid response field" % key)
             actual_value = actual_info[key]
         return actual_value
 
