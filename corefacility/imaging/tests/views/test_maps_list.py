@@ -2,36 +2,24 @@ from rest_framework import status
 from parameterized import parameterized
 
 from core.entity.project import ProjectSet
-from core.test.views.project_data_test_mixin_small import ProjectDataTestMixinSmall
 from core.test.views.list_test.base_test_class import BaseTestClass
 from imaging import App
 from imaging.models.enums import MapType
 from imaging.entity import Map
 
+from .map_list_mixin import MapListMixin
 
-class TestMapList(ProjectDataTestMixinSmall, BaseTestClass):
+
+class TestMapList(MapListMixin, BaseTestClass):
 
     MAP_LIST_PATH = "/api/{version}/core/projects/{project_alias}/imaging/data/"
 
     application = App()
 
-    project_maps = None
-
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
         cls.create_test_environment(project_number=2)
-        cls.set_maps()
-
-    @classmethod
-    def set_maps(cls):
-        cls.project_maps = dict()
-        for map_info in cls.map_data_provider():
-            functional_map = Map(**map_info)
-            functional_map.create()
-            if functional_map.project.alias not in cls.project_maps:
-                cls.project_maps[functional_map.project.alias] = list()
-            cls.project_maps[functional_map.project.alias].append(functional_map)
 
     def setUp(self):
         super().setUp()
@@ -41,19 +29,6 @@ class TestMapList(ProjectDataTestMixinSmall, BaseTestClass):
     def tearDownClass(cls):
         cls.destroy_test_environment()
         super().tearDownClass()
-
-    @classmethod
-    def map_data_provider(cls):
-        p1 = ProjectSet().get(cls.projects[0])
-        p2 = ProjectSet().get(cls.projects[1])
-        return [
-            dict(alias="c022_X210", type=MapType.orientation, project=p1),
-            dict(alias="c022_X100", type=MapType.direction, project=p1),
-            dict(alias="c023_X2", type=MapType.orientation, project=p1),
-            dict(alias="c025_X300", type=MapType.direction, project=p1),
-            dict(alias="c040_X100", type=MapType.orientation, project=p2),
-            dict(alias="c040_X101", type=MapType.direction, project=p2),
-        ]
 
     @parameterized.expand([
         ("ordinary_user", "test_project", status.HTTP_404_NOT_FOUND),

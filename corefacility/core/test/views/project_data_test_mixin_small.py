@@ -116,7 +116,6 @@ class ProjectDataTestMixinSmall:
         """
         Creates test project and sets proper permissions
         :param project_number: total number of projects
-        :return: nothing
         """
         cls.projects = []
         for project_index in range(project_number):
@@ -131,13 +130,17 @@ class ProjectDataTestMixinSmall:
             cls.projects.append(project.id)
 
     @classmethod
-    def attach_application(cls):
+    def attach_application(cls, application=None):
         """
         Attaches application to the project
+        :param application: application to be attached or None to attach application mentioned in the application
+            public property
         """
+        if application is None:
+            application = cls.application
         for project_id in cls.projects:
             project = ProjectSet().get(project_id)
-            project_application = ProjectApplication(application=cls.application, project=project, is_enabled=True)
+            project_application = ProjectApplication(application=application, project=project, is_enabled=True)
             project_application.create()
 
     @classmethod

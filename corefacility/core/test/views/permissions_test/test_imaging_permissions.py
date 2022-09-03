@@ -7,7 +7,7 @@ from imaging import App as ImagingApp
 from imaging.entity import Map
 
 from ..base_view_test import BaseViewTest
-from .base_project_data_test import ProjectDataTestMixin
+from ..project_data_test_mixin import ProjectDataTestMixin
 
 MAP_CREATE_FILE = Path(__file__).parent / "test_cases/imaging_map_create.csv"
 MAP_UPDATE_FILE = Path(__file__).parent / "test_cases/imaging_map_update.csv"
