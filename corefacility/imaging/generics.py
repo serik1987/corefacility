@@ -1,4 +1,8 @@
+from rest_framework.exceptions import NotFound
+
 from core.generic_views import EntityViewMixin
+from core.entity.entity_exceptions import EntityNotFoundException
+from imaging.entity import MapSet
 
 
 class FunctionalMapMixin(EntityViewMixin):
@@ -12,10 +16,16 @@ class FunctionalMapMixin(EntityViewMixin):
         :param entity_set: the pinwheel set before the filtration
         :return: the pinwheel set after the filtration
         """
-        entity_set = super().filter_queryset(entity_set)
+        map_set = MapSet()
+        map_set.project = self.request.project
         try:
-            entity_set.map_id = int(self.kwargs['map_lookup'])
+            map_lookup = int(self.kwargs['map_lookup'])
         except ValueError:
-            entity_set.map_alias = self.kwargs['map_lookup']
-        entity_set.project_id = self.request.project.id
+            map_lookup = self.kwargs['map_lookup']
+        try:
+            functional_map = map_set.get(map_lookup)
+        except EntityNotFoundException:
+            raise NotFound()
+        entity_set = super().filter_queryset(entity_set)
+        entity_set.map = functional_map
         return entity_set

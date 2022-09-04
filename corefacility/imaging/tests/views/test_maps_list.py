@@ -1,11 +1,8 @@
 from rest_framework import status
 from parameterized import parameterized
 
-from core.entity.project import ProjectSet
 from core.test.views.list_test.base_test_class import BaseTestClass
 from imaging import App
-from imaging.models.enums import MapType
-from imaging.entity import Map
 
 from .map_list_mixin import MapListMixin
 
