@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-04 17:35+0300\n"
+"POT-Creation-Date: 2022-09-05 00:14+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -302,13 +302,47 @@ msgstr "Неверные учётные данные."
 msgid "You can't delete yourself."
 msgstr "Вы не можете удалить самого себя"
 
-#: imaging/api_exceptions.py:14
-msgid "Number of variables in the NPZ file is not correct"
+#: imaging/api_exceptions.py:19
+msgid ""
+"Project's home directory was not defined for the project. Please, ask system "
+"administrator to cope with troubles"
 msgstr ""
+"Домащняя директория проекта не определена для данного проекта. Пожалуйста, "
+"обратитесь к системному администратору для решения данной проблемы"
 
-#: imaging/api_exceptions.py:20
+#: imaging/api_exceptions.py:26
+msgid "Number of variables in the NPZ file is not correct"
+msgstr "Данный NPZ-файл должен содержать ровно одно поле"
+
+#: imaging/api_exceptions.py:32
 msgid "The file doesn't contain 2D map consisting from complex numbers"
 msgstr ""
+"данный файл не содержит двумерную матрицу, состоящую из комплексных чисел"
+
+#: imaging/api_exceptions.py:39
+msgid "Please, upload the functional map to apply this map processor"
+msgstr ""
+"Пожалуйста, загрузите функциональную карту на сервер для выполнения этого "
+"действия"
+
+#: imaging/api_exceptions.py:46
+msgid ""
+"The functional map has been permanently removed from the server or "
+"corrupted. Please, upload it again"
+msgstr ""
+"Функциональная карта безвозвратно удалена с сервера, либо повреждена. "
+"Пожалуйста, загрузите её снова"
+
+#: imaging/api_exceptions.py:54
+#, python-format
+msgid "Can't process this map because another map with alias '%s' exists"
+msgstr ""
+"Невозможно обработать функциональную карту, поскольку другая карта с "
+"псевдонимом '%s' уже создана"
+
+#: imaging/api_exceptions.py:61
+msgid "The target map contains no data"
+msgstr "В ходе обработки была получена карта без данных"
 
 #: imaging/entity/map/map_set.py:15
 msgid "Functional map"
@@ -334,7 +368,7 @@ msgstr "Центр ориентационной гиперколонки"
 msgid "Rectangular ROI"
 msgstr "Прямоугольная область интереса"
 
-#: roi/serializers/rectangular_roi_serializer.py:29
+#: roi/serializers/rectangular_roi_serializer.py:33
 msgid "Incorrect combination of ROI border values"
 msgstr "Неверно заданы значения границ областей интереса"
 

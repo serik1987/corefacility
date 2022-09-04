@@ -39,10 +39,10 @@ class MapListMixin(ProjectDataTestMixinSmall):
         p1 = ProjectSet().get(cls.projects[0])
         p2 = ProjectSet().get(cls.projects[1])
         return [
-            dict(alias="c022_X210", type=MapType.orientation, project=p1),
-            dict(alias="c022_X100", type=MapType.direction, project=p1),
-            dict(alias="c023_X2", type=MapType.orientation, project=p1),
-            dict(alias="c025_X300", type=MapType.direction, project=p1),
-            dict(alias="c040_X100", type=MapType.orientation, project=p2),
-            dict(alias="c040_X101", type=MapType.direction, project=p2),
+            dict(alias="c022_X210", type=MapType.orientation, project=p1, width=12400, height=12400),
+            dict(alias="c022_X100", type=MapType.direction, project=p1, width=12400, height=12400),
+            dict(alias="c023_X2", type=MapType.orientation, project=p1, width=12400, height=12400),
+            dict(alias="c025_X300", type=MapType.direction, project=p1, width=12400, height=12400),
+            dict(alias="c040_X100", type=MapType.orientation, project=p2, width=12400, height=12400),
+            dict(alias="c040_X101", type=MapType.direction, project=p2, width=12400, height=12400),
         ]

@@ -8,7 +8,7 @@ import numpy
 from numpy.lib.npyio import NpzFile
 
 from core.generic_views import EntityViewSet, FileUploadMixin
-from core.api_exceptions import FileFormatException, OperatingSystemException
+from core.api_exceptions import FileFormatException
 from imaging import App
 from imaging.entity import MapSet
 from imaging.serializers import MapSerializer
@@ -73,10 +73,7 @@ class MapViewSet(FileUploadMixin, EntityViewSet):
                 not str(imaging_data.dtype).startswith("complex"):
             raise NotAMapException()
         resolution_y, resolution_x = imaging_data.shape
-        map_entity._resolution_x = resolution_x
-        map_entity._resolution_y = resolution_y
-        map_entity.notify_field_changed("resolution_x")
-        map_entity.notify_field_changed("resolution_y")
+        map_entity._set_resolution(resolution_x, resolution_y)
         map_entity.update()
         imaging_data_stream = BytesIO()
         numpy.save(imaging_data_stream, imaging_data)
@@ -91,6 +88,8 @@ class MapViewSet(FileUploadMixin, EntityViewSet):
         :return: nothing
         """
         super().attach_file(functional_map, attaching_file)
+        if self.request.project.project_dir is None or not os.path.isdir(self.request.project.project_dir):
+            raise ProjectDirNotDefinedException()
         filename = os.path.join(self.request.project.project_dir, functional_map.data.url)
         with open(filename, "wb") as file_object:
             file_object.write(attaching_file.file.getbuffer())
@@ -101,6 +100,8 @@ class MapViewSet(FileUploadMixin, EntityViewSet):
         :param request: The REST framework request
         :return: the REST framework response
         """
+        if self.request.project.project_dir is None or not os.path.isdir(self.request.project.project_dir):
+            raise ProjectDirNotDefinedException()
         functional_map = self.get_object()
         if functional_map.data.url is not None:
             filename = os.path.join(self.request.project.project_dir, functional_map.data.url)

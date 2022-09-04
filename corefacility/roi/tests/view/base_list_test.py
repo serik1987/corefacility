@@ -19,6 +19,9 @@ class BaseListTest(MapListMixin, BaseTestClass):
     entity_list = None
     """ Dynamic variable filled by dictionary of all tested entities from the testing environment """
 
+    entity_id_list = None
+    """ This is also dynamic property that contains list of all entity IDs """
+
     @classmethod
     def setUpTestData(cls):
         if cls.entity_class is None:
@@ -26,6 +29,7 @@ class BaseListTest(MapListMixin, BaseTestClass):
         super().setUpTestData()
         cls.create_test_environment(add_roi_application=True)
         cls.entity_list = dict()
+        cls.entity_id_list = list()
         for project_alias, map_index, kwargs in cls.data_provider():
             map_alias = cls.project_maps[project_alias][map_index].alias
             if project_alias not in cls.entity_list:
@@ -35,6 +39,7 @@ class BaseListTest(MapListMixin, BaseTestClass):
             entity = cls.entity_class(map=cls.project_maps[project_alias][map_index], **kwargs)
             entity.create()
             cls.entity_list[project_alias][map_alias].append(entity)
+            cls.entity_id_list.append(entity.id)
 
     @classmethod
     def data_provider(cls):

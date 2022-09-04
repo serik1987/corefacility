@@ -57,3 +57,16 @@ class Map(Entity):
         if self.height != other.height:
             return False
         return True
+
+    def _set_resolution(self, resolution_x, resolution_y):
+        """
+        Sets the map resolution (to be used by providers only).
+        CAUTION. This is your responsibility to update() or create() the map to save its data to the database
+        :param resolution_x: map width in pixels
+        :param resolution_y: map height in pixels
+        :return: nothing
+        """
+        self._resolution_x = resolution_x
+        self._resolution_y = resolution_y
+        self.notify_field_changed("resolution_x")
+        self.notify_field_changed("resolution_y")
