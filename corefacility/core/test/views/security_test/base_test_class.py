@@ -171,7 +171,6 @@ class BaseTestClass(BaseViewTest):
     def create_entity_for_test(self, test_data):
         """
         Creates the entity for testing purpose
-
         :param test_data: The data that shall be assigned to fields of the creating entity
         :return: ID of the newly created entity
         """
@@ -211,7 +210,6 @@ class BaseTestClass(BaseViewTest):
     def check_detail_info(self, actual_info, expected_info):
         """
         Checks whether actual_info contains the same information that exists in the expected_info
-
         :param actual_info: the actual information
         :param expected_info: the expected information
         :return: nothing
