@@ -36,19 +36,19 @@ class TestRectangularRoi(BaseEntityTest):
         new_map = Map(alias="c022_X02", type="ori", project=cls._related_project)
         cls._all_maps = [cls._related_map, other_map, new_map, None]
 
-    @parameterized.expand(integer_provider(min_value=1))
+    @parameterized.expand(integer_provider(min_value=0))
     def test_left(self, *args):
         self._test_field("left", *args, use_defaults=False, right=200, top=300, bottom=400, map=self._related_map)
 
-    @parameterized.expand(integer_provider(min_value=1))
+    @parameterized.expand(integer_provider(min_value=0))
     def test_right(self, *args):
         self._test_field("right", *args, use_defaults=False, left=100, top=300, bottom=400, map=self._related_map)
 
-    @parameterized.expand(integer_provider(min_value=1))
+    @parameterized.expand(integer_provider(min_value=0))
     def test_top(self, *args):
         self._test_field("top", *args, use_defaults=False, left=100, right=200, bottom=400, map=self._related_map)
 
-    @parameterized.expand(integer_provider(min_value=1))
+    @parameterized.expand(integer_provider(min_value=0))
     def test_bottom(self, *args):
         self._test_field("bottom", *args, use_defaults=False, left=100, right=200, top=300, map=self._related_map)
 

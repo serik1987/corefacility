@@ -1,9 +1,8 @@
 from rest_framework import status
 from parameterized import parameterized
 
-from core.test.views.list_test.base_test_class import BaseTestClass
-from imaging.tests.views.map_list_mixin import MapListMixin
 from roi.entity import Pinwheel
+from ..base_list_test import BaseListTest
 
 
 def base_search_provider():
@@ -22,29 +21,13 @@ def base_search_provider():
     ]
 
 
-class TestPinwheelList(MapListMixin, BaseTestClass):
+class TestPinwheelList(BaseListTest):
 
-    PINWHEEL_SEARCH_PATH = "/api/{version}/core/projects/{project}/imaging/processors/{map}/roi/pinwheels/"
-
-    entity_list = None
-
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-        cls.create_test_environment(add_roi_application=True)
-        cls.entity_list = dict()
-        for project_alias, map_index, kwargs in cls.pinwheel_provider():
-            map_alias = cls.project_maps[project_alias][map_index].alias
-            if project_alias not in cls.entity_list:
-                cls.entity_list[project_alias] = dict()
-            if map_alias not in cls.entity_list[project_alias]:
-                cls.entity_list[project_alias][map_alias] = list()
-            entity = Pinwheel(map=cls.project_maps[project_alias][map_index], **kwargs)
-            entity.create()
-            cls.entity_list[project_alias][map_alias].append(entity)
+    entity_class = Pinwheel
+    entity_search_path = "/api/{version}/core/projects/{project}/imaging/processors/{map}/roi/pinwheels/"
 
     @classmethod
-    def pinwheel_provider(cls):
+    def data_provider(cls):
         def kwargs(x, y):
             return {"x": x, "y": y}
 
@@ -72,21 +55,7 @@ class TestPinwheelList(MapListMixin, BaseTestClass):
         """
         Tests the base searching facility
         """
-        pinwheel_search_path = self.PINWHEEL_SEARCH_PATH.format(
-            version=self.API_VERSION, project=project_alias, map=map_alias)
-        headers = self.get_authorization_headers(token_id)
-        response = self.client.get(pinwheel_search_path, **headers)
-        self.assertEquals(response.status_code, expected_status_code, "Unexpected response status")
-        if expected_status_code < status.HTTP_300_MULTIPLE_CHOICES:
-            actual_data = response.data['results']
-            if map_alias not in self.entity_list[project_alias]:
-                self.assertEquals(len(actual_data), 0, "The pinwheel list must be empty")
-            else:
-                expected_data = self.entity_list[project_alias][map_alias]
-                self.assertEquals(len(actual_data), len(expected_data), "Unexpected number of pinwheels in the list")
-                for index in range(len(actual_data)):
-                    actual_pinwheel = actual_data[index]
-                    expected_pinwheel = expected_data[index]
-                    self.assertEquals(actual_pinwheel['id'], expected_pinwheel.id, "Unexpected pinwheel ID")
-                    self.assertEquals(actual_pinwheel['x'], expected_pinwheel.x, "Unexpected pinwheel X")
-                    self.assertEquals(actual_pinwheel['y'], expected_pinwheel.y, "Unexpected pinwheel Y")
+        self._test_base_search(token_id, project_alias, map_alias, expected_status_code)
+
+
+del BaseListTest
