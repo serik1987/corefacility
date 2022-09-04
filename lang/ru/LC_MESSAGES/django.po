@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-02 18:59+0300\n"
+"POT-Creation-Date: 2022-09-04 17:35+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,14 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: core/api_exceptions.py:54 core/generic_views/file_upload_mixin.py:113
+msgid "This file type is not uploadable"
+msgstr "Невозможно загрузить данный тип файла"
+
+#: core/api_exceptions.py:65
+msgid "The image resolution is too small"
+msgstr "Разрешение изображения слишком мало"
 
 #: core/entity/entity_exceptions/__init__.py:10
 msgid "The requested resource was not found here"
@@ -92,17 +100,9 @@ msgstr "Проект"
 msgid "User"
 msgstr "Пользователь"
 
-#: core/generic_views/avatar_mixin.py:51
-msgid "The image resolution is too small"
-msgstr "Разрешение изображения слишком мало"
-
-#: core/generic_views/file_upload_mixin.py:62
+#: core/generic_views/file_upload_mixin.py:63
 msgid "The uploaded file is too large"
 msgstr "Загружаемый Вами файл имеет слишком большой размер"
-
-#: core/generic_views/file_upload_mixin.py:113
-msgid "This file type is not uploadable"
-msgstr "Невозможно загрузить данный тип файла"
 
 #: core/migrations/0002_fill.py:59
 msgid "Full access"
@@ -302,6 +302,14 @@ msgstr "Неверные учётные данные."
 msgid "You can't delete yourself."
 msgstr "Вы не можете удалить самого себя"
 
+#: imaging/api_exceptions.py:14
+msgid "Number of variables in the NPZ file is not correct"
+msgstr ""
+
+#: imaging/api_exceptions.py:20
+msgid "The file doesn't contain 2D map consisting from complex numbers"
+msgstr ""
+
 #: imaging/entity/map/map_set.py:15
 msgid "Functional map"
 msgstr "Функциональная карта"
@@ -314,7 +322,7 @@ msgstr "Карта ориентационной настройки"
 msgid "Direction map"
 msgstr "Карта дирекциональной настройки"
 
-#: imaging/serializers.py:10
+#: imaging/serializers/map_serializer.py:10
 msgid "This value shall not be zero"
 msgstr "Данное значение не должно быть равно нулю"
 
@@ -325,6 +333,10 @@ msgstr "Центр ориентационной гиперколонки"
 #: roi/entity/rectangular_roi/rectangular_roi_set.py:13
 msgid "Rectangular ROI"
 msgstr "Прямоугольная область интереса"
+
+#: roi/serializers/rectangular_roi_serializer.py:29
+msgid "Incorrect combination of ROI border values"
+msgstr "Неверно заданы значения границ областей интереса"
 
 #~ msgid "Application usage"
 #~ msgstr "Использование приложения"

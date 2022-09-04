@@ -18,9 +18,9 @@ class RectangularRoi(Entity):
     _required_fields = ["left", "right", "top", "bottom", "map"]
 
     _public_field_description = {
-        "left": EntityField(int, min_value=1, description="Left"),
-        "right": EntityField(int, min_value=1, description="Right"),
-        "top": EntityField(int, min_value=1, description="Top"),
-        "bottom": EntityField(int, min_value=1, description="Bottom"),
+        "left": EntityField(int, min_value=0, description="Left"),
+        "right": EntityField(int, min_value=0, description="Right"),
+        "top": EntityField(int, min_value=0, description="Top"),
+        "bottom": EntityField(int, min_value=0, description="Bottom"),
         "map": RelatedEntityField("imaging.entity.Map", description="Imaging map"),
     }
