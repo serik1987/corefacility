@@ -18,7 +18,7 @@ class Pinwheel(Entity):
     _entity_provider_list = [PinwheelProvider()]
 
     _public_field_description = {
-        "x": EntityField(int, min_value=1, description="Pinwheel abscissa"),
-        "y": EntityField(int, min_value=1, description="Pinwheel ordinate"),
+        "x": EntityField(int, min_value=0, description="Pinwheel abscissa"),
+        "y": EntityField(int, min_value=0, description="Pinwheel ordinate"),
         "map": RelatedEntityField("imaging.entity.Map", description="Related map"),
     }

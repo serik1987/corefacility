@@ -3,7 +3,7 @@ from parameterized import parameterized
 from core.test.data_providers.entity_sets import filter_data_provider
 from core.test.entity_set.base_test_class import BaseTestClass
 
-from imaging.tests.data_providers.entity_objects import MapSetObject
+from imaging.tests.data_providers.entity_objects.map_set_object import MapSetObject
 
 from roi.tests.entity_objects.rectangular_roi_set_object import RectangularRoiSetObject
 

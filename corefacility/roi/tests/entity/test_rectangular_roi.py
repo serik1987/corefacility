@@ -1,21 +1,22 @@
 from parameterized import parameterized
 
-from core.test.entity.base_test_class import BaseTestClass
+from core.entity.entity_exceptions import EntityFieldInvalid
 from core.test.data_providers.field_value_providers import integer_provider, put_stages_in_provider
 from imaging.entity import Map
-
 from roi.tests.entity_objects.rectangular_roi_object import RectangularRoiObject
+
+from .base_entity_test import BaseEntityTest
 
 
 def map_provider():
     return put_stages_in_provider([
         (0, 1, None),
-        (2, 1, ValueError),
-        (3, 1, ValueError),
+        (2, 1, RuntimeError),
+        (3, 1, EntityFieldInvalid),
     ])
 
 
-class TestRectangularRoi(BaseTestClass):
+class TestRectangularRoi(BaseEntityTest):
     """
     Tests the rectangular ROI.
     """
@@ -29,12 +30,10 @@ class TestRectangularRoi(BaseTestClass):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls._related_map = Map(alias="c022_X210", type="ori")
-        cls._related_map.create()
         RectangularRoiObject.define_default_kwarg("map", cls._related_map)
-        other_map = Map(alias="c022_X330", type="dir")
+        other_map = Map(alias="c022_X330", type="dir", project=cls._related_project)
         other_map.create()
-        new_map = Map(alias="c022_X02", type="ori")
+        new_map = Map(alias="c022_X02", type="ori", project=cls._related_project)
         cls._all_maps = [cls._related_map, other_map, new_map, None]
 
     @parameterized.expand(integer_provider(min_value=1))
@@ -75,4 +74,4 @@ class TestRectangularRoi(BaseTestClass):
         self.assertEquals(rect_roi.map.id, self._related_map.id, "ROI map was dismissed")
 
 
-del BaseTestClass
+del BaseEntityTest

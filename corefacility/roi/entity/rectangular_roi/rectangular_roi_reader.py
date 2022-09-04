@@ -35,14 +35,16 @@ class RectangularRoiReader(RawSqlQueryReader):
             .add_select_expression("imaging_map.resolution_x") \
             .add_select_expression("imaging_map.resolution_y") \
             .add_select_expression("imaging_map.width") \
-            .add_select_expression("imaging_map.height")
+            .add_select_expression("imaging_map.height") \
+            .add_select_expression("imaging_map.project_id")
 
     def apply_map_filter(self, imaging_map):
         for builder in (self.count_builder, self.items_builder):
             builder.main_filter &= StringQueryFilter("imaging_map.id=%s", imaging_map.id)
 
     def create_external_object(self, roi_id, roi_left, roi_right, roi_top, roi_bottom,
-                               map_id, map_alias, map_data, map_type, resolution_x, resolution_y, width, height):
+                               map_id, map_alias, map_data, map_type, resolution_x, resolution_y, width, height,
+                               project_id):
         from imaging.models.enums import MapType
         return ModelEmulator(
             id=roi_id,
@@ -58,6 +60,7 @@ class RectangularRoiReader(RawSqlQueryReader):
                 resolution_x=resolution_x,
                 resolution_y=resolution_y,
                 width=width,
-                height=height
+                height=height,
+                project_id=project_id
             )
         )
