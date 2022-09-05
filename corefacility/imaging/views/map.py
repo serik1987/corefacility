@@ -2,10 +2,12 @@ import os
 from io import BytesIO
 
 from django.core.files import File
+from django.http import HttpResponse
 from rest_framework.decorators import action
 from rest_framework.response import Response
 import numpy
 from numpy.lib.npyio import NpzFile
+import scipy
 
 from core.generic_views import EntityViewSet, FileUploadMixin
 from core.api_exceptions import FileFormatException
@@ -28,7 +30,7 @@ class MapViewSet(FileUploadMixin, EntityViewSet):
     allowed_content_types = ["application/octet-stream"]
     file_field = "data"
 
-    @action(methods=["PATCH", "DELETE"], detail=True, url_path="npy", url_name="binary-data")
+    @action(methods=["GET", "PATCH", "PUT", "POST", "DELETE"], detail=True, url_path="npy", url_name="binary-data")
     def npy(self, request, *args, **kwargs):
         """
         Dealing with binary data
@@ -37,7 +39,23 @@ class MapViewSet(FileUploadMixin, EntityViewSet):
         :param kwargs: request path keyword arguments
         :return: nothing
         """
-        return self._file_action(request, *args, **kwargs)
+        if request.method.lower() == "get":
+            return self.download_file(request)
+        elif request.method.lower() == "delete":
+            return self.delete_file(request)
+        elif request.method.lower() in ('patch', 'put', 'post'):
+            return self.upload_file(request)
+
+    @action(methods=["GET"], detail=True, url_path="mat", url_name="mat-data")
+    def mat(self, request, *args, **kwargs):
+        """
+        Conversion of the binary data to the .mat format
+        :param request: the request received from the client application
+        :param args: request arguments
+        :param kwargs: request keyword arguments
+        :return: the response sent to the client application
+        """
+        return self.download_file(request, processor=self.process_mat)
 
     def filter_queryset(self, map_set):
         """
@@ -105,7 +123,51 @@ class MapViewSet(FileUploadMixin, EntityViewSet):
         functional_map = self.get_object()
         if functional_map.data.url is not None:
             filename = os.path.join(self.request.project.project_dir, functional_map.data.url)
-            os.remove(filename)
+            if os.path.exists(filename):
+                os.remove(filename)
         functional_map.data.detach_file()
         map_serializer = self.detail_serializer_class(functional_map, context={"request": self.request})
         return Response(map_serializer.data)
+
+    def download_file(self, request, processor=None):
+        """
+        Downloads the file
+        :param request: request received from the user
+        :param processor: some function that accepts filename as first argument and returns the BytesIO object where
+            output data will be written
+        :return: the response to be sent to the client
+        """
+        if self.request.project.project_dir is None or not os.path.isdir(self.request.project.project_dir):
+            raise ProjectDirNotDefinedException()
+        functional_map = self.get_object()
+        if functional_map.data.url is None:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        filename = os.path.join(self.request.project.project_dir, functional_map.data.url)
+        if not os.path.exists(filename):
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        output_stream = (processor if processor is not None else self.process_npy)(filename)
+        response = HttpResponse(output_stream.getbuffer(), content_type="application/octet-stream")
+        response['Content-Disposition'] = 'attachment; filename="%s"' % functional_map.data.url
+        return response
+
+    def process_npy(self, filename):
+        """
+        Transforms the NUMPY .npy file to the output stream in npy format
+        :param filename: full name of a file to be transformed
+        :return: the output stream to be saved to the buffer
+        """
+        output_stream = BytesIO()
+        with open(filename, "rb") as npy_file:
+            output_stream.write(npy_file.read())
+        return output_stream
+
+    def process_mat(self, filename):
+        """
+        Transforms the NUMPY .npy file to the output stream in .mat format
+        :param filename: name of the locally saved .npy file
+        :return: the output stream with the data to be sent to the client
+        """
+        output_stream = BytesIO()
+        source_data = numpy.load(filename)
+        scipy.io.savemat(output_stream, mdict={"data": source_data})
+        return output_stream

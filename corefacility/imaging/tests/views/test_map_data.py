@@ -1,7 +1,9 @@
 import os
 from pathlib import Path
+from io import BytesIO
 
 import numpy as np
+import scipy
 from rest_framework import status
 from parameterized import parameterized
 
@@ -11,7 +13,7 @@ from imaging import App
 from imaging.entity import Map
 
 
-class TestMapUploading(ProjectDataTestMixinSmall, FileUploadTest):
+class TestMapData(ProjectDataTestMixinSmall, FileUploadTest):
     """
     Tests whether the map can be successfully uploaded or deleted
     """
@@ -73,12 +75,36 @@ class TestMapUploading(ProjectDataTestMixinSmall, FileUploadTest):
         super()._test_security(token_id, expected_status_code, delete_status_code)
 
     def test_upload_invalid_file(self):
+        """
+        tests uploading the invalid file format
+        """
         invalid_filename = Path(__file__).parent.parent.parent.parent / \
                        "core/test/data_providers/pdf/bind-9.13.3-manual.pdf"
         with open(invalid_filename, "rb") as invalid_file:
             response = self.client.patch(self.get_request_path(), {"file": invalid_file}, format="multipart",
                                          **self.get_authorization_headers("superuser"))
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST, "Bad uploaded file")
+
+    def test_file_download(self, format="mat"):
+        """
+        Tests the file downloading
+        """
+        sample_file = self.get_sample_file()
+        desired_data = np.load(sample_file)['data']
+        headers = self.get_authorization_headers("superuser")
+        self.upload(sample_file, expected_status_code=status.HTTP_200_OK, token_id="superuser")
+        request_path = self.get_request_path().replace("npy", format)
+        response = self.client.get(request_path, **headers)
+        self.assertEquals(response.status_code, status.HTTP_200_OK, "Unexpected response status code")
+        content_stream = BytesIO()
+        content_stream.write(response.content)
+        content_stream.seek(0)
+        actual_data = None
+        if format == "npy":
+            actual_data = np.load(content_stream)
+        if format == "mat":
+            actual_data = scipy.io.loadmat(content_stream)['data']
+        self.assertTrue((actual_data == desired_data).all(), "Maps are not the same")
 
     def get_request_path(self):
         return self.upload_request_path.format(version=self.API_VERSION, project_alias=self.project.alias,

@@ -57,10 +57,6 @@ class TestMap(FileFieldMixin, BaseTestClass):
         with self.assertRaises(EntityDuplicatedException, msg="The map alias must be unique"):
             Map(alias="c022_X210", type=MapType.direction, project=self._project).create()
 
-    @parameterized.expand(map_data_provider())
-    def test_data(self, *args):
-        self._test_file_field("data", None, File, *args)
-
     @parameterized.expand(map_type_provider())
     def test_type(self, *args):
         self._test_field("type", *args, use_defaults=False, alias="c022_X210", project=self._project)
