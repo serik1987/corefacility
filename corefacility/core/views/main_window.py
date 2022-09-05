@@ -49,7 +49,7 @@ class MainWindow(SetCookieMixin, TemplateView):
         css_name = "%s/%s" % (app, self.css_name)
         js_name = "%s/%s" % (app, self.js_name)
         self._authorize_user()
-        self._set_version()
+        self._set_api_version()
         dump = json.dumps(kwargs)
         return super().get_context_data(js_settings=dump, css=css_name, js=js_name)
 
@@ -88,7 +88,8 @@ class MainWindow(SetCookieMixin, TemplateView):
             app = App()
             uuid = str(App().uuid)
         else:
-            app = self.module_set.get(UUID(uuid))
+            app = self.module_set.get(uuid)
+            uuid = str(uuid)
         self.kwargs['app_uuid'] = uuid
         return app.__module__
 
@@ -108,5 +109,5 @@ class MainWindow(SetCookieMixin, TemplateView):
         else:
             self.kwargs['authorization_token'] = None
 
-    def _set_version(self):
+    def _set_api_version(self):
         self.kwargs['client_version'] = str(self.client_version)
