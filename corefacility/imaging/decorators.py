@@ -1,4 +1,5 @@
 from functools import wraps
+import numpy
 from django.http import HttpResponseRedirect
 from rest_framework.decorators import action
 
@@ -41,6 +42,8 @@ def map_processing(target_alias_suffix="proc", detail=True, url_path="proc", url
                 pass
             source_data = self.load_map_data()
             target_data = inner_func(self, source_data, map_processing_detail)
+            if not isinstance(target_data, numpy.ndarray):
+                raise ValueError("The function decorated by @map_processing decorator must return the NUMPY array")
             map_url = self.save_map_data(target_alias, target_data)
             return HttpResponseRedirect(redirect_to=map_url)
         return outer_func

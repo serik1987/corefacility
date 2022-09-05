@@ -1,6 +1,12 @@
+import os
+from time import time
+from pathlib import Path
+import numpy
 from rest_framework import status
 
+from core.entity.project import ProjectSet
 from core.test.views.list_test.base_test_class import BaseTestClass
+from imaging.entity import MapSet
 from imaging.tests.views.map_list_mixin import MapListMixin
 
 
@@ -9,8 +15,19 @@ class BaseListTest(MapListMixin, BaseTestClass):
     This is the base class for testing pinwheel lists and rectangular ROI lists
     """
 
+    SAMPLE_FILE = Path(__file__).parent.parent.parent.parent / \
+                  "imaging/tests/data_providers/sample_maps/c010_ori00_filt.npz"
+
+    map_uploading_path = "/api/{version}/core/projects/{project}/imaging/data/{map}/npy/"
+
+    map_processing_path = None
+    """ Path template for the map processing request """
+
     entity_class = None
     """ Class of the tested entity (must be a subclass of the core.entity.entity.Entity component) """
+
+    entity_set_class = None
+    """ Class of set of the tested entity """
 
     entity_search_path = None
     """ Please, type the full path to entity list. You can use {project} and {map} placeholders that will 
@@ -75,3 +92,36 @@ class BaseListTest(MapListMixin, BaseTestClass):
                         actual_value = actual_entity[field]
                         expected_value = getattr(expected_entity, field)
                         self.assertEquals(actual_value, expected_value, "Unexpected " + field)
+
+    def _test_map_processing(self, token_id, project_alias, map_alias, data_index, upload_map, expected_status_code):
+        """
+        Tests the ROI processing
+        """
+        headers = self.get_authorization_headers(token_id)
+        if upload_map == "auto":
+            map_uploading_path = self.map_uploading_path.format(version=self.API_VERSION, project=project_alias,
+                                                                map=map_alias)
+            with open(self.SAMPLE_FILE, "rb") as sample_file:
+                uploading_result = self.client.patch(map_uploading_path, {"file": sample_file},
+                                                     format="multipart", **headers)
+            self.assertEquals(uploading_result.status_code, status.HTTP_200_OK,
+                              "Unexpected response status during the file upload")
+        roi_processing_path = self.map_processing_path.format(
+            version=self.API_VERSION, project=project_alias, map=map_alias, roi=self.entity_id_list[data_index])
+        request_start_time = time()
+        response = self.client.post(roi_processing_path, follow=True, **headers)
+        request_finish_time = time()
+        self.assertLess(request_finish_time - request_start_time, 1.0,
+                        "The request is too busy")
+        self.assertEquals(response.status_code, expected_status_code, "Unexpected status code")
+        target_map = None
+        if expected_status_code < status.HTTP_300_MULTIPLE_CHOICES:
+            expected_project = ProjectSet().get(project_alias)
+            expected_map = MapSet().get(map_alias)
+            self.assert_data_valid(response, expected_map, data_index)
+            full_map_path = os.path.join(expected_project.project_dir, response.data['data'])
+            self.assertTrue(os.path.isfile(full_map_path), "The processed map has not been saved")
+        return target_map
+
+    def assert_data_valid(self, response, expected_map, data_index):
+        raise NotImplementedError()
