@@ -67,8 +67,8 @@ class FunctionalMapMixin(EntityViewMixin):
         new_functional_map = Map(
             alias=alias,
             type=self.request.functional_map.type,
-            width=self.request.functional_map.width,
-            height=self.request.functional_map.height,
+            width=self.request.functional_map.width * resolution_x / self.request.functional_map.resolution_x,
+            height=self.request.functional_map.height * resolution_y / self.request.functional_map.resolution_y,
             project=self.request.project
         )
         new_functional_map._set_resolution(resolution_x, resolution_y)
