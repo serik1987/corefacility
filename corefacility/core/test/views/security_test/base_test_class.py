@@ -80,7 +80,8 @@ class BaseTestClass(BaseViewTest):
             self.check_4xx_details(alias_response)
         return id_response
 
-    def _test_entity_update(self, test_data_id, updated_data_id, token_id, expected_response_code):
+    def _test_entity_update(self, test_data_id, updated_data_id, token_id, expected_response_code,
+                            data_is_partial=True):
         """
         Testing the update action for views.
 
@@ -88,13 +89,13 @@ class BaseTestClass(BaseViewTest):
         will append the "_data" suffix to the data ID and will refer to the public field with a given name.
 
         The token ID is a part of a public class field containing the token. To take the token this function
-        will append the "_token" suffix to the data ID and will refer to the public field with a given name.
-
+        will append the "_token" suffix to the data ID and will refer to the public field with a given name
         :param test_data_id: ID for the initial data
         :param updated_data_id: ID for the data patch. PUTting the updated_data shall result in error 400 but
             PUTting the test_data + updated_data shall result in success.
         :param token_id: token corresponding to the authorized user.
         :param expected_response_code: the response code that you expect.
+        :param data_is_partial: True if the data are partial, False otherwise
         :return: nothing
         """
         test_data = getattr(self, test_data_id + "_data")
@@ -102,15 +103,17 @@ class BaseTestClass(BaseViewTest):
         entity_id = self.create_entity_for_test(test_data)
         path = self.get_entity_detail_path(entity_id)
         auth = self.get_authorization_headers(token_id)
-        bad_response = self.client.put(path, data=updated_data, **auth)
-        self.assertGreaterEqual(bad_response.status_code, status.HTTP_400_BAD_REQUEST,
-                                "PUTting the updated_data alone shall result in error 400")
+        if data_is_partial:
+            bad_response = self.client.put(path, data=updated_data, **auth)
+            self.assertGreaterEqual(bad_response.status_code, status.HTTP_400_BAD_REQUEST,
+                                    "PUTting the updated_data alone shall result in error 400")
         full_data = test_data.copy()
         full_data.update(updated_data)
         good_response = self.client.put(path, data=full_data, **auth)
         self.assertEquals(good_response.status_code, expected_response_code, "PUTting")
         self.check_entity_save(good_response, full_data)
         self.check_4xx_details(good_response)
+        return good_response
 
     def _test_entity_partial_update(self, test_data_id, updated_data_id, token_id, expected_response_code):
         """

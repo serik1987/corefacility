@@ -25,6 +25,9 @@ class TestProjectApplications(ProjectDataTestMixin, BaseTestClass):
     id_field = "uuid"
     alias_field = None
 
+    enabled_data = {"is_enabled": True}
+    disabled_data = {"is_enabled": False}
+
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -127,7 +130,107 @@ class TestProjectApplications(ProjectDataTestMixin, BaseTestClass):
         # 21 tests
     ])
     def test_entity_get(self, data_id, token_id, response_status):
+        """
+        Security test for the entity get
+        """
         self._test_entity_get(data_id, token_id, response_status)
+
+    @parameterized.expand([
+        ("imaging_enabled", "disabled", "superuser", status.HTTP_200_OK),
+        ("imaging_disabled", "enabled", "superuser", status.HTTP_200_OK),
+        ("roi_enabled", "disabled", "superuser", status.HTTP_200_OK),
+        ("core_application", "disabled", "superuser", status.HTTP_404_NOT_FOUND),
+        ("fake_application", "disabled", "superuser", status.HTTP_404_NOT_FOUND),
+        ("disabled_application", "enabled", "superuser", status.HTTP_404_NOT_FOUND),
+        ("permission_required_application", "disabled", "superuser", status.HTTP_200_OK),
+        ("imaging_enabled", "disabled", "user5", status.HTTP_403_FORBIDDEN),
+        ("imaging_disabled", "enabled", "user5", status.HTTP_403_FORBIDDEN),
+        ("roi_enabled", "disabled", "user5", status.HTTP_403_FORBIDDEN),
+        ("core_application", "disabled", "user5", status.HTTP_403_FORBIDDEN),
+        ("fake_application", "disabled", "user5", status.HTTP_403_FORBIDDEN),
+        ("permission_required_application", "disabled", "user5", status.HTTP_403_FORBIDDEN),
+        ("imaging_enabled", "disabled", "user6", status.HTTP_403_FORBIDDEN),
+        ("imaging_disabled", "enabled", "user6", status.HTTP_403_FORBIDDEN),
+        ("roi_enabled", "disabled", "user6", status.HTTP_403_FORBIDDEN),
+        ("core_application", "disabled", "user6", status.HTTP_403_FORBIDDEN),
+        ("fake_application", "disabled", "user6", status.HTTP_403_FORBIDDEN),
+        ("imaging_enabled", "disabled", "user1", status.HTTP_404_NOT_FOUND),
+        ("imaging_disabled", "enabled", "user1", status.HTTP_404_NOT_FOUND),
+        ("roi_enabled", "disabled", "user1", status.HTTP_404_NOT_FOUND),
+        ("core_application", "disabled", "user1", status.HTTP_404_NOT_FOUND),
+        ("fake_application", "disabled", "user1", status.HTTP_404_NOT_FOUND),
+        # 21 tests
+    ])
+    def test_entity_update(self, test_data_id, updated_data_id, token_id, expected_response_code):
+        """
+        Security test for the entity update
+        """
+        self._test_entity_update(test_data_id, updated_data_id, token_id, expected_response_code,
+                                 data_is_partial=False)
+
+    @parameterized.expand([
+        ("imaging_enabled", "disabled", "superuser", status.HTTP_200_OK),
+        ("imaging_disabled", "enabled", "superuser", status.HTTP_200_OK),
+        ("roi_enabled", "disabled", "superuser", status.HTTP_200_OK),
+        ("core_application", "disabled", "superuser", status.HTTP_404_NOT_FOUND),
+        ("fake_application", "disabled", "superuser", status.HTTP_404_NOT_FOUND),
+        ("disabled_application", "enabled", "superuser", status.HTTP_404_NOT_FOUND),
+        ("permission_required_application", "disabled", "superuser", status.HTTP_200_OK),
+        ("imaging_enabled", "disabled", "user5", status.HTTP_403_FORBIDDEN),
+        ("imaging_disabled", "enabled", "user5", status.HTTP_403_FORBIDDEN),
+        ("roi_enabled", "disabled", "user5", status.HTTP_403_FORBIDDEN),
+        ("core_application", "disabled", "user5", status.HTTP_403_FORBIDDEN),
+        ("fake_application", "disabled", "user5", status.HTTP_403_FORBIDDEN),
+        ("permission_required_application", "disabled", "user5", status.HTTP_403_FORBIDDEN),
+        ("imaging_enabled", "disabled", "user6", status.HTTP_403_FORBIDDEN),
+        ("imaging_disabled", "enabled", "user6", status.HTTP_403_FORBIDDEN),
+        ("roi_enabled", "disabled", "user6", status.HTTP_403_FORBIDDEN),
+        ("core_application", "disabled", "user6", status.HTTP_403_FORBIDDEN),
+        ("fake_application", "disabled", "user6", status.HTTP_403_FORBIDDEN),
+        ("imaging_enabled", "disabled", "user1", status.HTTP_404_NOT_FOUND),
+        ("imaging_disabled", "enabled", "user1", status.HTTP_404_NOT_FOUND),
+        ("roi_enabled", "disabled", "user1", status.HTTP_404_NOT_FOUND),
+        ("core_application", "disabled", "user1", status.HTTP_404_NOT_FOUND),
+        ("fake_application", "disabled", "user1", status.HTTP_404_NOT_FOUND),
+        # 21 tests
+    ])
+    def test_entity_partial_update(self, test_data_id, updated_data_id, token_id, expected_response_code):
+        """
+        Security test for the partial update of the entity
+        """
+        self._test_entity_partial_update(test_data_id, updated_data_id, token_id, expected_response_code)
+
+    @parameterized.expand([
+        ("imaging_enabled", "superuser", status.HTTP_204_NO_CONTENT),
+        ("imaging_disabled", "superuser", status.HTTP_204_NO_CONTENT),
+        ("roi_enabled", "superuser", status.HTTP_204_NO_CONTENT),
+        ("core_application", "superuser", status.HTTP_404_NOT_FOUND),
+        ("fake_application", "superuser", status.HTTP_404_NOT_FOUND),
+        ("disabled_application", "superuser", status.HTTP_404_NOT_FOUND),
+        ("permission_required_application", "superuser", status.HTTP_204_NO_CONTENT),
+        ("imaging_enabled", "user5", status.HTTP_204_NO_CONTENT),
+        ("imaging_disabled", "user5", status.HTTP_403_FORBIDDEN),
+        ("roi_enabled", "user5", status.HTTP_204_NO_CONTENT),
+        ("core_application", "user5", status.HTTP_404_NOT_FOUND),
+        ("fake_application", "user5", status.HTTP_404_NOT_FOUND),
+        ("permission_required_application", "user5", status.HTTP_403_FORBIDDEN),
+        ("imaging_enabled", "user6", status.HTTP_403_FORBIDDEN),
+        ("imaging_disabled", "user6", status.HTTP_403_FORBIDDEN),
+        ("roi_enabled", "user6", status.HTTP_403_FORBIDDEN),
+        ("core_application", "user6", status.HTTP_403_FORBIDDEN),
+        ("fake_application", "user6", status.HTTP_403_FORBIDDEN),
+        ("imaging_enabled", "user1", status.HTTP_404_NOT_FOUND),
+        ("imaging_disabled", "user1", status.HTTP_404_NOT_FOUND),
+        ("roi_enabled", "user1", status.HTTP_404_NOT_FOUND),
+        ("core_application", "user1", status.HTTP_404_NOT_FOUND),
+        ("fake_application", "user1", status.HTTP_404_NOT_FOUND),
+        # 21 tests
+    ])
+    def test_entity_destroy(self, data_id, token_id, expected_status_code):
+        """
+        Security tests for the entity destroy
+        """
+        self._test_entity_destroy(data_id, token_id, expected_status_code)
 
     def check_detail_info(self, actual_info, expected_info):
         """

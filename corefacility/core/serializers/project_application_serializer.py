@@ -15,7 +15,7 @@ class ProjectApplicationSerializer(EntitySerializer):
 
     entity_class = ProjectApplication
 
-    uuid = serializers.UUIDField(source="application.uuid", help_text="Application UUID")
+    uuid = serializers.UUIDField(source="application.uuid", required=False, help_text="Application UUID")
     name = serializers.SerializerMethodField(help_text="Human-readable application name")
     permissions = serializers.ReadOnlyField(source="application.permissions", help_text="Application permissions")
     is_enabled = serializers.BooleanField(help_text="is application link enabled?")
@@ -46,18 +46,22 @@ class ProjectApplicationSerializer(EntitySerializer):
         :param data: data before the additional validation
         :return: data after the additional validation
         """
-        module_set = CorefacilityModuleSet()
-        module_set.is_application = True
-        module_set.is_enabled = True
-        try:
-            application = module_set.get(data['application']['uuid'])
-        except EntityNotFoundException:
-            raise serializers.ValidationError("Incorrect module's UUID")
-        if application.permissions != "add" and not self.context['request'].user.is_superuser:
-            raise serializers.ValidationError("The user has no permissions to add this application. "
-                                              "To frontend developers: please, exclude this application from the "
-                                              "application list")
-        data['application'] = application
+        if self.instance is None:
+            module_set = CorefacilityModuleSet()
+            module_set.is_application = True
+            module_set.is_enabled = True
+            try:
+                application = module_set.get(data['application']['uuid'])
+            except EntityNotFoundException:
+                raise serializers.ValidationError("Incorrect module's UUID")
+            if application.permissions != "add" and not self.context['request'].user.is_superuser:
+                raise serializers.ValidationError("The user has no permissions to add this application. "
+                                                  "To frontend developers: please, exclude this application from the "
+                                                  "application list")
+            data['application'] = application
+        else:
+            if 'application' in data:
+                del data['application']
         return data
 
     def create(self, data):

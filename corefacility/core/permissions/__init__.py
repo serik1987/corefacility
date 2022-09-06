@@ -105,14 +105,35 @@ class ProjectApplicationPermission(ProjectRelatedPermission):
     Defines permissions for individual project applications
     """
 
-    def has_project_permission(self, request, view, project, access_level, is_user_superuser):
+    SAFE_METHODS = ["GET", "HEAD", "OPTIONS"]
+    ENABILITY_SWITCHERS = ["PUT", "PATCH"]
+
+    def has_project_permission(self, request, view, project, access_level, is_project_superuser):
         """
-        Checks whether the user can deal with a certain particular project
+        Checks whether the user can deal with any project-to-app link, create or list them
         :param request: a currently processing request
         :param view: an API view responsible for processing the request
         :param project: a project the user is trying to work on
         :param access_level: a project access level calculated for a particular user
-        :param is_user_superuser: True if the user has superuser rights for the project, False otherwise
+        :param is_project_superuser: True if the user has superuser rights for the project (i.e., the user
+            either superuser or project governor or governor of some group that have 'full' access to the project),
+            False otherwise
         :return: True if the access shall be granted. False if the access shall be denied.
         """
-        return is_user_superuser
+        if not is_project_superuser:
+            return False
+        if request.method.upper() in self.SAFE_METHODS:
+            return True
+        return request.user.is_superuser or request.method.upper() not in self.ENABILITY_SWITCHERS
+
+    def has_object_permission(self, request, view, project_app):
+        """
+        Checks whether the user can deal with particular project-to-app link
+        :param request: the HTTP request received from the client application
+        :param view: useless
+        :param project_app: the project-to-application link that the user is trying to
+        :return:
+        """
+        if request.user.is_superuser or request.method.upper() in self.SAFE_METHODS:
+            return True
+        return project_app.is_enabled and project_app.application.permissions == 'add'
