@@ -13,3 +13,4 @@ from .log_record import LogRecordViewSet
 from .widgets import WidgetsView
 from .view_404 import View404
 from .projects_module_list_view import ProjectModulesListView
+from .project_application import ProjectApplicationViewSet

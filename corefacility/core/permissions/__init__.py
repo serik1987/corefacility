@@ -98,3 +98,21 @@ class ProjectSettingsPermission(ProjectRelatedPermission):
         :return: True if the access shall be granted. False if the access shall be denied.
         """
         return is_user_superuser
+
+
+class ProjectApplicationPermission(ProjectRelatedPermission):
+    """
+    Defines permissions for individual project applications
+    """
+
+    def has_project_permission(self, request, view, project, access_level, is_user_superuser):
+        """
+        Checks whether the user can deal with a certain particular project
+        :param request: a currently processing request
+        :param view: an API view responsible for processing the request
+        :param project: a project the user is trying to work on
+        :param access_level: a project access level calculated for a particular user
+        :param is_user_superuser: True if the user has superuser rights for the project, False otherwise
+        :return: True if the access shall be granted. False if the access shall be denied.
+        """
+        return is_user_superuser

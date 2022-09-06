@@ -12,5 +12,6 @@ from .log_list_serializer import LogListSerializer
 from .log_detail_serializer import LogDetailSerializer
 from .log_record_serializer import LogRecordSerializer
 from .module_serializer import ModuleSerializer
+from .project_application_serializer import ProjectApplicationSerializer
 
 from .login_password_serializer import LoginPasswordSerializer

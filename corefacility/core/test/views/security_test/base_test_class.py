@@ -40,6 +40,7 @@ class BaseTestClass(BaseViewTest):
         self.assertEqual(response.status_code, expected_status_code)
         self.check_entity_save(response, test_data)
         self.check_4xx_details(response)
+        return response
 
     def _test_entity_get(self, test_data_id, token_id, expected_status_code):
         """
