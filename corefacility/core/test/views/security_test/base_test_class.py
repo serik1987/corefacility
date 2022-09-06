@@ -78,6 +78,7 @@ class BaseTestClass(BaseViewTest):
                 self.assertEqual(actual_id, entity_id, "Entity IDs are not the same")
                 self.check_detail_info(alias_response.data, test_data)
             self.check_4xx_details(alias_response)
+        return id_response
 
     def _test_entity_update(self, test_data_id, updated_data_id, token_id, expected_response_code):
         """

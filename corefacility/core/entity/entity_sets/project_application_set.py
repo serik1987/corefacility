@@ -1,5 +1,7 @@
+from warnings import warn
 from django.utils.translation import gettext_lazy as _
 
+from ..entity_exceptions import EntityNotFoundException
 from .entity_set import EntitySet
 from ..entity_readers.project_application_reader import ProjectApplicationReader
 
@@ -32,3 +34,21 @@ class ProjectApplicationSet(EntitySet):
     def is_enabled(self):
         raise AttributeError("The property is_enabled does not exist. "
                              "May be, you mean: entity_is_enabled, application_is_enabled")
+
+    def get(self, lookup):
+        """
+        Returns the ProjectApplication entity given that there is only ond entity satisfying filter conditions.
+        If the ProjectApplicationSet returns two or more project applications as well as no applications,
+        EntityNotFoundException will be risen
+        :param lookup: useless in that case
+        :return:
+        """
+        project_application = None
+        for current_entity in self:
+            if project_application is not None:
+                warn("There are more than one project applications satisfying given conditions")
+                raise EntityNotFoundException()
+            project_application = current_entity
+        if project_application is None:
+            raise EntityNotFoundException()
+        return project_application

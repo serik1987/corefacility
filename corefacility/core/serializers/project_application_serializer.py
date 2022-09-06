@@ -1,3 +1,4 @@
+from django.utils.translation import gettext
 from rest_framework import serializers
 
 from core.entity.entity_exceptions import EntityNotFoundException
@@ -15,7 +16,17 @@ class ProjectApplicationSerializer(EntitySerializer):
     entity_class = ProjectApplication
 
     uuid = serializers.UUIDField(source="application.uuid", help_text="Application UUID")
+    name = serializers.SerializerMethodField(help_text="Human-readable application name")
+    permissions = serializers.ReadOnlyField(source="application.permissions", help_text="Application permissions")
     is_enabled = serializers.BooleanField(help_text="is application link enabled?")
+
+    def get_name(self, entity):
+        """
+        Returns the human-readable application name
+        :param entity: the project application entity
+        :return: its human-readable name
+        """
+        return gettext(entity.application.name)
 
     def validate_is_enabled(self, is_enabled):
         """

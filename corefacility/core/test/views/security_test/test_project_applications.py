@@ -1,7 +1,9 @@
 from uuid import UUID
+from django.utils.translation import gettext
 from rest_framework import status
 from parameterized import parameterized
 
+from core.entity.entity_exceptions import EntityNotFoundException
 from core.entity.corefacility_module import CorefacilityModuleSet
 from core.entity.project_application import ProjectApplication, ProjectApplicationSet
 from core import App as CoreApp
@@ -20,6 +22,8 @@ class TestProjectApplications(ProjectDataTestMixin, BaseTestClass):
     resource_name = "projects/nsw/apps"
     project = None
     ordinary_user_required = False
+    id_field = "uuid"
+    alias_field = None
 
     @classmethod
     def setUpTestData(cls):
@@ -94,9 +98,36 @@ class TestProjectApplications(ProjectDataTestMixin, BaseTestClass):
         :param token_id: login of a user truing to add the data
         :param expected_status_code: the response status that should be
         """
-        response = super()._test_entity_create(data_id, token_id, expected_status_code)
-        print(token_id, data_id, response)
-        print(response.data)
+        super()._test_entity_create(data_id, token_id, expected_status_code)
+
+    @parameterized.expand([
+        ("imaging_enabled", "superuser", status.HTTP_200_OK),
+        ("imaging_disabled", "superuser", status.HTTP_200_OK),
+        ("roi_enabled", "superuser", status.HTTP_200_OK),
+        ("core_application", "superuser", status.HTTP_404_NOT_FOUND),
+        ("fake_application", "superuser", status.HTTP_404_NOT_FOUND),
+        ("disabled_application", "superuser", status.HTTP_404_NOT_FOUND),
+        ("permission_required_application", "superuser", status.HTTP_200_OK),
+        ("imaging_enabled", "user5", status.HTTP_200_OK),
+        ("imaging_disabled", "user5", status.HTTP_200_OK),
+        ("roi_enabled", "user5", status.HTTP_200_OK),
+        ("core_application", "user5", status.HTTP_404_NOT_FOUND),
+        ("fake_application", "user5", status.HTTP_404_NOT_FOUND),
+        ("permission_required_application", "user5", status.HTTP_200_OK),
+        ("imaging_enabled", "user6", status.HTTP_403_FORBIDDEN),
+        ("imaging_disabled", "user6", status.HTTP_403_FORBIDDEN),
+        ("roi_enabled", "user6", status.HTTP_403_FORBIDDEN),
+        ("core_application", "user6", status.HTTP_403_FORBIDDEN),
+        ("fake_application", "user6", status.HTTP_403_FORBIDDEN),
+        ("imaging_enabled", "user1", status.HTTP_404_NOT_FOUND),
+        ("imaging_disabled", "user1", status.HTTP_404_NOT_FOUND),
+        ("roi_enabled", "user1", status.HTTP_404_NOT_FOUND),
+        ("core_application", "user1", status.HTTP_404_NOT_FOUND),
+        ("fake_application", "user1", status.HTTP_404_NOT_FOUND),
+        # 21 tests
+    ])
+    def test_entity_get(self, data_id, token_id, response_status):
+        self._test_entity_get(data_id, token_id, response_status)
 
     def check_detail_info(self, actual_info, expected_info):
         """
@@ -114,8 +145,7 @@ class TestProjectApplications(ProjectDataTestMixin, BaseTestClass):
         """
         Checks whether the entity was saved successfully after POST, PUT or PATCH request. There are two checks.
         The first check will test whether expected fields are present in the output response or not. The second
-        one will test whether expected fields are properly saved in the database or not.
-
+        one will test whether expected fields are properly saved in the database or not
         :param response: the response returned by the requests mentioned above
         :param test_data: a dictionary containing tested fields and their expected values.
         :return: nothing.
@@ -133,6 +163,32 @@ class TestProjectApplications(ProjectDataTestMixin, BaseTestClass):
                 project_application = set_item
             self.assertEquals(project_application.is_enabled, test_data['is_enabled'],
                               "The link enability status must be correctly written to the database")
+
+    def create_entity_for_test(self, test_data):
+        """
+        Finds application for the testing purpose
+        :param test_data: any test with application data
+        :return: UUID for the corefacility entity
+        """
+        try:
+            module = CorefacilityModuleSet().get(UUID(test_data['uuid']))
+            project_application = ProjectApplication(project=self.project, application=module,
+                                                     is_enabled=test_data['is_enabled'])
+            project_application.create()
+        except (ValueError, EntityNotFoundException):
+            pass
+        return test_data['uuid']
+
+    def check_detail_info(self, actual_info, expected_info):
+        """
+        Checks whether actual_info contains the same information that exists in the expected_info
+        :param actual_info: the actual information
+        :param expected_info: the expected information
+        """
+        super().check_detail_info(actual_info, expected_info)
+        module = CorefacilityModuleSet().get(UUID(actual_info['uuid']))
+        self.assertEquals(actual_info['name'], gettext(module.name), "Unexpected module name")
+        self.assertEquals(actual_info['permissions'], module.permissions, "Unexpected module permissions")
 
 
 del BaseTestClass
