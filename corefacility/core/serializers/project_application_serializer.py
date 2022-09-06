@@ -54,6 +54,9 @@ class ProjectApplicationSerializer(EntitySerializer):
                 application = module_set.get(data['application']['uuid'])
             except EntityNotFoundException:
                 raise serializers.ValidationError("Incorrect module's UUID")
+            except KeyError:
+                data['application'] = None
+                return data
             if application.permissions != "add" and not self.context['request'].user.is_superuser:
                 raise serializers.ValidationError("The user has no permissions to add this application. "
                                                   "To frontend developers: please, exclude this application from the "
@@ -70,5 +73,12 @@ class ProjectApplicationSerializer(EntitySerializer):
         :param data: the validated data
         :return: the project application that has already been created
         """
+        if data['application'] is None:
+            raise serializers.ValidationError(
+                {
+                    "uuid": "To frontend developers: The 'uuid' field is required in POST request and ignored in "
+                            "PUT/PATCH requests",
+                }
+            )
         data['project'] = self.context['request'].project
         return super().create(data)
