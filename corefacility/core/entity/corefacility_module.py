@@ -147,6 +147,34 @@ class CorefacilityModule(Entity):
         return super().user_settings
 
     @property
+    def permissions(self):
+        """
+        Returns the module permission from the user settings
+        """
+        if not self.is_application:
+            raise AttributeError("Permissions are not defined at the application level")
+        return self.user_settings.get("permissions", "add")
+
+    @permissions.setter
+    def permissions(self, value):
+        """
+        Sets the module permissions from the user settings
+        """
+        from core.models.enums import LevelType
+        from core.entity.access_level import AccessLevelSet
+        if not self.is_application:
+            raise AttributeError("Permissions are not defined at the application level")
+        if not isinstance(value, str):
+            raise ValueError("The value must be a string")
+        level_set = AccessLevelSet()
+        level_set.type = LevelType.app_level
+        try:
+            level_set.get(value)
+        except EntityNotFoundException:
+            raise ValueError("No such application permission level: '%s'" % value)
+        self.user_settings.set("permissions", value)
+
+    @property
     def is_enabled(self):
         """
         Defines whether the module is enabled
@@ -433,7 +461,7 @@ class CorefacilityModule(Entity):
 
     def notify_field_changed(self, field_name):
         """
-        When EntityValueManager changes some of the entity fields it must call this method to notify this entity
+        When EntityValueManager changes some entity fields it must call this method to notify this entity
         that the field has been change.
 
         If the EntityValueManager doesn't do this, the entity state will not be considered as 'changed' which

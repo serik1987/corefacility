@@ -39,6 +39,13 @@ class TestProjectApplications(ProjectDataTestMixin, BaseTestClass):
         return {"uuid": str(imaging.uuid), "is_enabled": True}
 
     @property
+    def permission_required_application_data(self):
+        imaging = ImagingApp()
+        imaging.permissions = "permission_required"
+        imaging.update()
+        return {"uuid": str(imaging.uuid), "is_enabled": True}
+
+    @property
     def imaging_disabled_data(self):
         return {"uuid": str(ImagingApp().uuid), "is_enabled": False}
 
@@ -61,11 +68,13 @@ class TestProjectApplications(ProjectDataTestMixin, BaseTestClass):
         ("core_application", "superuser", status.HTTP_400_BAD_REQUEST),
         ("fake_application", "superuser", status.HTTP_400_BAD_REQUEST),
         ("disabled_application", "superuser", status.HTTP_400_BAD_REQUEST),
+        ("permission_required_application", "superuser", status.HTTP_201_CREATED),
         ("imaging_enabled", "user5", status.HTTP_201_CREATED),
         ("imaging_disabled", "user5", status.HTTP_400_BAD_REQUEST),
         ("roi_enabled", "user5", status.HTTP_201_CREATED),
         ("core_application", "user5", status.HTTP_400_BAD_REQUEST),
         ("fake_application", "user5", status.HTTP_400_BAD_REQUEST),
+        ("permission_required_application", "user5", status.HTTP_400_BAD_REQUEST),
         ("imaging_enabled", "user6", status.HTTP_403_FORBIDDEN),
         ("imaging_disabled", "user6", status.HTTP_403_FORBIDDEN),
         ("roi_enabled", "user6", status.HTTP_403_FORBIDDEN),

@@ -42,6 +42,10 @@ class ProjectApplicationSerializer(EntitySerializer):
             application = module_set.get(data['application']['uuid'])
         except EntityNotFoundException:
             raise serializers.ValidationError("Incorrect module's UUID")
+        if application.permissions != "add" and not self.context['request'].user.is_superuser:
+            raise serializers.ValidationError("The user has no permissions to add this application. "
+                                              "To frontend developers: please, exclude this application from the "
+                                              "application list")
         data['application'] = application
         return data
 

@@ -24,8 +24,7 @@ class Module(models.Model):
     user_settings = models.JSONField(help_text="Settings defined by the user and stored in the JSON format")
     is_application = models.BooleanField(default=True, editable=False,
                                          help_text="True if the module is application")
-    is_enabled = models.BooleanField(default=True,
-                                     help_text="True if the module has switched on")
+    is_enabled = models.BooleanField(default=True, help_text="True if the module has switched on")
 
     class Meta:
         unique_together = ["alias", "parent_entry_point"]

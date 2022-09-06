@@ -11,6 +11,9 @@ from core.test.data_providers.module_providers import module_provider, entry_poi
 from core.test.entity.base_apps_test import BaseAppsTest
 from core.test.entity.entity_objects.corefacility_module_set_object import CorefacilityModuleSetObject
 
+from imaging import App as ImagingApp
+from roi import App as RoiApp
+
 ALL_ENTRY_POINT_CLASSES = [ep_info['entry_point'] for ep_info in entry_point_provider()]
 
 
@@ -329,3 +332,28 @@ class TestCorefacilityModule(BaseAppsTest):
         module = module_class()
         self.assertEquals(module.user_settings.get(sample_name), sample_value,
                           "The module user settings was not transmitted correctly")
+
+    @parameterized.expand([
+        (module_class, value, is_valid)
+        for module_class in (ImagingApp, RoiApp)
+        for value, is_valid in [
+            ("add", True),
+            ("permission_required", True),
+            ("usage", False),
+            ("no_access", False),
+        ]
+    ])
+    def test_permissions(self, module_class, value, is_valid):
+        module_class.reset()
+        module = module_class()
+        self.assertEquals(module.permissions, "add", "Default permissions must be set to 'add'")
+        if is_valid:
+            module.permissions = value
+            module.update()
+            del module
+            module_class.reset()
+            module = module_class()
+            self.assertEquals(module.permissions, value, "The 'permission' property must be reproducible")
+        else:
+            with self.assertRaises(ValueError, msg="Incorrect permission level must generate an exception"):
+                module.permissions = value
