@@ -15,9 +15,24 @@ class ModuleSettingsViewSet(EntityViewSet):
     entity_set_class = CorefacilityModuleSet
 
     def retrieve(self, request, *args, **kwargs):
+        """
+        Retrieves user settings for a given module
+        :param request: the request received from the client
+        :param args: results of the request path parsing
+        :param kwargs: results of the request path parsing
+        :return: the response to be sent to the client
+        """
         module = self.get_object()
         module_serializer = module.get_serializer_class()(module)
         return Response(module_serializer.data)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        module = self.get_object()
+        serializer = module.get_serializer_class()(module, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
     def get_object(self):
         """

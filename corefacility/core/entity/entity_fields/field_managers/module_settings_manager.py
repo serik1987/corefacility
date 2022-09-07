@@ -1,3 +1,7 @@
+from datetime import timedelta
+from django.utils.duration import duration_string
+from django.utils.module_loading import import_string
+
 from .entity_value_manager import EntityValueManager
 
 
@@ -20,6 +24,9 @@ class ModuleSettingsManager(EntityValueManager):
             value = self._field_value[name]
         else:
             value = default_value
+        if isinstance(value, dict) and 'method' in value and 'value' in value:
+            deserialization_function = import_string(value['method'])
+            value = deserialization_function(value['value'])
         return value
 
     def set(self, name, value):
@@ -30,6 +37,11 @@ class ModuleSettingsManager(EntityValueManager):
         :param value: the module setting value
         :return: nothing
         """
+        if isinstance(value, timedelta):
+            value = {
+                "method": "django.utils.dateparse.parse_duration",
+                "value": duration_string(value)
+            }
         self._field_value[name] = value
         self.entity.notify_field_changed(self.field_name)
 
@@ -42,7 +54,7 @@ class ModuleSettingsManager(EntityValueManager):
         if self._field_value is None or item not in self._field_value:
             raise KeyError("settings has not been initialized - use serializer's default value!")
         else:
-            return self._field_value[item]
+            return self.get(item)
 
     def __len__(self):
         """

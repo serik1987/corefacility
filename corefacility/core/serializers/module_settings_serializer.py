@@ -20,3 +20,15 @@ class ModuleSettingsSerializer(EntitySerializer):
         :return: human-readable name of that module
         """
         return gettext(module.name)
+
+    def update(self, module, validated_data):
+        """
+        Sets the module settings
+        :param module: the corefacility module which settings must be adjusted
+        :param validated_data: input data after they have been validated
+        :return: the updated entity
+        """
+        for key, value, in validated_data['user_settings'].items():
+            module.user_settings.set(key, value)
+        del validated_data['user_settings']
+        return super().update(module, validated_data)
