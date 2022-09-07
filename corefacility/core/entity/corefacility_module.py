@@ -29,6 +29,8 @@ class CorefacilityModule(Entity):
     e) all methods marked here as NotImplementedError must be implemented
     """
 
+    DEFAULT_APP_PERMISSION = "add"
+
     _entity_set_class = CorefacilityModuleSet
 
     _entity_provider_list = [CorefacilityModuleProvider()]
@@ -153,7 +155,7 @@ class CorefacilityModule(Entity):
         """
         if not self.is_application:
             raise AttributeError("Permissions are not defined at the application level")
-        return self.user_settings.get("permissions", "add")
+        return self.user_settings.get("permissions", self.DEFAULT_APP_PERMISSION)
 
     @permissions.setter
     def permissions(self, value):

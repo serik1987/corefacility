@@ -41,3 +41,10 @@ class App(ProjectApp):
         return {
             "processors": ProcessorsEntryPoint()
         }
+
+    def get_serializer_class(self):
+        """
+        Returns the serializer for the application settings retrieval/updating
+        """
+        from core.serializers import ApplicationSettingsSerializer
+        return ApplicationSettingsSerializer

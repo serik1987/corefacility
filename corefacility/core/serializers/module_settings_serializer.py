@@ -28,7 +28,8 @@ class ModuleSettingsSerializer(EntitySerializer):
         :param validated_data: input data after they have been validated
         :return: the updated entity
         """
-        for key, value, in validated_data['user_settings'].items():
-            module.user_settings.set(key, value)
-        del validated_data['user_settings']
+        if 'user_settings' in validated_data:
+            for key, value, in validated_data['user_settings'].items():
+                module.user_settings.set(key, value)
+            del validated_data['user_settings']
         return super().update(module, validated_data)

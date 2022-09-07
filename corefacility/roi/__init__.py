@@ -10,3 +10,7 @@ class App(ImagingProcessor):
 
     def get_name(self):
         return "ROI definition"
+
+    def get_serializer_class(self):
+        from core.serializers import ApplicationSettingsSerializer
+        return ApplicationSettingsSerializer

@@ -17,3 +17,4 @@ from .project_application_serializer import ProjectApplicationSerializer
 from .login_password_serializer import LoginPasswordSerializer
 
 from .module_settings_serializer import ModuleSettingsSerializer
+from .application_settings_serializer import ApplicationSettingsSerializer
