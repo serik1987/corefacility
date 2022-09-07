@@ -267,6 +267,13 @@ class CorefacilityModule(Entity):
         """
         raise NotImplementedError("is_enabled_by_default")
 
+    def get_serializer_class(self):
+        """
+        Defines the serializer class. The serializer class is used to represent module settings in JSON format
+        :return: instance of rest_framework.serializers.Serializer class
+        """
+        raise NotImplementedError("get_serializer_class")
+
     def get_entry_points(self):
         """
         You can create your own entry points that allow another corefacility users to create their own

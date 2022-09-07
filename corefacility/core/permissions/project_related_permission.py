@@ -1,3 +1,4 @@
+from django.core.exceptions import ImproperlyConfigured
 from rest_framework.permissions import IsAuthenticated
 
 from core.entity.project import ProjectSet
@@ -31,6 +32,10 @@ class ProjectRelatedPermission(IsAuthenticated):
         """
         if not super().has_permission(request, view):
             return False
+        if 'project_lookup' not in view.kwargs:
+            raise ImproperlyConfigured("The default permission module is not suitable for this kind of paths. "
+                                       "Please, set another permission module in 'permission_classes' property of "
+                                       "your view")
         lookup = view.kwargs['project_lookup']
         try:
             lookup = int(lookup)

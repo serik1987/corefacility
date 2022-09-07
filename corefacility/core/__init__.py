@@ -19,6 +19,7 @@ class App(CorefacilityModule):
 
     DEFAULT_MAX_PASSWORD_SYMBOLS = 10
     DEFAULT_AUTH_TOKEN_LIFETIME = timedelta(minutes=30)
+    DEFAULT_USER_CAN_CHANGE_HIS_PASSWORD = False
 
     def get_parent_entry_point(self):
         """
@@ -89,6 +90,14 @@ class App(CorefacilityModule):
             "settings": SettingsEntryPoint(),
         }
 
+    def get_serializer_class(self):
+        """
+        Defines the serializer class. The serializer class is used to represent module settings in JSON format
+        :return: instance of rest_framework.serializers.Serializer class
+        """
+        from core.serializers.core_settings_serializer import CoreSettingsSerializer
+        return CoreSettingsSerializer
+
     def delete(self):
         """
         Raises an exception because you can't delete the core module.
@@ -115,3 +124,9 @@ class App(CorefacilityModule):
         :return: the authentication token lifetime
         """
         return self.user_settings.get("auth_token_lifetime", self.DEFAULT_AUTH_TOKEN_LIFETIME)
+
+    def user_can_change_password(self):
+        """
+        Returns True if the user can change his password when logged in. False otherwise
+        """
+        return self.user_settings.get("is_user_can_change_password", self.DEFAULT_USER_CAN_CHANGE_HIS_PASSWORD)

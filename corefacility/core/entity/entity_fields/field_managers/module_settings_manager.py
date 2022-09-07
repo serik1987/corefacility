@@ -33,6 +33,17 @@ class ModuleSettingsManager(EntityValueManager):
         self._field_value[name] = value
         self.entity.notify_field_changed(self.field_name)
 
+    def __getattr__(self, item):
+        """
+        Returns the value of the module settings field
+        :param item: name of the module settings field
+        :return: value of the module settings field
+        """
+        if self._field_value is None or item not in self._field_value:
+            raise KeyError("settings has not been initialized - use serializer's default value!")
+        else:
+            return self._field_value[item]
+
     def __len__(self):
         """
         Defines total number of user settings

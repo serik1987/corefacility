@@ -198,6 +198,8 @@ class EntitySet:
         :param name: the filter name
         :return: the filter value
         """
+        if name not in self._entity_filters:
+            return None
         return self._entity_filters[name]
 
     def __setattr__(self, name, value):
