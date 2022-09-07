@@ -26,16 +26,17 @@ class ProjectApplicationViewSet(EntityViewSet):
         :return: project_application_set after the additional filtration
         """
         project_application_set = super().filter_queryset(project_application_set)
-
-        try:
-            uuid = UUID(self.kwargs['lookup'])
-        except ValueError:
-            raise NotFound()
-        module_set = CorefacilityModuleSet()
-        module_set.is_enabled = True
-        module_set.is_application = True
-        module = self.get_entity_or_404(module_set, uuid)
-
         project_application_set.project = self.request.project
-        project_application_set.application = module
+
+        if 'lookup' in self.kwargs:
+            try:
+                uuid = UUID(self.kwargs['lookup'])
+            except ValueError:
+                raise NotFound()
+            module_set = CorefacilityModuleSet()
+            module_set.is_enabled = True
+            module_set.is_application = True
+            module = self.get_entity_or_404(module_set, uuid)
+            project_application_set.application = module
+
         return project_application_set
