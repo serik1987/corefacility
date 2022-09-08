@@ -6,6 +6,7 @@ from core.entity.corefacility_module import CorefacilityModuleSet
 from core.entity.entry_points import AuthorizationsEntryPoint, SettingsEntryPoint, ProjectsEntryPoint, \
     SynchronizationsEntryPoint
 from imaging.entity.entry_points import ProcessorsEntryPoint
+from core import App as CoreApp
 from imaging import App as ImagingApp
 from roi import App as RoiApp
 
@@ -18,6 +19,7 @@ class TestCorefacilityModule(BaseTestClass):
     """
 
     _request_path = "/api/{version}/settings/".format(version=BaseTestClass.API_VERSION)
+    ep_list_path = "/api/{version}/settings/{module}/entry-points/"
 
     superuser_required = True
     ordinary_user_required = True
@@ -87,6 +89,32 @@ class TestCorefacilityModule(BaseTestClass):
         self._container.is_application = True
         self._container.is_enabled = True
         self._test_search({"profile": "basic", "enabled_apps_only": ""}, login, status_code)
+
+    @parameterized.expand([
+        (CoreApp, "superuser", status.HTTP_200_OK),
+        (ImagingApp, "superuser", status.HTTP_200_OK),
+        (RoiApp, "superuser", status.HTTP_200_OK),
+        (CoreApp, "ordinary_user", status.HTTP_403_FORBIDDEN),
+        (CoreApp, None, status.HTTP_401_UNAUTHORIZED),
+    ])
+    def test_entry_points(self, module_class, login, expected_status_code):
+        """
+        Tests all entry points
+        """
+        module = module_class()
+        path = self.ep_list_path.format(version=self.API_VERSION, module=module.uuid)
+        headers = self.get_authorization_headers(login)
+        response = self.client.get(path, **headers)
+        self.assertEquals(response.status_code, expected_status_code, "Unexpected response status")
+        if expected_status_code == status.HTTP_200_OK:
+            results = response.data['results']
+            self.assertEquals(len(results), len(module.get_entry_points()), "Unexpected number of entry points")
+            for entry_point_info in results:
+                self.assertIn(entry_point_info['alias'], module.get_entry_points(),
+                              "Entry point '%s' is not within the list" % entry_point_info['alias'])
+                entry_point = module.get_entry_points()[entry_point_info['alias']]
+                self.assertEquals(entry_point_info['id'], entry_point.id, "Unexpected entry point ID")
+                self.assertEquals(entry_point_info['name'], gettext(entry_point.name), "Unexpected entry point name")
 
     def assert_items_equal(self, response_info, module):
         """

@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 from .testviews.test_transaction import TestTransaction
 from .views import View404, UserViewSet, GroupViewSet, ProjectViewSet, LoginView, ProfileView, AccessLevelView, \
     ProjectPermissionViewSet, SynchronizationView, LogViewSet, LogRecordViewSet, WidgetsView, ProjectModulesListView, \
-    ProjectApplicationViewSet, ModuleSettingsViewSet
+    ProjectApplicationViewSet, ModuleSettingsViewSet, EntryPointListView
 from .views.profile_avatar import ProfileAvatarView
 
 router = DefaultRouter()
@@ -30,6 +30,7 @@ urlpatterns = [
     path(r'access-levels/', AccessLevelView.as_view(), name="access-level"),
     path(r'account-synchronization/', SynchronizationView.as_view(), name="account-synchronization"),
     path(r'widgets/<uuid:module_uuid>/<str:entry_point_alias>/', WidgetsView.as_view(), name="widgets"),
+    path(r'settings/<uuid:uuid>/entry-points/', EntryPointListView.as_view(), name="entry-points"),
 
               ] + router.urls + [
 
