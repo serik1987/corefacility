@@ -10,6 +10,8 @@ class CoreSettingsSerializer(ModuleSettingsSerializer):
     Serializes, deserializes and validates the 'core' module settings
     """
 
+    is_enabled = serializers.ReadOnlyField(help_text="Is module enabled? (Always True)")
+
     max_password_symbols = serializers.IntegerField(
         source="user_settings.max_password_symbols",
         default=App.DEFAULT_MAX_PASSWORD_SYMBOLS,
