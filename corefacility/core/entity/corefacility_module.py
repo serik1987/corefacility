@@ -300,13 +300,16 @@ class CorefacilityModule(Entity):
 
     def install(self):
         """
-        Adds the module and all its related entry points to the database
-
-        :return: nothing
+        Installs the module by making changes to the module itself, to the file system and to the code of
+        a parent module and the core module (if applicable)
         """
+        from core import App
         self._check_preinstall_state()
-        parent_entry_point = self._check_parent_entry_point()
-        self._check_module_alias(parent_entry_point)
+        if not isinstance(self, App):
+            parent_entry_point = self._check_parent_entry_point()
+            self._check_module_alias(parent_entry_point)
+        else:
+            self._set_database_property("alias", self.get_alias())
         self._check_module_name()
         self._check_module_html_code()
         self._check_module_is_application()

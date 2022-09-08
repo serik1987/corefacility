@@ -27,6 +27,9 @@ class TestHighLevelFunctions(TestCase):
 
     @parameterized.expand(modules_method_provider())
     def test_modules_method(self, is_enabled, entry_point_class, expected_module_list):
+        """
+        Tests the modules() method
+        """
         expected_module_list = self._apply_is_enabled_filter(is_enabled, expected_module_list)
         for module in entry_point_class().modules(is_enabled):
             self.assertEquals(module.state, "loaded", "The module shall be properly loaded")
@@ -38,6 +41,9 @@ class TestHighLevelFunctions(TestCase):
 
     @parameterized.expand(modules_method_provider())
     def test_module_method(self, is_enabled, entry_point_class, expected_module_list):
+        """
+        Tests the module() method
+        """
         expected_module_list = self._apply_is_enabled_filter(is_enabled, expected_module_list)
         for module in expected_module_list:
             module_alias = module().get_alias()
@@ -47,6 +53,9 @@ class TestHighLevelFunctions(TestCase):
 
     @parameterized.expand(modules_method_provider())
     def test_widgets_method(self, is_enabled, entry_point_class, expected_module_list):
+        """
+        Tests the widgets() method
+        """
         expected_module_list = self._apply_is_enabled_filter(is_enabled, expected_module_list)
         expected_module_info = {}
         for expected_module_class in expected_module_list:

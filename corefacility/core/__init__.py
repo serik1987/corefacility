@@ -1,4 +1,6 @@
 from datetime import timedelta
+from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.hashers import make_password
 
 from .entity import CorefacilityModule
 from .entity.entity_exceptions import RootModuleDeleteException
@@ -97,6 +99,56 @@ class App(CorefacilityModule):
         """
         from core.serializers.core_settings_serializer import CoreSettingsSerializer
         return CoreSettingsSerializer
+
+    def install(self):
+        """
+        Installs the core module.
+
+        This function will be run automatically during migration of all applications to the database, given that
+        there is one and only one database
+        """
+        super().install()
+        self._install_pseudo_modules()
+        self._create_support_user()
+        self._install_access_levels()
+
+    def _install_pseudo_modules(self):
+        from core.authorizations.auto import AutomaticAuthorization
+        from core.authorizations.password_recovery import PasswordRecoveryAuthorization
+        from core.authorizations.standard import StandardAuthorization
+        from core.synchronizations import IhnaSynchronization
+        AutomaticAuthorization().install()
+        PasswordRecoveryAuthorization().install()
+        StandardAuthorization().install()
+        IhnaSynchronization().install()
+
+    def _create_support_user(self):
+        from core.models import User as UserModel
+        support = UserModel(
+            login="support",
+            password_hash=make_password("support"),
+            is_locked=False,
+            is_superuser=True,
+            is_support=True
+        )
+        support.save()
+
+    def _install_access_levels(self):
+        from core.models.enums import LevelType
+        from core.models import AccessLevel
+        project_permission = LevelType.project_level.value
+        app_permission = LevelType.app_level.value
+        AccessLevel.objects.bulk_create([
+            AccessLevel(type=app_permission, alias="add", name=_("Add application")),
+            AccessLevel(type=app_permission, alias="permission_required",
+                        name=_("Add application (superuser permission required)")),
+            AccessLevel(type=project_permission, alias="full", name=_("Full access")),
+            AccessLevel(type=project_permission, alias="data_full", name=_("Dealing with data")),
+            AccessLevel(type=project_permission, alias="data_add", name=_("Data adding and processing only")),
+            AccessLevel(type=project_permission, alias="data_process", name=_("Data processing only")),
+            AccessLevel(type=project_permission, alias="data_view", name=_("Viewing the data")),
+            AccessLevel(type=project_permission, alias="no_access", name=_("No access")),
+        ])
 
     def delete(self):
         """
