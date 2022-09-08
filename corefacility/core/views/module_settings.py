@@ -1,9 +1,13 @@
 from uuid import UUID
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 
 from core.entity.corefacility_module import CorefacilityModuleSet
+from core.entity.entry_points.entry_point_set import EntryPointSet
+from core.entity.entity_exceptions import EntityNotFoundException
 from core.generic_views import EntityViewSet
-from core.permissions import AdminOnlyPermission
+from core.permissions import ModuleSettingsPermission
+from core.serializers import ModuleSerializer
 
 
 class ModuleSettingsViewSet(EntityViewSet):
@@ -11,8 +15,10 @@ class ModuleSettingsViewSet(EntityViewSet):
     Module settings, install and/or uninstall
     """
 
-    permission_classes = [AdminOnlyPermission]
+    permission_classes = [ModuleSettingsPermission]
     entity_set_class = CorefacilityModuleSet
+    list_serializer_class = ModuleSerializer
+    detail_serializer_class = None
 
     def retrieve(self, request, *args, **kwargs):
         """
@@ -33,6 +39,29 @@ class ModuleSettingsViewSet(EntityViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
+    def filter_queryset(self, module_set):
+        """
+        Filters the existent module set
+        :param module_set: module set before the filtration process
+        :return: module set after the filtration process
+        """
+        if "entry_point" in self.request.query_params:
+            ep_lookup = self.request.query_params['entry_point']
+            if ep_lookup == "" or ep_lookup == "0":
+                module_set.is_root_module = True
+            else:
+                try:
+                    ep_id = int(ep_lookup)
+                    ep_set = EntryPointSet()
+                    entry_point = ep_set.get(ep_id)
+                    module_set.entry_point = entry_point
+                except (ValueError, EntityNotFoundException):
+                    raise ValidationError("incorrect entry point ID")
+        if "enabled_apps_only" in self.request.query_params:
+            module_set.is_enabled = True
+            module_set.is_application = True
+        return module_set
 
     def get_object(self):
         """

@@ -19,6 +19,20 @@ class AdminOnlyPermission(IsAuthenticated):
         return bool(super().has_permission(request, view) and request.user.is_superuser)
 
 
+class ModuleSettingsPermission(AdminOnlyPermission):
+    """
+    admins can do everything, any other users can list all modules under ?enabled_apps_only app
+    """
+
+    SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
+
+    def has_permission(self, request, view):
+        if super().has_permission(request, view):
+            return True
+        return view.action == "list" and "enabled_apps_only" in request.query_params and \
+            request.user and request.user.is_authenticated
+
+
 class NoSupportPermission(IsAuthenticated):
     """
     The permission gives all access to all user except the 'support' user.

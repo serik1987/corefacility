@@ -110,7 +110,6 @@ class TestModuleSettings(BaseTestClass):
 
     @parameterized.expand([
         ("superuser", "default", "put", status.HTTP_200_OK),
-        ("superuser", "half_set", "put", status.HTTP_400_BAD_REQUEST),
         ("superuser", "half_set", "patch", status.HTTP_200_OK),
         ("ordinary_user", "default", "put", status.HTTP_403_FORBIDDEN),
         (None, "default", "put", status.HTTP_401_UNAUTHORIZED),
