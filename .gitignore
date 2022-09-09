@@ -135,3 +135,6 @@ dmypy.json
 # Other settings
 applications.list
 corefacility/corefacility/settings/application_settings.py
+core/entity/ep_urls/projects.py
+core/entity/ep_urls/settings.py
+imaging/entity/ep_urls/processors.py

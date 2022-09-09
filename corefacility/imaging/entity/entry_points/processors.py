@@ -49,6 +49,15 @@ class ProcessorsEntryPoint(EntryPoint):
         """
         return False
 
+    def get_parent_module_class(self):
+        """
+        Returns the parent module for a given entry point. Such a module will be used as an entry point cue
+
+        :return: the parent module or None if no cue shall be provided
+        """
+        from imaging import App as ImagingApp
+        return ImagingApp
+
 
 class ImagingProcessor(ProjectApp):
     """

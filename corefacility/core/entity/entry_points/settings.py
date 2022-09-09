@@ -41,6 +41,15 @@ class SettingsEntryPoint(EntryPoint):
         """
         return False
 
+    def get_parent_module_class(self):
+        """
+        Returns the parent module for a given entry point. Such a module will be used as an entry point cue
+
+        :return: the parent module or None if no cue shall be provided
+        """
+        from core import App as CoreApp
+        return CoreApp
+
 
 class SettingsModule(CorefacilityModule):
     """
