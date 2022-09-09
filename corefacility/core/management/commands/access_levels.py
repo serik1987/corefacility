@@ -9,6 +9,8 @@ class Command(BaseCommand):
     Prints all access levels in one column (this will facilitate the view development).
     """
 
+    requires_migrations_checks = True
+
     LEVEL_TYPES = {
         LevelType.project_level: "Project access levels",
         LevelType.app_level: "Application access levels",

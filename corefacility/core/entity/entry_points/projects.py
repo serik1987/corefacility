@@ -32,6 +32,16 @@ class ProjectsEntryPoint(EntryPoint):
     def get_type(self):
         return "lst"
 
+    def is_route_exist(self):
+        """
+        Defines whether the entry point participates in the API conjunction.
+        IF the entry point participates in the API conjunction all modules attached to it must have api_urls
+        python's module in their root directory and corefacility's automatic configuration system will organize
+        URL paths through this entry point. Also, such paths will be updated during migration of any child application
+        :return: True if the entry point participates in the API conjunction, False otherwise
+        """
+        return True
+
 
 class ProjectApp(CorefacilityModule):
     """

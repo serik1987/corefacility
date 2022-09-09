@@ -19,6 +19,34 @@ class App(CorefacilityModule):
     d) manages user accounts, do administrative tasks, provides authentication but not authorization
     """
 
+    INSTALLED_APPS = [
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'django.contrib.staticfiles',
+        'django.contrib.messages',
+        'rest_framework',
+        #  'core', The application must add himself to the application list!
+        # 'authorizations.google',
+        # 'authorizations.mailru',
+        # 'authorizations.ihna',
+        # 'authorizations.cookie',
+        # 'imaging',    The application must add himself to the application list!
+        # 'roi',    The application must add himself to the application list!
+    ]
+
+    MIDDLEWARE = [
+        'core.middleware.LogMiddleware',
+        'core.middleware.CommandMakerMiddleware',
+        'django.middleware.security.SecurityMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.locale.LocaleMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    ]
+
     DEFAULT_MAX_PASSWORD_SYMBOLS = 10
     DEFAULT_AUTH_TOKEN_LIFETIME = timedelta(minutes=30)
     DEFAULT_USER_CAN_CHANGE_HIS_PASSWORD = False

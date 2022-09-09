@@ -10,6 +10,8 @@ class Command(BaseCommand):
     Provides an account synchronization process
     """
 
+    requires_migrations_checks = True
+
     TECHNICAL_PAUSE = 1.0
 
     def handle(self, *args, **kwargs):

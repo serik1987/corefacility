@@ -131,3 +131,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 /media/
+
+# Other settings
+applications.list
+corefacility/corefacility/settings/application_settings.py
