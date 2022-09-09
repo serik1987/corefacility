@@ -47,7 +47,7 @@ class ProcessorsEntryPoint(EntryPoint):
         URL paths through this entry point. Also, such paths will be updated during migration of any child application
         :return: True if the entry point participates in the API conjunction, False otherwise
         """
-        return False
+        return True
 
     def get_parent_module_class(self):
         """

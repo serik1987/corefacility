@@ -1,3 +1,5 @@
+import os
+from pathlib import Path
 import re
 from uuid import UUID
 
@@ -16,6 +18,15 @@ from .entity_exceptions import ModuleUuidNotGuessedException, \
     ParentModuleNotInstalledException, ModuleDeprecatedException, EntityOperationNotPermitted
 
 
+API_URLS_TEMPLATE = """
+from django.urls import path, include
+
+urlpatterns = [
+    {urlpatterns}
+]
+"""
+
+
 class CorefacilityModule(Entity):
     """
     Base class for all corefacility modules and applications that defines all necessary information used for
@@ -30,6 +41,8 @@ class CorefacilityModule(Entity):
     """
 
     DEFAULT_APP_PERMISSION = "add"
+
+    EP_ROUTES_FILE = "ep_urls/%s.py"
 
     _entity_set_class = CorefacilityModuleSet
 
@@ -303,6 +316,14 @@ class CorefacilityModule(Entity):
         Installs the module by making changes to the module itself, to the file system and to the code of
         a parent module and the core module (if applicable)
         """
+        self._install_database()
+        self._install_routes()
+
+    def _install_database(self):
+        """
+        Writes information about the application and all entry points connected to this application
+        :return:
+        """
         from core import App
         self._check_preinstall_state()
         if not isinstance(self, App):
@@ -323,6 +344,28 @@ class CorefacilityModule(Entity):
             self._autoload()
             for _, entry_point in self.get_entry_points().items():
                 entry_point.install(self)
+
+    def _install_routes(self):
+        """
+        Embeds the module local paths to the global corefacility's path's mapping
+        """
+        from core import App
+        if not isinstance(self, App) and self.parent_entry_point.is_route_exist():
+            module_set = CorefacilityModuleSet()
+            module_set.entry_point = self.parent_entry_point
+            path_list = [
+                "path(r'{alias}/', include('{module}.api_urls'))".format(
+                    alias=module.alias,
+                    module=module.app_class.split(".App", 1)[0]
+                )
+                for module in module_set
+            ]
+            import inspect
+            ep_file = inspect.getfile(type(self.parent_entry_point))
+            file_name = str(Path(ep_file).parent.parent / self.EP_ROUTES_FILE) % self.parent_entry_point.alias
+            file_content = API_URLS_TEMPLATE.format(urlpatterns=",\n".join(path_list))
+            with open(file_name, "w") as routes_file:
+                routes_file.write(file_content)
 
     def _check_preinstall_state(self):
         """
