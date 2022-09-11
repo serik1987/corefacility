@@ -12,10 +12,10 @@ from .entity_field_mixins.user_field_mixin import UserFieldMixin
 def user_provider():
     provided_data = [
         ("main", "alternate", None),
-        ("non_existent", "alternate", (EntityFieldInvalid, ValueError)),
-        ("deleted", "alternate", (EntityFieldInvalid, ValueError)),
-        ("no", "alternate", (EntityFieldInvalid, ValueError)),
-        ("invalid", "alternate", (EntityFieldInvalid, ValueError)),
+        ("non_existent", "alternate", (EntityFieldInvalid, ValueError, RuntimeError)),
+        ("deleted", "alternate", (EntityFieldInvalid, ValueError, RuntimeError)),
+        ("no", "alternate", (EntityFieldInvalid, ValueError, RuntimeError)),
+        ("invalid", "alternate", (EntityFieldInvalid, ValueError, RuntimeError)),
     ]
 
     return put_stages_in_provider(provided_data)

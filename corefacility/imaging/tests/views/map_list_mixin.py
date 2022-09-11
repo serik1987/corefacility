@@ -13,10 +13,11 @@ class MapListMixin(ProjectDataTestMixinSmall):
 
     project_maps = None
 
-    application = ImagingApp()
+    application = None
 
     @classmethod
     def create_test_environment(cls, project_number=2, add_roi_application=False):
+        cls.application = ImagingApp()
         if project_number < 2:
             raise ValueError("Number of projects in the map list environment must not be less than 2")
         super().create_test_environment(project_number)

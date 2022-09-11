@@ -18,7 +18,7 @@ class TestMapData(ProjectDataTestMixinSmall, FileUploadTest):
     Tests whether the map can be successfully uploaded or deleted
     """
 
-    application = App()
+    application = None
     """ Tested application """
 
     functional_map = None
@@ -49,6 +49,7 @@ class TestMapData(ProjectDataTestMixinSmall, FileUploadTest):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
+        cls.application = App()
         cls.create_test_environment()
         cls.functional_map = Map(alias="c023_X210", type="ori", project=cls.project, width=12400, height=12400)
         cls.functional_map.create()

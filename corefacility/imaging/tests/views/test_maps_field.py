@@ -40,11 +40,12 @@ class TestMapsField(ProjectDataTestMixinSmall, BaseTestClass):
         "type": "ori",
     }
 
-    application = App()
+    application = None
 
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
+        cls.application = App()
         cls.create_test_environment()
 
     @classmethod
