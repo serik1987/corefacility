@@ -83,14 +83,14 @@ class TestLogRecord(BaseTestClass):
     def test_field_log_not_created(self):
         log = Log(user=self._sample_user)
         log.request_date.mark()
-        with self.assertRaises((EntityFieldInvalid, ValueError),
+        with self.assertRaises((EntityFieldInvalid, ValueError, RuntimeError),
                                msg="Inexistent Log has been attached to the log record"):
             record = LogRecord(log=log, message="Sample message", level="DBG")
             record.record_time.mark()
             record.create()
 
     def test_field_log_invalid(self):
-        with self.assertRaises((EntityFieldInvalid, ValueError),
+        with self.assertRaises((EntityFieldInvalid, ValueError, RuntimeError),
                                msg="Incorrect data type has been used as 'log' value"):
             record = LogRecord(log="hello, world", message="Sample message", level="DBG")
             record.record_time.mark()

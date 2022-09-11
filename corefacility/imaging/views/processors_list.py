@@ -9,7 +9,11 @@ class ProcessorsListView(ModuleListView):
     List of all imaging processors
     """
 
-    entry_point = ProcessorsEntryPoint()
+    def get_entry_point(self):
+        """
+        Returns the entry point the module is attached to
+        """
+        return ProcessorsEntryPoint()
 
     def set_additional_data_info(self, response_data):
         """

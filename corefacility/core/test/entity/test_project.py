@@ -7,7 +7,7 @@ from core.models import Project as ProjectModel
 from core.entity.group import Group
 from core.entity.user import User
 from core.entity.project import Project
-from core.entity.entity_exceptions import EntityDuplicatedException
+from core.entity.entity_exceptions import EntityDuplicatedException, EntityFieldInvalid
 from core.test.data_providers.field_value_providers import alias_provider, image_provider, string_provider
 from .base_test_class import BaseTestClass
 from .entity_field_mixins.file_field_mixin import FileFieldMixin
@@ -103,13 +103,15 @@ class TestProject(FileFieldMixin, BaseTestClass):
         obj = self.get_entity_object_class()()
         obj.create_entity()
         another_user = User(login="vasily.petrov")
-        with self.assertRaises(ValueError, msg="The user was assigned to the 'root_group' property of the project"):
+        with self.assertRaises((ValueError, EntityFieldInvalid, RuntimeError),
+                               msg="The user was assigned to the 'root_group' property of the project"):
             obj.entity.root_group = another_user
 
     def test_root_group_none(self):
         obj = self.get_entity_object_class()()
         obj.create_entity()
-        with self.assertRaises(ValueError, msg="The empty value to the 'root_group' was successfully assigned"):
+        with self.assertRaises((ValueError, EntityFieldInvalid, RuntimeError),
+                               msg="The empty value to the 'root_group' was successfully assigned"):
             obj.entity.root_group = None
 
     def test_governor_none(self):
@@ -117,7 +119,8 @@ class TestProject(FileFieldMixin, BaseTestClass):
         obj.create_entity()
         another_user = User(login="vasily.petrov")
         another_user.create()
-        with self.assertRaises(ValueError, msg="another value to the 'governor was assigned"):
+        with self.assertRaises((ValueError, EntityFieldInvalid, RuntimeError),
+                               msg="another value to the 'governor was assigned"):
             obj.entity.governor = another_user
 
     @parameterized.expand(string_provider(0, 1024))

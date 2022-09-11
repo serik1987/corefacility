@@ -77,7 +77,8 @@ class TestGroup(BaseTestClass):
         obj = GroupObject()
         obj.create_entity()
         obj.reload_entity()
-        with self.assertRaises(ValueError, msg="An attempt to assign non-existent user is not failed"):
+        with self.assertRaises((RuntimeError, ValueError, EntityFieldInvalid),
+                               msg="An attempt to assign non-existent user is not failed"):
             obj.entity.governor = inexistent_governor
 
     def test_group_user_not_exists(self):

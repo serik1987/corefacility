@@ -62,7 +62,7 @@ class TestToken(UserFieldMixin, ExpiryDateMixin, PasswordMixin, BaseTestClass):
         obj.create_entity()
         obj.reload_entity()
         sample_user = User(login="sample")
-        with self.assertRaises((EntityFieldInvalid, ValueError),
+        with self.assertRaises((ValueError, EntityFieldInvalid, RuntimeError),
                                msg="Non-existent user was successfully attached to the authentication token"):
             obj.entity.user = sample_user
             obj.entity.update()

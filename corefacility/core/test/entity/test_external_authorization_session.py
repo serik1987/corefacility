@@ -16,8 +16,8 @@ from ...entity.entity_exceptions import EntityFieldInvalid
 def authorization_module_provider():
     return put_stages_in_provider([
         (IhnaApp(), GoogleApp(), None),
-        (CoreApp(), GoogleApp(), ValueError),
-        (42, GoogleApp(), ValueError)
+        (CoreApp(), GoogleApp(), EntityFieldInvalid),
+        (42, GoogleApp(), EntityFieldInvalid)
     ])
 
 
@@ -27,6 +27,9 @@ class TestExternalAuthorizationSession(ExpiryDateMixin, PasswordMixin, BaseTestC
 
     @parameterized.expand(authorization_module_provider())
     def test_authorization_module(self, *args):
+        """
+        Tests the validity of the authorization_module field
+        """
         self._test_field("authorization_module", *args, use_defaults=False)
 
     @parameterized.expand([

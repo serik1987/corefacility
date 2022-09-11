@@ -5,6 +5,9 @@ from django.test import TestCase
 from parameterized import parameterized
 
 from core import App as CoreApp
+from core.entity.entry_points.projects import ProjectsEntryPoint
+from core.entity.entry_points.settings import SettingsEntryPoint
+from imaging.entity.entry_points.processors import ProcessorsEntryPoint
 from core.entity.entity_exceptions import RootModuleDeleteException, ModuleConstraintFailedException, \
     EntityNotFoundException, EntityOperationNotPermitted, ModuleInstallationStateException, \
     ParentModuleNotInstalledException, ModuleDeprecatedException
@@ -51,6 +54,23 @@ class TestCorefacilityModuleDelete(TestCase):
         entry_point_set = EntryPointSet()
         for _ in entry_point_set:
             pass
+
+    @classmethod
+    def tearDownClass(cls):
+        AutomaticAuthorization.reset()
+        PasswordRecoveryAuthorization.reset()
+        StandardAuthorization.reset()
+        CookieAuthorization.reset()
+        IhnaAuthorization.reset()
+        MailruAuthorization.reset()
+        GoogleAuthorization.reset()
+        IhnaSynchronization.reset()
+        ImagingApp.reset()
+        RoiApp.reset()
+        ProjectsEntryPoint.reset()
+        SettingsEntryPoint.reset()
+        ProcessorsEntryPoint.reset()
+        super().tearDownClass()
 
     @parameterized.expand(module_delete_provider())
     def test_delete(self, module_class, expected_exception):

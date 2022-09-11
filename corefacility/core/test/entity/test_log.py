@@ -145,7 +145,7 @@ class TestLog(BaseTestClass):
         some_user = User(login="vasily.pupkin")
         obj = LogObject()
         obj.create_entity()
-        with self.assertRaises((EntityFieldInvalid, ValueError),
+        with self.assertRaises((EntityFieldInvalid, ValueError, RuntimeError),
                                msg="Incorrect or inexistent user was successfully assigned"):
             obj.entity.user = some_user
             obj.entity.update()

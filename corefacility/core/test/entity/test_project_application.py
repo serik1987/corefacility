@@ -11,24 +11,24 @@ from roi import App as RoiApp
 from core.test.data_providers.field_value_providers import boolean_provider, put_stages_in_provider
 from .base_test_class import BaseTestClass
 from .entity_objects.project_application_object import ProjectApplicationObject
-from ...entity.entity_exceptions import EntityDuplicatedException
+from ...entity.entity_exceptions import EntityDuplicatedException, EntityFieldInvalid
 
 
 def application_project_provider():
     return put_stages_in_provider([
         ("valid_project", 0, 1, None),
-        ("not_a_project", 2, 1, ValueError),
-        ("None_value", 3, 1, ValueError),
-        ("not_created_project", 4, 1, ValueError),
+        ("not_a_project", 2, 1, (ValueError, EntityFieldInvalid, RuntimeError)),
+        ("None_value", 3, 1, (ValueError, EntityFieldInvalid, RuntimeError)),
+        ("not_created_project", 4, 1, (ValueError, EntityFieldInvalid, RuntimeError)),
     ])
 
 
 def application_provider():
     return put_stages_in_provider([
         ("positive", False, ImagingApp, RoiApp, None),
-        ("not_an_app", False, StandardAuthorization, RoiApp, ValueError),
-        ("not_a_module", False, "proj", RoiApp, ValueError),
-        ("uninstalled_app", True, RoiApp, ImagingApp, ValueError),
+        ("not_an_app", False, StandardAuthorization, RoiApp, (ValueError, EntityFieldInvalid, RuntimeError)),
+        ("not_a_module", False, "proj", RoiApp, (ValueError, EntityFieldInvalid, RuntimeError)),
+        ("uninstalled_app", True, RoiApp, ImagingApp, (ValueError, EntityFieldInvalid, RuntimeError)),
         ("none_app", False, ImagingApp, RoiApp, None),
     ])
 
@@ -71,6 +71,9 @@ class TestProjectApplication(BaseTestClass):
 
     @parameterized.expand(application_project_provider())
     def test_project(self, test_name, field_value, updated_value, exception_to_throw, route_number):
+        """
+        Tests the 'project' field
+        """
         field_value = self._project_values[field_value]
         updated_value = self._project_values[updated_value]
         self._test_field("project", field_value, updated_value, exception_to_throw, route_number, use_defaults=False,

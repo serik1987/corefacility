@@ -16,10 +16,6 @@ def base_search_provider():
         (BaseTestClass.TEST_COUNT, None, BaseTestClass.POSITIVE_TEST_CASE),
         (BaseTestClass.TEST_ITERATION, None, BaseTestClass.POSITIVE_TEST_CASE),
 
-        (BaseTestClass.TEST_FIND_BY_ID, 0, BaseTestClass.POSITIVE_TEST_CASE),
-        (BaseTestClass.TEST_FIND_BY_ID, 11, BaseTestClass.POSITIVE_TEST_CASE),
-        (BaseTestClass.TEST_FIND_BY_ID, -1, BaseTestClass.NEGATIVE_TEST_CASE),
-
         (BaseTestClass.TEST_FIND_BY_INDEX, -1, BaseTestClass.NEGATIVE_TEST_CASE),
         (BaseTestClass.TEST_FIND_BY_INDEX, 0, BaseTestClass.POSITIVE_TEST_CASE),
         (BaseTestClass.TEST_FIND_BY_INDEX, 11, BaseTestClass.POSITIVE_TEST_CASE),

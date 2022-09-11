@@ -8,7 +8,11 @@ class ProjectModulesListView(ModuleListView):
     Downloading list of all modules attached to the processors entry point
     """
 
-    entry_point = ProjectsEntryPoint()
+    def get_entry_point(self):
+        """
+        The entry point which modules shall be listed
+        """
+        return ProjectsEntryPoint()
 
     def set_additional_data_info(self, response_data):
         """

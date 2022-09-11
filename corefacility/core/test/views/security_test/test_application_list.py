@@ -99,6 +99,10 @@ class TestApplicationList(ProjectDataTestMixin, BaseTestClass):
         response = self.client.get(module_list_path, **request_headers)
         if isinstance(expected_status_code, str):
             expected_status_code = int(expected_status_code)
+        if expected_status_code < status.HTTP_300_MULTIPLE_CHOICES and \
+                response.status_code >= status.HTTP_400_BAD_REQUEST:
+            print(response.status_code)
+            print(response.data)
         self.assertEquals(response.status_code, expected_status_code, "Unexpected response status")
         return response.data
 
@@ -144,7 +148,6 @@ class TestApplicationList(ProjectDataTestMixin, BaseTestClass):
         self.assertEquals(actual_info['uuid'], str(expected_info.uuid), "Module UUIDs are not the same")
         self.assertEquals(actual_info['alias'], expected_info.alias, "Unexpected module alias")
         self.assertEquals(actual_info['name'], gettext(expected_info.name), "Unexpected module name")
-
 
 
 del BaseTestClass
