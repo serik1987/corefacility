@@ -8,6 +8,7 @@ from rest_framework.response import Response
 import numpy
 from numpy.lib.npyio import NpzFile
 import scipy
+import scipy.io
 
 from core.generic_views import EntityViewSet, FileUploadMixin
 from core.api_exceptions import FileFormatException

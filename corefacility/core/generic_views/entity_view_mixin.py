@@ -87,9 +87,13 @@ class EntityViewMixin(SetCookieMixin):
             if value == "":
                 value = None
             if value is not None:
+                if hasattr(dateutil.parser, "ParserError"):
+                    error_class = dateutil.parser.ParserError
+                else:
+                    error_class = ValueError
                 try:
                     value = dateutil.parser.parse(value)
-                except dateutil.parser.ParserError:
+                except error_class:
                     raise ValidationError({filter_param: "The value is not recognized as correct datetime."},
                                           code="invalid")
             return value
