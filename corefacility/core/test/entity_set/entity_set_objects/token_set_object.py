@@ -15,6 +15,8 @@ class TokenSetObject(EntitySetObject):
 
     _token_passwords = None
 
+    _user_set_object = None
+
     def __init__(self, user_set_object, _entity_list=None):
         if len(user_set_object) < 4:
             raise RuntimeError("Please, provide user_set_object containing at least four users")
@@ -23,6 +25,7 @@ class TokenSetObject(EntitySetObject):
         else:
             self._entities = []
             self._token_passwords = []
+            self._user_set_object = user_set_object
             for user_index in self.data_provider():
                 user = user_set_object[user_index]
                 authentication = self._entity_class(user=user)
@@ -49,3 +52,6 @@ class TokenSetObject(EntitySetObject):
         :return: authentication object password
         """
         return self._token_passwords[auth_index]
+
+    def clone(self):
+        return self.__class__(self._user_set_object, _entity_list=list(self._entities))

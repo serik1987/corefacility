@@ -592,6 +592,13 @@ class CorefacilityModule(Entity):
         else:
             super().__setattr__(name, value)
 
+    def _reload(self):
+        """
+        Reloads the entity from the database
+        :return: copy of the entity
+        """
+        return self._entity_set_class().get(self.uuid)
+
     def __eq__(self, other):
         """
         Compares two corefacility modules, just for the debugging purpose

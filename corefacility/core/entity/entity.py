@@ -326,6 +326,24 @@ class Entity:
             super().__getattribute__(name)
             super().__setattr__(name, value)
 
+    def __deepcopy__(self, memo):
+        """
+        Provides the deep object copy (used for the testing purpose)
+        :param memo: dictionary of all copied fields
+        :return: nothing
+        """
+        if self.state in {"loaded", "saved"}:
+            return self._reload()
+        else:
+            return self
+
+    def _reload(self):
+        """
+        Reloads the entity from the database
+        :return: copy of the entity
+        """
+        return self._entity_set_class().get(self.id)
+
     def notify_field_changed(self, field_name):
         """
         When EntityValueManager changes some of the entity fields it must call this method to notify this entity

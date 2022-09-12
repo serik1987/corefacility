@@ -124,3 +124,12 @@ class EntitySetObject:
         :return: nothing
         """
         return self.entity_class(**entity_fields)
+
+    def __deepcopy__(self, memodict):
+        """
+        Provides deep copy of the object. In spite of the clone() method,
+        such method is compatible with deepcopy object
+        :param memodict: dictionary of items that has already been copied
+        :return: copy of the object
+        """
+        return self.clone()
