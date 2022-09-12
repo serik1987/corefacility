@@ -9,6 +9,7 @@ from core.entity.access_level import AccessLevelSet
 from core.entity.entity_providers.posix_providers.posix_provider import PosixProvider
 from core.entity.entity_providers.file_providers.files_provider import FilesProvider
 from core.entity.entry_points.authorizations import AuthorizationModule
+from core.os import CommandMaker
 
 
 class ProjectDataTestMixinSmall:
@@ -49,10 +50,14 @@ class ProjectDataTestMixinSmall:
         if not settings.CORE_SUGGEST_ADMINISTRATION:
             PosixProvider.force_disable = False
             FilesProvider.force_disable = False
+        executor = list()
+        maker = CommandMaker()
+        maker.initialize_executor(executor)
         cls.load_access_levels()
         cls.create_users_and_groups()
         cls.create_projects(project_number)
         cls.attach_application()
+        maker.clear_executor(executor)
 
     def initialize_projects(self):
         """
@@ -66,11 +71,15 @@ class ProjectDataTestMixinSmall:
         """
         Destroys the test environment
         """
+        executor = list()
+        maker = CommandMaker()
+        maker.initialize_executor(executor)
         for project in cls.projects:
             if not isinstance(project, Project):
                 project = ProjectSet().get(project)
             project.delete()
         cls.delete_users_and_groups()
+        maker.clear_executor(executor)
 
     @classmethod
     def load_access_levels(cls):

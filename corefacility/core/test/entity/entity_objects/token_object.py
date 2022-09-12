@@ -9,7 +9,7 @@ class TokenObject(EntityObject):
     """
 
     TOTAL_SYMBOL_NUMBER = 20
-    EXPIRATION_TERM = timedelta(milliseconds=300)
+    EXPIRATION_TERM = timedelta(seconds=1)
 
     _initial_password = None
 

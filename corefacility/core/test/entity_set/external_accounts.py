@@ -72,6 +72,7 @@ class TestExternalAccounts(BaseTestClass):
         super().setUpTestData()
         cls._user_set_object = UserSetObject()
         cls._account_set_object = cls._external_account_set_object_class(cls._user_set_object)
+        print(cls._user_set_object)
 
     def setUp(self):
         super().setUp()
@@ -93,6 +94,9 @@ class TestExternalAccounts(BaseTestClass):
 
     @parameterized.expand(user_filter_provider())
     def test_user_filter(self, user, number, arg, test_type):
+        """
+        Tests the user filter property
+        """
         if isinstance(user, int):
             user = self._user_set_object[user]
         self.apply_filter("user", user)
