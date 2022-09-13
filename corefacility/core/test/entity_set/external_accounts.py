@@ -72,7 +72,6 @@ class TestExternalAccounts(BaseTestClass):
         super().setUpTestData()
         cls._user_set_object = UserSetObject()
         cls._account_set_object = cls._external_account_set_object_class(cls._user_set_object)
-        print(cls._user_set_object)
 
     def setUp(self):
         super().setUp()

@@ -119,7 +119,7 @@ class MapViewSet(FileUploadMixin, EntityViewSet):
         :param request: The REST framework request
         :return: the REST framework response
         """
-        if self.request.project.project_dir is None or not os.path.isdir(self.request.project.project_dir):
+        if self.request.project.project_dir is None or not os.path.isdir(self.request.project.project_dir):        
             raise ProjectDirNotDefinedException()
         functional_map = self.get_object()
         if functional_map.data.url is not None:

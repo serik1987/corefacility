@@ -97,6 +97,9 @@ class FileUploadTest(MediaFilesMixin, BaseViewTest):
         request_path = self.get_special_delete_path()
         auth_headers = self.get_authorization_headers("superuser")
         response = delete_function(request_path, **auth_headers)
+        if response.status_code >= status.HTTP_400_BAD_REQUEST:
+            print(response)
+            print(response.data)
         self.assertEquals(response.status_code, self.get_delete_response_status_code(),
                           "Unexpected file delete status code")
         self.assert_file_exists([])
