@@ -8,7 +8,7 @@ from .entity_sets.user_set import UserSet
 from .entity_fields import EntityField, EntityAliasField, ManagedEntityField, ReadOnlyField, \
     EntityPasswordManager, PublicFileManager, ExpiryDateManager
 from core.entity.entity_fields.field_managers.group_manager import GroupManager
-from .entity_exceptions import EntityFieldInvalid
+from .entity_exceptions import EntityFieldInvalid, SupportUserModificationNotAllowed
 from .entity_providers.model_providers.user_provider import UserProvider as ModelProvider
 from .entity_providers.posix_providers.user_provider import UserProvider as PosixProvider
 from .entity_providers.file_providers.user_files_provider import UserFilesProvider
@@ -67,7 +67,7 @@ class User(Entity):
         :return: nothing
         """
         if self._login == "support":
-            raise EntityFieldInvalid("You are not allowed to create more 'support' user")
+            raise SupportUserModificationNotAllowed()
         else:
             super().create()
 
@@ -78,7 +78,7 @@ class User(Entity):
         :return: nothing
         """
         if self._login == "support" and self._edited_fields != {"is_locked"}:
-            raise EntityFieldInvalid("You are not allowed to modify the 'support' user")
+            raise SupportUserModificationNotAllowed()
         else:
             super().update()
 

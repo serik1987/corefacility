@@ -2,7 +2,7 @@
 {% load i18n %}
 {% translate "Loading..." as loading_message %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{language_code}}">
 <head>
     <meta charset="UTF-8">
     <title>{{loading_message}}</title>
@@ -15,9 +15,9 @@
     <link rel="stylesheet" type="text/css" href="{% static 'common.min.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static css %}">
     <script>
-        const SETTINGS={{js_settings|safe}};
+        window.SETTINGS={{js_settings|safe}};
     </script>
-    <script src="{% static js %}"></script>
+    <script src="{% static js %}" async></script>
 </head>
 <body>
     <div id="waitbar">

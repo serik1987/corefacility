@@ -1,0 +1,68 @@
+<div id="spinner">Please wait...</div>
+
+<div>
+    <div id="error-message">
+        <a class="close-button" href="/">Close</a>
+        <p class="message">Test error message</p>
+    </div>
+</div>
+
+<div id="users">
+
+    <div class="ctrl-controls">
+        <button class="ctrl-add">Add new user</button>
+    </div>
+
+    <form class="dlg-search">
+        <fieldset>
+            <input type="checkbox" name="light-profile">
+            <label>Output small number of users</label>
+            <input type="text" name="search" placeholder="Input the user for search here...">
+        </fieldset>
+    </form>
+
+    <table class="user-list">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>login</th>
+                <th>name</th>
+                <th>surname</th>
+                <th>E-mail</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <div class="ctrl-controls ctrl-navigation">
+        <button class="ctrl-previous">&lt;&lt; Previous</button>
+        <button class="ctrl-next">Next &gt;&gt;</button>
+    </div>
+
+    <form class="dlg-properties" action="#" method="post">
+        <fieldset>
+            <label>Login</label>
+            <input type="text" name="login">
+            <br>
+
+            <label>Name</label>
+            <input type="text" name="name">
+            <br>
+
+            <label>Surname</label>
+            <input type="text" name="surname">
+            <br>
+
+            <label>E-mail</label>
+            <input type="text" name="email">
+            <br>
+
+            <div class="button-row">
+                <input type="submit" name="ok" value="OK">
+                <input type="reset" name="cancel" value="Cancel">
+            </div>
+        </fieldset>
+    </form>
+
+</div>

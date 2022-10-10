@@ -26,13 +26,6 @@ class App(CorefacilityModule):
         'django.contrib.staticfiles',
         'django.contrib.messages',
         'rest_framework',
-        #  'core', The application must add himself to the application list!
-        # 'authorizations.google',
-        # 'authorizations.mailru',
-        # 'authorizations.ihna',
-        # 'authorizations.cookie',
-        # 'imaging',    The application must add himself to the application list!
-        # 'roi',    The application must add himself to the application list!
     ]
 
     MIDDLEWARE = [

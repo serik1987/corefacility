@@ -21,6 +21,12 @@ class EntityFieldInvalid(EntityException):
         super().__init__(_("%s with such values can't exist") % entity_name)
 
 
+class SupportUserModificationNotAllowed(EntityException):
+
+    def __init__(self):
+        super().__init__("You are not allowed to create or modify the 'support' user")
+
+
 class EntityOperationNotPermitted(EntityException):
 
     def __init__(self, msg=None):

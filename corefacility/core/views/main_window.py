@@ -1,6 +1,6 @@
-from uuid import UUID
 import json
 
+from django.conf import settings
 from django.views.generic import TemplateView
 
 from core import App
@@ -18,6 +18,7 @@ class MainWindow(SetCookieMixin, TemplateView):
     template_name = "core/index.html"
     css_name = "main.min.css"
     js_name = "main.min.js"
+    language_code = settings.LANGUAGE_CODE.split('-')[0]
 
     kwargs = None
     module_set = None
@@ -51,7 +52,7 @@ class MainWindow(SetCookieMixin, TemplateView):
         self._authorize_user()
         self._set_api_version()
         dump = json.dumps(kwargs)
-        return super().get_context_data(js_settings=dump, css=css_name, js=js_name)
+        return super().get_context_data(js_settings=dump, css=css_name, js=js_name, language_code=self.language_code)
 
     def render_to_response(self, context, **response_kwargs):
         """

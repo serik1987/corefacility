@@ -1,6 +1,7 @@
 from django.conf import settings
 
 from ..entity.log import Log
+import logging
 
 
 class LogMiddleware:
@@ -40,27 +41,32 @@ class LogMiddleware:
         :return: nothing
         """
         if settings.DEBUG or request.method not in self.NON_LOGGING_METHOD:
-            if "HTTP_X_FORWARDED_FOR" in request.META:
-                x_forwarded_for = request.META['HTTP_X_FORWARDED_FOR'].split(",", 1)
-                ip_address = x_forwarded_for[0]
-            else:
-                ip_address = request.META['REMOTE_ADDR']
-            log = Log(log_address=request.path, request_method=request.method, ip_address=ip_address)
-            """
-            if len(request.FILES) == 0:
-                try:
-                    log.request_body = request.body.decode(encoding='utf-8')[:Log.TEXT_MAX_LENGTH]
-                except RawPostDataException:
-                    log.request_body = request.data.decode(encoding='utf-8')[:Log.TEXT_MAX_LENGTH]
-            """
-            log.request_date.mark()
             try:
-                log.request_body = request.body.decode("utf-8")
+                if "HTTP_X_FORWARDED_FOR" in request.META:
+                    x_forwarded_for = request.META['HTTP_X_FORWARDED_FOR'].split(",", 1)
+                    ip_address = x_forwarded_for[0]
+                else:
+                    ip_address = request.META['REMOTE_ADDR']
+                log = Log(log_address=request.path, request_method=request.method, ip_address=ip_address)
+                """
+                if len(request.FILES) == 0:
+                    try:
+                        log.request_body = request.body.decode(encoding='utf-8')[:Log.TEXT_MAX_LENGTH]
+                    except RawPostDataException:
+                        log.request_body = request.data.decode(encoding='utf-8')[:Log.TEXT_MAX_LENGTH]
+                """
+                log.request_date.mark()
+                try:
+                    log.request_body = request.body.decode("utf-8")
+                except Exception as e:
+                    log.request_body = "<i>Not available</i>"
+                log.create()
+                request.corefacility_log = log
+                request.corefacility_log_middleware = self
             except Exception as e:
-                log.request_body = "<i>Not available</i>"
-            log.create()
-            request.corefacility_log = log
-            request.corefacility_log_middleware = self
+                logging.getLogger('django.corefacility.log').error(
+                    "Unable to insert the log to the database due to the following error: " + str(e)
+                )
 
     def process_view(self, request, callback, callback_args, callback_kwargs):
         """
@@ -72,11 +78,16 @@ class LogMiddleware:
         :param callback_kwargs: callback keywords
         :return: nothing
         """
-        callback_doc = callback.__doc__
-        if hasattr(request, "corefacility_log") and callback_doc is not None:
-            operation_description = callback.__doc__.strip().split("\n")[0].strip()
-            request.corefacility_log.operation_description = operation_description
-            request.corefacility_log.update()
+        try:
+            callback_doc = callback.__doc__
+            if hasattr(request, "corefacility_log") and callback_doc is not None:
+                operation_description = callback.__doc__.strip().split("\n")[0].strip()
+                request.corefacility_log.operation_description = operation_description
+                request.corefacility_log.update()
+        except Exception as e:
+            logging.getLogger('django.corefacility.log').error(
+                "Unable to insert the log to the database due to the following error: " + str(e)
+            )
 
     def process_exception(self, request, exception):
         """
@@ -96,7 +107,12 @@ class LogMiddleware:
         :param response: the response to be processed
         :return: nothing
         """
-        log.response_status = response.status_code
-        if not response.streaming and log.response_body != "***":
-            log.response_body = response.content.decode(encoding="utf-8")[:Log.TEXT_MAX_LENGTH]
-        log.update()
+        try:
+            log.response_status = response.status_code
+            if not response.streaming and log.response_body != "***":
+                log.response_body = response.content.decode(encoding="utf-8")[:Log.TEXT_MAX_LENGTH]
+            log.update()
+        except Exception as e:
+            logging.getLogger('django.corefacility.log').error(
+                "Unable to insert the log to the database due to the following error: " + str(e)
+            )
