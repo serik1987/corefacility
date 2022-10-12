@@ -93,7 +93,7 @@ class HttpClient{
 			.finally(() => {
 				--self._requestNumber;
 				document.dispatchEvent(new CustomEvent("response", {detail: self._requestNumber}));
-			});;
+			});
 	}
 
 	processErrorResponse(response, poolingFunction, poolNumber){	
@@ -111,9 +111,9 @@ class HttpClient{
 				.then(errorData => {
 					if (response.status >= SERVER_SIDE_ERROR_MIN){
 						poolNumber += 1;
-						if (poolNumber <= MAX_5xx_POOL_SIZE){
+						if (poolNumber < MAX_5xx_POOL_SIZE){
 							return wait(POOL_WAIT)
-								.then(() => poolingFunction());
+								.then(() => poolingFunction(poolNumber));
 						} else {
 							throw new ServerSideError(response.status, errorData);
 						}

@@ -13,10 +13,26 @@ class Application{
 		return this._token;
 	}
 
+	set token(value){
+		if (typeof value !== "string" && value !== null){
+			throw new TypeError("The token must be string");
+		}
+		this._token = value;
+	}
+
 	get isAuthorized(){
 		return !!this._token;
 	}
 
 }
 
-window.application = new Application();
+let application = null;
+
+Object.defineProperty(window, "application", {
+	get(){
+		if (application === null){
+			application = new Application();
+		}
+		return application;
+	}
+});

@@ -115,6 +115,7 @@ venv.bak/
 
 # node modules
 /frontend/js/core/node_modules/
+/frontend/js/core/coverage/
 
 # Spyder project settings
 .spyderproject

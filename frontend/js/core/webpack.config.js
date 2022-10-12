@@ -6,5 +6,5 @@ module.exports = {
 	output: {
 		filename: 'main.min.js',
 		path: path.resolve(__dirname, '../../../corefacility/core/static/core'),
-	}
+	},
 }

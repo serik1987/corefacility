@@ -57,18 +57,18 @@ async function showPropertyFormModal(resetForm=false){
 
 
 async function updateUser(lookup){
-    let user = await User.get(lookup);
-    let propertyForm = document.querySelector("#users .dlg-properties");
-    propertyForm.querySelector("[name=login]").value = user.login;
-    propertyForm.querySelector("[name=name]").value = user.name;
-    propertyForm.querySelector("[name=surname]").value = user.surname;
-    propertyForm.querySelector("[name=email").value = user.email;
-    location.hash = `#${user.login}`;
-    let updatedUserData = await showPropertyFormModal(false);
-    location.hash = "";
-    if (updatedUserData === false) return;
-    Object.assign(user, updatedUserData);
     try{
+        let user = await User.get(lookup);
+        let propertyForm = document.querySelector("#users .dlg-properties");
+        propertyForm.querySelector("[name=login]").value = user.login;
+        propertyForm.querySelector("[name=name]").value = user.name;
+        propertyForm.querySelector("[name=surname]").value = user.surname;
+        propertyForm.querySelector("[name=email").value = user.email;
+        location.hash = `#${user.login}`;
+        let updatedUserData = await showPropertyFormModal(false);
+        location.hash = "";
+        if (updatedUserData === false) return;
+        Object.assign(user, updatedUserData);
         await user.update();
     } catch (e){
         errorMessage(e);
@@ -269,6 +269,12 @@ window.addEventListener("load", async event => {
         let hash = location.hash;
         if (hash.charAt(0) === '#'){
             hash = hash.slice(1);
+        }
+        let browserTitle = document.head.querySelector("title");
+        if (hash){
+            browserTitle.innerText = hash;
+        } else {
+            browserTitle.innerText = "User List";
         }
         if (!hash && propertiesDlg.classList.contains("opened")){
             propertiesDlg.classList.remove("opened");

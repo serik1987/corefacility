@@ -18,6 +18,7 @@ export class HttpError extends ModelError{
 		super(errorInfo.detail || "The server returned error response without any details.");
 		this.status = responseStatus;
 		this.name = errorInfo.code || `Error ${responseStatus}`;
+		this.info = errorInfo;
 	}
 
 }
