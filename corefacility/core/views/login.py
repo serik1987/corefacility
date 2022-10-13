@@ -37,7 +37,8 @@ class LoginView(SetCookieMixin, APIView):
             raise NotAuthenticated(_("Incorrect credentials."), code="authorization_failed")
         token = auth_module.issue_token(user)
         user_serializer = UserListSerializer(user)
-        request.corefacility_log.response_body = "***"
+        if hasattr(request, "corefacility_log"):
+            request.corefacility_log.response_body = "***"
         return Response({
             "token": token,
             "user": user_serializer.data,

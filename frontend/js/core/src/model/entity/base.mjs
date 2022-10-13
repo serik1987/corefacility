@@ -1,4 +1,4 @@
-import {NotImplementedError, EntityPropertyError, EntityStateError} from '../../exceptions/model.mjs';
+import {NotImplementedError, EntityPropertyError, EntityStateError, ReadOnlyPropertyError} from '../../exceptions/model.mjs';
 import EntityPage from './page.mjs';
 import EntityState from './entity-state.mjs';
 
@@ -18,6 +18,10 @@ export default class Entity{
 
 	get id(){
 		return this._entityFields.id;
+	}
+
+	set id(value){
+		throw new ReadOnlyPropertyError(this._entityName, "id");
 	}
 
 	get state(){
@@ -84,6 +88,7 @@ export default class Entity{
 			await Promise.all(promises);
 			this._state = EntityState.deleted;
 			this._propertiesChanged.clear();
+			this._entityFields.id = null;
 		} catch (e){
 			this._state = previousState;
 			throw e;
@@ -92,9 +97,10 @@ export default class Entity{
 
 	static async find(searchParams){
 		let searchProvider = this._entityProviders[this.SEARCH_PROVIDER_INDEX];
-		if (searchParams){
-			searchProvider.searchParams = searchParams;
+		if (!searchParams){
+			searchParams = {};
 		}
+		searchProvider.searchParams = searchParams;
 		let entities = await searchProvider.findEntities();
 		if (entities instanceof EntityPage){
 			entities._entityList.map(entity => { entity._state = "found"; });
@@ -114,6 +120,14 @@ export default class Entity{
 		return string;
 	}
 
+	static isFieldRequired(fieldName){
+		if (fieldName === "id"){
+			return false;
+		} else {
+			return this._propertyDescription[fieldName].required;
+		}
+	}
+
 	_defineProperties(){
 		let propertyDescription = this.constructor._propertyDescription;
 		for (let propertyName in propertyDescription){
@@ -126,10 +140,10 @@ export default class Entity{
 					}
 				},
 				set(value){
-					if (this._state === "deleted" || this._state === "pending"){
+					if (this._state === "deleted" || this._state === "pending" || this._state === "found"){
 						throw new EntityStateError(this._state, "property change");
 					}
-					let internalValue = propertyDescription[propertyName].proofread(value);
+					let internalValue = propertyDescription[propertyName].proofread(this._entityName, propertyName, value);
 					if (internalValue !== undefined){
 						this._entityFields[propertyName] = internalValue;
 					}

@@ -18,7 +18,7 @@ export default class EntityPage{
 		return this._entityList.length;
 	}
 
-	next(){
+	async next(){
 		if (!this._next){
 			throw new RangeError("The last page reached");
 		}
@@ -26,7 +26,7 @@ export default class EntityPage{
 			.then(resultData => this._dataToPageMapper(resultData));
 	}
 
-	previous(){
+	async previous(){
 		if (!this._previous){
 			throw new RangeError("The first page reached");
 		}

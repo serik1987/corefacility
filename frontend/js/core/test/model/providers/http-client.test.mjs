@@ -286,7 +286,7 @@ describe("HTTP client test", () => {
 			await client.get(userListUrl);
 			fail("The client.get() can't be fulfilled when response 402 Payment Required received");
 		}
-		catch (e){
+		catch (e){		
 			expect(e).toBeInstanceOf(HttpError);
 		}
 	});

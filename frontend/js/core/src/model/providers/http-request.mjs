@@ -12,12 +12,12 @@ export default class HttpRequestProvider extends EntityProvider{
 
     _getEntityListUrl(){
         let apiVersion = window.SETTINGS.client_version;
-        return new URL(`${this.constructor.ORIGIN}/api/${apiVersion}/${this.pathSegment}/`);
+        return new URL(`${window.origin}/api/${apiVersion}/${this.pathSegment}/`);
     }
 
     _getEntitySearchUrl(searchParams){
         let url = this._getEntityListUrl();
-        searchParams = searchParams || {};
+        searchParams = searchParams;
         for (let name in searchParams){
             url.searchParams.append(name.toString(), searchParams[name].toString());
         }
@@ -44,14 +44,13 @@ export default class HttpRequestProvider extends EntityProvider{
             });
     }
 
-    updateEntity(entity, partial=true){
-        let method = partial ? 'PATCH' : 'PUT';
+    updateEntity(entity){
         let url = this._getEntityDetailUrl(entity);
         let inputData = {};
         for (let property of entity._propertiesChanged){
             inputData[property] = entity._entityFields[property];
         }
-        return client.request(url, method, inputData)
+        return client.patch(url, inputData)
             .then(responseData => {
                 entity._entityFields = {};
                 Object.assign(entity._entityFields, responseData);
@@ -104,5 +103,3 @@ export default class HttpRequestProvider extends EntityProvider{
     }
 
 }
-
-HttpRequestProvider.ORIGIN = globalThis.ORIGIN || window.origin;

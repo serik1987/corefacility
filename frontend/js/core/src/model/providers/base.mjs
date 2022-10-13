@@ -24,11 +24,11 @@ export default class EntityProvider{
 		throw new NotImplementedError('createEntity');
 	}
 
-	updateEntity(entity, partial=True){
+	updateEntity(entity){
 		throw new NotImplementedError('updateEntity');
 	}
 
-	deleteEntity(entity, partial=True){
+	deleteEntity(entity){
 		throw new NotImplementedError('deleteEntity');
 	}
 

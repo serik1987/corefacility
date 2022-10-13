@@ -19,6 +19,15 @@ export class EntityPropertyError extends ModelError{
 }
 
 
+export class ReadOnlyPropertyError extends ModelError{
+
+    constructor(entityName, propertyName){
+        super(`The entity ${entityName}'s property '${propertyName}' is read-only`);
+    }
+
+}
+
+
 export class EntityStateError extends ModelError{
 
     constructor(entityState, action){
