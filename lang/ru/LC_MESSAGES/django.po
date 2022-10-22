@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-05 00:14+0300\n"
+"POT-Creation-Date: 2022-10-21 13:46+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,54 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: authorizations/cookie/migrations/0002_install.py:13
+msgid "Authorization through Cookie"
+msgstr "Авторизация через Cookie"
+
+#: authorizations/google/migrations/0002_install.py:13
+msgid "Authorization through Google"
+msgstr "Авторизация через Google"
+
+#: authorizations/ihna/migrations/0002_install.py:13
+msgid "Authorization through IHNA website"
+msgstr "Авторизация через сайт ИВНД и НФ РАН"
+
+#: authorizations/mailru/migrations/0002_install.py:13
+msgid "Authorization through Mail.ru"
+msgstr "Авторизация через Mail.ru"
+
+#: core/__init__.py:163
+msgid "Add application"
+msgstr "Добавление приложения в проект"
+
+#: core/__init__.py:165
+msgid "Add application (superuser permission required)"
+msgstr "Добавление приложения в проект (с согласия суперпользователя)"
+
+#: core/__init__.py:166
+msgid "Full access"
+msgstr "Полный доступ"
+
+#: core/__init__.py:167
+msgid "Dealing with data"
+msgstr "Работа с данными"
+
+#: core/__init__.py:168
+msgid "Data adding and processing only"
+msgstr "Только добавление и обработка данных"
+
+#: core/__init__.py:169
+msgid "Data processing only"
+msgstr "Только обработка данных"
+
+#: core/__init__.py:170
+msgid "Viewing the data"
+msgstr "Только просмотр данных"
+
+#: core/__init__.py:171
+msgid "No access"
+msgstr "Доступ закрыт"
 
 #: core/api_exceptions.py:54 core/generic_views/file_upload_mixin.py:113
 msgid "This file type is not uploadable"
@@ -39,18 +87,18 @@ msgstr "Невозможно создать требуемый ресурс, т�
 msgid "%s with such values can't exist"
 msgstr "Поле %s с подобными значениями не существует"
 
-#: core/entity/entity_exceptions/__init__.py:28
+#: core/entity/entity_exceptions/__init__.py:34
 msgid "The entity operation is not permitted"
 msgstr "Указанная операция над сущностью невозможна"
 
-#: core/entity/entity_exceptions/__init__.py:40
+#: core/entity/entity_exceptions/__init__.py:46
 msgid ""
 "This feature is not supported for current database engine. Use another one"
 msgstr ""
 "Данное свойство не поддерживается на установленной Вами СУБД. Установка "
 "PostgreSQL решит эту проблему"
 
-#: core/entity/entity_exceptions/__init__.py:45
+#: core/entity/entity_exceptions/__init__.py:51
 msgid ""
 "The user is a governor of at least one group. Its delete will automatically "
 "remove these groups and reflect another user rights. Are you sure?"
@@ -60,7 +108,7 @@ msgstr ""
 "изменению прав доступа других пользователей к тому или иному функционалу. Вы "
 "желаете продолжить?"
 
-#: core/entity/entity_exceptions/__init__.py:52
+#: core/entity/entity_exceptions/__init__.py:58
 msgid ""
 "The group is a root group for at least one project. Its delete will "
 "automatically remove these projects and reflect another user rights. Are you "
@@ -70,11 +118,11 @@ msgstr ""
 "удаление приведёт к автоматическому уничтожению этих проектов, а также "
 "изменит права доступа других пользователей к функционалу. Продолжить?"
 
-#: core/entity/entity_exceptions/__init__.py:138
+#: core/entity/entity_exceptions/__init__.py:144
 msgid "Error during installation of the module"
 msgstr "Ошибка в процессе установки модуля"
 
-#: core/entity/entity_exceptions/__init__.py:150
+#: core/entity/entity_exceptions/__init__.py:156
 msgid ""
 "This module has a parent module that have not been completely installed yet"
 msgstr ""
@@ -88,7 +136,7 @@ msgstr "Модуль"
 msgid "Scientific Group"
 msgstr "Научный коллектив"
 
-#: core/entity/entity_sets/project_application_set.py:12
+#: core/entity/entity_sets/project_application_set.py:14
 msgid "Project application"
 msgstr "Приложение в проекте"
 
@@ -104,101 +152,9 @@ msgstr "Пользователь"
 msgid "The uploaded file is too large"
 msgstr "Загружаемый Вами файл имеет слишком большой размер"
 
-#: core/migrations/0002_fill.py:59
-msgid "Full access"
-msgstr "Полный доступ"
-
-#: core/migrations/0002_fill.py:60
-msgid "Dealing with data"
-msgstr "Работа с данными"
-
-#: core/migrations/0002_fill.py:61
-msgid "Data adding and processing only"
-msgstr "Только добавление и обработка данных"
-
-#: core/migrations/0002_fill.py:62
-msgid "Data processing only"
-msgstr "Только обработка данных"
-
-#: core/migrations/0002_fill.py:63
-msgid "Viewing the data"
-msgstr "Только просмотр данных"
-
-#: core/migrations/0002_fill.py:64
-msgid "No access"
-msgstr "Доступ закрыт"
-
-#: core/migrations/0002_fill.py:77
-msgid "Add application"
-msgstr "Добавление приложения в проект"
-
-#: core/migrations/0002_fill.py:79
-msgid "Add application (superuser permission required)"
-msgstr "Добавление приложения в проект (с согласия суперпользователя)"
-
-#: core/migrations/0002_fill.py:91
+#: core/migrations/0002_install.py:24
 msgid "Core functionality"
 msgstr "Базовый функционал"
-
-#: core/migrations/0002_fill.py:96
-msgid "Authorization methods"
-msgstr "Способы авторизации"
-
-#: core/migrations/0002_fill.py:100
-msgid "Standard authorization"
-msgstr "Стандартная авторизация"
-
-#: core/migrations/0002_fill.py:103
-msgid "Authorization through IHNA website"
-msgstr "Авторизация через сайт ИВНД и НФ РАН"
-
-#: core/migrations/0002_fill.py:106
-msgid "Authorization through Google"
-msgstr "Авторизация через Google"
-
-#: core/migrations/0002_fill.py:109
-msgid "Authorization through Mail.ru"
-msgstr "Авторизация через Mail.ru"
-
-#: core/migrations/0002_fill.py:112
-msgid "Authorization through Cookie"
-msgstr "Авторизация через Cookie"
-
-#: core/migrations/0002_fill.py:115
-msgid "Password recovery function"
-msgstr "Функция восстановления пароля"
-
-#: core/migrations/0002_fill.py:118
-msgid "Automatic authorization"
-msgstr "Автоматическая авторизация"
-
-#: core/migrations/0002_fill.py:123
-msgid "Account synchronization"
-msgstr "Синхронизация учётных записей"
-
-#: core/migrations/0002_fill.py:128
-msgid "IHNA RAS account synchronization"
-msgstr "Синхронизация с сайтом ИВНД и НФ РАН"
-
-#: core/migrations/0002_fill.py:132
-msgid "Project applications"
-msgstr "Работа с научными проектами"
-
-#: core/migrations/0002_fill.py:137
-msgid "Basic functional maps processing"
-msgstr "Базовая обработка функциональных карт"
-
-#: core/migrations/0002_fill.py:142
-msgid "Imaging processors"
-msgstr "Обработка функциональных карт"
-
-#: core/migrations/0002_fill.py:145
-msgid "ROI definition"
-msgstr "Выделение ROI"
-
-#: core/migrations/0002_fill.py:148
-msgid "Other settings"
-msgstr "Прочие настройки"
 
 #: core/models/enums/entry_point_type.py:9
 msgid ""
@@ -294,6 +250,18 @@ msgstr ""
 msgid "Loading..."
 msgstr "Загрузка..."
 
+#: core/templates/core/index.html:24
+msgid "You need to enable Javascript to run this application"
+msgstr ""
+"Вам необходимо включить поддержку Javascript в браузере для того, чтобы "
+"запустить это приложение"
+
+#: core/templates/core/index.html:36
+msgid ""
+"The device screen resolution is too small. Please, use this application on "
+"another device"
+msgstr "Ваше устройство имеет монитор со слишком малым разрешением. Пожалуйста, запустите это приложение на устройстве с большим разрешением"
+
 #: core/views/login.py:37
 msgid "Incorrect credentials."
 msgstr "Неверные учётные данные."
@@ -348,6 +316,10 @@ msgstr "В ходе обработки была получена карта бе
 msgid "Functional map"
 msgstr "Функциональная карта"
 
+#: imaging/migrations/0002_install.py:13
+msgid "Basic functional maps processing"
+msgstr "Базовая обработка функциональных карт"
+
 #: imaging/models/enums/map_type.py:9
 msgid "Orientation map"
 msgstr "Карта ориентационной настройки"
@@ -360,6 +332,14 @@ msgstr "Карта дирекциональной настройки"
 msgid "This value shall not be zero"
 msgstr "Данное значение не должно быть равно нулю"
 
+#: roi/api_exceptions.py:10
+msgid "To process the map please, give map dimensions in um"
+msgstr ""
+
+#: roi/api_exceptions.py:17
+msgid "To process the map please, mark at least one pinwheel center"
+msgstr ""
+
 #: roi/entity/pinwheel/pinwheel_set.py:14
 msgid "Pinwheel"
 msgstr "Центр ориентационной гиперколонки"
@@ -368,9 +348,40 @@ msgstr "Центр ориентационной гиперколонки"
 msgid "Rectangular ROI"
 msgstr "Прямоугольная область интереса"
 
+#: roi/migrations/0002_install.py:13
+msgid "ROI definition"
+msgstr "Выделение ROI"
+
 #: roi/serializers/rectangular_roi_serializer.py:33
 msgid "Incorrect combination of ROI border values"
 msgstr "Неверно заданы значения границ областей интереса"
+
+#~ msgid "Authorization methods"
+#~ msgstr "Способы авторизации"
+
+#~ msgid "Standard authorization"
+#~ msgstr "Стандартная авторизация"
+
+#~ msgid "Password recovery function"
+#~ msgstr "Функция восстановления пароля"
+
+#~ msgid "Automatic authorization"
+#~ msgstr "Автоматическая авторизация"
+
+#~ msgid "Account synchronization"
+#~ msgstr "Синхронизация учётных записей"
+
+#~ msgid "IHNA RAS account synchronization"
+#~ msgstr "Синхронизация с сайтом ИВНД и НФ РАН"
+
+#~ msgid "Project applications"
+#~ msgstr "Работа с научными проектами"
+
+#~ msgid "Imaging processors"
+#~ msgstr "Обработка функциональных карт"
+
+#~ msgid "Other settings"
+#~ msgstr "Прочие настройки"
 
 #~ msgid "Application usage"
 #~ msgstr "Использование приложения"

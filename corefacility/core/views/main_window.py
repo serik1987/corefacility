@@ -1,7 +1,11 @@
+import os
+import re
 import json
 
+from django.core.exceptions import ImproperlyConfigured
 from django.conf import settings
 from django.views.generic import TemplateView
+from django.contrib.staticfiles import finders
 
 from core import App
 from core.entity.corefacility_module import CorefacilityModuleSet
@@ -16,12 +20,16 @@ class MainWindow(SetCookieMixin, TemplateView):
 
     client_version = "v1"
     template_name = "core/index.html"
-    css_name = "main.min.css"
-    js_name = "main.min.js"
+    css_template = re.compile(r'^main\..+\.css$')
+    js_template = re.compile(r'^main\..+\.js$')
     language_code = settings.LANGUAGE_CODE.split('-')[0]
 
     kwargs = None
     module_set = None
+
+    _app_module = None
+    _css_name = None
+    _js_name = None
 
     def __init__(self, *args, **kwargs):
         """
@@ -35,6 +43,18 @@ class MainWindow(SetCookieMixin, TemplateView):
         self.module_set.is_enabled = True
         self.module_set.is_application = True
 
+    @property
+    def css_name(self):
+        if self._css_name is None:
+            self._css_name = self._find_frontend(self.css_template)
+        return self._css_name
+
+    @property
+    def js_name(self):
+        if self._js_name is None:
+            self._js_name = self._find_frontend(self.js_template)
+        return self._js_name
+
     def get_context_data(self, path='', uuid=None, **kwargs):
         """
         Transforms the path argument to the context arguments
@@ -46,13 +66,12 @@ class MainWindow(SetCookieMixin, TemplateView):
         """
         self.kwargs = kwargs
         self._split_application_path(path)
-        app = self._get_uuid(uuid)
-        css_name = "%s/%s" % (app, self.css_name)
-        js_name = "%s/%s" % (app, self.js_name)
+        self._evaluate_uuid(uuid)
         self._authorize_user()
-        self._set_api_version()
+        self._set_api_version_and_lang()
         dump = json.dumps(kwargs)
-        return super().get_context_data(js_settings=dump, css=css_name, js=js_name, language_code=self.language_code)
+        return super().get_context_data(js_settings=dump, css=self.css_name,
+                                        js=self.js_name, language_code=self.language_code)
 
     def render_to_response(self, context, **response_kwargs):
         """
@@ -84,15 +103,20 @@ class MainWindow(SetCookieMixin, TemplateView):
         if self.kwargs['iframe_route'][0] == "/":
             self.kwargs['iframe_route'] = self.kwargs['iframe_route'][1:]
 
-    def _get_uuid(self, uuid):
+    def _evaluate_uuid(self, uuid):
+        """
+        Evaluates the application UUID
+        :param uuid: the UUID to evaluate
+        :return: nothing
+        """
         if uuid is None:
             app = App()
-            uuid = str(App().uuid)
+            uuid = str(app.uuid)
         else:
             app = self.module_set.get(uuid)
             uuid = str(uuid)
         self.kwargs['app_uuid'] = uuid
-        return app.__module__
+        self._app_module = app.__module__
 
     def _authorize_user(self):
         entry_point = AuthorizationsEntryPoint()
@@ -110,5 +134,19 @@ class MainWindow(SetCookieMixin, TemplateView):
         else:
             self.kwargs['authorization_token'] = None
 
-    def _set_api_version(self):
+    def _set_api_version_and_lang(self):
         self.kwargs['client_version'] = str(self.client_version)
+        self.kwargs['lang'] = str(self.language_code)
+
+    def _find_frontend(self, frontend_template):
+        if self._app_module is None:
+            raise RuntimeError("call of _evaluate_uuid must be preceded!")
+        frontend_location = finders.find(self._app_module)
+        filename = None
+        for current_filename in os.listdir(frontend_location):
+            if frontend_template.match(current_filename):
+                filename = "%s/%s" % (self._app_module, current_filename)
+        if filename is None:
+            raise ImproperlyConfigured("The frontend part of the application has not been built using the "
+                                       "minify.sh script. Please, build it using the minify.sh script")
+        return filename

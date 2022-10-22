@@ -1,0 +1,14 @@
+.link_button{
+	color: rgb(20, 103, 210);
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.link_button.disabled{
+	cursor: not-allowed;
+	color: rgb(120, 121, 124);
+}
+
+.link_button.inactive{
+	cursor: default;
+}

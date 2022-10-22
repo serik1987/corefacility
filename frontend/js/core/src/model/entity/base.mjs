@@ -1,10 +1,34 @@
-import {NotImplementedError, EntityPropertyError, EntityStateError, ReadOnlyPropertyError} from '../../exceptions/model.mjs';
+import {NotImplementedError, EntityPropertyError, EntityStateError, ReadOnlyPropertyError}
+    from '../../exceptions/model.mjs';
 import EntityPage from './page.mjs';
 import EntityState from './entity-state.mjs';
 
 
+/** This is a base class for all entities
+ *  The Entity is some client-side object (e.g., user, project, data file)
+ *  that the client user can or can't read, save, modify or delete.
+ * 
+ *  The entities may have one or several external entity sources. The entity
+ *  operations are provided as exchange of information between entities and
+ *  their external sources.
+ * 
+ *  Each entity has one or several entity fields, Such fields can be 
+ *  modified as simple Javascript properties.
+ *  Example: get user ID:      some_user.id
+ *           set user E-mail:  some_user.email = 'sergei.kozhukhov@ihna.ru'
+ *  When the entity field is read-only, you are not allowed to modify it, 
+ *  in this case ReadOnlyPropertyError will be thrown
+ */
 export default class Entity{
 
+	/** Creates new entity.
+	 *  The constructor called outside the class is used to create the entity
+	 *  that have never been saved to any of the external sources.
+	 *  Entity creating doesn't imply its immediately saving to the external
+	 *  source
+	 *  @param entityInfo values of the entity fields that will be automatically
+	 *                    assigned during the entity create
+	 */
 	constructor(entityInfo){
 		this._entityFields = {id: null};
 		this._state = 'creating';
@@ -13,21 +37,46 @@ export default class Entity{
 		if (entityInfo !== null && entityInfo !== undefined){
 			this._setInitialProperties(entityInfo);
 		}
-		this.constructor._entityProviders;
 	}
 
+	/** The entity ID or null if the entity was not created in the external source.
+	 *  Each entity has unique entity ID that can be used to distinguish
+	 *  one entity from another one and point exactly to this given entity.
+	 *  Any entity
+	 */
 	get id(){
 		return this._entityFields.id;
 	}
 
+	/** Throws an exception indicating that the entity ID is read-only */
 	set id(value){
 		throw new ReadOnlyPropertyError(this._entityName, "id");
 	}
 
+	/** Read-only property indicating the entity state. The property equals to one
+	 *  of the following values:
+	 *  'creating' the entity was initialized on the client side but was not sent
+	 *  to the remote server to its create. Only create() operation is allowed here.
+	 *  'saved' the entity has been recently save due to either create() or update().
+	 *  All operations except create() are allowed here
+	 *  'loaded' the entity has been recently downloaded from the server.
+	 *  'changed' the entity was modified but the changes were not saved in the external
+	 *  sources. If your entity has 'changed' state this means that you have to call
+	 *  the update() method. Otherwise, your changes may be lost.
+	 *  'deleted' the entity has been removed from the external Web server
+	 *  'pending' the last entity operation returned the promise that has not been
+	 *  resolved. In this case any entity operatings as well as its modification is not allowed.
+	 *  If you see the entity in the pending state, it means that you forgot to put the
+	 *  'await keyword somewhere'.
+	 */
 	get state(){
 		return this._state;
 	}
 
+	/** Creates the entity on the remote service
+	 *  @async
+	 *  @return {undefined}
+	 */
 	async create(){
 		if (this._state != EntityState.creating){
 			throw new EntityStateError(this._state, 'create');
@@ -44,6 +93,12 @@ export default class Entity{
 		}
 	}
 
+	/** This is a static method that downloads entity with a given ID or alias
+	 *  @async
+	 *  @static
+	 *  @param {int|string} lookup the entity ID or alias
+	 *  @return {Entity} the entity to be returned
+	 */
 	static async get(lookup){
 		let searchProvider = this._entityProviders[this.SEARCH_PROVIDER_INDEX];
 		let entity = await searchProvider.loadEntity(lookup);
@@ -51,11 +106,19 @@ export default class Entity{
 		return entity;
 	}
 
+	/** Returns a copy of the entity downloaded from the server
+	 *  @async
+	 *  @return {Entity} the entity copy
+	 */
 	async reload(){
 		return this.constructor.get(this.id);
 	}
 
-	async update(partial=true){
+	/** Saves all entity changes to the hard disk.
+	 *  @async
+	 *  @return {undefined}
+	 */
+	async update(){
 		if (this._state === EntityState.loaded || this._state === EntityState.saved){
 			return;
 		}
@@ -65,7 +128,7 @@ export default class Entity{
 		}
 		this._state = EntityState.pending;
 		let promises = this.constructor._entityProviders
-			.map(provider => provider.updateEntity(this, partial));
+			.map(provider => provider.updateEntity(this));
 		try{
 			await Promise.all(promises);
 			this._state = EntityState.saved;
@@ -76,6 +139,10 @@ export default class Entity{
 		}
 	}
 
+	/** Deletes the entity from the external source
+	 *  @async
+	 *  @return {undefined}
+	 */
 	async delete(){
 		let previousState = this._state;
 		if (this._state === EntityState.creating || this._state === EntityState.deleted || this._state === EntityState.pending){
@@ -95,6 +162,20 @@ export default class Entity{
 		}
 	}
 
+	/** Finds all entities satisfying given conditions
+	 * 	@async
+	 *  @static
+	 *  @param {object} searchParams. The entity search params depending on the given entity.
+	 *  @return {EntityPage|list[Entity]}
+	 * 		The output result depends on whether the response from the Web server is paginated or not.
+	 * 		If the response is paginated, it means that the Web server sends only small pieces of the 
+	 * 		entity lists. Such a piece is called 'entity page'. In this case the function returns a single
+	 * 		entity page. The entity page allows to read all entities containing in the page as well as
+	 * 		navigate between pages.
+	 * 		If the response is not paginated, it means that the Web server will send the whole list of
+	 * 		entity. Such a list will be transformed to the Javascript's array of the entity objects and
+	 * 		returned here.
+	 */
 	static async find(searchParams){
 		let searchProvider = this._entityProviders[this.SEARCH_PROVIDER_INDEX];
 		if (!searchParams){
@@ -102,10 +183,8 @@ export default class Entity{
 		}
 		searchProvider.searchParams = searchParams;
 		let entities = await searchProvider.findEntities();
-		if (entities instanceof EntityPage){
-			entities._entityList.map(entity => { entity._state = "found"; });
-		} else {
-			entities.map(entity => { entity._state = "found"; });
+		if (entities instanceof Array){
+			entities.map(entity => { entity._state = EntityState.found; });
 		}
 		return entities;
 	}
@@ -120,6 +199,13 @@ export default class Entity{
 		return string;
 	}
 
+	/** Checks whether given entity field is required or not/
+	 *  If the field is required, you can't create the entity using the create() method until
+	 *  some value will be set to the field
+	 *  @static
+	 *  @param {string} fieldName name of the field to check
+	 *  @return {boolean} true if the field is required, false otherwise
+	 */
 	static isFieldRequired(fieldName){
 		if (fieldName === "id"){
 			return false;
@@ -128,6 +214,10 @@ export default class Entity{
 		}
 	}
 
+	/** Applies standard Javascript's Object.defineProperty routine that allows you to
+	 *  deal with entity fields as with simple Entity object's properties.
+	 * 	@return {undefined}
+	 */
 	_defineProperties(){
 		let propertyDescription = this.constructor._propertyDescription;
 		for (let propertyName in propertyDescription){
@@ -159,6 +249,10 @@ export default class Entity{
 		Object.preventExtensions(this);
 	}
 
+	/** The function was invoked once and used to set initial values to the entity fields
+	 *  @param {entityInfo} the initial values to the entity fields passed as constructor arguments
+	 *  @return {undefined}
+	 */
 	_setInitialProperties(entityInfo){
 		for (let propertyName in entityInfo){
 			if (!(propertyName in this.constructor._propertyDescription)){
@@ -168,21 +262,44 @@ export default class Entity{
 		}
 	}
 
+	/** Returns the human-readable entity name
+	 *  @abstract
+	 *  @static
+	 *  @return {string} the entity name
+	 */
 	static get _entityName(){
 		throw new NotImplementedError('static get _entityName');
 	}
 
+	/** Returns the list of all entity providers.
+	 *  Each entity provider should be associated with a certain external source where entities
+	 *  contains and provides entity save or retrieve only for this sources. When you create, update
+	 * 	or delete the entity, all providers in the list will be asked to create, update or delete the entity.
+	 *  @static
+	 * 	@return {list[EntityProvider]} list of entity provider objects
+	 */
 	static get _entityProviders(){
-		if (this.__internalEntityProviders === undefined){
-			this.__internalEntityProviders = this._defineEntityProviders();
-		}
-		return this.__internalEntityProviders;
+	    if (this.__internalEntityProviders === undefined){
+	        this.__internalEntityProviders = this._defineEntityProviders();
+	    }
+	    return this.__internalEntityProviders;
 	}
 
+	/** Initializes the list of all entity providers. The function invokes once during the initiation of
+	 *  the very first entity object. During the entity development, the functions allows to attach given
+	 *  entity provider to the entity
+	 *  @abstract
+	 *  @return [list{EntityProvider}] list of all entity providers
+	 */
 	static _defineEntityProviders(){
 		throw new NotImplementedError('static _defineEntityProviders');
 	}
 
+	/** Returns an object containing propertyName => propertyDescription pairs.
+	 *  Each property description is an instance of the EntityField class that tells the entity
+	 *  how to get or set a given entity field
+	 *  @return {object} field description for all fields
+	 */
 	static get _propertyDescription(){
 		if (this.__internalPropertyDescription === undefined){
 			this.__internalPropertyDescription = this._definePropertyDescription();
@@ -190,10 +307,20 @@ export default class Entity{
 		return this.__internalPropertyDescription;
 	}
 
+	/** Initializes property descriptions.
+	 *  The method invokes only once. When you create new entity class you must redefine this method
+	 *  and describe all entity fields by the {field_name: instance_of_EntityField} pair
+	 *  @abstract
+	 *  @return {objecty} an object that will be used for field value retrievals and set
+	 */
 	static _definePropertyDescription(){
 		throw new NotImplementedError("static _definePropertyDescription");
 	}
 
 }
 
+
+/** Index of the entity provider in the EntityClass._entityProviders array
+ *  that will be used for get() and find() functions
+ */
 Entity.SEARCH_PROVIDER_INDEX = 0;

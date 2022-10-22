@@ -1,0 +1,35 @@
+.icon_wrapper{
+	display: inline-block;
+	vertical-align: middle;
+	width: 25px;
+	height: 25px;
+	border: 1px solid transparent;
+	border-radius:  50%;
+	cursor:  pointer;
+}
+
+.icon_wrapper:hover:not(.disabled):not(.inactive){
+	background-color: #e0e0e0;
+}
+
+.icon_wrapper.disabled, .icon_wrapper.inactive{
+	cursor:  default;
+}
+
+.icon{
+	display:  block;
+	margin: 18.42% auto;
+	width:  63.16%;
+	height:  63.16%;
+}
+
+.icon svg{
+	display:  block;
+	width:  100%;
+	height:  100%;
+	fill:  #5f6368;
+}
+
+.icon_wrapper.disabled svg{
+	fill:  #e5e5e5;
+}

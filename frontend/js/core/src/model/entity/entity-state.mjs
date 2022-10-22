@@ -1,3 +1,6 @@
+/** Defines the entity state.
+ *  Detailed description of the entity state is given in the Entity help
+ */
 let EntityState = {
 	creating: 'creating',
 	pending: 'pending',
@@ -5,6 +8,7 @@ let EntityState = {
 	loaded: 'loaded',
 	changed: 'changed',
 	deleted: 'deleted',
+	found: 'found',
 };
 
 export default EntityState;

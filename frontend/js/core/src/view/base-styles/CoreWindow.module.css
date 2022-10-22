@@ -1,0 +1,55 @@
+.window header{
+	position:  fixed;
+	z-index:  1;
+	left:  0;
+	right:  0;
+	top:  0;
+	border-bottom:  1px solid rgb(218, 220, 224);
+	height:  64px;
+	overflow:  hidden;
+}
+
+.window header .logo{
+	float: left;
+	margin:  5px 30px;
+	width: 54px;
+	height: 54px;
+}
+
+.window header .controls{
+	margin-left:  114px;
+	width:  723px;
+}
+
+.window header .icons{
+	float:  right;
+	line-height:  64px;
+}
+
+.window header .icons > a{
+	margin-right: 5px;
+	width: 38px;
+	height: 38px;
+}
+
+.window header .icons > a:last-child{
+	margin-right:  17px;
+}
+
+.window main{
+	position:  fixed;
+	top:  65px;
+	left:  0;
+	right:  0;
+	bottom:  0;
+}
+
+
+@media screen and (max-width:  994px){
+
+	.window header .controls{
+		width: auto;
+		margin-right: 157px;
+	}
+
+}

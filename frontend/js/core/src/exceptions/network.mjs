@@ -1,11 +1,12 @@
 import {ModelError} from './model.mjs';
+import {translate as t} from '../utils.mjs';
 
 
 export class NetworkError extends ModelError{
 
 	constructor(e){
-		super("Unable to connect to the server");
-		this.name = "Connection error";
+		super(t("Unable to connect to the server"));
+		this.name = t("Connection error");
 		console.error(e);
 	}
 
@@ -15,9 +16,9 @@ export class NetworkError extends ModelError{
 export class HttpError extends ModelError{
 
 	constructor(responseStatus, errorInfo){
-		super(errorInfo.detail || "The server returned error response without any details.");
+		super(errorInfo.detail || t("The server returned error response without any details."));
 		this.status = responseStatus;
-		this.name = errorInfo.code || `Error ${responseStatus}`;
+		this.name = errorInfo.code || `${t("Error")} ${responseStatus}`;
 		this.info = errorInfo;
 	}
 

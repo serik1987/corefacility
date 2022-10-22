@@ -1,0 +1,59 @@
+.scrollable{
+	padding: 1px;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+.overflow_x{
+	overflow-x: auto;
+}
+
+.overflow_y{
+	overflow-y:  auto;
+}
+
+.scrollable::-webkit-scrollbar{
+	width: 16px;
+	height: 16px;
+	overflow: visible;
+}
+
+.scrollable::-webkit-scrollbar-corner{
+	background: transparent;
+}
+
+.scrollable::-webkit-scrollbar-button{
+	height: 0;
+	width: 0;
+}
+
+.scrollable::-webkit-scrollbar-track{
+	background-color: transparent;
+	background-clip: padding-box;
+	border: solid transparent;
+	border-width: 0px 0px 0px 4px;
+}
+
+.scrollable::-webkit-scrollbar-track:hover{
+	background-color: rgba(0, 0, 0, 0.051);
+	background-image: linear-gradient(to right,
+		rgb(217, 217, 217) 0px,
+		rgb(217, 217, 217) 1px,
+		transparent 1px,
+		transparent 100%
+	);
+}
+
+.scrollable::-webkit-scrollbar-thumb{
+	background-clip: padding-box;
+	background-color: rgba(0, 0, 0, 0.2);
+	border: solid transparent;
+	border-width: 1px 3px 1px 6px;
+	min-height: 28px;
+	padding: 100px 0 0;
+}
+
+.scrollable::-webkit-scrollbar-thumb:hover{
+	background-color:  rgba(0, 0, 0, 0.427);
+}
