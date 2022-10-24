@@ -22,17 +22,12 @@ export default class ListItem extends Button{
 	 *  to the callback props, because it accounts for disabled and inactive props
 	 */
 	handleClick(event){
-
-		if (!this.props.inactive && !this.props.disabled){
-			if (this.props.item){
-				event.detail = this.props.item;
-			} else {
-				event.detail = null;
-			}
-			if (this.props.onClick){
-				this.props.onClick(event);
-			}
+		if (this.props.item){
+			event.detail = this.props.item;
+		} else {
+			event.detail = null;
 		}
+		super.handleClick(event);
 	}
 
 }

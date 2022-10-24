@@ -4,9 +4,9 @@ import {initReactI18next} from 'react-i18next';
 import CoreApp from './view/CoreApp.jsx';
 
 
+let app = <CoreApp/>;
 let backendLang = window.SETTINGS.lang;
 let root = createRoot(document.getElementById("root"));
-let app = <CoreApp/>;
 
 
 fetch(`/static/core/translation.${backendLang}.json`)

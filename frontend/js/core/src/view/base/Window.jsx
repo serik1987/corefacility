@@ -1,5 +1,5 @@
 import {NotImplementedError} from '../../exceptions/model.mjs';
-import * as React from 'react';
+import DialogWrapper from './DialogWrapper.jsx';
 
 
 /** This is the base class for all corefacility windows
@@ -8,7 +8,7 @@ import * as React from 'react';
  *  
  *  The class requires no props.
  */
-export default class Window extends React.Component{
+export default class Window extends DialogWrapper{
 
 	constructor(props){
 		super(props);
@@ -30,14 +30,6 @@ export default class Window extends React.Component{
 	shouldComponentUpdate(props, state){
 		this._setBrowserTitle();
 		return true;
-	}
-
-	/** Renders the window.
-	 *  @abstract
-	 */
-	render(){
-		throw new NotImplementedError("render");
-		return null;
 	}
 
 }

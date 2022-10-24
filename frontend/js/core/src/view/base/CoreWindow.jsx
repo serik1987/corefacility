@@ -55,7 +55,6 @@ export default class CoreWindow extends Window{
 				inside the component tag.`);
 		}
 		this.reloadingComponent.reload();
-		console.log(t("Home Page"));
 	}
 
 	setReloadCallback(component){
@@ -85,6 +84,7 @@ export default class CoreWindow extends Window{
 				<main>
 					{ this.renderContent() }
 				</main>
+				{ this.renderAllModals() }
 			</div>
 		);
 	}
