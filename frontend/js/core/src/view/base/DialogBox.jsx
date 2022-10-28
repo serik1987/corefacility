@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {wait} from '../../utils.mjs';
-import {NotImplementedError} from '../../exceptions/model.mjs';
 import Scrollable from './Scrollable.jsx';
 import styles from '../base-styles/DialogBox.module.css';
 
@@ -17,6 +16,7 @@ import styles from '../base-styles/DialogBox.module.css';
  * 		@param {object} options all other options except the dialog ID were collected
  * 			within a single options. To render the dialog box with given options, set them
  * 			as the third argument.
+ * 		@param {boolean} inactive The inactive dialog can't be closed by the user.
  * 
  * 	State:
  * 		The most of state variables are not allowed to change even though you inherit from the
@@ -54,9 +54,8 @@ export default class DialogBox extends React.Component{
 		this.__mouseY = null;
 	}
 
-	/** The dialog box title */
-	get title(){
-		throw new NotImplementedError("get title");
+	get visible(){
+		return this.state.__isOpening || this.state.__isOpened || this.state.__isClosing;
 	}
 
 	/** Defines duration of the box opening / closing animatiom in milliseconds */
@@ -143,7 +142,7 @@ export default class DialogBox extends React.Component{
 	 * 	Corresponding promise will be fulfilled by false
 	 */
 	handleOutsideClick(event){
-		if (this.__mouseX === null || this.__mouseY === null){
+		if (!this.props.inactive && (this.__mouseX === null || this.__mouseY === null)){
 			this.closeDialog(false);
 		} else {
 			this.__mouseX = this.__mouseY = null;
@@ -181,13 +180,11 @@ export default class DialogBox extends React.Component{
 			if (clientRect.right + deltaX < window.innerWidth &&
 					clientRect.left + deltaX >= 0){
 				dialog.style.left = `${clientRect.left + deltaX}px`;
-				// this.setState({x: clientRect.left + deltaX});
 			}
 
 			if (clientRect.bottom + deltaY < window.innerHeight &&
 					clientRect.top + deltaY >= 0){
 				dialog.style.top = `${clientRect.top + deltaY}px`;
-				// this.setState({y: clientRect.top + deltaY});
 			}
 		}
 	}
@@ -195,18 +192,6 @@ export default class DialogBox extends React.Component{
 	/** The event triggers when the user releases the button */
 	handleMouseUp(event){
 		this.__mouseX = this.__mouseY = null;
-	}
-
-	/** Renders the dialog box title */
-	renderHeader(){
-		return (<h1>{this.title}</h1>);
-	}
-
-	/** Renders the dialog box content.
-	 * 	@abstract
-	 */
-	renderContent(){
-		throw new NotImplementedError("renderContent");
 	}
 
 	render(){
@@ -228,11 +213,11 @@ export default class DialogBox extends React.Component{
 					}}
 					>
 					<div class={styles.dialog_header} onMouseDown={this.handleMouseDown}>
-						{ this.renderHeader() }
+						<h1>{this.props.title}</h1>
 					</div>
 					<div class={styles.dialog_content}>
 						<Scrollable overflowX={true} overflowY={true}>
-							{ this.renderContent() }
+							{ this.props.children }
 						</Scrollable>
 					</div>
 				</div>

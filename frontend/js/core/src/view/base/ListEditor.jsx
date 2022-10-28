@@ -1,3 +1,4 @@
+import {NotImplementedError} from '../../exceptions/model.mjs';
 import ListLoader from './ListLoader.jsx';
 
 
@@ -32,17 +33,17 @@ export default class ListEditor extends ListLoader{
 
 	constructor(props){
 		super(props);
-		this.handleAddItem = this.handleAddItem.bind(this);
+		this.handleAddButton = this.handleAddButton.bind(this);
 		this.handleSelectItem = this.handleSelectItem.bind(this);
 	}
 
-	/** Handles pressing the Add button.
+	/** Must be invoked when the user presses the Add button.
 	 *  This is a callback widget for the child component responsible
 	 *  for item adding. Don't forget to add this to the button!
 	 * 	@param {SyntheticEvent} event the event object
 	 *  @return {undefined}
 	 */
-	async handleAddItem(event){
+	async handleAddButton(event){
 		if (!this.props.onUserAddOpen){
 			throw new TypeError("The onUserAddOpen promise has not been added as props");
 		}
@@ -50,7 +51,7 @@ export default class ListEditor extends ListLoader{
 		if (entity === null){
 			return;
 		}
-		console.log(entity.toString());
+		this.itemListComponent.addItem(entity);
 	}
 
 	/** Handles clicking on a particular entity.

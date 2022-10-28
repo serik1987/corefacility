@@ -15,6 +15,14 @@ input[type="search"]::-webkit-search-results-decoration {
   -webkit-appearance:none;
 }
 
+.scrollable > *{
+	padding: 16px 25px;
+}
+
+form button{
+	margin: 0;
+}
+
 body #small-size-message{
 	display:  none;
 }

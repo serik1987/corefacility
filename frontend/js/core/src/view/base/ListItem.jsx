@@ -1,4 +1,5 @@
 import Button from './Button.jsx';
+import ItemList from './ItemList.jsx';
 
 
 /** This is the base class for all list items (i.e., children of the ItemList component)
@@ -16,6 +17,16 @@ import Button from './Button.jsx';
  */
 export default class ListItem extends Button{
 
+	constructor(props){
+		super(props);
+	}
+
+	/** This function calls after creating the ListItem for entity tagged by 'recentlyAdded'.
+	 * 
+	 * 	You can leave this function empty or put your own developed animation here.
+	 */
+	itemAddAnimationStart(){}
+
 	/**
 	 *  handles the button click.
 	 *  When you will decide to extend this base class, pass exactly this callback
@@ -28,6 +39,13 @@ export default class ListItem extends Button{
 			event.detail = null;
 		}
 		super.handleClick(event);
+	}
+
+	componentDidMount(){
+		if (this.props.item.tag === "recentlyAdded"){
+			this.itemAddAnimationStart();
+			this.props.item.tag = undefined;
+		}
 	}
 
 }

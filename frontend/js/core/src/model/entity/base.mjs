@@ -1,6 +1,5 @@
 import {NotImplementedError, EntityPropertyError, EntityStateError, ReadOnlyPropertyError}
     from '../../exceptions/model.mjs';
-import EntityPage from './page.mjs';
 import EntityState from './entity-state.mjs';
 
 
@@ -32,6 +31,7 @@ export default class Entity{
 	constructor(entityInfo){
 		this._entityFields = {id: null};
 		this._state = 'creating';
+		this._tag = undefined;
 		this._propertiesChanged = new Set();
 		this._defineProperties();
 		if (entityInfo !== null && entityInfo !== undefined){
@@ -51,6 +51,17 @@ export default class Entity{
 	/** Throws an exception indicating that the entity ID is read-only */
 	set id(value){
 		throw new ReadOnlyPropertyError(this._entityName, "id");
+	}
+
+	/** The entity tag is small value of any type that can be assigned by the view.
+	 * 	The entity tags are used separated different entity in some groups.
+	 */
+	get tag(){
+		return this._tag;
+	}
+
+	set tag(value){
+		this._tag = value;
 	}
 
 	/** Read-only property indicating the entity state. The property equals to one
@@ -78,7 +89,7 @@ export default class Entity{
 	 *  @return {undefined}
 	 */
 	async create(){
-		if (this._state != EntityState.creating){
+		if (this._state !== EntityState.creating){
 			throw new EntityStateError(this._state, 'create');
 		}
 		this._state = EntityState.pending;
@@ -184,7 +195,7 @@ export default class Entity{
 		searchProvider.searchParams = searchParams;
 		let entities = await searchProvider.findEntities();
 		if (entities instanceof Array){
-			entities.map(entity => { entity._state = EntityState.found; });
+			entities.map(entity => { return entity._state = EntityState.found; });
 		}
 		return entities;
 	}

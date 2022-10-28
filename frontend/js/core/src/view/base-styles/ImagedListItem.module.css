@@ -1,11 +1,14 @@
 .imaged{
 	margin: 15px 0;
+	box-sizing: border-box;
 	border: 1px solid rgb(218, 220, 224);
 	border-radius: 3px;
 	box-shadow: 1px 1px 3px 0px rgba(0, 0, 0, 0.27);
-	padding: 20px;
+	overflow: hidden;
 	cursor: pointer;
-	transition: box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+	transition:
+		box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+		height 0.27s ease-in-out;
 }
 
 .imaged.disabled{
@@ -20,7 +23,11 @@
 	box-shadow: none;
 }
 
-.imaged:after{
+.imaged > div{
+	padding: 20px;
+}
+
+.imaged > div:after{
 	content: '';
 	height: 0;
 	display: block;

@@ -25,24 +25,18 @@ export default class CoreListEditor extends ListEditor{
 		throw new NotImplementedError("get listHeader");
 	}
 
-	/** Returns the component where list of entities will be printed.
-	 *  This is assumed that the component has 'items' prop
-	 */
-	get entityListComponent(){
-		throw new NotImplementedError("get entityListComponent")
-	}
-
 	/** Renders the "Add new Entity" button.
 	 *  Redeclare this method if you want to do it in another way
+	 * 
+	 * 	@return {React.Component}
 	 */
 	renderAddButton(){
-		return (<PrimaryButton onClick={this.handleAddItem} type="submit">
+		return (<PrimaryButton onClick={this.handleAddButton} type="submit" inactive={this.isLoading}>
 			{ this.addItemButtonName }
 		</PrimaryButton>);
 	}
 
 	render(){
-		let ItemList = this.entityListComponent;
 		let pendingClass = (this.isLoading || this.isError) ? styles.pending : null;
 
 		return (
@@ -58,8 +52,7 @@ export default class CoreListEditor extends ListEditor{
 					isAnimatable={true}
 				/>
 				<article className={pendingClass}>
-					<ItemList items={this.itemList} isLoading={this.isLoading}
-						isError={this.isError} onItemSelect={this.handleSelectItem}/>
+					{ this.renderItemList() }
 				</article>
 			</div>
 		);

@@ -1,5 +1,9 @@
+import * as React from 'react';
+
 import ListItem from './ListItem.jsx';
+import SlideDown from './SlideDown.jsx';
 import styles from '../base-styles/ImagedListItem.module.css';
+
 
 
 /** The item list that renders to some wide rectangular section that contains an image on the left
@@ -21,22 +25,47 @@ import styles from '../base-styles/ImagedListItem.module.css';
  */
 export default class ImagedListItem extends ListItem{
 
+	constructor(props){
+		super(props);
+		this.htmlRoot = React.createRef();
+	}
+
+	/** Evoked after the very first render when 'recentlyAdded' tag was set.
+	 */
+	itemAddAnimationStart(){
+		SlideDown.slideDown(this.htmlRoot.current);
+	}
+
 	render(){
 		let className = styles.imaged;
-		if (this.disabled){
+		if (this.props.disabled){
 			className += ` ${styles.disabled}`;
 		}
-		if (this.inactive){
+		if (this.props.inactive){
 			className += ` ${styles.inactive}`;
 		}
 
-		return (<li key={this.props.item.id} className={className} onClick={this.handleClick}>
-			<img src={this.props.img.toString()} className={styles.logo}
-				width={this.props.imageWidth} height={this.props.imageHeight}/>
-			<section>
-				{this.props.children}
-			</section>
-		</li>);
+		return (
+		<li
+			key={this.props.item.id}
+			className={className}
+			onClick={this.handleClick}
+			ref={this.htmlRoot}
+			>
+				<div>
+					<img
+						src={this.props.img.toString()}
+						className={styles.logo}
+						alt={this.props.img.toString()}
+						width={this.props.imageWidth}
+						height={this.props.imageHeight}
+					/>
+					<section>
+						{this.props.children}
+					</section>
+				</div>
+		</li>
+		);
 	}
 
 }

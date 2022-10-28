@@ -1,4 +1,4 @@
-import {wait} from '../../utils.mjs';
+import {NotImplementedError} from '../../exceptions/model.mjs';
 import * as React from 'react';
 
 
@@ -11,6 +11,11 @@ import * as React from 'react';
  * 	The DialogWrapper manager dialog boxes and contains machinery for
  * 	their opening and closing, promise-based suspension of the task by
  * 	the time the user enters the data inside this dialog.
+ * 
+ * 	This is not a requirement that the opening component must be an instance of the
+ * 	DialogWrapper. The only things required are to:
+ * 	(1) accept 'dialogId' and 'options' props
+ * 	(2) have openDialog async method
  */
 export default class DialogWrapper extends React.Component{
 
@@ -28,9 +33,8 @@ export default class DialogWrapper extends React.Component{
 	 * 	The method must be invoked inside the constructor. It will be worked improperly when
 	 * 	it will be invoked everywhere else.
 	 * 
-	 * 	@param {string} dialogId all dialogs registered in the same DialogWrapper are
-	 * 	distinguished by some unique string which is called "the dialog identifier". Set
-	 *	any arbitrary but always different string value to your dialog box.
+	 * 	@param {string|Symbol} dialogId any arbitrary string or Symbol you ever wants. Different
+	 * 		dialogs registered on the same DialogWrapper should have different dialog IDs.
 	 * 
 	 * 	@param {DialogBox} DialogComponent the dialog component to render
 	 *
@@ -38,6 +42,10 @@ export default class DialogWrapper extends React.Component{
 	 * 		All values will be placed to a single options window.
 	 */
 	registerModal(dialogId, DialogComponent, options){
+		if (dialogId in this.__modalInfo){
+			throw new Error(`Another dialog box with ID ${dialogId} has already been registered. 
+				Try another value as dialog box ID`);
+		}
 		options = options || {};
 		this.__modalInfo.push({
 			dialogId: dialogId,
@@ -82,6 +90,9 @@ export default class DialogWrapper extends React.Component{
 	 */
 	async openModal(dialogId, inputData){
 		let component = this.__modalComponents[dialogId];
+		if (component.openDialog === undefined){
+			return Promise.reject(new TypeError(`The component registered in the dialog wrapper with ID='${dialogId}' doesn't have openDialog method.`));
+		}
 		return component.openDialog(inputData);
 	}
 

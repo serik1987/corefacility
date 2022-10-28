@@ -36,6 +36,30 @@ export default class Scrollable extends React.Component{
         this.handleScroll = this.handleScroll.bind(this);
     }
 
+    /** Scrolls the container to a point (x, y)
+     * 
+     *      @param {number} x   Position of the horizontal scroll bar
+     *      @param {number} y   Position of the vertical scroll bar
+     *      @return {undefined}
+     * 
+     * If x or y is higher that the scroll area dimensions, the component
+     * will be scrolled at the very end. So, if you want to scroll them at
+     * the very end, use Infinity as their values.
+     */
+    scroll(x, y){
+        let scrollElement = this.scrollContainer.current;
+        if (x === Infinity){
+            scrollElement.scrollLeft = scrollElement.scrollWidth;
+        } else {
+            scrollElement.scrollLeft = x;
+        }
+        if (y === Infinity){
+            scrollElement.scrollTop = scrollElement.scrollHeight;
+        } else {
+            scrollElement.scrollTop = y;
+        }
+    }
+
     /** The scroll handler. This function accepts events directly from the scrollbars
      *  and calls the props' onScroll function.
      */
@@ -58,7 +82,7 @@ export default class Scrollable extends React.Component{
 		let overflowXClass = overflowX ? ` ${styles.overflow_x}` : '';
 		let overflowYClass = overflowY ? ` ${styles.overflow_y}` : '';
 
-		return(<div className={`${styles.scrollable}${overflowXClass}${overflowYClass}`}
+		return(<div className={`scrollable ${styles.scrollable}${overflowXClass}${overflowYClass}`}
                 onScroll={this.handleScroll} ref={this.scrollContainer}>
 			{this.props.children}
 		</div>);

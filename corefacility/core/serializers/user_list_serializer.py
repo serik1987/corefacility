@@ -1,4 +1,5 @@
 from django.utils.translation import gettext_lazy as _
+from rest_framework.exceptions import ValidationError
 from rest_framework import serializers
 
 from . import EntitySerializer
@@ -20,8 +21,8 @@ class UserListSerializer(EntitySerializer):
                                           _('Enter a valid login consisting of letters, numbers, '
                                             'underscores or hyphens.')
                                   })
-    name = serializers.CharField(required=False, allow_blank=True, max_length=100,
+    name = serializers.CharField(required=False, allow_blank=True, allow_null=True, max_length=100,
                                  label="First name")
-    surname = serializers.CharField(required=False, allow_blank=True, max_length=100,
+    surname = serializers.CharField(required=False, allow_blank=True, allow_null=True, max_length=100,
                                     label="Last name")
     avatar = serializers.ReadOnlyField(source="avatar.url", label="Avatar URL")

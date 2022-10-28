@@ -20,6 +20,7 @@ export class HttpError extends ModelError{
 		this.status = responseStatus;
 		this.name = errorInfo.code || `${t("Error")} ${responseStatus}`;
 		this.info = errorInfo;
+		this.isDetailed = errorInfo.detail !== null && errorInfo.detail !== undefined;
 	}
 
 }

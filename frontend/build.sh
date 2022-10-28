@@ -7,7 +7,7 @@ for app_name in `ls js`
 do
   if [ "$app_name" != "corefacility" ]
   then
-    echo Creating JS for $app_name...
+    echo Creating CSS and JS for $app_name...
     cd js/$app_name
     npm run build
     cd ../..

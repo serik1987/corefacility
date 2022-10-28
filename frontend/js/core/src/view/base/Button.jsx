@@ -38,7 +38,7 @@ export default class Button extends React.Component{
 			} else if (this.props.href){
 				console.log(this.props.href);
 			} else {
-				console.warning("corefacility.core.view.base.Button: no handler was attached to the button, " +
+				console.warn("corefacility.core.view.base.Button: no handler was attached to the button, " +
 					"The clicking is useless");
 			}
 		}

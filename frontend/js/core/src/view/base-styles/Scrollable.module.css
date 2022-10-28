@@ -1,7 +1,8 @@
 .scrollable{
-	padding: 1px;
 	width: 100%;
 	height: 100%;
+	box-sizing: border-box;
+	padding: 1px;
 	overflow: hidden;
 }
 
@@ -49,7 +50,7 @@
 	background-clip: padding-box;
 	background-color: rgba(0, 0, 0, 0.2);
 	border: solid transparent;
-	border-width: 1px 3px 1px 6px;
+	border-width: 1px 1px 1px 6px;
 	min-height: 28px;
 	padding: 100px 0 0;
 }

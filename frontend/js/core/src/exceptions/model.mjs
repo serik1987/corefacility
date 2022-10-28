@@ -35,3 +35,10 @@ export class EntityStateError extends ModelError{
     }
 
 }
+
+
+export class ValidationError extends ModelError{
+
+    name = "ValidationError";
+
+}

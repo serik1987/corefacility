@@ -1,5 +1,4 @@
 import {NotImplementedError} from '../../exceptions/model.mjs';
-import {HttpError} from '../../exceptions/network.mjs';
 import Loader from './Loader.jsx';
 
 
@@ -26,7 +25,9 @@ export default class ListLoader extends Loader{
 
 	constructor(props){
 		super(props);
+		this.registerItemList = this.registerItemList.bind(this);
 
+		this._itemListComponent = null;
 		this._filter = null;
 		this._desiredFilterIdentity = null;
 		this._actualFilterIdentity = null;
@@ -46,6 +47,13 @@ export default class ListLoader extends Loader{
 	 */
 	get entityClass(){
 		throw new NotImplementedError("get entityClass");
+	}
+
+	/** Returns the component where list of entities will be printed.
+	 *  This is assumed that the component has 'items' prop
+	 */
+	get entityListComponent(){
+		throw new NotImplementedError("get entityListComponent")
 	}
 
 	/** Uses the component props (and probably state?) to identify the filter.
@@ -80,6 +88,13 @@ export default class ListLoader extends Loader{
 		return this.state._itemList;
 	}
 
+	get itemListComponent(){
+		if (this._itemListComponent === null){
+			throw new TypeError("The itemListComponent has not been registered yet.");
+		}
+		return this._itemListComponent;
+	}
+
 	/** true if the item list is going to be refreshed
 	 *  false otherwise */
 	get isLoading(){
@@ -104,6 +119,14 @@ export default class ListLoader extends Loader{
 			throw new Error("The filter was not set")
 		}
 		return this._filter;
+	}
+
+	/** Registers item list for imperative control
+	 *  @param {React.Component} component 	The component to be registered
+	 * 	@return {undefined}
+	 */
+	registerItemList(component){
+		this._itemListComponent = component;
 	}
 
 	/** Tells the component that list fetching is in progress.
@@ -164,6 +187,20 @@ export default class ListLoader extends Loader{
 		this._desiredFilterIdentity = this.deriveFilterIdentityFromProps(props);
 
 		return true;
+	}
+
+	/** Renders the item list.
+	 *  This function must be invoked from the render() function.
+	 */
+	renderItemList(){
+		let ItemList = this.entityListComponent;
+		return (<ItemList
+					items={this.itemList}
+					isLoading={this.isLoading}
+					isError={this.isError}
+					ref={this.registerItemList}
+					onItemSelect={this.handleSelectItem}
+				/>);
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot){

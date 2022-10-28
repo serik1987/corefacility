@@ -4,7 +4,7 @@ import {
 	ServerSideError, NetworkError
 }
 from '../../exceptions/network.mjs';
-import {wait} from '../../utils.mjs';
+import {wait, translate as t} from '../../utils.mjs';
 
 
 /** The object contains information about all HTTP errors
@@ -189,7 +189,7 @@ class HttpClient{
 			return response.json()
 				.catch(e => {
 					return {
-						'detail': response.status >= SERVER_SIDE_ERROR_MIN ? "Internal server error" : "The response body is not presented in JSON format",
+						'detail': response.status >= SERVER_SIDE_ERROR_MIN ? t("Internal server error") : t("The response body is not presented in JSON format"),
 					}
 				})
 				.then(errorData => {
