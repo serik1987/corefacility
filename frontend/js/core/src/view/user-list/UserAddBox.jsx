@@ -15,7 +15,7 @@ export default class UserAddBox extends CreateForm{
 	/** Describes all fields that can be filled during the user creation
 	 * 	and provides their corresponding values
 	 */
-	get defaultValues(){
+	async getDefaultValues(){
 		return {
 			"login": null,
 			"name": null,
@@ -70,7 +70,7 @@ export default class UserAddBox extends CreateForm{
 				/>
 			</div>
 			<div className={styles.controls}>
-				<PrimaryButton type="submit" onClick={this.handleSubmit} inactive={this.state.inactive} disabled={!this.isSubmittable}>
+				<PrimaryButton {...this.getSubmitProps()} >
 					{t('Add')}
 				</PrimaryButton>
 				<PrimaryButton type="cancel" onClick={ event => this.dialog.closeDialog(false) } inactive={this.state.inactive}>

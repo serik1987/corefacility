@@ -1,8 +1,8 @@
 import {NotImplementedError} from '../../exceptions/model.mjs';
 import ListEditor from './ListEditor.jsx';
 import PrimaryButton from './PrimaryButton.jsx';
-import MessageBar from './MessageBar.jsx';
-import styles from '../base-styles/EntityEditor.module.css';
+import CoreWindowHeader from './CoreWindowHeader.jsx';
+
 
 
 
@@ -25,37 +25,24 @@ export default class CoreListEditor extends ListEditor{
 		throw new NotImplementedError("get listHeader");
 	}
 
-	/** Renders the "Add new Entity" button.
-	 *  Redeclare this method if you want to do it in another way
-	 * 
-	 * 	@return {React.Component}
-	 */
-	renderAddButton(){
-		return (<PrimaryButton onClick={this.handleAddButton} type="submit" inactive={this.isLoading}>
-			{ this.addItemButtonName }
-		</PrimaryButton>);
-	}
-
 	render(){
-		let pendingClass = (this.isLoading || this.isError) ? styles.pending : null;
 
 		return (
-		    <div className={styles.primary}>
-				<aside>
-					{ this.renderAddButton() }
-				</aside>
-				<h1>{ this.listHeader }</h1>
-				<MessageBar
-					isLoading={this.isLoading}
-					isError={this.isError}
-					error={this.error}
-					isAnimatable={true}
-				/>
-				<article className={pendingClass}>
+			<CoreWindowHeader
+				isLoading={this.isLoading}
+				isError={this.isError}
+				error={this.error}
+				header={this.listHeader}
+				aside={
+					<PrimaryButton onClick={this.handleAddButton} type="submit" inactive={this.isLoading}>
+						{ this.addItemButtonName }
+					</PrimaryButton>
+				}
+				>
 					{ this.renderItemList() }
-				</article>
-			</div>
+			</CoreWindowHeader>
 		);
+
 	}
 
 }

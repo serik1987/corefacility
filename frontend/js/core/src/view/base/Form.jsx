@@ -22,13 +22,16 @@ import styles from '../base-styles/Form.module.css';
  * 		the object) or can be simply preliminary set of values (in case
  * 		when user creates new object)
  * 
- * 	rawValues - values entered by the user
+ * 	rawValues - values entered by the user These values are part of the component
+ * 		state: all fields are rendered according to rawValues.
  * 
  * 	formValues - values after primitive proprocessing (i.e., removing loading
  * 		and trailing whitespaces, converting to proper Javascript type, converting
- * 		empty strings to null etc.)
+ * 		empty strings to null etc.). These values don't influence on rendering
+ * 		of fields.
  * 
- * formObject - on the one hand, formObject is responsible for client-side data validation.
+ * formObject - strictly must be an instance of Entity.
+ * 		On the one hand, formObject is responsible for client-side data validation.
  * 		i.e., it accepts invalidated data from the formValues and must reveal the
  * 		validated data or throw an exception if client-side validation fails.
  * 		On the other side, formObject is the only intermediate that is responsible
@@ -37,6 +40,7 @@ import styles from '../base-styles/Form.module.css';
  * 
  * 	modifyFormObject - when the formObject is constructedm the modifyFormObject
  * 		becomes the main form function
+ * 
  * 
  * 
  * Props:
@@ -65,14 +69,20 @@ export default class Form extends React.Component{
 		this._forceUpdate = false; // When this value is true, shouldComponentUpdate is always true
 								   // The value becomes false after each form update.
 		this.state = {
-			rawValues: null,
+			rawValues: {},
 			errors: {},
 			globalError: null,
 			inactive: false,
 		}
 		this._formValues = null;
 		this._formObject = null;
-		this.resetForm(null, false);
+	}
+
+	/** The entity class. The formObject will be exactly an instance of this class.
+	 * 	The formObject is implied to be an instance of Entity
+	 */
+	get entityClass(){
+		throw new NotImplementedError("entityClass");
 	}
 
 	/** Values after their primitive preprocessing (i.e., removing leading and trailing whitespaces, etc.) */
@@ -92,6 +102,12 @@ export default class Form extends React.Component{
 	get isSubmittable(){
 		if (this.hasFieldError){
 			return false;
+		}
+
+		for (let field in this._formValues){
+			if (this.entityClass.isFieldRequired(field) && this._formValues[field] === null){
+				return false;
+			}
 		}
 
 		return true;
@@ -116,7 +132,12 @@ export default class Form extends React.Component{
 		}
 	}
 
-	/** Renders props of the child DialogBox. Must be used in the render function like here:
+	/** Renders props that required for the DialogBox component to be successfully embedded inside the form, including:
+	 * 		(1) options - the options prop passed inside the form from the DialogWrapper
+	 * 		(2) ref - the registerDialog method that allows the form to achieve direct imerative control on the dialog
+	 * 		(3) inactive - correlated with form's inactive state.
+	 * 
+	 * 	Just do it like here:
 	 * 		<DialogBox {...this.getDialogProps()} title="Some Form"/>
 	 * 
 	 * 	@return {object} set of props that are necessary for dialog to work correctly
@@ -130,9 +151,15 @@ export default class Form extends React.Component{
 	}
 
 	/** Renders props of any child component that supply the rawData to the data flow.
-	 * 		(i.e., inputs, checkboxes, radiobuttons etc.)
+	 * 		(i.e., inputs, checkboxes, radiobuttons etc.) - we call them 'fields'
 	 * 
-	 *  You need to set these props if you want your form to work correctly, like here...
+	 * The method renders all props that are required for the field to work correctly:
+	 * 		(1) value - must be taken from the rawValues object from the form's state
+	 * 		(2) error - must be taken from the errors object from the form's state
+	 * 		(3) onInputChange - must be form's handleInputChange
+	 * 		(4) inactive - must be correlated with the form's inactive state.
+	 * 
+	 *  Just do it like here:
 	 *  <TextInput
 	 *				{...this.getFieldProps('surname')}
 	 *				htmlType="text"
@@ -152,6 +179,36 @@ export default class Form extends React.Component{
 		}
 	}
 
+	/** Renders props of the submit button.
+	 * 
+	 * 	The method renders all props that are required for button to work correctly, i.e.,
+	 * 		(1) the button type must be "submit"
+	 * 		(2) the click handler must be this.handleSubmit
+	 * 		(3) the inactive prop must be correlated with the form's inactive state
+	 * 		(4) the disabled prop must be correlated with the form's isSubmittable JS property
+	 * 
+	 *  Just do it like here: <PrimaryButton {...this.getSubmitProps()} >Add</PrimaryButton>
+	 */
+	getSubmitProps(){
+		return {
+			type: "submit",
+			onClick: this.handleSubmit,
+			inactive: this.state.inactive,
+			disabled: !this.isSubmittable,
+		}
+	}
+
+	/** Return default values. The function is required if you want the resetForm to work correctly
+	 * 	Each field must be mentioned!
+	 * 	@abstract
+	 * 	@async
+	 * 		@param {object} inputData some input data passed to the form (They could be undefined)
+	 * 		@return {object} the defaultValues
+	 */
+	async getDefaultValues(inputData){
+		throw new NotImplementedError("defaultValues");
+	}
+
 	/** Sets default values to the form. The function calls everywhere when the dialog box opens
 	 * 	or the form initializes.
 	 * 	@async
@@ -161,24 +218,39 @@ export default class Form extends React.Component{
 	 * 	@return {undefined}
 	 * 
 	 */
-	async resetForm(inputData, shouldUpdate = true){
-		throw new NotImplementedError("resetForm");
+	async resetForm(inputData){
+		this.setState({inactive: true});
+		let defaultValues = await this.getDefaultValues(inputData);
+		this.setState({
+			rawValues: defaultValues,
+			errors: {},
+			globalError: null,
+			inactive: false,
+		});
+		this._formValues = defaultValues;
+		this._formObject = null;
 	}
 
 	/** Tells the form what to do if the user presses the 'Submit' buton. It could be
 	 * 		posting new entity on the server, requesting for data processing - whenever
 	 * 		you want!
 	 * 
-	 * 	If the function throws an error, this error become a form's global error.
+	 * 	HIGHLY IMPORTANT! Throw an error when the server-side validation fails only!
+	 * 	If client-side validation fails, the function must just change and throw
+	 * 	ValidationError with no arguments.
+	 * 
 	 * 	@abstract
 	 *  @async
 	 * 	@return {undefined} all the result is changes in this._formObject
+	 * 		The function should throw an exception when server-side validation fails or
+	 * 		modify the errors state when the client-side validation fails.
 	 */
 	async modifyFormObject(){
 		throw new NotImplementedError("modifyFormObject");
 	}
 
 	/** Triggers when the user changes the value in the field.
+	 * 
 	 * 
 	 * 	@param {string} name the field name where user changes the value
 	 * 	@param {SyntheticEvent} the event triggered by the object. Because the value
@@ -189,6 +261,7 @@ export default class Form extends React.Component{
 	 * 	@return {undefined}
 	 */
 	handleInputChange(name, event){
+		/* First, change rawValues (about rawValues, formValues, formObject see in class description) */
 		this.setState({
 			rawValues: {
 				...this.state.rawValues,
@@ -200,35 +273,25 @@ export default class Form extends React.Component{
 			},
 			globalError: null,
 		});
-
+		/* Secondly, change formValues */
 		if (this._formValues === null){
 			throw new TypeError("The Javascript property 'formValues' must be reset in the resetForm() method")
 		}
 		this._formValues[name] = event.value;
+		/* Thirdly, ... */
 		if (this._formObject !== null){
-			this.fillFormObject(name, event.value);
-		}
-	}
-
-	/** Sets proper value to the form field.
-	 *  Throws an exception if the value is invalid
-	 * 
-	 * 	@param {string} name the field name
-	 * 	@param {string} value the field value from the formValues
-	 * 	@return {boolean} true if the form is valid, false otherwise
-	 */
-	fillFormObject(name, value){
-		try{
-			this._formObject[name] = value;
-			return true;
-		} catch (error){
-			this.setState({
-				errors: {
-					...this.state.errors,
-					[name]: error.message,
-				}
-			});
-			return false;
+			try{
+					/* ... change form object or ... */
+				this._formObject[name] = event.value;
+			} catch (error){
+				/* .... print error if client-side validation fails */
+				this.setState({
+					errors: {						// IMPORTANT! Such operator will work if you guarantee that
+						...this.state.errors, 		// you don't change the other field errors previously
+						[name]: error.message, 		// In this case we actually did not do that!
+					}
+				});
+			}
 		}
 	}
 
@@ -239,54 +302,64 @@ export default class Form extends React.Component{
 	 */
 	async handleSubmit(event){
 		try{
+			/* Clear all error messages and lock the form to prevent the user from any consequtive actions */
 			this.setState({
 				errors: {},
 				globalError: null,
 				inactive: true,
 			});
+			/* Change the formObject and call its methods that provide its interaction with the external world */
 			await this.modifyFormObject();
 			if (this._formObject === null){
 				throw new TypeError("The 'modifyFormObject' method should always guarantee that the _formObject is created after promise resolution");
 			}
+			/* If the dialog box is inside the form, close the dialog box and resolve the dialog box opening promise by the formObject */
 			if (this.dialog){
 				await this.dialog.closeDialog(this._formObject);
 			}
 		} catch (error){
+			/* In case when the server-side validation fails or  */
 			this.handleError(error);
 		} finally{
+			/* Don't forget to unlock the form in order to allow the user to fix errors or use it again */
 			this.setState({inactive: false});
 		}
 	}
 
-	/**	Transforms Javascript exception to the error message in the message bar
+	/**	Transforms Javascript exception to the error message in the message bar.
 	 * 
 	 * 	@param {Error} error Javascript exception
 	 * 	@return {undefined}
 	 */
 	handleError(error){
-		switch (error.constructor){
-			case networkErrors.UnauthorizedError:
-				window.location.reload();
-				break;
-			default:
-				let fieldErrors = {};
-				let globalError = error.message;
-				for (let name in error.info){
-					if (name in this._formValues){
-						fieldErrors[name] = error.info[name].join(" ");
-					}
-				}
-				if (!error.isDetailed && Object.keys(fieldErrors).length > 0){
-					globalError = null;
-				}
-				if (!error.isDetailed && error.info && error.info.non_field_errors){
-					globalError = error.info.non_field_errors.join(" ");
-				}
-				this.setState({
-					errors: {...this.state.errors, ...fieldErrors},
-					globalError: globalError,
-				});
+		if (error instanceof networkErrors.UnauthorizedError){
+			/* After application reloading non-authorized users will be moved to the authorization form */
+			window.location.reload();
+			return;
 		}
+		
+		let fieldErrors = {};
+		let globalError = error.message;
+		/* When server-side field validation fails, error.info contains information about all invalid fields */
+		for (let name in error.info){
+			if (name in this._formValues){
+				fieldErrors[name] = error.info[name].join(" ");
+			}
+		}
+		/* When server-side field validation fails, the error has no message but has information */
+		if (!error.isDetailed && Object.keys(fieldErrors).length > 0){
+			globalError = null;
+		}
+		/* When the object-level validation fails (see https://www.django-rest-framework.org/api-guide/serializers/#object-level-validation)
+		 * the error may have no error message, but there are extra information from the error info
+		 */
+		if (!error.isDetailed && error.info && error.info.non_field_errors){
+			globalError = error.info.non_field_errors.join(" ");
+		}
+		this.setState({
+			errors: {...this.state.errors, ...fieldErrors},
+			globalError: globalError,
+		});
 	}
 
 	shouldComponentUpdate(props, state){

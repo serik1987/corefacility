@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {Navigate} from 'react-router-dom';
 
 import {NotImplementedError} from '../../exceptions/model.mjs';
 
@@ -11,8 +12,9 @@ import {NotImplementedError} from '../../exceptions/model.mjs';
  *  	@param {string} onClick		a callback that will be invoked when the user clicks the button
  * 		@param {boolean} inactive   if the button is inactive, clicking on it has no effect
  * 		@param {boolean} disabled	if the button is disabled, it is inactive and is shown as grey
- * 		@param {string} href		the route to be moved when you click the button
  * 	The onClick prop always override the href prop
+ * 
+ * 	*  The component has internal states.
  */
 export default class Button extends React.Component{
 
@@ -22,6 +24,10 @@ export default class Button extends React.Component{
 
 		if (this.props.disabled && this.props.inactive){
 			throw new Error("The button can't be both inactive and disabled");
+		}
+
+		this.state = {
+			__redirect: false,
 		}
 	}
 
@@ -36,7 +42,9 @@ export default class Button extends React.Component{
 			if (this.props.onClick){
 				this.props.onClick(event);
 			} else if (this.props.href){
-				console.log(this.props.href);
+				this.setState({
+					__redirect: true,
+				})
 			} else {
 				console.warn("corefacility.core.view.base.Button: no handler was attached to the button, " +
 					"The clicking is useless");
@@ -44,14 +52,24 @@ export default class Button extends React.Component{
 		}
 	}
 
+	render(){
+		if (this.state.__redirect){
+			return <Navigate to={this.props.href}/>
+		} else {
+			return this.renderContent();
+		}
+	}
+
 	/** Renders the button. This is an abstract method. So, when you extend the button,
 	 *  don't forget to implement this method.
 	 *  MIND about conditional rendering because the button may have two states depending
-	 *  on the this.props.disabled value: enabled or disabled
+	 *  on the this.props.disabled value: enabled or disabled.
+	 * 
+	 * 	Don't override the render() method because such a method is responsible for proper
+	 * 	work of href prop.
 	 *  @abstract
 	 */
-	render(){
+	renderContent(){
 		throw new NotImplementedError("render");
-		return null;
 	}
 }

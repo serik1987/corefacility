@@ -1,3 +1,5 @@
+import {Link} from 'react-router-dom';
+
 import {translate as t} from '../../utils.mjs';
 import {NotImplementedError} from '../../exceptions/model.mjs';
 import Loader from './Loader.jsx';
@@ -58,7 +60,7 @@ export default class CoreWindow extends Window{
 	}
 
 	setReloadCallback(component){
-		if (!(component instanceof Loader)){
+		if (!(component instanceof Loader) && component !== null){
 			throw new Error(`The reloading component must be an instance of the Loader class (see Loader.jsx)`)
 		}
 		this.reloadingComponent = component;
@@ -69,9 +71,9 @@ export default class CoreWindow extends Window{
 		return (
 			<div className={styles.window}>
 				<header>
-					<a href="/" className={styles.logo} title={t("Home Page")}>
+					<Link to="/" className={styles.logo} title={t("Home Page")}>
 						<LogoImage/>
-					</a>
+					</Link>
 					<div className={styles.icons}>
 						<Icon onClick={this.onReload} tooltip={t("Reload")} src={<RefreshImage/>}/>
 						<Icon href="/profile/" tooltip={t("Account Settings")} src={<PersonImage/>}/>

@@ -7,45 +7,6 @@ import {NotImplementedError, ValidationError} from '../../exceptions/model.mjs';
  */
 export default class CreateForm extends Form{
 
-	/** Default values. The form will be reset to these values everytime it opens */
-	get defaultValues(){
-		throw new NotImplementedError("defaultValues");
-	}
-
-	/** The entity class. The formObject will be exactly an instance of this class.
-	 * 	The formObject is implied to be an instance of Entity
-	 */
-	get entityClass(){
-		throw new NotImplementedError("entityClass");
-	}
-
-	/** Sets default values to the form. The function calls everywhere when the dialog box opens
-	 * 	or the form initializes.
-	 * 	@async
-	 * 	@abstract
-	 * 	@param {any} inputData some input data depending on the subclass
-	 * 	@param {shouldUpdate} true to update the state, false to initialize new state.
-	 * 	@return {undefined}
-	 * 
-	 */
-	async resetForm(inputData, shouldUpdate = true){
-		if (shouldUpdate){
-			this.setState({
-				rawValues: {...this.defaultValues},
-				errors: {},
-				globalError: null,
-			});
-		} else {
-			this.state = {
-				rawValues: {...this.defaultValues},
-				errors: {},
-				globalError: null,
-			}
-		}
-		this._formValues = {...this.defaultValues};
-		this._formObject = null;
-	}
-
 	/** Tells the form what to do if the user presses the 'Submit' buton. It could be
 	 * 		posting new entity on the server, requesting for data processing - whenever
 	 * 		you want!
@@ -58,6 +19,7 @@ export default class CreateForm extends Form{
 	async modifyFormObject(){
 		if (this._formObject === null){
 			this._formObject = new this.entityClass();
+			/* Providing deferred client-side validation */
 			let fieldErrors = {}
 			for (let name in this._formValues){
 				try{
@@ -66,6 +28,7 @@ export default class CreateForm extends Form{
 					fieldErrors[name] = error.message;
 				}
 			}
+			/* If client-side validation fails, we need to brake the promise chain */
 			if (Object.keys(fieldErrors).length > 0){
 				this.setState({
 					errors: fieldErrors,
@@ -73,6 +36,9 @@ export default class CreateForm extends Form{
 				throw new ValidationError();
 			}
 		}
+		/* Sending data to the server where (a) server-side validation will be provided;
+		 *  (b) the entity will be saved to the database or another external source
+		 */
 		await this._formObject.create();
 	}
 

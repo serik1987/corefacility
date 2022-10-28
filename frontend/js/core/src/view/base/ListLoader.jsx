@@ -90,7 +90,7 @@ export default class ListLoader extends Loader{
 
 	get itemListComponent(){
 		if (this._itemListComponent === null){
-			throw new TypeError("The itemListComponent has not been registered yet.");
+			throw new TypeError("The itemListComponent has not been registered.");
 		}
 		return this._itemListComponent;
 	}

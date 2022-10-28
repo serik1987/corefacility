@@ -56,6 +56,9 @@ export default class DialogWrapper extends React.Component{
 
 	/** This is a private method, don't invoke it! */
 	__registerModalComponent(component){
+		if (component === null || component.props.dialogId in this.__modalComponents){
+			return;
+		}
 		this.__modalComponents[component.props.dialogId] = component;
 	}
 

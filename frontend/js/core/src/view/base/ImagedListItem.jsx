@@ -13,10 +13,11 @@ import styles from '../base-styles/ImagedListItem.module.css';
  *  	@param {string} onClick		a callback that will be invoked when the user clicks the button
  * 										data of the event passed to the callback has event.detail
  * 										property equal to a certain item attached to the list
- * 	WARNING: when you render this component within an instance of ItemList, you always must set
+ * 	WARNING: when you render this component within an instance of ItemList, you can set
  *  this property to this.onItemSelect to lift up the state
  * 		@param {boolean} inactive   if the button is inactive, clicking on it has no effect
  * 		@param {boolean} disabled	if the button is disabled, it is inactive and is shown as grey 
+ * 		@param {string} href		the route to be moved when you click the button
  * 		@param {Entity} item 		The item attached to the list
  * 		@param {string|URL}	img		URL of the image that will be shown on the left
  * 		@param {number} imageWidth	The image width in px
@@ -36,7 +37,7 @@ export default class ImagedListItem extends ListItem{
 		SlideDown.slideDown(this.htmlRoot.current);
 	}
 
-	render(){
+	renderContent(){
 		let className = styles.imaged;
 		if (this.props.disabled){
 			className += ` ${styles.disabled}`;

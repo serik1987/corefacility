@@ -8,12 +8,12 @@ import ItemList from './ItemList.jsx';
  *  	@param {string} onClick		a callback that will be invoked when the user clicks the button
  * 										data of the event passed to the callback has event.detail
  * 										property equal to a certain item attached to the list
- * 	WARNING: when you render this component within an instance of ItemList, you always must set
+ * 	WARNING: when you render this component within an instance of ItemList, you can set
  *  this property to this.onItemSelect to lift up the state
  * 		@param {boolean} inactive   if the button is inactive, clicking on it has no effect
  * 		@param {boolean} disabled	if the button is disabled, it is inactive and is shown as grey 
  * 		@param {Entity} item 		The item attached to the list
- * 	Please note that href property is not implemented here.
+ * 		@param {string} href		the route to be moved when you click the button
  */
 export default class ListItem extends Button{
 
