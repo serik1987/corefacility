@@ -1,5 +1,4 @@
 import {
-	BrowserRouter as Router,
 	Routes,
 	Route,
 	Navigate
@@ -16,16 +15,17 @@ import Window404 from './base/Window404.jsx';
  */
 export default class CoreApp extends App{
 
-	render(){
+	/** Renders all routes.
+	 * 	@return {React.Component} the component must be <Routes> from 'react-dom-routes'.
+	 */
+	renderAllRoutes(){
 		return (
-			<Router>
-				<Routes>
-					<Route path="/users/:lookup/" element={<UserDetailWindow/>} />
-					<Route path="/users/" element={<UserListWindow/>} />
-					<Route path="/" element={<Navigate to="/users/"/>} />
-					<Route path="*" element={<Window404/>}/>
-				</Routes>
-			</Router>
+			<Routes>
+				<Route path="/users/:lookup/" element={<UserDetailWindow/>} />
+				<Route path="/users/" element={<UserListWindow/>} />
+				<Route path="/" element={<Navigate to="/users/"/>} />
+				<Route path="*" element={<Window404/>}/>
+			</Routes>
 		);
 	}
 

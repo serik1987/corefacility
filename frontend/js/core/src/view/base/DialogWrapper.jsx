@@ -93,6 +93,9 @@ export default class DialogWrapper extends React.Component{
 	 */
 	async openModal(dialogId, inputData){
 		let component = this.__modalComponents[dialogId];
+		if (component === undefined){
+			return Promise.reject(new TypeError(`The component with ID=${dialogId} has not been registered in the dialog wrapper, or renderAllModals was not run`));
+		}
 		if (component.openDialog === undefined){
 			return Promise.reject(new TypeError(`The component registered in the dialog wrapper with ID='${dialogId}' doesn't have openDialog method.`));
 		}

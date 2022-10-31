@@ -17,6 +17,7 @@ import styles from '../base-styles/DialogBox.module.css';
  * 			within a single options. To render the dialog box with given options, set them
  * 			as the third argument.
  * 		@param {boolean} inactive The inactive dialog can't be closed by the user.
+ * 		@param {string} title The title to be displayed above the dialog box.
  * 
  * 	State:
  * 		The most of state variables are not allowed to change even though you inherit from the

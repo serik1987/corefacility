@@ -23,11 +23,29 @@ form button{
 	margin: 0;
 }
 
+form.window-form section{
+	border: 1px solid rgb(218, 220, 224);
+	border-radius: 3px;
+	box-shadow: 1px 1px 3px 0 rgba(0, 0, 0, 0.27);
+	padding: 20px;
+}
+
+form.window-form section h2{
+	font-size: 14px;
+	font-weight: 600;
+	margin: 0;
+	margin-bottom: 16px;
+}
+
+
+/* CSS for message */
 body #small-size-message{
 	display:  none;
 }
 
-@media screen and (max-width: 500px){
+
+/* CSS for wait bar */
+@media screen and (max-width: 700px){
 	body #small-size-message{
 		display: block;
 		position: fixed;

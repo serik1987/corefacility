@@ -44,6 +44,10 @@ export default class MessageBar extends React.Component{
 	 *  The property uses 'message' field or the 'error' property
 	 */
 	get errorMessage(){
+		if (typeof this.props.error === "string"){
+			return this.props.error;
+		}
+
 		switch (this.props.error.constructor){
 			case UnauthorizedError:
 				window.location.reload();

@@ -13,6 +13,10 @@ import {NotImplementedError} from '../../exceptions/model.mjs';
  */
 export default class Loader extends React.Component{
 
+	/** Reloads the data. This method runs automatically when the componentDidMount.
+	 * 	Also, you can invoke it using the imperative React principle
+	 * 	@return {undefined}
+	 */
 	reload(){
 		throw new NotImplementedError("reload");
 	}

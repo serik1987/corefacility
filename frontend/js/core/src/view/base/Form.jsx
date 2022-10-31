@@ -1,4 +1,5 @@
 import * as React from 'react';
+import Loader from './Loader.jsx'
 import {translate as t} from '../../utils.mjs';
 import {NotImplementedError} from '../../exceptions/model.mjs';
 import * as networkErrors from '../../exceptions/network.mjs';
@@ -15,7 +16,9 @@ import styles from '../base-styles/Form.module.css';
  * 
  * 	Such data have the following flow:
  * 
- * 	defaultValues => rawValues => formValues => formObject => modifyFormObject
+ * 	inputData => defaultValues => rawValues => formValues => formObject => modifyFormObject
+ * 
+ * 	inputData - a short object that is necessary to build defaultValues.
  * 
  * 	defaultValues - values before the user interactions. These data may
  * 		be downloaded from the external server (in case when user modifies
@@ -47,19 +50,30 @@ import styles from '../base-styles/Form.module.css';
  * 		@param {object} options		Auxiliary options to be passed to the form.
  * 									They depend on certain subclass specification.
  * 
+ * 		@param {object} inputData	When the prop equals to null or undefined,
+ * 									the resetForm() method will not be invoked after
+ * 									form mounting or pressing the Reload button from
+ * 									the main menu. When the prop equals to object,
+ * 									the resetForm() will be invoked during the mount
+ * 									or press the reload() button and these input data
+ * 									will be substituted.
+ * 
  * State:
  * 		@param {object} rawValues	values as they have been entered by the user
+ * 
  * 		@param {object} errors 		Field errors. The field error is defined for
  * 			a certain field (e.g., Incorrect e-mail, phone is not filled etc.).
  * 			This state has a form key => value where where key is field name and
  * 			value is error message corresponding to it
+ * 
  * 		@param {string} globalError The error unrelated to any of the fields
  * 			(e.g., authentication failed, network disconnected etc.)
+ * 
  * 		@param {boolean} inactive	When the form interacts with the server
  * 			(e.g., fetches or posts the data) its interaction with the rest of
  * 			the world is also impossible
  */
-export default class Form extends React.Component{
+export default class Form extends Loader{
 
 	constructor(props){
 		super(props);
@@ -150,6 +164,24 @@ export default class Form extends React.Component{
 		}
 	}
 
+	/** Renders props that required for the MessageBar to be successfully embedded inside the form, including:
+	 * 		(1) isLoading - correlated with form's inactive state
+	 * 		(2) isError - equals to globalError !== null
+	 * 		(3) error - the error to be printed
+	 */
+	getMessageBarProps(){
+		let globalError = this.state.globalError;
+		if (!globalError && this.hasFieldError){
+			globalError = t("The form was filled incorrectly.");
+		}
+
+		return {
+			isLoading: this.state.inactive,
+			isError: globalError !== null,
+			error: globalError,
+		}
+	}
+
 	/** Renders props of any child component that supply the rawData to the data flow.
 	 * 		(i.e., inputs, checkboxes, radiobuttons etc.) - we call them 'fields'
 	 * 
@@ -206,7 +238,17 @@ export default class Form extends React.Component{
 	 * 		@return {object} the defaultValues
 	 */
 	async getDefaultValues(inputData){
-		throw new NotImplementedError("defaultValues");
+		throw new NotImplementedError("getDefaultValues");
+	}
+
+	/** Reloads the data. This method runs automatically when the componentDidMount.
+	 * 	Also, you can invoke it using the imperative React principle
+	 * 	@return {undefined}
+	 */
+	reload(){
+		if (this.props.inputData && !this.state.inactive){
+			this.resetForm(this.props.inputData);
+		}
 	}
 
 	/** Sets default values to the form. The function calls everywhere when the dialog box opens
@@ -219,7 +261,11 @@ export default class Form extends React.Component{
 	 * 
 	 */
 	async resetForm(inputData){
-		this.setState({inactive: true});
+		this.setState({
+			errors: {},
+			globalError: null,
+			inactive: true,
+		});
 		let defaultValues = await this.getDefaultValues(inputData);
 		this.setState({
 			rawValues: defaultValues,
@@ -298,9 +344,10 @@ export default class Form extends React.Component{
 	/** Evokes when the user presses the Submit button.
 	 * 
 	 * 	@param {SyntheticEvent} the event triggered by the submission button
-	 * 	@return {undefined}
+	 * 	@return {boolean} true if the form was successfully submitted, false otherwise
 	 */
 	async handleSubmit(event){
+		let success = false;
 		try{
 			/* Clear all error messages and lock the form to prevent the user from any consequtive actions */
 			this.setState({
@@ -317,6 +364,7 @@ export default class Form extends React.Component{
 			if (this.dialog){
 				await this.dialog.closeDialog(this._formObject);
 			}
+			success = true;
 		} catch (error){
 			/* In case when the server-side validation fails or  */
 			this.handleError(error);
@@ -324,6 +372,7 @@ export default class Form extends React.Component{
 			/* Don't forget to unlock the form in order to allow the user to fix errors or use it again */
 			this.setState({inactive: false});
 		}
+		return success;
 	}
 
 	/**	Transforms Javascript exception to the error message in the message bar.
@@ -377,7 +426,8 @@ export default class Form extends React.Component{
 	}
 
 	/** Renders special bar containing loading indicator and global error message
-	 * 	You must include invocation of this method to your render function
+	 * 	You should include invocation of this method to your render function if you don't implement
+	 * 	message bar.
 	 */
 	renderSystemMessage(){
 		let globalError = this.state.globalError;

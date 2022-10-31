@@ -2,6 +2,11 @@ import * as React from 'react';
 import styles from '../base-styles/Label.module.css';
 
 
+/** A simple widget label
+ * 
+ * 	Props:
+ * 		@param {React.Component} children 	A label message to print
+ */
 export default class Label extends React.Component{
 
 	render(){

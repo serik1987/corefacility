@@ -1,0 +1,60 @@
+/* UserDetailForm prefix will be automatically attached by the React.js compiler */
+.main{
+	padding: 0 30px 0 114px;
+}
+
+.main > div{
+	margin: 15px 0;
+}
+
+/* CSS for rows */
+.personal_data_row{
+	display: flex;
+	flex-wrap: wrap;
+	gap: 15px;
+}
+
+.administration_row{
+	display: flex;
+	gap: 15px;
+}
+
+.controls_row{
+	display: flex;
+	gap: 10px;
+	justify-content: center;
+}
+
+
+/* CSS for sections */
+.personal_data{
+	flex: 1 0 450px;
+}
+
+.personal_data .widgets{
+	display: grid;
+	grid-template-columns: 150px 1fr;
+	grid-gap: 10px;
+}
+
+.avatar_box{
+	flex: 0 0 200px;
+}
+
+.password_changer{
+	flex: 2;
+}
+
+.administration{
+	flex: 1;
+}
+
+.administration > div:nth-child(2){
+	margin-bottom: 10px;
+}
+
+/* Misc. CSS */
+.unset{
+	font-weight: 300;
+	font-style: italic;
+}

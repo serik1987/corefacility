@@ -1,12 +1,14 @@
-import * as React from 'react';
+import {BrowserRouter as Router} from 'react-router-dom';
 
 import {NotImplementedError} from '../../exceptions/model.mjs';
+import DialogWrapper from './DialogWrapper.jsx';
+import QuestionBox from './QuestionBox.jsx';
 
 
 /** Base class for application root components
  *  Requires no props
  */
-export default class App extends React.Component{
+export default class App extends DialogWrapper{
 
 	/** Set up the initial state. The Web server sent
 	 *  the initial state during the index.html file rendering
@@ -14,6 +16,8 @@ export default class App extends React.Component{
 	 */
 	constructor(props){
 		super(props);
+		this.registerModal("question", QuestionBox);
+
 		this.state = {
 			token: window.SETTINGS.authorization_token,
 			uuid: window.SETTINGS.app_uuid
@@ -56,9 +60,21 @@ export default class App extends React.Component{
 		}
 	}
 
+	/** Renders all routes.
+	 * 	@abstract
+	 * 	@return {React.Component} the component must be <Routes> from 'react-dom-routes'.
+	 */
+	renderAllRoutes(){
+		throw new NotImplementedError("renderAllRoutes");
+	}
+
 	render(){
-		throw new NotImplementedError("render");
-		return null;
+		return (
+			<Router>
+				{ this.renderAllRoutes() }
+				{ this.renderAllModals() }
+			</Router>
+		);
 	}
 
 }

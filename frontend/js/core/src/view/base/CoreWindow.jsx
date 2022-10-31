@@ -24,6 +24,19 @@ export default class CoreWindow extends Window{
 		this.reloadingComponent = null;
 		this.onReload = this.onReload.bind(this);
 		this.setReloadCallback = this.setReloadCallback.bind(this);
+		this.handle404 = this.handle404.bind(this);
+
+		this.state = {
+			error404: false
+		}
+	}
+
+	/** If this property is true, the component can be reloaded.
+	 *  The reloading works properly if ref={setReloadCallback}
+	 * 	was set to true for at least one child component.
+	 */
+	get reloadable(){
+		return true;
 	}
 
 	/** Renders the area on the top of the Web browser window;
@@ -66,6 +79,14 @@ export default class CoreWindow extends Window{
 		this.reloadingComponent = component;
 	}
 
+	/** Handles the 404 error by setting page 404
+	 * 
+	 * 	@return {undefined}
+	 */
+	handle404(){
+		this.setState({error404: true});
+	}
+
 	/** Provides rendering of the core window */
 	render(){
 		return (
@@ -75,7 +96,7 @@ export default class CoreWindow extends Window{
 						<LogoImage/>
 					</Link>
 					<div className={styles.icons}>
-						<Icon onClick={this.onReload} tooltip={t("Reload")} src={<RefreshImage/>}/>
+						{this.reloadable && <Icon onClick={this.onReload} tooltip={t("Reload")} src={<RefreshImage/>}/>}
 						<Icon href="/profile/" tooltip={t("Account Settings")} src={<PersonImage/>}/>
 						<Icon href="/settings/" tooltip={t("Application Settings")} src={<SettingsImage/>}/>
 					</div>
