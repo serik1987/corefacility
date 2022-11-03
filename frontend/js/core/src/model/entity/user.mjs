@@ -1,7 +1,7 @@
 import {translate as t} from '../../utils.mjs';
 import Entity from './base.mjs';
-import EntityField from '../fields/field.mjs';
-import ReadOnlyField from '../fields/read-only-field.mjs';
+import {StringField, BooleanField, ReadOnlyField} from '../fields/fields.mjs';
+import {SlugValidator, EmailValidator, PhoneValidator} from '../fields/validators.mjs';
 import HttpRequestProvider from '../providers/http-request.mjs';
 
 
@@ -37,33 +37,50 @@ export default class User extends Entity{
 	static _definePropertyDescription(){
 		return {
 
-			"login": new EntityField(null, 'string', "Login", true)
-				.addValidator(EntityField.slugValidator
-					.setFieldName(t("Имя пользователя"))),
+			"login": new StringField()
+				.setDefaultValue(null)
+				.setRequired()
+				.setDescription("Login")
+				.addValidator(SlugValidator)
+					.setMessage("Enter a valid user name consisting of letters, numbers, underscores or hyphens.")
+					.parent,
 
-			"avatar": new ReadOnlyField("Avatar URL"),
+			"avatar": new StringField()
+				.setDescription("Avatar URL"),
 
-			"is_password_set": new ReadOnlyField("Is user password was set"),
+			"is_password_set": new ReadOnlyField()
+				.setDescription("Is user password was set"),
 
-			"name": new EntityField(undefined, 'string', "First Name", false),
+			"name": new StringField()
+				.setDescription("Name"),
 
-			"surname": new EntityField(undefined, 'string', "Surname", false),
+			"surname": new StringField()
+				.setDescription("Surname"),
 
-			"email": new EntityField(undefined, 'string', "E-mail", false)
-				.addValidator(EntityField.emailValidator),
+			"email": new StringField()
+				.setDescription("E-mail")
+				.addValidator(EmailValidator)
+					.parent,
 
-			"phone": new EntityField(undefined, "string", "Phone number", false)
-				.addValidator(EntityField.phoneValidator),
+			"phone": new StringField()
+				.setDescription("Phone number")
+				.addValidator(PhoneValidator)
+					.parent,
 
-			"is_locked": new EntityField(false, "boolean", "Is user locked", false),
+			"is_locked": new BooleanField()
+				.setDescription("Is user locked"),
 
-			"is_superuser": new EntityField(false, "boolean", "Has administrator rights", false),
+			"is_superuser": new BooleanField()
+				.setDescription("Has administrator rights"),
 
-			"is_support": new ReadOnlyField("Is support user"),
+			"is_support": new ReadOnlyField()
+				.setDescription("Is support user"),
 
-			"unix_group": new ReadOnlyField("POSIX user"),
+			"unix_group": new ReadOnlyField()
+				.setDescription("POSIX user"),
 
-			"home_dir": new ReadOnlyField("POSIX home directory"),
+			"home_dir": new ReadOnlyField()
+				.setDescription("POSIX home directory"),
 		}
 	}
 

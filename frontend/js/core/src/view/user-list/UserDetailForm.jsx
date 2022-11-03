@@ -69,6 +69,8 @@ export default class UserDetailForm extends UpdateForm{
 			this.props.setBrowserTitle(header);
 		}
 
+		console.log(`${this._formObject}`);
+
 		return (
 			<CoreWindowHeader
 				{...this.getMessageBarProps()}
@@ -92,24 +94,28 @@ export default class UserDetailForm extends UpdateForm{
 											{...this.getFieldProps('name')}
 											htmlType="text"
 											tooltip={t("The first name is required for better visualization")}
+											maxLength={100}
 										/>
 										<Label>{t('Last name')}</Label>
 										<TextInput
 											{...this.getFieldProps('surname')}
 											htmlType="text"
 											tooltip={t("The last name is required for better visualization")}
+											maxLength={100}
 										/>
 										<Label>{t('E-mail')}</Label>
 										<TextInput
 											{...this.getFieldProps('email')}
 											htmlType="email"
 											tooltip={t("The e-mail will be used for password recovery service and sending another notifications")}
+											maxLength={254}
 										/>
 										<Label>{t('Phone number')}</Label>
 										<TextInput
 											{...this.getFieldProps('phone')}
 											htmlType="phone"
 											tooltip={t("When suspicious activity was detected, please, call the user using this phone number: the user can confirm or deny this operation")}
+											maxLength={20}
 										/>
 										<Label>{t('UNIX account name')}</Label>
 										<Label>{this.state.rawValues.unix_group || unset}</Label>

@@ -235,7 +235,7 @@ export default class Entity{
 			Object.defineProperty(this, propertyName, {
 				get() {
 					if (propertyName in this._entityFields){
-						return propertyDescription[propertyName].correct(this._entityFields[propertyName]);
+						return propertyDescription[propertyName].correct(this, propertyName, this._entityFields[propertyName]);
 					} else {
 						return propertyDescription[propertyName].default;
 					}
@@ -244,7 +244,7 @@ export default class Entity{
 					if (this._state === "deleted" || this._state === "pending" || this._state === "found"){
 						throw new EntityStateError(this._state, "property change");
 					}
-					let internalValue = propertyDescription[propertyName].proofread(this._entityName, propertyName, value);
+					let internalValue = propertyDescription[propertyName].proofread(this, propertyName, value);
 					if (internalValue !== undefined){
 						this._entityFields[propertyName] = internalValue;
 					}
