@@ -38,7 +38,19 @@
 }
 
 .avatar_box{
+	box-sizing: border-box;
 	flex: 0 0 200px;
+
+	display: flex;
+	flex-direction: column;
+}
+
+.avatar_box h2{
+	flex-grow: 0;
+}
+
+.avatar_box :global .file-container{
+	flex-grow: 1;
 }
 
 .password_changer{

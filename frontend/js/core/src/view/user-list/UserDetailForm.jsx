@@ -7,6 +7,7 @@ import Label from '../base/Label.jsx';
 import TextInput from '../base/TextInput.jsx';
 import CheckboxInput from '../base/CheckboxInput.jsx';
 import PrimaryButton from '../base/PrimaryButton.jsx';
+import AvatarUploader from '../base/AvatarUploader.jsx';
 import styles from './UserDetailForm.module.css';
 
 
@@ -118,7 +119,19 @@ export default class UserDetailForm extends UpdateForm{
 								</section>
 								<section className={styles.avatar_box}>
 									<h2>{t("Avatar")}</h2>
-									<p>Layouting avatar loader...</p>
+									<AvatarUploader
+										tooltip={t("The user photo facilitates distinguising users among each other. This is not necessary to use your real photo.")}
+										width={150}
+										height={150}
+
+										onFileSelect={event => {
+											console.log("Uploading the file...");
+											console.log(event.value);
+										}}
+										onFileRemove={event => {
+											console.log("Removing the file...");
+										}}									
+									/>
 								</section>
 							</div>
 							<div className={styles.administration_row}>

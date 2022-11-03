@@ -35,6 +35,8 @@
 	"Do you really want to delete this resource?": "Вы действительно хотите удалить этот ресурс?",
 	"The requested resource has already been deleted.": "Запрашиваемый ресурс успешно удалён и теперь больше не существует.",
 	"Go back...": "Назад...",
+	"Upload": "Загрузить",
+	"Delete": "Удалить",
 
 	"User List": "Список пользователей",
 	"Users": "Пользователи",
@@ -64,5 +66,6 @@
 	"Superuser has full access data and features in corefacility as well as in every its application": "Суперпользователь имеет полный доступ ко всем данным и ко всему функционалу как самого corefacility, так и любого его приложения",
 	"This operation will permanently remove the user account, reset all user's membership in groups. ": "Данное действие навсегда удалит учётную запись пользователя. Кроме того, пользователь будет исключён из всех групп. ",
 	"All user's personal files will also be permanently deleted from the cloud storage. ": "Все персональные файлы пользователя также будут уничтожены. ",
-	"Are you wish to continue?": "Продолжить?"
+	"Are you wish to continue?": "Продолжить?",
+	"The user photo facilitates distinguising users among each other. This is not necessary to use your real photo.": "Аватар облегчает визуальное различение пользователей. Вам не обязательно использовать реальную фотографию пользователя."
 }

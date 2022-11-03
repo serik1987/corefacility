@@ -1,0 +1,25 @@
+.image_container{
+	margin: 0 auto;
+	margin-bottom: 15px;
+}
+
+.image_container.no_image{
+	background: rgb(218, 220, 224);
+}
+
+.controls{
+	display: flex;
+	justify-content: center;
+	gap: 5px;
+}
+
+.loading{
+	margin: 10px 0 0 0;
+	text-align: center;
+}
+
+.error{
+	margin: 10px 0 0 0;
+	text-align: center;
+	color: rgb(197, 57, 41);
+}
