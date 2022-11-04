@@ -54,6 +54,8 @@ const POOL_WAIT = 1000;
  */
 class HttpClient{
 
+	FILE_UPLOAD_METHOD = "PATCH";
+
 	/**
 	 *  Creates new HTTP client
 	 *  The HTTP client creates only once ans is accessible from the client variable
@@ -128,6 +130,7 @@ class HttpClient{
 	 * 						 if the request contains no body
 	 *  @param {boolean} isJsonResponse true if the response body is assumed to be in JSON
 	 * 	   				 format, false if the response body is assumed to be empty
+	 * 	@return {object} Response body on success. When isJsonResponse = false, null will be returned
 	 */
 	request(url, method, data, isJsonResponse = true){
 		this._requestNumber++;
@@ -165,6 +168,50 @@ class HttpClient{
 		})()
 			.finally(() => {
 				--self._requestNumber;
+				document.dispatchEvent(new CustomEvent("response", {detail: self._requestNumber}));
+			});
+	}
+
+	/** Uploads single file to the server
+	 * 	@async
+	 *  @param {string|URL} the requested URL
+	 * 	@param {File} the file to be uploaded
+	 * 	@return {object} the response body on success
+	 */
+	upload(url, file){
+		let self = this;
+		this._requestNumber++;
+		document.dispatchEvent(new CustomEvent("request", {detail: this._requestNumber}));
+
+		let headers = new Headers();
+		headers.set("Accept", "application/json");
+		if (window.application.isAuthorized){
+			headers.set("Authorization", `Token ${window.application.token}`);
+		}
+
+		let formData = new FormData();
+		formData.set("file", file);
+		let requestOptions = {
+			method: this.FILE_UPLOAD_METHOD,
+			headers: headers,
+			body: formData,
+		}
+
+		return (function poolingFunction(poolNumber = 0){
+			return fetch(url, requestOptions)
+				.catch(e => {
+					throw new NetworkError(e);
+				})
+				.then(response => {
+					if (!response.ok){
+						return self.processErrorResponse(response, poolingFunction, poolNumber);
+					} else {
+						return response.json();
+					}
+				})
+		})()
+			.finally(() => {
+				self._requestNumber--;
 				document.dispatchEvent(new CustomEvent("response", {detail: self._requestNumber}));
 			});
 	}

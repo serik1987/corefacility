@@ -29,6 +29,7 @@ import styles from '../base-styles/AvatarUploader.module.css';
  * 										Otherwise, does nothing.
  * @param {Number} width 				image width in px
  * @param {Number} height 				image height in px
+ * @param {boolean} readonly 			When the widget is read-only, "Upload" and "Delete" buttons are not shown.
  * 
  * State:
  * @param {File|string|null} value 		Value of the widget in uncontrollable mode.
@@ -39,9 +40,7 @@ import styles from '../base-styles/AvatarUploader.module.css';
 
  	/** Renders internal content of the widget */
 	renderContent(){
-		console.log("Rendering the widget...");
-		console.log(this.value);
-		console.log(this.valueUrl);
+		console.log("Avatar render.");
 
 		let valueWidget = null;
 		if (this.valueUrl){
@@ -58,15 +57,22 @@ import styles from '../base-styles/AvatarUploader.module.css';
 			}}></div>;
 		}
 
+		let controlsWidget = null;
+		if (!this.props.readonly){
+			controlsWidget = (
+				<div className={styles.controls}>
+					<Hyperlink onClick={this.handleUpload} disabled={this.props.disabled} inactive={this.inactive}>{t("Upload")}</Hyperlink>
+					<Hyperlink onClick={this.handleRemove} disabled={this.props.disabled} inactive={this.inactive}>{t("Delete")}</Hyperlink>
+				</div>
+			);
+		}
+
 		return (
 			<div>
 				{valueWidget}
-				<div className={styles.controls}>
-					<Hyperlink onClick={this.handleUpload} disabled={this.props.disabled} inactive={this.props.inactive}>{t("Upload")}</Hyperlink>
-					<Hyperlink onClick={this.handleRemove} disabled={this.props.disabled} inactive={this.props.inactive}>{t("Delete")}</Hyperlink>
-				</div>
+				{controlsWidget}
 				{this.props.error !== null && <p className={styles.error}>{this.props.error}</p>}
-				{this.props.inactive && this.props.loading && <p className={styles.loading}>{t("Loading...")}</p>}
+				{this.inactive && this.loading && <p className={styles.loading}>{t("Loading...")}</p>}
 			</div>
 		);
 	}

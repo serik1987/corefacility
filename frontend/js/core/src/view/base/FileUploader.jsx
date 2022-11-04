@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import {NotImplementedError} from '../../exceptions/model.mjs';
+import {HttpError} from '../../exceptions/network.mjs';
 import styles from '../base-styles/FileUploader.module.css';
 
 
@@ -14,6 +15,7 @@ import styles from '../base-styles/FileUploader.module.css';
  * Props:
  * @param {callback} onFileSelect		Triggers when the user selects certain file.
  * @param {callback} onFileRemove		Triggers when the user clears certain file.
+ * @param {callback} onError 			Triggers when file upload or delete raises an error.
  * @param {File|string|null} value 		If this prop is given, the widget is stated to
  * 										be in controllable mode. This props reflects the
  * 										value of the widget.
@@ -22,10 +24,25 @@ import styles from '../base-styles/FileUploader.module.css';
  * @param {File|string} defaultValue	In uncontrollable mode defines value of the widget
  * 										after its first mounting.
  * @param {string} tooltip				The widget's tooltip.
+ * @param {FileManager} fileManager		if this parameter was set, the following will happened:
+ * 			onFileSelect prop will be ignored, FileManagers's upload() method will be called instead
+ *			onFileRemove prop will be ignored, FileManager's delete() method will be called instead
+ * 			value prop will be ignored, FileManager's value property will be used instead
+ * 			when the FileManager is in progress, disabled is always treated as false, inactive is always
+ * 			treated as true
+ * @param {boolean} inactive			If true, the user can't change value of this widget
+ * @param {boolean} loading 			If inactive is true, prints the 'Loading...' message below the uploader.
+ * 										Otherwise, does nothing.
+ * @param {boolean} readonly 			When the widget is read-only, "Upload" and "Delete" buttons are not shown.
  * 
  * State:
  * @param {File|string|null} value 		Value of the widget in uncontrollable mode.
  * 										Value of this state is useless in controllable mode.
+ * @param {boolean} inactive			if true, the user can't change value of this widget
+ * @param {boolean} loading 			If inactive is true, prints the 'Loading...' message below the uploader.
+ * 										Otherwise, does nothing.
+ * inactive is true if either inactive state or inactive prop is true
+ * loading is true if either loading state or loading prop is true
  * 
  * Types of values:
  * 		File - the local client's file opened in the Web browser but still not uploaded.
@@ -39,6 +56,8 @@ import styles from '../base-styles/FileUploader.module.css';
  * 		3) when no file is attached, use null
  */
 export default class FileUploader extends React.Component{
+
+	RELOAD_STATUS_CODES = [401, 403, 404];
 
 	constructor(props){
 		super(props);
@@ -56,10 +75,14 @@ export default class FileUploader extends React.Component{
 			url: null,
 		}
 
+		this.state = {
+			inactive: false,
+			loading: false,
+		}
 		if (this.props.value === undefined && this.props.defaultValue !== undefined){
-			this.state = {value: this.props.defaultValue};
+			this.state.value = this.props.defaultValue;
 		} else {
-			this.state = {value: null};
+			this.state.value = null;
 		}
 	}
 
@@ -70,6 +93,9 @@ export default class FileUploader extends React.Component{
 
 	/** Value to output */
 	get value(){
+		if (this.props.fileManager){
+			return this.props.fileManager.value;
+		}
 		if (this.props.value !== undefined){ /* Controllable mode */
 			return this.props.value;
 		} else { /* Uncontrollable mode */
@@ -83,7 +109,6 @@ export default class FileUploader extends React.Component{
 			return this.value;
 		} else if (this.value instanceof File){
 			if (this.value !== this.__fileToUrlMapping.file){
-				console.log("Change URL");
 				if (this.__fileToUrlMapping.url !== null){
 					URL.revokeObjectURL(this.__fileToUrlMapping.url);
 				}
@@ -94,11 +119,21 @@ export default class FileUploader extends React.Component{
 		}
 	}
 
+	/** the widget inactivity. Integrates information over state and props */
+	get inactive(){
+		return this.state.inactive || this.props.inactive;
+	}
+
+	/** the widget loading state. Integrates information over state and props */
+	get loading(){
+		return this.state.loading || this.props.loading;
+	}
+
 	/** The function evokes when dragging file enters the widget area
 	 * 	@param {SyntheticEvent} event the dragging file
 	 */
 	handleDragEnter(event){
-		if (this.props.disabled || this.props.inactive){
+		if (this.props.disabled || this.inactive || this.props.readonly){
 			return;
 		}
 		event.preventDefault();
@@ -111,7 +146,7 @@ export default class FileUploader extends React.Component{
 	/** The function evokes when dragging file leave the widget area
 	 */
 	handleDragLeave(event){
-		if (this.props.disabled || this.props.inactive){
+		if (this.props.disabled || this.inactive || this.props.readonly){
 			return;
 		}
 		this.__dragCounter--;
@@ -128,6 +163,7 @@ export default class FileUploader extends React.Component{
 	 */
 	handleUpload(event){
 		let self = this;
+		this.setState({error: null});
 
 		let inputElement = document.createElement("input");
 		inputElement.setAttribute("type", "file");
@@ -142,18 +178,11 @@ export default class FileUploader extends React.Component{
 		inputElement.click();
 	}
 
-	handleRemove(event){
-		this.setState({value: null});
-		if (this.props.onFileRemove){
-			this.props.onFileRemove(event);
-		}
-	}
-
 	/** The function evokes when the file is gragging over the file uploader
 	 * 	@param {SyntheticEvent} event 	the event to trigger
 	 */
 	handleDragOver(event){
-		if (this.props.disabled || this.props.inactive){
+		if (this.props.disabled || this.inactive || this.props.readonly){
 			return;
 		}
 		event.preventDefault();
@@ -162,7 +191,8 @@ export default class FileUploader extends React.Component{
 	/** The function evokes when the file has been dropped to the file uploader
 	 */
 	handleDrop(event){
-		if (this.props.disabled || this.props.inactive){
+		this.setState({error: null});
+		if (this.props.disabled || this.inactive || this.props.readonly){
 			return;
 		}
 		event.preventDefault();
@@ -182,11 +212,76 @@ export default class FileUploader extends React.Component{
 
 	/** The function evokes each time the user select a box using either
 	 *  file drop or 'Upload' button.
+	 * 	@async
+	 * 	@param {object} event The event that triggered this function
+	 * 	@return {undefined}
 	 */
 	async handleFileSelect(event){
-		this.setState({value: event.value});
-		if (this.props.onFileSelect){
-			this.props.onFileSelect(event);
+		if (this.props.fileManager){
+			await this.accessFileManager(manager => manager.upload(event.value));
+		} else {
+			this.setState({value: event.value});
+			if (this.props.onFileSelect){
+				this.props.onFileSelect(event);
+			}
+		}
+	}
+
+	/** The function evokes when the user presses "Delete" button.
+	 * 	@async
+	 * 	@param {object} event the event that triggered that function
+	 * 	@return {undefined}
+	 */
+	async handleRemove(event){
+		if (this.props.fileManager){
+			await this.accessFileManager(manager => manager.delete());
+		} else {
+			this.setState({value: null});
+			if (this.props.onFileRemove){
+				this.props.onFileRemove(event);
+			}
+		}
+	}
+
+	/** Runs some function on the file manager
+	 * 	@async
+	 * 	@param {function} f 	The function to be executed
+	 * 		@param {FileMAnager} manager 	Manages on which the function shall be executed
+	 * 		@return {undefined}
+	 * 	@return {undefined}
+	 * 	
+	 */
+	async accessFileManager(f){
+		try{
+			this.setState({
+				error: null,
+				inactive: true,
+				loading: true,
+			});
+			await f(this.props.fileManager);
+			if (this.props.onError){
+				this.props.onError(null);
+			}
+		} catch (error){
+			this.handleError(error);
+		} finally {
+			this.setState({
+				inactive: false,
+				loading: false,
+			});
+		}
+	}
+
+	/** The function evokes when upload or delete response failed
+	 * 	@param {Error} error the error that has been thrown
+	 * 	@return {undefined}
+	 */
+	handleError(error){
+		if (error instanceof HttpError && this.RELOAD_STATUS_CODES.indexOf(error.status) !== -1){
+			window.location.reload();
+		}
+		if (this.props.onError){
+			this.props.onError(error.message);
 		}
 	}
 

@@ -69,7 +69,7 @@ export default class UserDetailForm extends UpdateForm{
 			this.props.setBrowserTitle(header);
 		}
 
-		console.log(`${this._formObject}`);
+		console.log("Form render.");
 
 		return (
 			<CoreWindowHeader
@@ -126,17 +126,11 @@ export default class UserDetailForm extends UpdateForm{
 								<section className={styles.avatar_box}>
 									<h2>{t("Avatar")}</h2>
 									<AvatarUploader
+										{...this.getChildComponentProps("avatar")}
+										fileManager={this._formObject && this._formObject.avatar}
 										tooltip={t("The user photo facilitates distinguising users among each other. This is not necessary to use your real photo.")}
 										width={150}
 										height={150}
-
-										onFileSelect={event => {
-											console.log("Uploading the file...");
-											console.log(event.value);
-										}}
-										onFileRemove={event => {
-											console.log("Removing the file...");
-										}}									
 									/>
 								</section>
 							</div>

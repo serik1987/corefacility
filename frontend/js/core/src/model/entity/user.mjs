@@ -1,7 +1,9 @@
 import {translate as t} from '../../utils.mjs';
 import Entity from './base.mjs';
 import {StringField, BooleanField, ReadOnlyField} from '../fields/fields.mjs';
+import FileField from '../fields/file-manager.mjs';
 import {SlugValidator, EmailValidator, PhoneValidator} from '../fields/validators.mjs';
+import FileManager from '../fields/file-manager.mjs';
 import HttpRequestProvider from '../providers/http-request.mjs';
 
 
@@ -45,8 +47,8 @@ export default class User extends Entity{
 					.setMessage("Enter a valid user name consisting of letters, numbers, underscores or hyphens.")
 					.parent,
 
-			"avatar": new StringField()
-				.setDescription("Avatar URL"),
+			"avatar": new FileField(entity => `users/${entity.id}/avatar/`)
+				.setDescription("User's avatar"),
 
 			"is_password_set": new ReadOnlyField()
 				.setDescription("Is user password was set"),

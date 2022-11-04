@@ -1,6 +1,7 @@
 import {Navigate} from 'react-router-dom';
 import styled from 'styled-components';
 
+import {id} from '../../utils.mjs';
 import {translate as t} from '../../utils.mjs';
 import entityState from '../../model/entity/entity-state.mjs';
 import {NotImplementedError} from '../../exceptions/model.mjs';
@@ -116,6 +117,7 @@ export default class UpdateForm extends Form{
 		this.setState({
 			"reloadError": this.__reloadError = null,
 		});
+		console.log(this._formObject);
 		try{
 			if (!('lookup' in inputData)){
 				throw new Error("UpdateForm.getDefaultValues: bad entity lookup");

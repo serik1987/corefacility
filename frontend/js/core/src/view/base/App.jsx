@@ -28,7 +28,7 @@ export default class App extends DialogWrapper{
 
 	/** UUID for the current application */
 	get uuid(){
-		return this._uuid;
+		return this.state.uuid;
 	}
 
 	/** Authorization token.

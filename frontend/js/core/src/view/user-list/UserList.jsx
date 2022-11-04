@@ -44,7 +44,7 @@ export default class UserList extends PaginatedList{
 
 		return (<ImagedListItem
 				key={user.id}
-				img={user.avatar}
+				img={user.avatar.internalValue}
 				imageWidth={75}
 				imageHeight={75}
 				item={user}

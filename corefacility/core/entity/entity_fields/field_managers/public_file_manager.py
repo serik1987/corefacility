@@ -1,3 +1,7 @@
+import sys
+from random import random
+import hashlib
+
 from django.core.files import File
 from django.db import transaction
 from django.conf import settings
@@ -18,6 +22,20 @@ class PublicFileManager(EntityValueManager):
     """
 
     _include_media_root = None
+
+    @staticmethod
+    def compute_hash(filename):
+        """
+        Computes the file hash. The file hash is unique for each file content.
+        :param filename: filename to open
+        :return: file hash
+        """
+        full_name = settings.MEDIA_ROOT + "/" + filename
+        hash_md5 = hashlib.md5()
+        with open(full_name, "rb") as f:
+            for chunk in iter(lambda: f.read(4096), b""):
+                hash_md5.update(chunk)
+        return hash_md5.hexdigest()
 
     def __init__(self, value, default_value=None, include_media_root: bool = True):
         """
@@ -82,7 +100,13 @@ class PublicFileManager(EntityValueManager):
         else:
             filename = self._field_value.name
             if self._include_media_root:
-                filename = settings.MEDIA_URL + filename
+                sign = self.compute_hash(filename)
+                filename = settings.MEDIA_URL + filename + "?{hash}".format(hash=sign)
+                # We need to add file hashing to clear browser cache in the following way:
+                # /static/core/user_avatar.jpg?hash1 and /static/code/user_avatar.jpg?hash2
+                # were treated as same files by the Server but different ones by the Web browser.
+                # If the Web browser saved /static/core/user_avatar.jpg?hash1 in cache, it will not
+                # retrieve the cache to obtain /static/code/user_avatar.jpg?hash2
         return filename
 
     def __eq__(self, other):

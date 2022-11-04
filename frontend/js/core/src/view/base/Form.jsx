@@ -84,7 +84,8 @@ export default class Form extends Loader{
 								   // The value becomes false after each form update.
 		this.state = {
 			rawValues: {},
-			errors: {},
+			errors: {}, 			// Field errors trigger when the user filled the field incorrectly
+			noFieldErrors: {},		// No-field errors trigger when the child form element has troubles
 			globalError: null,
 			inactive: false,
 		}
@@ -211,6 +212,20 @@ export default class Form extends Loader{
 		}
 	}
 
+	/** Renders props of any child component that provide its own interaction with
+	 * 	external sources (i.e., file managers, password changers).
+	 * 
+	 * 	The method will render all props required for correct error displaying:
+	 * 		(1) error - must be taken from the errors state
+	 * 		(2) onError - will properly set the errors state
+	 */
+	getChildComponentProps(fieldName){
+		return {
+			error: this.state.noFieldErrors[fieldName],
+			onError: message => this.setChildError(fieldName, message),
+		}
+	}
+
 	/** Renders props of the submit button.
 	 * 
 	 * 	The method renders all props that are required for button to work correctly, i.e.,
@@ -263,14 +278,13 @@ export default class Form extends Loader{
 	async resetForm(inputData){
 		this.setState({
 			errors: {},
+			noFieldErrors: {},
 			globalError: null,
 			inactive: true,
 		});
 		let defaultValues = await this.getDefaultValues(inputData);
 		this.setState({
 			rawValues: defaultValues,
-			errors: {},
-			globalError: null,
 			inactive: false,
 		});
 		this._formValues = defaultValues;
@@ -352,6 +366,7 @@ export default class Form extends Loader{
 			/* Clear all error messages and lock the form to prevent the user from any consequtive actions */
 			this.setState({
 				errors: {},
+				noFieldErrors: {},
 				globalError: null,
 				inactive: true,
 			});
@@ -408,6 +423,20 @@ export default class Form extends Loader{
 		this.setState({
 			errors: {...this.state.errors, ...fieldErrors},
 			globalError: globalError,
+		});
+	}
+
+	/** Sets the message to some arbitrary field error. Execution of this function will not result to
+	 * 	display of the global error message.
+	 * 	This function is suitable for all child components that provide their own network interaction
+	 * 	capabilities (i.e., file uploaders, password resets etc.)
+	 */
+	setChildError(fieldName, message){
+		this.setState({
+			noFieldErrors: {
+				...this.state.noFieldErrors,
+				[fieldName]: message,
+			}
 		});
 	}
 
