@@ -27,7 +27,7 @@ export class FileManager extends FieldManager{
 
 	/** Uploads the file to the external server
 	 * 	@param {File} file the File object
-	 * 	@return {?????????????????}
+	 * 	@return {undefined}
 	 */
 	async upload(file){
 		this._uploadingFile = file;
@@ -35,7 +35,6 @@ export class FileManager extends FieldManager{
 			let result = await client.upload(this._path, file);
 			this._internalValue = result[this._propertyName];
 			this._entity._entityFields = result;
-			return result;			
 		} catch (error){
 			throw error;
 		} finally {
@@ -52,7 +51,6 @@ export class FileManager extends FieldManager{
 		this._uploadingFile = null;
 		this._internalValue = result[this._propertyName];
 		this._entity._entityFields = result;
-		return result;
 	}
 
 	/** A short string representation of the file

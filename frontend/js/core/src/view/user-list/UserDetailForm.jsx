@@ -69,8 +69,6 @@ export default class UserDetailForm extends UpdateForm{
 			this.props.setBrowserTitle(header);
 		}
 
-		console.log("Form render.");
-
 		return (
 			<CoreWindowHeader
 				{...this.getMessageBarProps()}

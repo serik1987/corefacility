@@ -40,8 +40,6 @@ import styles from '../base-styles/AvatarUploader.module.css';
 
  	/** Renders internal content of the widget */
 	renderContent(){
-		console.log("Avatar render.");
-
 		let valueWidget = null;
 		if (this.valueUrl){
 			valueWidget = <img
