@@ -30,6 +30,7 @@ class OsConfigurationSuggestion(APIException):
     def __init__(self, command_list):
         commands = []
         for command in command_list:
-            commands.append(" ".join(command['args'][0]))
+            arguments = map(lambda str: str if " " not in str else '"%s"' % str, command['args'][0])
+            commands.append(" ".join(arguments))
         detail = self.MESSAGE + "\n".join(commands)
         self.detail = {"code": "action_required", "detail": detail}

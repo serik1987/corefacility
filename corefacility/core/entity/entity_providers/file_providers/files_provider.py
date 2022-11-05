@@ -2,6 +2,7 @@ import os
 import shutil
 
 from core.entity.entity import Entity
+from core.entity.entity_exceptions import BaseDirIoException
 from core.os import CommandMaker
 
 from ..entity_provider import EntityProvider
@@ -62,7 +63,10 @@ class FilesProvider(EntityProvider):
                 maker.add_command(("mkdir", dir_name))
                 self.change_dir_permissions(maker, entity, dir_name)
             else:
-                os.mkdir(dir_name)
+                try:
+                    os.mkdir(dir_name)
+                except OSError:
+                    raise BaseDirIoException()
             self.update_dir_info(entity, dir_name)
 
     def resolve_conflict(self, given_entity: Entity, contained_entity: Entity):
@@ -108,7 +112,10 @@ class FilesProvider(EntityProvider):
                     maker.add_command(("rm", "-rf", dir_name))
             else:
                 if os.path.isdir(dir_name):
-                    shutil.rmtree(dir_name)
+                    try:
+                        shutil.rmtree(dir_name)
+                    except OSError:
+                        raise BaseDirIoException()
 
     def wrap_entity(self, external_object):
         """

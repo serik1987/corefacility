@@ -3,6 +3,7 @@ import {BrowserRouter as Router} from 'react-router-dom';
 import {NotImplementedError} from '../../exceptions/model.mjs';
 import DialogWrapper from './DialogWrapper.jsx';
 import QuestionBox from './QuestionBox.jsx';
+import PosixActionBox from './PosixActionBox.jsx';
 
 
 /** Base class for application root components
@@ -17,6 +18,7 @@ export default class App extends DialogWrapper{
 	constructor(props){
 		super(props);
 		this.registerModal("question", QuestionBox);
+		this.registerModal("posix_action", PosixActionBox);
 
 		this.state = {
 			token: window.SETTINGS.authorization_token,

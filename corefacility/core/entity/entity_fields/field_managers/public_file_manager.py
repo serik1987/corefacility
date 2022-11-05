@@ -100,13 +100,18 @@ class PublicFileManager(EntityValueManager):
         else:
             filename = self._field_value.name
             if self._include_media_root:
-                sign = self.compute_hash(filename)
-                filename = settings.MEDIA_URL + filename + "?{hash}".format(hash=sign)
+                try:
+                    sign = self.compute_hash(filename)
+                    filename = settings.MEDIA_URL + filename + "?{hash}".format(hash=sign)
                 # We need to add file hashing to clear browser cache in the following way:
                 # /static/core/user_avatar.jpg?hash1 and /static/code/user_avatar.jpg?hash2
                 # were treated as same files by the Server but different ones by the Web browser.
                 # If the Web browser saved /static/core/user_avatar.jpg?hash1 in cache, it will not
                 # retrieve the cache to obtain /static/code/user_avatar.jpg?hash2
+                except FileNotFoundError:
+                    filename = self._default_value
+                     # If someone deletes the file, we will return the default value. The user
+                     # can upload the file again!
         return filename
 
     def __eq__(self, other):

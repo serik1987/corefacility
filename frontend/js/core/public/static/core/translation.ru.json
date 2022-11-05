@@ -20,6 +20,8 @@
 	"Close without save": "Закрыть без сохранения",
 	"Remove": "Удалить",
 	"Not defined.": "Не задано",
+	"Action Required": "Требуется действие",
+	"Continue": "Продолжить",
 	"Yes": "Да",
 	"No": "Нет",
 
@@ -28,6 +30,7 @@
 	"Account Settings": "Настройки учётной записи",
 	"Application Settings": "Настройки приложения",
 	"Required field.": "Обязательное поле.",
+	"Copy to clipboard": "Копировать в буфер обмена",
 	"This field allows letters, digits, underscores and hyphens": "Это поле допускает только латинские буквы, дефисы, цифры и знаки подчёркивания",
 	"Enter a valid user name consisting of letters, numbers, underscores or hyphens.": "Введите правильное имя пользователя, состоящее из латинских букв, цифр, дефисов и знаков подчёркивания",
 	"Incorrect e-mail": "Неверный E-mail",

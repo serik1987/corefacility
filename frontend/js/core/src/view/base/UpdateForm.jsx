@@ -217,22 +217,25 @@ export default class UpdateForm extends Form{
 	 * 	from all external service
 	 */
 	async handleDelete(event){
+		let self = this;
 		let userWantsToDelete = await this.promptDelete(event);
 		if (!userWantsToDelete){
 			return;
 		}
-		try{
-			this.setState({
-				errors: {},
-				globalError: null,
-				inactive: true,
-			});
-			await this._formObject.delete();
-		} catch (error){
-			this.handleError(error);
-		} finally {
-			this.setState({inactive: false});
-		}
+		(async function tryAgainFunction(){
+			try{
+				self.setState({
+					errors: {},
+					globalError: null,
+					inactive: true,
+				});
+				await self._formObject.delete();
+			} catch (error){
+				self.handleError(error, tryAgainFunction);
+			} finally {
+				self.setState({inactive: false});
+			}
+		})();
 	}
 
 	/** Asks the user whether he wants to delete the form object

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 
@@ -58,6 +59,10 @@ class ProjectRootGroupConstraintFails(EntityException):
         super().__init__(_("The group is a root group for at least one project. "
                            "Its delete will automatically remove these projects and reflect another user rights. "
                            "Are you sure?"))
+
+class BaseDirIoException(EntityException):
+    def __init__(self):
+        super().__init__(_("Unable to write to %s directory.") % settings.CORE_PROJECT_BASEDIR)
 
 
 class LogException(EntityException):

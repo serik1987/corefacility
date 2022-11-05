@@ -382,7 +382,7 @@ export default class Form extends Loader{
 			success = true;
 		} catch (error){
 			/* In case when the server-side validation fails or  */
-			this.handleError(error);
+			this.handleError(error, () => this.handleSubmit(event));
 		} finally{
 			/* Don't forget to unlock the form in order to allow the user to fix errors or use it again */
 			this.setState({inactive: false});
@@ -393,12 +393,25 @@ export default class Form extends Loader{
 	/**	Transforms Javascript exception to the error message in the message bar.
 	 * 
 	 * 	@param {Error} error Javascript exception
+	 * 	@param {function} tryAgainFunction an optional parameter. If tryAgainFunction is not null or undefined,
+	 * 		the user receives "Action required" dialog box and presses Continue, the tryAgainFunction will be executed.
 	 * 	@return {undefined}
 	 */
-	handleError(error){
+	async handleError(error, tryAgainFunction){
 		if (error instanceof networkErrors.UnauthorizedError){
 			/* After application reloading non-authorized users will be moved to the authorization form */
 			window.location.reload();
+			return;
+		}
+
+		if (error instanceof networkErrors.BadRequestError && error.name === "action_required"){
+			let message_parts = error.message.split("\n\n")
+			let message = message_parts[0];
+			let bashScript = message_parts[1].split("\n");
+			let messageResult = await window.application.openModal("posix_action", {message, bashScript});
+			if (messageResult && tryAgainFunction){
+				tryAgainFunction();
+			}
 			return;
 		}
 		

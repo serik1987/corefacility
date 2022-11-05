@@ -1,0 +1,42 @@
+.container{
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.message{
+	margin: 0;
+	max-width: 630px;
+}
+
+.code_wrapper{
+	position: relative;
+}
+
+.code{
+	box-sizing: border-box;
+	outline: none;
+	border: 1px solid rgb(118, 118, 118);
+	border-radius: 3px;
+	width: 100%;
+	min-height: 100px;
+	background: rgb(235, 236, 240);
+	padding: 8px;
+	resize: none;
+	font-family: monospace;
+	font-size: 14px;
+	color: #333;
+	white-space: nowrap;
+}
+
+.code_wrapper :global .icon{
+	position: absolute;
+	top: 5px;
+	right: 5px;
+}
+
+.controls{
+	display: flex;
+	justify-content: center;
+	gap: 10px;
+}
