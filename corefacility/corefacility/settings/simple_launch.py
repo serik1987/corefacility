@@ -12,6 +12,9 @@ class SimpleLaunchConfiguration(CorefacilityConfiguration):
     # E-mails will not send in desktop configurations
     EMAIL_BACKEND = "django.core.mail.backends.dummy.EmailBackend"
 
+    # E-mail support
+    EMAIL_SUPPORT = False
+
     # The base directory where all project and user files were located
     CORE_PROJECT_BASEDIR = os.path.join(Path.home(), "My Research")
 

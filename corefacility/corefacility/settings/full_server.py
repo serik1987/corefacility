@@ -10,6 +10,9 @@ class FullServerConfiguration(CorefacilityConfiguration):
 
     admin_allowed = True
 
+    # E-mail support
+    EMAIL_SUPPORT = False
+
     # The list of allowed IPs. The application will perform operating system administrator routines only for
     # remote clients which IP addresses are from the list
     ALLOWED_IPS = values.ListValue([])

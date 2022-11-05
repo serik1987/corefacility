@@ -13,6 +13,9 @@ class VirtualServerConfiguration(CorefacilityConfiguration):
     # The base directory where all project and user files were located
     CORE_PROJECT_BASEDIR = os.path.join(Path.home(), ".research")
 
+    # E-mail support
+    EMAIL_SUPPORT = True
+
     # Whether the application can manage UNIX groups
     CORE_MANAGE_UNIX_GROUPS = False
 

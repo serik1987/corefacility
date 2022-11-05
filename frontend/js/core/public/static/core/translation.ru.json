@@ -57,8 +57,13 @@
 	"Avatar": "Аватар",
 	"Locked": "Заблокирован",
 	"Superuser": "Суперпользователь",
+	"Password": "Пароль",
 	"User's password": "Пароль пользователя",
 	"Administration": "Администрирование",
+	"Print password": "Распечатать пароль",
+	"Send activation code": "Выслать активационный код по электронной почте",
+	"The password was set.": "Пароль пользователя задан.",
+	"The password was not set.": "Пароль пользователя не задан.",
 	"User delete confirmation": "Подтверждение удаления пользователя",
 	"There are no users satisfying search criteria.": "Не найдены пользователи, удовлетворяющие поисковым критериям.",
 	"The login is required for the user identification process during authentication": "Для идентификации пользователя при выполнении аутентификации требуется указать имя пользователя (латиницей)",
@@ -71,5 +76,6 @@
 	"This operation will permanently remove the user account, reset all user's membership in groups. ": "Данное действие навсегда удалит учётную запись пользователя. Кроме того, пользователь будет исключён из всех групп. ",
 	"All user's personal files will also be permanently deleted from the cloud storage. ": "Все персональные файлы пользователя также будут уничтожены. ",
 	"Are you wish to continue?": "Продолжить?",
-	"The user photo facilitates distinguising users among each other. This is not necessary to use your real photo.": "Аватар облегчает визуальное различение пользователей. Вам не обязательно использовать реальную фотографию пользователя."
+	"The user photo facilitates distinguising users among each other. This is not necessary to use your real photo.": "Аватар облегчает визуальное различение пользователей. Вам не обязательно использовать реальную фотографию пользователя.",
+	"To get access to the corefacility use the following credentials:": "Для получения доступа к corefacility используйте следующие авторизационные данные:"
 }

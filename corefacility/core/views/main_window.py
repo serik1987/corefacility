@@ -137,6 +137,7 @@ class MainWindow(SetCookieMixin, TemplateView):
     def _set_api_version_and_lang(self):
         self.kwargs['client_version'] = str(self.client_version)
         self.kwargs['lang'] = str(self.language_code)
+        self.kwargs['email_support'] = settings.EMAIL_SUPPORT
 
     def _find_frontend(self, frontend_template):
         if self._app_module is None:

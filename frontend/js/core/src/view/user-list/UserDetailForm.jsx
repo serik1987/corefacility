@@ -1,4 +1,7 @@
 import {translate as t} from '../../utils.mjs';
+import client from '../../model/providers/http-client.mjs';
+import {tpl_password} from '../../template.mjs';
+import {NotImplementedError} from '../../exceptions/model.mjs';
 import User from '../../model/entity/user.mjs';
 import UpdateForm from '../base/UpdateForm.jsx';
 import CoreWindowHeader from '../base/CoreWindowHeader.jsx';
@@ -7,6 +10,7 @@ import Label from '../base/Label.jsx';
 import TextInput from '../base/TextInput.jsx';
 import CheckboxInput from '../base/CheckboxInput.jsx';
 import PrimaryButton from '../base/PrimaryButton.jsx';
+import Hyperlink from '../base/Hyperlink.jsx';
 import AvatarUploader from '../base/AvatarUploader.jsx';
 import styles from './UserDetailForm.module.css';
 
@@ -15,6 +19,15 @@ import styles from './UserDetailForm.module.css';
  * 	to manage single users in the user list.
  */
 export default class UserDetailForm extends UpdateForm{
+
+	RELOAD_STATUS_CODES = [401, 403, 404];
+
+	constructor(props){
+		super(props);
+		this.changePassword = this.changePassword.bind(this);
+		this.printPassword = this.printPassword.bind(this);
+		this.sendActivationCode = this.sendActivationCode.bind(this);
+	}
 
 	/** The entity class. The formObject will be exactly an instance of this class.
 	 * 	The formObject is implied to be an instance of Entity
@@ -28,6 +41,7 @@ export default class UserDetailForm extends UpdateForm{
 	get fieldList(){
 		return [
 			'login',
+			'is_password_set',
 			'name',
 			'surname',
 			'email',
@@ -56,6 +70,29 @@ export default class UserDetailForm extends UpdateForm{
 		});
 	}
 
+	async changePassword(event, method){
+		try{
+			this.setState({inactive: true});
+			this.setChildError("password", null);
+			await method(event);
+		} catch (error){
+			this.setChildError("password", error.message);
+		} finally {
+			this.setState({inactive: false});
+		}
+	}
+
+	async printPassword(event){
+		let apiVersion = window.SETTINGS.client_version;
+		let path = `/api/${apiVersion}/users/${this._formObject.id}/password-reset/`;
+		let {password} = await client.post(path, {});
+		tpl_password(this._formObject.login, password);
+	}
+
+	async sendActivationCode(event){
+		throw new NotImplementedError("sendActivationCode");
+	}
+
 	renderContent(){
 		let unset = <i className={styles.unset}>{t('Not defined.')}</i>;
 		let header
@@ -67,6 +104,13 @@ export default class UserDetailForm extends UpdateForm{
 
 		if (this.props.setBrowserTitle){
 			this.props.setBrowserTitle(header);
+		}
+
+		let passwordSetMessage = null;
+		if (this.state.rawValues.is_password_set){
+			passwordSetMessage = t("The password was set.");
+		} else {
+			passwordSetMessage = t("The password was not set.");
 		}
 
 		return (
@@ -135,7 +179,20 @@ export default class UserDetailForm extends UpdateForm{
 							<div className={styles.administration_row}>
 								<section className={styles.password_changer}>
 									<h2>{t("User's password")}</h2>
-									<p>Layouting Password change...</p>
+									<p className={styles.changer_message}>{passwordSetMessage}</p>
+									<div className={styles.changer_button}>
+										<Hyperlink onClick={event => this.changePassword(event, this.printPassword)} inactive={this.state.inactive}>
+											{t("Print password")}
+										</Hyperlink>
+									</div>
+									{window.SETTINGS.email_support &&
+										<div className={styles.changer_button}>
+											<Hyperlink onClick={event => this.changePassword(event, this.sendActivationCode)} inactive={this.state.inactive}>
+												{t("Send activation code")}
+											</Hyperlink>
+										</div>
+									}
+									{ this.state.noFieldErrors.password && <p className={styles.changer_error}>{this.state.noFieldErrors.password}</p> }
 								</section>
 								<section className={styles.administration}>
 									<h2>{t("Administration")}</h2>
@@ -163,7 +220,7 @@ export default class UserDetailForm extends UpdateForm{
 								</PrimaryButton>
 								<PrimaryButton
 									type="remove"
-									inactove={this.state.inactive}
+									inactive={this.state.inactive}
 									onClick={this.handleDelete}
 									>
 										{t('Remove')}

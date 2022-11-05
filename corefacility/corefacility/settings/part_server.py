@@ -12,6 +12,9 @@ class PartServerConfiguration(CorefacilityConfiguration):
     # The base directory where all project and user files were located
     CORE_PROJECT_BASEDIR = "/home"
 
+    # E-mail support
+    EMAIL_SUPPORT = True
+
     # Whether the application can manage UNIX groups
     CORE_MANAGE_UNIX_GROUPS = True
 
