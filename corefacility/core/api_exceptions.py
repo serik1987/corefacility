@@ -65,6 +65,32 @@ class AvatarResolutionTooSmallException(CorefacilityAPIException):
         super().__init__(code="file_upload_error", detail=_("The image resolution is too small"))
 
 
+class MailAddressUndefinedException(CorefacilityAPIException):
+    """
+    Raises when the user's e-mail was not set and we are trying to send e-mail
+    """
+
+    status_code = status.HTTP_400_BAD_REQUEST
+
+    def __init__(self):
+        super().__init__(code="mail_address_undefined", detail=_("Can't send e-mail to this user because it's e-mail field was not filled"))
+
+
+class MailFailedException(CorefacilityAPIException):
+    """
+    Raises when mail was failed to be delivered
+    """
+
+    status_code = status.HTTP_400_BAD_REQUEST
+
+    def __init__(self, origin: OSError):
+        """
+        Contructs an exception
+        :param error: Error thrown by core.utils.mail function
+        """
+        super().__init__(code="mail_delivery_failed", detail=_("The following problem occured during the mail delivery: ") + str(origin))
+
+
 def exception_handler(exc, context):
     """
     Defines standard exception handler for all corefacility project.

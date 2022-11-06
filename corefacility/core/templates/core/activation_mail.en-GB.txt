@@ -1,0 +1,10 @@
+Dear {{surname}} {{name}},
+
+We are kindly inform you that your account on {{host}}
+web server has been successfully created.
+To activate this, please, follow:
+
+{{activation_url}}
+
+Best regards,
+Administrator of the {{host}}

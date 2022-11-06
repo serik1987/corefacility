@@ -2,6 +2,7 @@ import {translate as t} from '../../utils.mjs';
 import client from '../../model/providers/http-client.mjs';
 import {tpl_password} from '../../template.mjs';
 import {NotImplementedError} from '../../exceptions/model.mjs';
+import {BadRequestError} from '../../exceptions/network.mjs';
 import User from '../../model/entity/user.mjs';
 import UpdateForm from '../base/UpdateForm.jsx';
 import CoreWindowHeader from '../base/CoreWindowHeader.jsx';
@@ -76,21 +77,78 @@ export default class UserDetailForm extends UpdateForm{
 			this.setChildError("password", null);
 			await method(event);
 		} catch (error){
+			if (this.RELOAD_STATUS_CODES.indexOf(error.status) !== -1){
+				window.location.reload();
+			}
 			this.setChildError("password", error.message);
 		} finally {
 			this.setState({inactive: false});
 		}
 	}
 
+	async doSuggestedAction(action){
+		while (true){
+			try{
+				await action();
+				return true;
+			} catch (error){
+				if (error instanceof BadRequestError && error.name === "action_required"){
+					let result = await this.processPosixError(error);
+					if (!result){
+						return false;
+					}
+				} else {
+					throw error;
+				}
+			}
+		}
+	}
+
 	async printPassword(event){
 		let apiVersion = window.SETTINGS.client_version;
 		let path = `/api/${apiVersion}/users/${this._formObject.id}/password-reset/`;
-		let {password} = await client.post(path, {});
+		let password = null;
+		if (window.SETTINGS.suggest_administration){
+			let user = this._formObject;
+			let oldLock = user.is_locked;
+			console.log(oldLock);
+			if (!oldLock){
+				user.is_locked = true;
+				if (!(await this.doSuggestedAction(() => user.update()))){
+					user.is_locked = oldLock;
+					return;
+				}
+			}
+			let response = await client.post(path, {});
+			password = response.password;
+			let stage_status = await window.application.openModal("posix_action", {
+				"message": t("The user password is: {PASSWORD} Please, set this password using the following command:")
+					.replace("{PASSWORD}", password),
+				"bashScript": ["passwd " + user.login],
+			});
+			if (!stage_status){
+				return;
+			}
+			user.is_locked = oldLock;
+			if (!(await this.doSuggestedAction(() => user.update()))){
+				user.is_locked = true;
+				return;
+			}
+		} else {
+			let response = await client.post(path, {});
+			password = response.password
+		}
 		tpl_password(this._formObject.login, password);
 	}
 
 	async sendActivationCode(event){
-		throw new NotImplementedError("sendActivationCode");
+		let apiVersion = window.SETTINGS.client_version;
+		let path = `/api/${apiVersion}/users/${this._formObject.id}/activation-mail/`;
+		await client.post(path, {});
+		await window.application.openModal("message", {
+			title: t("Account activation"),
+			body: t("The activation mail has been successfully sent to the user."),
+		});
 	}
 
 	renderContent(){
@@ -185,7 +243,7 @@ export default class UserDetailForm extends UpdateForm{
 											{t("Print password")}
 										</Hyperlink>
 									</div>
-									{window.SETTINGS.email_support &&
+									{window.SETTINGS.email_support && !window.SETTINGS.suggest_administration &&
 										<div className={styles.changer_button}>
 											<Hyperlink onClick={event => this.changePassword(event, this.sendActivationCode)} inactive={this.state.inactive}>
 												{t("Send activation code")}

@@ -390,6 +390,22 @@ export default class Form extends Loader{
 		return success;
 	}
 
+	/** Processes 'action_required' errors.
+	 * 	@param {BadRequestError} error the error to be processed
+	 * 	@param {callable} tryAgainFunction the function without arguments to be invoked when the user pressed CONTINUE button.
+	 * 	@return {undefined}
+	 */
+	async processPosixError(error, tryAgainFunction){
+		let message_parts = error.message.split("\n\n")
+		let message = message_parts[0];
+		let bashScript = message_parts[1].split("\n");
+		let messageResult = await window.application.openModal("posix_action", {message, bashScript});
+		if (messageResult && tryAgainFunction){
+			tryAgainFunction();
+		}
+		return messageResult;
+	}
+
 	/**	Transforms Javascript exception to the error message in the message bar.
 	 * 
 	 * 	@param {Error} error Javascript exception
@@ -405,13 +421,7 @@ export default class Form extends Loader{
 		}
 
 		if (error instanceof networkErrors.BadRequestError && error.name === "action_required"){
-			let message_parts = error.message.split("\n\n")
-			let message = message_parts[0];
-			let bashScript = message_parts[1].split("\n");
-			let messageResult = await window.application.openModal("posix_action", {message, bashScript});
-			if (messageResult && tryAgainFunction){
-				tryAgainFunction();
-			}
+			this.processPosixError(error, tryAgainFunction);
 			return;
 		}
 		

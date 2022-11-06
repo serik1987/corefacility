@@ -68,7 +68,7 @@ class MainWindow(SetCookieMixin, TemplateView):
         self._split_application_path(path)
         self._evaluate_uuid(uuid)
         self._authorize_user()
-        self._set_api_version_and_lang()
+        self._set_static_options()
         dump = json.dumps(kwargs)
         return super().get_context_data(js_settings=dump, css=self.css_name,
                                         js=self.js_name, language_code=self.language_code)
@@ -134,10 +134,11 @@ class MainWindow(SetCookieMixin, TemplateView):
         else:
             self.kwargs['authorization_token'] = None
 
-    def _set_api_version_and_lang(self):
+    def _set_static_options(self):
         self.kwargs['client_version'] = str(self.client_version)
         self.kwargs['lang'] = str(self.language_code)
         self.kwargs['email_support'] = settings.EMAIL_SUPPORT
+        self.kwargs['suggest_administration'] = settings.CORE_SUGGEST_ADMINISTRATION
 
     def _find_frontend(self, frontend_template):
         if self._app_module is None:

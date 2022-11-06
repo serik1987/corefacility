@@ -1,3 +1,6 @@
+import urllib
+
+from django.core.signing import Signer
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework import status
@@ -6,6 +9,8 @@ from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 
 from core import App
+from core.utils import mail
+from core.api_exceptions import MailAddressUndefinedException, MailFailedException
 from core.os.user import PosixUser, OperatingSystemUserNotFoundException
 from core.transaction import CorefacilityTransaction
 from ..entity.user import UserSet
@@ -52,6 +57,7 @@ class UserViewSet(AvatarMixin, EntityViewSet):
         :param kwargs: dictionary arguments
         :return: REST framework response
         """
+        from core.os.command_maker import CommandMaker
         with CorefacilityTransaction():
             user = self.get_object()
             symbol_alphabet = EntityPasswordManager.SMALL_LATIN_LETTERS + EntityPasswordManager.DIGITS
@@ -68,3 +74,37 @@ class UserViewSet(AvatarMixin, EntityViewSet):
             request.corefacility_log.response_body = "***"
             user.update()
         return Response({"password": new_password})
+
+    @action(detail=True, methods=['post'], url_path="activation-mail")
+    def activation_mail(self, request, *args, **kwargs):
+        app = App()
+        user = self.get_object()
+        if not user.email or user.email == "":
+            raise MailAddressUndefinedException()
+        alphabet = EntityPasswordManager.ALL_SYMBOLS
+        code_size = app.get_max_activation_code_symbols()
+        user_activation_code = user.activation_code_hash.generate(alphabet, code_size)
+        user.activation_code_expiry_date.set(app.get_activation_code_lifetime())
+        user.update()
+        signer = Signer()
+        activation_code = signer.sign_object({
+            "user_id": user.id,
+            "user_activation_code": user_activation_code
+        })
+        query_params = urllib.parse.urlencode({"activation_code": activation_code})
+        activation_url = "%s://%s/?%s" % (request.scheme, request.get_host(), query_params)
+        try:
+            mail(
+                template_prefix="core/activation_mail",
+                context_data={
+                    "surname": user.surname,
+                    "name": user.name,
+                    "host": request.get_host(),
+                    "activation_url": activation_url
+                },
+                subject=_("Account activation"),
+                recipient=user.email
+            )
+        except OSError as error:
+            raise MailFailedException(error)
+        return Response({})

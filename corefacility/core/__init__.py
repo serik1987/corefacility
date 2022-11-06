@@ -43,6 +43,8 @@ class App(CorefacilityModule):
     DEFAULT_MAX_PASSWORD_SYMBOLS = 10
     DEFAULT_AUTH_TOKEN_LIFETIME = timedelta(minutes=30)
     DEFAULT_USER_CAN_CHANGE_HIS_PASSWORD = False
+    DEFAULT_MAX_ACTIVATION_CODE_SYMBOLS = 20
+    DEFAULT_ACTIVATION_CODE_LIFETIME = timedelta(days=3)
 
     def get_parent_entry_point(self):
         """
@@ -203,3 +205,19 @@ class App(CorefacilityModule):
         Returns True if the user can change his password when logged in. False otherwise
         """
         return self.user_settings.get("is_user_can_change_password", self.DEFAULT_USER_CAN_CHANGE_HIS_PASSWORD)
+
+    def get_max_activation_code_symbols(self):
+        """
+        Returns the total number of symbols in the activation code
+
+        :return: total number of symbols in the activation code
+        """
+        return self.user_settings.get("max_activation_code_symbols", self.DEFAULT_MAX_ACTIVATION_CODE_SYMBOLS)
+
+    def get_activation_code_lifetime(self):
+        """
+        Returns the total lifetime of the activation code
+
+        :return: timedelta representing the activation code lifetime
+        """
+        return self.user_settings.get("activation_code_lifetime", self.DEFAULT_ACTIVATION_CODE_LIFETIME)
