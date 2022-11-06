@@ -122,7 +122,7 @@ export default class UserDetailForm extends UpdateForm{
 			let response = await client.post(path, {});
 			password = response.password;
 			let stage_status = await window.application.openModal("posix_action", {
-				"message": t("The user password is: {PASSWORD} Please, set this password using the following command:")
+				"message": t("The user password is: {PASSWORD} Please, set this password in the operating system using the following command:")
 					.replace("{PASSWORD}", password),
 				"bashScript": ["passwd " + user.login],
 			});
