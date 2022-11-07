@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 
-import {translate as t} from '../../utils.mjs';
 import Form from './Form.jsx';
 import DialogBox from './DialogBox.jsx';
 import PrimaryButton from './PrimaryButton.jsx';
@@ -40,7 +39,7 @@ export default class MessageBox extends Form{
 				{...this.getDialogProps()}
 				title={title}
 				>
-					<p>{body}</p>
+					<Message>{body}</Message>
 					<Controls>
 						<PrimaryButton
 							onClick={event => this.dialog.closeDialog(true)}

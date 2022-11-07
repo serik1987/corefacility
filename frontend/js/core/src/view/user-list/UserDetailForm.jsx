@@ -266,6 +266,7 @@ export default class UserDetailForm extends UpdateForm{
 									/>
 								</section>
 							</div>
+							{this.renderEntityState()}
 							<div className={styles.controls_row}>
 								<PrimaryButton {...this.getSubmitProps()}>{t('Save')}</PrimaryButton>
 								<PrimaryButton {...this.getSubmitProps()} onClick={this.handleSubmitAndClose}>{t('Save and close')}</PrimaryButton>
@@ -288,6 +289,18 @@ export default class UserDetailForm extends UpdateForm{
 					</Scrollable>
 			</CoreWindowHeader>
 		);
+	}
+
+	componentDidUpdate(prevProps, prevState){
+		if ((prevState.rawValues.name !== this.state.rawValues.name ||
+			prevState.rawValues.surname !== this.state.rawValues.surname) &&
+			this.props.onNameChange){
+			if (!this._formValues.surname || !this._formValues.name){
+				this.props.onNameChange(null);
+			} else {
+				this.props.onNameChange(`${this._formValues.surname} ${this._formValues.name}`);
+			}
+		}
 	}
 
 }

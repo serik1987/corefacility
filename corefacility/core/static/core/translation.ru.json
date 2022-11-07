@@ -80,5 +80,6 @@
 	"The user photo facilitates distinguising users among each other. This is not necessary to use your real photo.": "Аватар облегчает визуальное различение пользователей. Вам не обязательно использовать реальную фотографию пользователя.",
 	"To get access to the corefacility use the following credentials:": "Для получения доступа к corefacility используйте следующие авторизационные данные:",
 	"The activation mail has been successfully sent to the user.": "Письмо с активационным ключём успешно отправлено пользователю.",
-	"The user password is: {PASSWORD} Please, set this password in the operating system using the following command:": "Пароль пользователя: {PASSWORD} Пожалуйста, установите пароль в операционной системе, используя следующую команду:"
+	"The user password is: {PASSWORD} Please, set this password in the operating system using the following command:": "Пароль пользователя: {PASSWORD} Пожалуйста, установите пароль в операционной системе, используя следующую команду:",
+	"The data have not been saved!": "Данные не сохранены!"
 }

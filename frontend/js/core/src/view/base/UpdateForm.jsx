@@ -8,6 +8,7 @@ import {NotImplementedError} from '../../exceptions/model.mjs';
 import {UnauthorizedError, NotFoundError} from '../../exceptions/network.mjs';
 import Form from './Form.jsx';
 import Hyperlink from './Hyperlink.jsx';
+import {ReactComponent as ExclamationMark} from '../base-svg/error.svg';
 
 
 /** This is the base class for all forms that loads existent entity from the
@@ -251,6 +252,33 @@ export default class UpdateForm extends Form{
 	 */
 	renderContent(){
 		throw new NotImplementedError("renderContent");
+	}
+
+	/** Renders "Data have not been saved!" bar
+	 */
+	renderEntityState(){
+		let Warning = styled.p`
+			margin: 0;
+			color: rgb(197, 57, 41);
+			fill: rgb(197, 57, 41);
+
+			${Warning} svg{
+				display: inline-block;
+				vertical-align: middle;
+				margin-right: 10px;
+				width: 24px;
+				height: 24px;
+			}
+		`;
+
+		if (this._formObject && this._formObject.state === entityState.changed){
+			return (
+				<Warning>
+					<ExclamationMark/>
+					{t("The data have not been saved!")}
+				</Warning>
+			);
+		}
 	}
 
 	render(){

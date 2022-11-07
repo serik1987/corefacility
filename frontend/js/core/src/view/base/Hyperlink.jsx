@@ -18,7 +18,7 @@ import styles from '../base-styles/Hyperlink.module.css';
 export default class Hyperlink extends Button{
 
 	renderContent(){
-		let classList = styles.link_button + 
+		let classList = styles.link_button + " hyperlink" + 
 			(this.props.disabled ? ` ${styles.disabled}` : '') +
 			(this.props.inactive ? ` ${styles.inactive}` : '');
 

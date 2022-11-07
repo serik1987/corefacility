@@ -20,16 +20,28 @@ export default class Window extends DialogWrapper{
 		throw new NotImplementedError("browserTitle");
 	}
 
-	/** Sets the browser title from the 'browserTitle' property */
-	_setBrowserTitle(){
-		if (this.browserTitle){
-			document.head.getElementsByTagName("title")[0].innerText = this.browserTitle;
+	/** Sets the browser title from the 'browserTitle' property 
+	 * 	@param {string|undefined} title Browser title. Undefined means
+	 * 		that browserTitle property will be used.
+	 */
+	_setBrowserTitle(title){
+		let browserTitle = title || this.browserTitle;
+		console.log(browserTitle);
+
+		if (browserTitle){
+			document.head.getElementsByTagName("title")[0].innerText = browserTitle;
 		}
 	}
 
+	/*
 	shouldComponentUpdate(props, state){
 		this._setBrowserTitle();
 		return true;
+	}
+	*/
+
+	componentDidMount(){
+		this._setBrowserTitle();
 	}
 
 }
