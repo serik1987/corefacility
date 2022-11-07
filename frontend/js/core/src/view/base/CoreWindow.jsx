@@ -4,7 +4,9 @@ import {translate as t} from '../../utils.mjs';
 import {NotImplementedError} from '../../exceptions/model.mjs';
 import Loader from './Loader.jsx';
 import Window from './Window.jsx';
+import ContextMenu from './ContextMenu.jsx';
 import Icon from './Icon.jsx';
+import Hyperlink from './Hyperlink.jsx';
 import styles from '../base-styles/CoreWindow.module.css';
 import {ReactComponent as LogoImage} from '../base-svg/logo.svg';
 import {ReactComponent as RefreshImage} from '../base-svg/refresh.svg';
@@ -98,7 +100,15 @@ export default class CoreWindow extends Window{
 					<div className={styles.icons}>
 						{this.reloadable && <Icon onClick={this.onReload} tooltip={t("Reload")} src={<RefreshImage/>}/>}
 						<Icon href="/profile/" tooltip={t("Account Settings")} src={<PersonImage/>}/>
-						<Icon href="/settings/" tooltip={t("Application Settings")} src={<SettingsImage/>}/>
+						<ContextMenu
+							caption={
+								<Icon tooltip={t("Application Settings")} src={<SettingsImage/>}/>
+							}
+							items={[
+								<Hyperlink href="/users/">{t("Users")}</Hyperlink>,
+								<Hyperlink href="/synchronization/">{t("Synchronization")}</Hyperlink>
+							]}
+						/>
 					</div>
 					<div className={styles.controls}>
 						{ this.renderControls() }

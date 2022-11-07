@@ -26,7 +26,6 @@ export default class Window extends DialogWrapper{
 	 */
 	_setBrowserTitle(title){
 		let browserTitle = title || this.browserTitle;
-		console.log(browserTitle);
 
 		if (browserTitle){
 			document.head.getElementsByTagName("title")[0].innerText = browserTitle;

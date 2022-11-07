@@ -21,7 +21,7 @@ export default class Icon extends Button{
 
 
 	renderContent(){
-		let disabled = this.props.disabled ? ' ' + styles.disabled : '';
+		let disabled = this.disabled ? ' ' + styles.disabled : '';
 		let inactive = this.props.inactive ? ' ' + styles.inactive : '';
 		return (
 			<a

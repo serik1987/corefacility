@@ -19,7 +19,7 @@ export default class Hyperlink extends Button{
 
 	renderContent(){
 		let classList = styles.link_button + " hyperlink" + 
-			(this.props.disabled ? ` ${styles.disabled}` : '') +
+			(this.disabled ? ` ${styles.disabled} disabled` : '') +
 			(this.props.inactive ? ` ${styles.inactive}` : '');
 
 		return (<a onClick={this.handleClick} href={this.props.href || '#'}  className={classList}>

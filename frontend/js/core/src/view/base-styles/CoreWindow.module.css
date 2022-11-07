@@ -6,7 +6,7 @@
 	top:  0;
 	border-bottom:  1px solid rgb(218, 220, 224);
 	height:  64px;
-	overflow:  hidden;
+	overflow:  visible;
 }
 
 .window header .logo{
@@ -26,13 +26,13 @@
 	line-height:  64px;
 }
 
-.window header .icons > a{
+.window header .icons > *{
 	margin-right: 5px;
 	width: 38px;
 	height: 38px;
 }
 
-.window header .icons > a:last-child{
+.window header .icons > *:last-child{
 	margin-right:  17px;
 }
 

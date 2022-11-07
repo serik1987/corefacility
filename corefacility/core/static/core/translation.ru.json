@@ -38,6 +38,7 @@
 	"Delete confirmation": "Подтверждение на удаление",
 	"Do you really want to delete this resource?": "Вы действительно хотите удалить этот ресурс?",
 	"The requested resource has already been deleted.": "Запрашиваемый ресурс успешно удалён и теперь больше не существует.",
+	"The data have not been saved!": "Данные не сохранены!",
 	"Go back...": "Назад...",
 	"Upload": "Загрузить",
 	"Delete": "Удалить",
@@ -81,5 +82,6 @@
 	"To get access to the corefacility use the following credentials:": "Для получения доступа к corefacility используйте следующие авторизационные данные:",
 	"The activation mail has been successfully sent to the user.": "Письмо с активационным ключём успешно отправлено пользователю.",
 	"The user password is: {PASSWORD} Please, set this password in the operating system using the following command:": "Пароль пользователя: {PASSWORD} Пожалуйста, установите пароль в операционной системе, используя следующую команду:",
-	"The data have not been saved!": "Данные не сохранены!"
+
+	"Synchronization": "Синхронизация"
 }

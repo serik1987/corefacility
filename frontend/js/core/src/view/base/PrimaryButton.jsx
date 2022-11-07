@@ -35,7 +35,7 @@ export default class PrimaryButton extends Button{
                 type="button"
                 className={"button primary-button " + typeClass + stateClass}
                 onClick={this.handleClick}
-                disabled={!!this.props.disabled}>
+                disabled={!!this.disabled}>
                 {this.props.children}
             </button>
 		);

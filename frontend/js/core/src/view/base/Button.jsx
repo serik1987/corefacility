@@ -31,6 +31,16 @@ export default class Button extends React.Component{
 		}
 	}
 
+	/** The button is considered to be disabled when either its 'disabled' prop is true or:
+	 * 	(1) its onClick prop is undefined, (2) its href prop is not undefined, (3) its
+	 * 	href prop refers to the current location.
+	 */
+	get disabled(){
+		return this.props.disabled || (
+			!this.props.onClick && this.props.href === window.location.pathname
+		);
+	}
+
 	/**
 	 *  handles the button click.
 	 *  When you will decide to extend this base class, pass exactly this callback
@@ -38,7 +48,7 @@ export default class Button extends React.Component{
 	 */
 	handleClick(event){
 		event.preventDefault();
-		if (!this.props.inactive && !this.props.disabled){
+		if (!this.props.inactive && !this.disabled){
 			if (this.props.onClick){
 				this.props.onClick(event);
 			} else if (this.props.href){

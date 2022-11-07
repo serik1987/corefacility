@@ -56,8 +56,6 @@ class _UserDetailWindow extends NavigationWindow{
 	 * 	@return {React.Component} the rendered component
 	 */
 	renderContent(){
-		console.log("Rendering content...");
-
 		return (<UserDetailForm 
 			ref={this.setReloadCallback}
 			inputData={{lookup: this.props.lookup}}
