@@ -1,7 +1,6 @@
 import {translate as t} from '../../utils.mjs';
 import client from '../../model/providers/http-client.mjs';
 import {tpl_password} from '../../template.mjs';
-import {NotImplementedError} from '../../exceptions/model.mjs';
 import {BadRequestError} from '../../exceptions/network.mjs';
 import User from '../../model/entity/user.mjs';
 import UpdateForm from '../base/UpdateForm.jsx';

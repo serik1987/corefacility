@@ -1,5 +1,4 @@
 import Button from './Button.jsx';
-import ItemList from './ItemList.jsx';
 
 
 /** This is the base class for all list items (i.e., children of the ItemList component)
@@ -16,10 +15,6 @@ import ItemList from './ItemList.jsx';
  * 		@param {string} href		the route to be moved when you click the button
  */
 export default class ListItem extends Button{
-
-	constructor(props){
-		super(props);
-	}
 
 	/** This function calls after creating the ListItem for entity tagged by 'recentlyAdded'.
 	 * 

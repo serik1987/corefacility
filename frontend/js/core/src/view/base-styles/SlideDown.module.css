@@ -1,0 +1,11 @@
+.slide_down{
+	display: none;
+	overflow: hidden;
+	box-sizing: border-box;
+	transition:
+		height 0.267s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide_down.opened{
+	display: block;
+}

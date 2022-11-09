@@ -1,7 +1,6 @@
 import {Navigate} from 'react-router-dom';
 import styled from 'styled-components';
 
-import {id} from '../../utils.mjs';
 import {translate as t} from '../../utils.mjs';
 import entityState from '../../model/entity/entity-state.mjs';
 import {NotImplementedError} from '../../exceptions/model.mjs';

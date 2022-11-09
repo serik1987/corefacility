@@ -20,10 +20,21 @@
 	"Close without save": "Закрыть без сохранения",
 	"Remove": "Удалить",
 	"Not defined.": "Не задано",
+	"undefined": "неизвестно",
 	"Action Required": "Требуется действие",
 	"Continue": "Продолжить",
 	"Yes": "Да",
 	"No": "Нет",
+
+	"OK": "Успешно",
+	"Created": "Создан",
+	"No Content": "Без содержимого",
+	"Bad request's input data": "Ошибка во входных данных запроса",
+	"Not Authorized": "Не авторизован",
+	"Permission denied": "Доступ закрыт",
+	"Method not allowed": "Метод не разрешён",
+	"Not acceptable": "Неприемлемо",
+	"Maximum request number exceeded": "Превышен максимальный лимит запросов",
 
 	"Home Page": "Главная страница",
 	"Reload": "Обновить",
@@ -42,9 +53,13 @@
 	"Go back...": "Назад...",
 	"Upload": "Загрузить",
 	"Delete": "Удалить",
+	"Filter options": "Параметры фильтрации",
+	"Loading the application main window": "Загрузка главного окна Приложения",
 
 	"User List": "Список пользователей",
+	"Deals with list of users.": "Работа со списком пользователей.",
 	"Users": "Пользователи",
+	"User": "Пользователь",
 	"User information": "Информация о пользователе",
 	"Search by first name, last name, login...": "Поиск по фамилии, имени, имени пользователя...",
 	"Login": "Имя пользователя",
@@ -83,5 +98,13 @@
 	"The activation mail has been successfully sent to the user.": "Письмо с активационным ключём успешно отправлено пользователю.",
 	"The user password is: {PASSWORD} Please, set this password in the operating system using the following command:": "Пароль пользователя: {PASSWORD} Пожалуйста, установите пароль в операционной системе, используя следующую команду:",
 
-	"Synchronization": "Синхронизация"
+	"Synchronization": "Синхронизация",
+
+	"Logs": "Журнал посещений",
+	"Viewing logs": "Просмотр журнала посещений",
+	"anonymous": "анонимный пользователь",
+	"Request method": "Метод запроса",
+	"Response status": "Статус ответа",
+
+	"Applications Settings": "Настройки приложений"
 }

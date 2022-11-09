@@ -1,6 +1,8 @@
 import {wait} from '../../utils.mjs';
 import * as React from 'react';
 
+import styles from '../base-styles/SlideDown.module.css';
+
 
 /** Minimum amount of time required for CSS to apply all styles, in ms */
 const MINIMUM_CSS_RESPONSE_TIME = 1;
@@ -12,6 +14,22 @@ const MINIMUM_CSS_RESPONSE_TIME = 1;
  * 
  * 	The component always slides down when moving minimized -> maximized state.
  * 	The component always slides up when moving maximized -> minimized state.
+ * 
+ * 	The component doesn't have its own machinery for sliding up or sliding down.
+ * 	Such a logics must be done by the parent component and result to changes in
+ * 	'isOpened' prop.
+ * 	
+ * 
+ * 	Props:
+ * 	@param {boolean} isOpened true if the component is in expanded state, false
+ * 		if the component is in contracted state.
+ * 	@param {string} cssSuffix additional CSS classes that will be appended to
+ * 		the root CSS element for its customization. We recommend to adjust borders
+ * 		and shadow through the CSS suffix.
+ * 		do NOT use this element to set the padding property: the slide down works
+ * 		correctly given that it doesn't have any padding!
+ * 		Slide down's border emerge immeditely and doesn't participate in animation
+ * 		process, So, don't make widget borders wider than 1-2 px
  *
  */
 export default class SlideDown extends React.Component{
@@ -54,6 +72,41 @@ export default class SlideDown extends React.Component{
 			htmlElement.style.height = null;
 			htmlElement.style.display = null;
 		}, {once: true});
+	}
+
+	constructor(props){
+		super(props);
+		this.__slidingRef = React.createRef();
+	}
+
+	/** HTML element that has to be slided down or slided up */
+	get htmlElement(){
+		return this.__slidingRef.current;
+	}
+
+	render(){
+		let menuClasses = styles.slide_down;
+		if (this.props.cssPrefix){
+			menuClasses += this.props.cssPrefix;
+		}
+		if (this.props.isOpened){
+			menuClasses += ` ${styles.opened}`;
+		}
+
+		return (
+			<div className={menuClasses} ref={this.__slidingRef}>
+				{this.props.children}
+			</div>
+		);
+	}
+
+	componentDidUpdate(prevProps, prevState){
+		if (!prevProps.isOpened && this.props.isOpened){
+			this.constructor.slideDown(this.htmlElement);
+		}
+		if (prevProps.isOpened && !this.props.isOpened){
+			this.constructor.slideUp(this.htmlElement);
+		}
 	}
 
 }

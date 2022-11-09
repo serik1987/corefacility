@@ -1,0 +1,58 @@
+.section_container{
+	display: flex;
+	gap: 20px;
+}
+
+.section:not(:last-child){
+	border-right: 1px solid rgb(218, 220, 224);
+	padding-right: 20px;
+}
+
+.section svg{
+	display: inline-block;
+	vertical-align: middle;
+	width: 16px;
+	height: 16px;
+	fill: rgb(60, 64, 67);
+}
+
+.section svg.success{
+	fill: rgb(6, 132, 65);
+}
+
+.section svg.failure{
+	fill: rgb(197, 57, 41);
+}
+
+.section .cross_fail{
+	outline: 1px solid red;
+}
+
+.success{
+	color: rgb(6, 132, 65);
+}
+
+.failure{
+	color: rgb(197, 57, 41);
+}
+
+.cross_fail{
+	direction: ltr;
+	display: inline-block;
+	vertical-align: middle;
+	border-right: 1px solid rgb(197, 57, 41);
+	background: rgb(197, 57, 41);
+	width: 0;
+	height: 16px;
+	transform-origin: top left;
+	transform: translate(-2px, 1px) rotate(45deg);
+}
+
+.cross_fail.reverse{
+	transform: translate(-15px, 3px) rotate(-45deg);
+}
+
+.section_header:not(:first-child){
+	display: inline-block;
+	margin-left: 2px;
+}

@@ -18,7 +18,9 @@ export default class ContextMenu extends React.Component{
 		this.handleCaptionClick = this.handleCaptionClick.bind(this);
 		this.handleMenuClose = this.handleMenuClose.bind(this);
 		this.changeAlignState = this.changeAlignState.bind(this);
-		this.__menuRef = React.createRef();
+		this.__registerSlideDown = this.__registerSlideDown.bind(this);
+
+		this.__slideDown = null;
 
 		this.state={
 			menuAlignMode: styles.align_left,
@@ -26,13 +28,19 @@ export default class ContextMenu extends React.Component{
 		}
 	}
 
-	get menu(){
-		return this.__menuRef.current;
+	__registerSlideDown(component){
+		this.__slideDown = component;
 	}
 
-	changeAlignState(event){
-		if (this.state.isOpened){
-			let rect = this.menu.getBoundingClientRect();
+	/** Avoids such situation when the menu overflows window
+	 * 
+	 * 	@param {SyntheticEvent} event that may cause item overflow
+	 * 		or null if the overflow could be caused by the component's
+	 * 		re-rendering.
+	 */
+	changeAlignState(){
+		if (this.state.isOpened && this.__slideDown !== null){
+			let rect = this.__slideDown.htmlElement.getBoundingClientRect();
 			if (rect.right > window.innerWidth){
 				this.setState({menuAlignMode: styles.align_right});
 			} else if (rect.left < 0){
@@ -41,19 +49,27 @@ export default class ContextMenu extends React.Component{
 		}
 	}
 
+	/** Expands the menu when this is contracted. Contracts the menu when
+	 * 	this is expanded.
+	 * 
+	 * 	@param {SyntheticEvent} event any event that causes the state change
+	 * 		(i.e., clicking on 'expand' button, right click etc.)
+	 */
 	handleCaptionClick(event){
 		this.setState({isOpened: !this.state.isOpened});
 	}
 
+	/** Contracts the menu despite of the menu state.
+	 * 
+	 * 	@param {SyntheticEvent} event any event that causes menu contraction
+	 * 		despite of the menu state (i.e., clicking outside the widget).
+	 */
 	handleMenuClose(event){
 		this.setState({isOpened: false});
 	}
 
 	render(){
-		let menuClasses = `${styles.items} ${this.state.menuAlignMode}`;
-		if (this.state.isOpened){
-			menuClasses += ` ${styles.opened}`;
-		}
+		let menuClasses = ` ${styles.slide_down} ${this.state.menuAlignMode}`;
 
 		const caption = React.cloneElement(this.props.caption,
 			{onClick: this.handleCaptionClick});
@@ -68,17 +84,17 @@ export default class ContextMenu extends React.Component{
 					<div className={`${styles.caption}`}>
 						{caption}
 					</div>
-					<div className={menuClasses} ref={this.__menuRef}>
-						<ul>
-							{this.props.items.map(item => {
-								return (
-									<li key={itemIndex++}>
-										{item}
-									</li>
-								);
-							})}
-						</ul>
-					</div>
+					<SlideDown
+						isOpened={this.state.isOpened}
+						cssPrefix={menuClasses}
+						ref={this.__registerSlideDown}
+						>
+							<ul className={styles.items}>
+								{this.props.items.map(item => {
+									return (<li key={itemIndex++}>{item}</li>);
+								})}
+							</ul>
+					</SlideDown>
 			</div>
 		);
 	}
@@ -95,12 +111,6 @@ export default class ContextMenu extends React.Component{
 
 	componentDidUpdate(prevProps, prevState){
 		this.changeAlignState(null);
-		if (!prevState.isOpened && this.state.isOpened){
-			SlideDown.slideDown(this.menu);
-		}
-		if (prevState.isOpened && !this.state.isOpened){
-			SlideDown.slideUp(this.menu);
-		}
 	}
 
 }

@@ -169,10 +169,6 @@ export class NumberField extends EntityField{
 /** Field that can be read-only */
 export class ReadOnlyField extends EntityField{
 
-	/** Creates the entity field that can't be modified
-	 *  @param {string} description Human readable description of the field
-	 *                  (to be used for debugging purpose only)
-	 */
 	constructor(){
 		super(undefined);
 	}
@@ -180,6 +176,22 @@ export class ReadOnlyField extends EntityField{
 	/** Always throw an exception to indicate that setting this field is not allowed */
 	proofread(entity, propertyName, value){
 		throw new ReadOnlyPropertyError(entity._entityName, propertyName);
+	}
+
+}
+
+
+/** Read-only field that contains dates only */
+export class ReadOnlyDateField extends ReadOnlyField{
+
+	/** Converts the data from ISO format to Javascript's Date object
+	 *  @param {Entity} entity 		The Entity this value belongs to
+	 * 	@param {string} name 		Name of the entity field
+	 * 	@param {any} value 			Value received from the external source
+	 * 	@return {any} 				the value dispatched to the user
+	 */
+	correct(entity, name, internalValue){
+		return new Date(internalValue);
 	}
 
 }

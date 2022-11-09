@@ -19,7 +19,7 @@ import styles from '../base-styles/PaginatedList.module.css';
  * 	download the first page. This is considered to be a feature of the parent component.
  * 
  * 	Props:
-* 		@param {EntityPage|null} items 		The item list, as it passed by the parent component.
+ * 		@param {EntityPage|null} items 		The item list, as it passed by the parent component.
  * 											Must be an instance of EntityPage
  * 		@param {boolean} isLoading			true if the parent component is in 'loading' state.
  * 		@param {boolean} isError			true if the parent component is failed to reload the list.
