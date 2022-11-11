@@ -1,30 +1,34 @@
 import * as React from 'react';
 
 import SlideDown from './SlideDown.jsx';
-import styles from '../base-styles/ContextMenu.module.css';
+import styles from '../base-styles/DropDown.module.css';
 
 
-/** Represents the context menu
+/** Represents any drop-down component. The component doesn't
+ * 	implement sliding up or sliding down
  * 
  * 	Props:
- * 	@param {React.Component} caption To open or close the context menu
- * 		the user must click anywhere in this component.
- * 	@param {array of React.Component} component items to be displayed
+ * 	@param {React.Component} caption Visible part of component
+ * 	@param {React.Component} children A part that can be slided up
+ * 		or dropped down.
+ * 	@oaram {callback} onMenuClose Triggers when the user clicks
+ * 		outside the drop down or its active element. The function
+ * 		must change the parent's component state in such a way as
+ * 		to bring the drop down to CLOSED state.
+ *	@param {string} cssSuffix Suffix to be attached to the SlideDown
+ * 		class list
  */
-export default class ContextMenu extends React.Component{
+export default class DropDown extends React.Component{
 
 	constructor(props){
 		super(props);
-		this.handleCaptionClick = this.handleCaptionClick.bind(this);
 		this.handleMenuClose = this.handleMenuClose.bind(this);
 		this.changeAlignState = this.changeAlignState.bind(this);
 		this.__registerSlideDown = this.__registerSlideDown.bind(this);
-
 		this.__slideDown = null;
 
-		this.state={
+		this.state = {
 			menuAlignMode: styles.align_left,
-			isOpened: false,
 		}
 	}
 
@@ -39,7 +43,7 @@ export default class ContextMenu extends React.Component{
 	 * 		re-rendering.
 	 */
 	changeAlignState(){
-		if (this.state.isOpened && this.__slideDown !== null){
+		if (this.props.isOpened && this.__slideDown !== null){
 			let rect = this.__slideDown.htmlElement.getBoundingClientRect();
 			if (rect.right > window.innerWidth){
 				this.setState({menuAlignMode: styles.align_right});
@@ -49,51 +53,37 @@ export default class ContextMenu extends React.Component{
 		}
 	}
 
-	/** Expands the menu when this is contracted. Contracts the menu when
-	 * 	this is expanded.
-	 * 
-	 * 	@param {SyntheticEvent} event any event that causes the state change
-	 * 		(i.e., clicking on 'expand' button, right click etc.)
-	 */
-	handleCaptionClick(event){
-		this.setState({isOpened: !this.state.isOpened});
-	}
-
 	/** Contracts the menu despite of the menu state.
 	 * 
 	 * 	@param {SyntheticEvent} event any event that causes menu contraction
 	 * 		despite of the menu state (i.e., clicking outside the widget).
 	 */
 	handleMenuClose(event){
-		this.setState({isOpened: false});
+		if (this.props.onMenuClose){
+			this.props.onMenuClose(event);
+		}
 	}
 
 	render(){
 		let menuClasses = ` ${styles.slide_down} ${this.state.menuAlignMode}`;
-
-		const caption = React.cloneElement(this.props.caption,
-			{onClick: this.handleCaptionClick});
-
-		let itemIndex = 0;
+		if (this.props.cssSuffix){
+			menuClasses += ` ${this.props.cssSuffix}`;
+		}
 
 		return (
 			<div
-				className={`${styles.context_menu} context-menu`}
+				className={`${styles.drop_down} drop-down`}
 				onClick={event => event.stopPropagation()}
 				>
-					<div className={`${styles.caption}`}>
-						{caption}
+					<div className={styles.caption}>
+						{this.props.caption}
 					</div>
 					<SlideDown
-						isOpened={this.state.isOpened}
-						cssPrefix={menuClasses}
+						isOpened={this.props.isOpened}
+						cssSuffix={menuClasses}
 						ref={this.__registerSlideDown}
 						>
-							<ul className={styles.items}>
-								{this.props.items.map(item => {
-									return (<li key={itemIndex++}>{item}</li>);
-								})}
-							</ul>
+							{this.props.children}
 					</SlideDown>
 			</div>
 		);

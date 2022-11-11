@@ -1,0 +1,26 @@
+.items{
+	list-style-type: none;
+	margin: 0;
+	box-sizing: border-box;
+	padding: 16px 0;
+	background: #fff;
+	line-height: 1;
+}
+
+.items li > a{
+	display: block;
+	box-sizing: border-box;
+	padding: 0 25px;
+	line-height: 30px;
+	min-width: 320px;
+	color: inherit;
+	text-decoration: none;
+}
+
+.items li > a:hover{
+	background: rgb(238, 238, 238);
+}
+
+.items li > a:global.disabled{
+	background: transparent;
+}

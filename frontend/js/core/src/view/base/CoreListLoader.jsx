@@ -57,7 +57,15 @@ export default class CoreListLoader extends ListLoader{
 		this.setState({isFilterOpened: !this.state.isFilterOpened});
 	}
 
+	/**	Renders the filter
+	 * 	@return {React.Component} all filter widgets to be rendered
+	 */
+	renderFilter(){
+		throw new NotImplementedError("renderFilter");
+	}
+
 	/** Renders the item list
+	 * 	@return {React.Component} the rendered components
 	 */
 	renderItemList(){
 		throw new NotImplementedError("renderItemList");
@@ -88,9 +96,9 @@ export default class CoreListLoader extends ListLoader{
 				}
 				>
 					<div class={styles.wrapper}>
-						<SlideDown isOpened={this.state.isFilterOpened} cssPrefix={` ${styles.filter_wrapper}`}>
+						<SlideDown isOpened={this.state.isFilterOpened} cssSuffix={` ${styles.filter_wrapper}`}>
 							<div className={styles.filter}>
-								Layouting the filter...
+								{this.renderFilter()}
 							</div>
 						</SlideDown>
 						<div className={styles.items_wrapper}>

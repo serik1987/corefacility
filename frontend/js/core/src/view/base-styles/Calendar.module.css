@@ -1,0 +1,91 @@
+.calendar{
+	padding: 0 14px 16px 19px;
+	font-family: Roboto, Arial, Sans-Serif;
+}
+
+.hyperlinks_panel{
+	display: flex;
+	margin-left: 4px;
+	margin-right: 3px;
+	justify-content: space-between;
+	align-items: center;
+	height: 32px;
+}
+
+.month_panel{
+	display: flex;
+	margin: 0 3px 0 4px;
+	height: 32px;
+	align-items: center;
+}
+
+.month_box{
+	font-weight: 500;
+	flex: 1;
+}
+
+.month_panel :global .icon{
+	flex: 0 25px;
+}
+
+.calendar_panel{
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+}
+
+.day_wrapper{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 10px;
+	font-weight: 500;
+	height: 28px;
+}
+
+.day{
+	display: block;
+	border-radius: 50%;
+	width: 24px;
+	height: 24px;
+	text-align: center;
+	line-height: 24px;
+	color: rgb(112, 117, 122);
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.day:hover{
+	background: rgb(241, 243, 244);
+}
+
+.day:active{
+	background: rgb(218, 220, 224);
+}
+
+.day.cmonth{
+	color: rgb(60, 64, 67);
+}
+
+.day.cdate{
+	background-color: rgb(26, 115, 232);
+	color: rgb(255, 255, 255);
+}
+
+.day.vdate{
+	background-color: rgb(210, 227, 252);
+	color: rgb(24, 90, 188);
+}
+
+.day.vdate:hover{
+	background-color: rgb(174, 203, 250);
+}
+
+.day.vdate:active{
+	background-color: rgb(128, 180, 248);
+}
+
+.day.disabled, .day.disabled:hover, .day.disabled:active{
+	color: rgb(112, 117, 122);
+	background: #fff;
+	cursor: not-allowed;
+}

@@ -4,7 +4,7 @@ import {translate as t} from '../../utils.mjs';
 import {NotImplementedError} from '../../exceptions/model.mjs';
 import Loader from './Loader.jsx';
 import Window from './Window.jsx';
-import ContextMenu from './ContextMenu.jsx';
+import DropDownMenu from './DropDownMenu.jsx';
 import Icon from './Icon.jsx';
 import Hyperlink from './Hyperlink.jsx';
 import styles from '../base-styles/CoreWindow.module.css';
@@ -100,7 +100,7 @@ export default class CoreWindow extends Window{
 					<div className={styles.icons}>
 						{this.reloadable && <Icon onClick={this.onReload} tooltip={t("Reload")} src={<RefreshImage/>}/>}
 						<Icon href="/profile/" tooltip={t("Account Settings")} src={<PersonImage/>}/>
-						<ContextMenu
+						<DropDownMenu
 							caption={
 								<Icon tooltip={t("Application Settings")} src={<SettingsImage/>}/>
 							}

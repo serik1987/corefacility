@@ -2,7 +2,11 @@ import {translate as t} from '../../utils.mjs';
 import Log from '../../model/entity/log.mjs';
 
 import CoreListLoader from '../base/CoreListLoader.jsx';
+import Label from '../base/Label.jsx';
+import TextInput from '../base/TextInput.jsx';
+import Calendar from '../base/Calendar.jsx';
 import LogList from './LogList.jsx';
+import styles from './LogListLoader.module.css';
 
 
 /** Represents list of all logs, allows to filter them by some criteria.
@@ -22,6 +26,14 @@ import LogList from './LogList.jsx';
  * 		reportListFailure instead of them.
  */
 export default class LogListLoader extends CoreListLoader{
+
+	constructor(props){
+		super(props);
+
+		this.state = {
+			...this.state,
+		}
+	}
 
 	/** Returns class of the entity which list must be downloaded from the external server
 	 *  using this component
@@ -56,6 +68,24 @@ export default class LogListLoader extends CoreListLoader{
 	 */
 	get listHeader(){
 		return t("Logs");
+	}
+
+	/**	Renders the filter
+	 * 	@return {React.Component} all filter widgets to be rendered
+	 */
+	renderFilter(){
+		return (
+			<div className={styles.filter}>
+				<Label>{t("Request date")}</Label>
+				<Calendar inactive={this.isLoading}/>
+				<Label>{t("User")}</Label>
+				<TextInput inactive={this.isLoading}/>
+				<Label>{t("IP address")}</Label>
+				<TextInput inactive={this.isLoading}/>
+				<Label>{t("Response status")}</Label>
+				<TextInput inactive={this.isLoading}/>
+			</div>
+		);
 	}
 
 	/** Renders the item list

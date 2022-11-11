@@ -16,6 +16,10 @@ import styles from '../base-styles/TextInput.module.css';
  *                                           - you can add additional string preprocessors to this widget
  *                                           - the class descendants may also provide additional preprocessing
  * 
+ *      @param {callback} onFocus           Triggers when the input element is in focus
+ * 
+ *      @param {callback} onBlur            Triggers when the input element loss the focus
+ * 
  *		@param {string} value 				Controllable value of the input field. This means that the input value
  *                                          will be set to the value of this prop during each rendering. This results
  *                                          to the following side effects:
@@ -73,6 +77,8 @@ export default class TextInput extends Input{
                         placeholder={this.props.placeholder}
 						disabled={this.props.disabled || this.props.inactive}
 						onChange={this.onInputChange}
+                        onFocus={this.props.onFocus}
+                        onBlur={this.props.onBlur}
 					/>
 				</div>
 				{ isError && <p className={styles.error}>{this.props.error}</p> }

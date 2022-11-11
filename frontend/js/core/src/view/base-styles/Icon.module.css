@@ -8,6 +8,10 @@
 	cursor:  pointer;
 }
 
+.icon_wrapper.disabled{
+	cursor: not-allowed;
+}
+
 .icon_wrapper:hover:not(.disabled):not(.inactive){
 	background-color: #e0e0e0;
 }

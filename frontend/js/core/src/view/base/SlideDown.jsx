@@ -45,10 +45,12 @@ export default class SlideDown extends React.Component{
 	static async slideDown(htmlElement){
 		let itemHeight = htmlElement.clientHeight;
 		htmlElement.style.height = "0px";
+		htmlElement.style.overflow = "hidden";
 		await wait(MINIMUM_CSS_RESPONSE_TIME);
 		htmlElement.style.height = `${itemHeight}px`;
 		htmlElement.addEventListener("transitionend", event => {
 			htmlElement.style.height = null;
+			htmlElement.style.overflow = null;
 		}, {once: true});
 	}
 
@@ -86,8 +88,8 @@ export default class SlideDown extends React.Component{
 
 	render(){
 		let menuClasses = styles.slide_down;
-		if (this.props.cssPrefix){
-			menuClasses += this.props.cssPrefix;
+		if (this.props.cssSuffix){
+			menuClasses += this.props.cssSuffix;
 		}
 		if (this.props.isOpened){
 			menuClasses += ` ${styles.opened}`;

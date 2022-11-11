@@ -8,4 +8,5 @@
 
 .slide_down.opened{
 	display: block;
+	overflow: visible;
 }
