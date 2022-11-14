@@ -56,3 +56,9 @@
 	display: inline-block;
 	margin-left: 2px;
 }
+
+.no_logs{
+	padding-left: 114px;
+	padding-right: 30px;
+	font-style: italic;
+}

@@ -1,0 +1,7 @@
+.container :global .drop-down{
+	width: 250px;
+}
+
+.container span{
+	font-family: Roboto, Arial, Sans-Serif;
+}

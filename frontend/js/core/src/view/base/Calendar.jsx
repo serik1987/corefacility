@@ -78,10 +78,14 @@ const THREE_NUMBER_PATTERN = /^[^\d]*(\d+)[^\d]+(\d+)[^\d]+(\d+)[^\d]*$/;
  * 	@param {Date} defaultValue			Value of the widget at the time of its creation (the constructor call).
  * 										Useless for fully controlled mode.
  * 
- * 	@param {Date} value 				If this is an instance of Javascript Date object or null, it defines that that
- * 										widget is in fully controlled mode and also equals to the date set up at last
- * 										widget opening.
- * 										undefined means that the widget is fully uncontrolled.
+ * 	@param {Date} value 				If this is an instance of Javascript Date object or null, it equals to the
+ * 										widget value. Undefined means that the widget is in fully uncontrolled mode. 
+ * 
+ * 	@param {Date} minDate 				The user can't set the date less than this value. All dates are interpreted as
+ * 										0:00:00 Client Time. The prop works properly with one day resolution.
+ * 
+ * 	@param {Date} maxDate 				The user can't set the date greater than this value. All dates are interpreted
+ * 										as 0:00:00 Client Time.  The prop works properlt with one day resolution.
  * ---------------------------------------------------------------------------------------------------------------------
  * 
  * 	State:
@@ -258,8 +262,7 @@ export default class Calendar extends DropDownInput{
 			month: null,
 			year: null,
 		});
-		event.value = date;
-		this.handleMenuClose(event);
+		this.handleMenuClose({...event, value: date});
 	}
 
 	/** Handles the input change of the box. (The state must be changed.)
@@ -405,11 +408,7 @@ export default class Calendar extends DropDownInput{
 			});
 		}
 		if (this.props.onInputChange){
-			event.value = date;
-			if (this.props.value !== undefined){ /* In fully controlled mode: trigger the componentDidUpdate! */
-				this.setState({value: undefined});
-			}
-			this.props.onInputChange(event);
+			this.props.onInputChange({...event, value: date});
 		}
 	}
 
@@ -506,20 +505,26 @@ export default class Calendar extends DropDownInput{
 		if (this.isDate(this.props.value)){
 			let value = new Date(this.props.value);
 			value = this._correctDateAccordingToProps(value);
-			this.setState({
-				value: value,
-				inputBoxRawValue: value.toLocaleDateString(),
-				inputBoxValue: value.toLocaleDateString(),
-			});
+			if (this.state.value === null || this.state.value.getTime() !== value.getTime()){
+				this.setState({
+					value: value,
+					month: value.getMonth(),
+					year: value.getFullYear(),
+					inputBoxRawValue: value.toLocaleDateString(),
+					inputBoxValue: value.toLocaleDateString(),
+				});
+			}
 		} else if (this.props.value === null){
-			this.setState({
-				value: null,
-				inputBoxRawValue: null,
-				inputBoxValue: null,
-			});
-		} else {
-			throw new Error(`The 'value' prop can't be ${this.props.value}: 
-				either a valid Date object or null or undefined`);
+			let currentDate = new Date();
+			if (this.state.value !== null){
+				this.setState({
+					value: null,
+					month: currentDate.getMonth(),
+					year: currentDate.getFullYear(),
+					inputBoxRawValue: null,
+					inputBoxValue: null,
+				});
+			}
 		}
 	}
 
@@ -645,8 +650,7 @@ export default class Calendar extends DropDownInput{
 	}
 
 	componentDidUpdate(prevProps, prevState){
-		if (this.props.value !== undefined /* In case of fully controlled state, */
-			&& this.state.value === undefined){ /* Given that the state has been cleared previously */
+		if (this.props.value !== undefined && !this.state.isOpened){
 			this._deriveStateFromProps();
 		}
 	}

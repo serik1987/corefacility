@@ -38,8 +38,8 @@ export default class ListLoader extends Loader{
 			_error:  null,
 		}
 
-		this._filter = this.deriveFilterFromProps(this.props);
-		this._desiredFilterIdentity = this.deriveFilterIdentityFromProps(this.props);
+		this._filter = this.deriveFilterFromPropsAndState(this.props, this.state);
+		this._desiredFilterIdentity = this.deriveFilterIdentityFromPropsAndState(this.props, this.state);
 	}
 
 	/** Returns class of the entity which list must be downloaded from the external server
@@ -58,10 +58,12 @@ export default class ListLoader extends Loader{
 
 	/** Uses the component props (and probably state?) to identify the filter.
 	 *  @abstract
+	 * 	@param {object} props props that must be used to calculate the filter.
+	 * 	@param {object} state the state that must be used to calculate the filter
 	 * 	@return {object} the filter that will be passed as a single argument to the
 	 * 	entity's find function
 	 */
-	deriveFilterFromProps(){
+	deriveFilterFromPropsAndState(props, state){
 		throw new NotImplementedError("deriveFilterFromProps");
 	}
 
@@ -72,9 +74,10 @@ export default class ListLoader extends Loader{
 	 * 		- if the user adjusted at least on of the filter property, the string changes
 	 * 	@abstract
 	 * 	@return {object} props props for which the filter must be calculated
+	 * 	@return {object} state state for which the filter must be calculated
 	 * 	@return {string} the filter identity
 	 */
-	deriveFilterIdentityFromProps(props){
+	deriveFilterIdentityFromPropsAndState(props, state){
 		throw new NotImplementedError("deriveFilterIdentity");
 	}
 
@@ -183,8 +186,8 @@ export default class ListLoader extends Loader{
 	}
 
 	shouldComponentUpdate(props, state){
-		this._filter = this.deriveFilterFromProps(props);
-		this._desiredFilterIdentity = this.deriveFilterIdentityFromProps(props);
+		this._filter = this.deriveFilterFromPropsAndState(props, state);
+		this._desiredFilterIdentity = this.deriveFilterIdentityFromPropsAndState(props, state);
 
 		return true;
 	}
@@ -204,7 +207,7 @@ export default class ListLoader extends Loader{
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot){
-		if (this._desiredFilterIdentity !== this._actualFilterIdentity){
+		if (this._desiredFilterIdentity !== this._actualFilterIdentity && !this.isLoading){
 			this.reload();
 		}
 	}

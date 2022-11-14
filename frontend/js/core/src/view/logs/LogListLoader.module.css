@@ -1,5 +1,5 @@
 .filter{
 	display: grid;
-	grid-template-columns: max-content 300px;
+	grid-template-columns: max-content max-content;
 	grid-gap: 10px;
 }

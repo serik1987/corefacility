@@ -4,7 +4,7 @@ import Log from '../../model/entity/log.mjs';
 import CoreListLoader from '../base/CoreListLoader.jsx';
 import Label from '../base/Label.jsx';
 import TextInput from '../base/TextInput.jsx';
-import Calendar from '../base/Calendar.jsx';
+import DateRange from '../base/DateRange.jsx';
 import LogList from './LogList.jsx';
 import styles from './LogListLoader.module.css';
 
@@ -29,9 +29,12 @@ export default class LogListLoader extends CoreListLoader{
 
 	constructor(props){
 		super(props);
+		this.handleRequestDate = this.handleRequestDate.bind(this);
 
 		this.state = {
 			...this.state,
+			requestDateFrom: null,
+			requestDateTo: null,
 		}
 	}
 
@@ -47,8 +50,15 @@ export default class LogListLoader extends CoreListLoader{
 	 * 	@return {object} the filter that will be passed as a single argument to the
 	 * 	entity's find function
 	 */
-	deriveFilterFromProps(){
-		return {}
+	deriveFilterFromPropsAndState(props, state){
+		let queryParams = {};
+		if (state.requestDateFrom){
+			queryParams.from = state.requestDateFrom.toISOString();
+		}
+		if (state.requestDateTo){
+			queryParams.to = state.requestDateTo.toISOString();
+		}
+		return queryParams;
 	}
 
 	/** The function transforms the filter props (and pronbably the state?) to
@@ -60,14 +70,25 @@ export default class LogListLoader extends CoreListLoader{
 	 * 	@return {object} props props for which the filter must be calculated
 	 * 	@return {string} the filter identity
 	 */
-	deriveFilterIdentityFromProps(props){
-		return "";
+	deriveFilterIdentityFromPropsAndState(props, state){
+		let requestDateFrom = state.requestDateFrom ? state.requestDateFrom.toISOString() : "";
+		let requestDateTo = state.requestDateTo ? state.requestDateTo.toISOString() : "";
+		return `${requestDateFrom};${requestDateTo}`;
 	}
 
 	/** The header to be displayed on the top.
 	 */
 	get listHeader(){
 		return t("Logs");
+	}
+
+	/** Triggers when the user clicks on the request date
+	 */
+	handleRequestDate(event){
+		this.setState({
+			requestDateFrom: event.from,
+			requestDateTo: event.to,
+		});
 	}
 
 	/**	Renders the filter
@@ -77,7 +98,12 @@ export default class LogListLoader extends CoreListLoader{
 		return (
 			<div className={styles.filter}>
 				<Label>{t("Request date")}</Label>
-				<Calendar inactive={this.isLoading}/>
+				<DateRange
+					inactive={this.isLoading}
+					onInputChange={this.handleRequestDate}
+					dateFrom={this.state.requestDateFrom}
+					dateTo={this.state.requestDateTo}
+				/>
 				<Label>{t("User")}</Label>
 				<TextInput inactive={this.isLoading}/>
 				<Label>{t("IP address")}</Label>

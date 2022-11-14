@@ -18,10 +18,11 @@ export default class UserListEditor extends CoreListEditor{
 
 	/** Uses the component props (and probably state?) to identify the filter.
 	 *  @param {object} props props that will be used to calculate the filter
+	 * 	@param {object} state state that will be used to calculate the filter
 	 * 	@return {object} the filter that will be passed as a single argument to the
 	 * 	entity's find function
 	 */
-	deriveFilterFromProps(props){
+	deriveFilterFromPropsAndState(props, state){
 		if (props.q !== null && props.q !== undefined){
 			return {profile: 'basic', q: props.q};
 		} else {
@@ -35,9 +36,10 @@ export default class UserListEditor extends CoreListEditor{
 	 * 		- if the user did not adjust the filter, the string remains to be unchanged
 	 * 		- if the user adjusted at least on of the filter property, the string changes
 	 *  @param {object} props the filter props that will be used to calculate the identity
+	 * 	@param {object} state the state that will be used to calculate the identity
 	 * 	@return {string} the filter identity
 	 */
-	deriveFilterIdentityFromProps(props){
+	deriveFilterIdentityFromPropsAndState(props, state){
 		if (props.q !== null && props.q !== undefined){
 			return props.q;
 		} else {

@@ -22,10 +22,12 @@ export default class DropDown extends React.Component{
 
 	constructor(props){
 		super(props);
+		this.handleItemClick = this.handleItemClick.bind(this);
 		this.handleMenuClose = this.handleMenuClose.bind(this);
 		this.changeAlignState = this.changeAlignState.bind(this);
 		this.__registerSlideDown = this.__registerSlideDown.bind(this);
 		this.__slideDown = null;
+		this.__ref = React.createRef();
 
 		this.state = {
 			menuAlignMode: styles.align_left,
@@ -64,6 +66,10 @@ export default class DropDown extends React.Component{
 		}
 	}
 
+	handleItemClick(event){
+		event.stopPropagation();
+	}
+
 	render(){
 		let menuClasses = ` ${styles.slide_down} ${this.state.menuAlignMode}`;
 		if (this.props.cssSuffix){
@@ -73,7 +79,8 @@ export default class DropDown extends React.Component{
 		return (
 			<div
 				className={`${styles.drop_down} drop-down`}
-				onClick={event => event.stopPropagation()}
+				onClick={this.handleItemClick}
+				ref={this.__ref}
 				>
 					<div className={styles.caption}>
 						{this.props.caption}

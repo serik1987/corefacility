@@ -86,8 +86,7 @@ export default class Input extends React.Component{
 			value = null;
 		}
 		if (this.props.onInputChange){
-			event.value = value;
-			this.props.onInputChange(event);
+			this.props.onInputChange({...event, value: value});
 		}
 	}
 

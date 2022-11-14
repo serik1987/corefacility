@@ -25,6 +25,8 @@
 	"Continue": "Продолжить",
 	"Yes": "Да",
 	"No": "Нет",
+	"From": "От",
+	"To": "До",
 
 	"Mon": "Пн",
 	"Tue": "Вт",
@@ -126,6 +128,7 @@
 	"Synchronization": "Синхронизация",
 
 	"Logs": "Журнал посещений",
+	"There are no requests satisfying given filter conditions.": "Не обнаружено ни одного запроса, удовлетворяющего критериям фильтров.",
 	"Viewing logs": "Просмотр журнала посещений",
 	"anonymous": "анонимный пользователь",
 	"Request method": "Метод запроса",

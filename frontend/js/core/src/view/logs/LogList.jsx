@@ -139,4 +139,11 @@ export default class LogList extends PaginatedList{
         );
     }
 
+    render(){
+        if (this.state.itemArray.length === 0 && !this.isLoading){
+            return <p className={styles.no_logs}>{t("There are no requests satisfying given filter conditions.")}</p>;
+        }
+        return super.render();
+    }
+
 }
