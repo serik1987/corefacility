@@ -79,8 +79,8 @@ export default class BooleanInput extends React.Component{
         let value = !this.value;
         this.setState({value: value});
         if (this.props.onInputChange){
-            event.value = event.target.value = value;
-            this.props.onInputChange(event);
+            event.target.value = value;
+            this.props.onInputChange({...event, value: value});
         }
     }
 

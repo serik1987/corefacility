@@ -136,7 +136,13 @@
 	"Request date": "Дата посещения",
 	"IP address": "IP-адрес",
 	"Response status": "Статус ответа",
+	"all": "все",
+	"certain": "определённый пользователь",
+	"All users": "Все пользователи",
+	"Anonymous requests only": "Только анонимные запросы",
+	"Requests from a given user": "Запросы только от определённого пользователя",
 	"Shows only those requests that has been sent by a certain user.": "Показать только те запросы, которые были отправлены конкретным пользователем.",
+	"Please, specify surname, name or login of such a user...": "Пожалуйста, уточните фамилию, имя или логин этого пользователя...",
 
 	"Applications Settings": "Настройки приложений"
 }

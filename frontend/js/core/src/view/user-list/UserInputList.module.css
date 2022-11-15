@@ -1,0 +1,45 @@
+.item_container{
+	display: flex;
+	margin: 8px 0;
+	height: 36px;
+	align-items: center;
+}
+
+.item_container:first-child{
+	margin-top: 0;
+}
+
+.item_container:last-child{
+	margin-bottom: 0;
+}
+
+.image_box{
+	margin-left: 8px;
+	margin-right: 12px;
+	flex: 0;
+	width: 32px;
+	height: 32px;
+}
+
+.image_box img{
+	border-radius: 50%;
+	width: 32px;
+	height: 32px;
+}
+
+.data_box{
+	flex: 1;
+	height: 36px;
+}
+
+.data_box .title_box{
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 20px;
+}
+
+.data_box .login_box{
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 16px;
+}

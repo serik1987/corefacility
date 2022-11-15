@@ -5,9 +5,19 @@ import CoreListLoader from '../base/CoreListLoader.jsx';
 import Label from '../base/Label.jsx';
 import TextInput from '../base/TextInput.jsx';
 import DateRange from '../base/DateRange.jsx';
+import RadioInput from '../base/RadioInput.jsx';
+import RadioButton from '../base/RadioButton.jsx';
 import UserInput from '../user-list/UserInput.jsx';
 import LogList from './LogList.jsx';
 import styles from './LogListLoader.module.css';
+
+
+const UserFilterOption = {
+	ALL: Symbol("all"),
+	ANONYMOUS: Symbol("anonymous"),
+	CERTAIN: Symbol("certain"),
+}
+Object.freeze(UserFilterOption);
 
 
 /** Represents list of all logs, allows to filter them by some criteria.
@@ -31,12 +41,14 @@ export default class LogListLoader extends CoreListLoader{
 	constructor(props){
 		super(props);
 		this.handleRequestDate = this.handleRequestDate.bind(this);
+		this.handleUserFilterSelect = this.handleUserFilterSelect.bind(this);
 		this.handleUserSelect = this.handleUserSelect.bind(this);
 
 		this.state = {
 			...this.state,
 			requestDateFrom: null,
 			requestDateTo: null,
+			userFilter: UserFilterOption.ALL,
 			user: null,
 		}
 	}
@@ -104,6 +116,12 @@ export default class LogListLoader extends CoreListLoader{
 		this.setState({user: user});
 	}
 
+	/** Handles selection of a proper user filter.
+	 */
+	handleUserFilterSelect(event){
+		this.setState({userFilter: event.value});
+	}
+
 	/**	Renders the filter
 	 * 	@return {React.Component} all filter widgets to be rendered
 	 */
@@ -123,11 +141,41 @@ export default class LogListLoader extends CoreListLoader{
 					dateTo={this.state.requestDateTo}
 				/>
 				<Label>{t("User")}</Label>
-				<UserInput
-					inactive={this.isLoading}
-					tooltip={t("Shows only those requests that has been sent by a certain user.")}
-					onItemSelect={this.handleUserSelect}
-				/>
+				<div className={styles.user_selector}>
+					<RadioInput
+					    className={styles.user_filter_selector}
+					    onInputChange={this.handleUserFilterSelect}
+					    value={this.state.userFilter}
+					    >
+                            <RadioButton
+                                value={UserFilterOption.ALL}
+                                tooltip={t("All users")}
+                                inactive={this.isLoading}
+                                >
+                                    {t("all")}
+                            </RadioButton>
+                            <RadioButton
+                                value={UserFilterOption.ANONYMOUS}
+                                tooltip={t("Anonymous requests only")}
+                                inactive={this.isLoading}
+                                >
+                                    {t("anonymous")}
+                            </RadioButton>
+                            <RadioButton
+                                value={UserFilterOption.CERTAIN}
+                                tooltip={t("Requests from a given user")}
+                                inactive={this.isLoading}
+                                >
+                                    {t("certain")}
+                            </RadioButton>
+					</RadioInput>
+					<UserInput
+						inactive={this.isLoading}
+						tooltip={t("Shows only those requests that has been sent by a certain user.")}
+						placeholder={t("Please, specify surname, name or login of such a user...")}
+						onItemSelect={this.handleUserSelect}
+					/>
+				</div>
 				<Label>{t("IP address")}</Label>
 				<TextInput inactive={this.isLoading}/>
 				<Label>{t("Response status")}</Label>

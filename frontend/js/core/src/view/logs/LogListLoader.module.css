@@ -3,3 +3,15 @@
 	grid-template-columns: max-content max-content;
 	grid-gap: 10px;
 }
+
+.user_selector{
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	align-items: stretch;
+}
+
+.user_filter_selector{
+	display: flex;
+	gap: 30px;
+}
