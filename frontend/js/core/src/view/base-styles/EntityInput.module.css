@@ -1,0 +1,5 @@
+.error_message.is_opened{
+	display: block;
+	padding: 10px 25px;
+	height: auto;
+}

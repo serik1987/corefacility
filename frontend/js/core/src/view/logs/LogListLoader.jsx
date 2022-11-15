@@ -5,6 +5,7 @@ import CoreListLoader from '../base/CoreListLoader.jsx';
 import Label from '../base/Label.jsx';
 import TextInput from '../base/TextInput.jsx';
 import DateRange from '../base/DateRange.jsx';
+import UserInput from '../user-list/UserInput.jsx';
 import LogList from './LogList.jsx';
 import styles from './LogListLoader.module.css';
 
@@ -30,11 +31,13 @@ export default class LogListLoader extends CoreListLoader{
 	constructor(props){
 		super(props);
 		this.handleRequestDate = this.handleRequestDate.bind(this);
+		this.handleUserSelect = this.handleUserSelect.bind(this);
 
 		this.state = {
 			...this.state,
 			requestDateFrom: null,
 			requestDateTo: null,
+			user: null,
 		}
 	}
 
@@ -58,6 +61,9 @@ export default class LogListLoader extends CoreListLoader{
 		if (state.requestDateTo){
 			queryParams.to = state.requestDateTo.toISOString();
 		}
+		if (state.user){
+			queryParams.user = state.user.id;
+		}
 		return queryParams;
 	}
 
@@ -73,7 +79,8 @@ export default class LogListLoader extends CoreListLoader{
 	deriveFilterIdentityFromPropsAndState(props, state){
 		let requestDateFrom = state.requestDateFrom ? state.requestDateFrom.toISOString() : "";
 		let requestDateTo = state.requestDateTo ? state.requestDateTo.toISOString() : "";
-		return `${requestDateFrom};${requestDateTo}`;
+		let user = state.user ? state.user.id : "null";
+		return `${requestDateFrom};${requestDateTo};${user}`;
 	}
 
 	/** The header to be displayed on the top.
@@ -91,10 +98,21 @@ export default class LogListLoader extends CoreListLoader{
 		});
 	}
 
+	/** Handles selection of a proper user.
+	 */
+	handleUserSelect(user){
+		this.setState({user: user});
+	}
+
 	/**	Renders the filter
 	 * 	@return {React.Component} all filter widgets to be rendered
 	 */
 	renderFilter(){
+		let userIdentity = null;
+		if (this.state.user){
+			userIdentity = this.state.user.surname || this.state.user.login;
+		}
+
 		return (
 			<div className={styles.filter}>
 				<Label>{t("Request date")}</Label>
@@ -105,7 +123,11 @@ export default class LogListLoader extends CoreListLoader{
 					dateTo={this.state.requestDateTo}
 				/>
 				<Label>{t("User")}</Label>
-				<TextInput inactive={this.isLoading}/>
+				<UserInput
+					inactive={this.isLoading}
+					tooltip={t("Shows only those requests that has been sent by a certain user.")}
+					onItemSelect={this.handleUserSelect}
+				/>
 				<Label>{t("IP address")}</Label>
 				<TextInput inactive={this.isLoading}/>
 				<Label>{t("Response status")}</Label>

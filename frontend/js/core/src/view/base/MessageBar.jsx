@@ -18,18 +18,25 @@ import {ReactComponent as ErrorImage} from '../base-svg/error.svg';
  * 	
  * 	Component props:
  * 		@param {boolean} isLoading 		true if the message bar is in 'Loading' state
+ * 
  * 		@param {boolean} isError		true if the message bar is in 'error' state.
  * 										if both props (i.e., isLoading and isError) are true, the message
  * 										bar is considered to be in 'error' state
+ * 
  * 		@param {string} loadingMessage 	the loading message to show if the message bar is in 'loading'
  * 										state. This prop is not applied if the message bar is not in the
  * 										loading state.
+ * 
  * 		@param {Error} error 			The error class to be shown. This props is inaffected when the
  * 										message bar state is not 'error'
+ * 
  * 		@param {boolean} isAnimatable	true if the state transition shall be animated, false otherwise
+ * 
  * 		@param {boolean} isInline		true if the bar is inline (no padding, no border, inline-block)
  * 										false if the bar is not inline (padding - 114px on the left, 30px
  * 										on the right, very thin border below, block)
+ * 
+ * 		@param {string} cssSuffix 		Additional CSS classes defined by the parent
  * 
  * 	The component is fully stateless.
  * 
@@ -72,6 +79,7 @@ export default class MessageBar extends React.Component{
 		let icon;
 		let animatableClass = this.props.isAnimatable ? ` ${styles.animatable}` : '';
 		let inlineClass = this.props.isInline ? ` ${styles.inline}` : '';
+		let cssClasses = this.props.cssSuffix ? ` ${this.props.cssSuffix}` : '';
 
 		if (this.props.isError){
 			messageBoxClass = ` ${styles.is_opened} ${styles.is_error}`;
@@ -88,7 +96,7 @@ export default class MessageBar extends React.Component{
 		}
 
 		return (
-			<div className={`${styles.message_bar}${messageBoxClass}${animatableClass}${inlineClass}`}>
+			<div className={`${styles.message_bar}${messageBoxClass}${animatableClass}${inlineClass}${cssClasses}`}>
 				{icon}
 				<p>{message}</p>
 			</div>

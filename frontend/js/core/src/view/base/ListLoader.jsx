@@ -64,7 +64,7 @@ export default class ListLoader extends Loader{
 	 * 	entity's find function
 	 */
 	deriveFilterFromPropsAndState(props, state){
-		throw new NotImplementedError("deriveFilterFromProps");
+		throw new NotImplementedError("deriveFilterFromPropsAndState");
 	}
 
 	/** The function transforms the filter props (and pronbably the state?) to
@@ -78,7 +78,7 @@ export default class ListLoader extends Loader{
 	 * 	@return {string} the filter identity
 	 */
 	deriveFilterIdentityFromPropsAndState(props, state){
-		throw new NotImplementedError("deriveFilterIdentity");
+		throw new NotImplementedError("deriveFilterIdentityFromPropsAndState");
 	}
 
 	/** The item list that has been recently loaded.

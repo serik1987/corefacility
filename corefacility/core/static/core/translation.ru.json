@@ -136,6 +136,7 @@
 	"Request date": "Дата посещения",
 	"IP address": "IP-адрес",
 	"Response status": "Статус ответа",
+	"Shows only those requests that has been sent by a certain user.": "Показать только те запросы, которые были отправлены конкретным пользователем.",
 
 	"Applications Settings": "Настройки приложений"
 }

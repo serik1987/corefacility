@@ -10,12 +10,6 @@ import styles from '../base-styles/DropDownInput.module.css';
  * 	The drop down box will slide down when the input element is in focus and will slide up when the input element
  * 	blurred.
  * 
- * 	All components of this class can work in fully uncontrolled mode only. However, any subclass may define its
- * 	own fully controlled mode.
- * 
- * 	The drop down input is stated to work in fully uncontrolled mode if its value widget is fully defined by the
- * 	widget's internal state. The parent component doesn't have to do anything but this is unable to set up the value.
- * 
  * 	Props:
  * ---------------------------------------------------------------------------------------------------------------------
  * 	@param {boolean} inactive			if true, the input box will be inactive and hence will not expand or contract
@@ -25,19 +19,30 @@ import styles from '../base-styles/DropDownInput.module.css';
  * 
  *	@param {string} error				The error message that will be printed when validation fails
  * 
- *	@param {string} htmlType			Type of the HTML's input element. For list of available types see here:
- * 											https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#input_types
- * 										The following types are supported: email, password, search, tel, text, url
- * 
  *	@param {string} tooltip				Detailed description of the field
  * 
  *  @param {string} placeholder			The input placeholder
+ * 
+ * 	@param {callback} onOpened	 		Triggers when the user opens the drop-down box
+ * 
+ * 	@param {callback} onClosed			Triggers when the user closes the drop-down box
+ * 
+ * 	@oaram {boolean} isOpened 			true if the the drop-down is opened, false otherwise. Overrides the isOpened
+ * 										state
+ * 
+ * 	@param {string} inputBoxValue		Current value of the input box when it works in fully controlled mode.
+ * 										Overrides the isOpened state.
+ * 
+ * 	@param {string} inputBoxRawValue	The same as value but before input preprocessing (removing leading and trailing
+ * 										whitespaces etc.)
  * ---------------------------------------------------------------------------------------------------------------------
  * 
  * 	State:
  * ---------------------------------------------------------------------------------------------------------------------
- * 	@param {string} inputBoxValue		Current value of the input box when it works in fully uncontrolled mode.
- * 										Useless when it works in fully controlled mode.
+ * 	@oaram {boolean} isOpened 			true if the the drop-down is opened, false otherwise.
+ * 
+ * 	@param {string} inputBoxValue		Current value of the input box.
+ * 
  * 	@param {string} inputBoxRawValue	The same as value but before input preprocessing (removing leading and trailing
  * 										whitespaces etc.)
  * ---------------------------------------------------------------------------------------------------------------------
@@ -75,6 +80,9 @@ export default class DropDownInput extends React.Component{
 	 */
 	handleFocus(event){
 		this.setState({isOpened: true});
+		if (this.props.onOpened){
+			this.props.onOpened(event);
+		}
 	}
 
 	/** Handles blur from the input element. (Does nothing but subclasses must redefine it.)
@@ -89,6 +97,9 @@ export default class DropDownInput extends React.Component{
 	 */
 	handleMenuClose(event){
 		this.setState({isOpened: false});
+		if (this.props.onClosed){
+			this.props.onClosed(event);
+		}
 	}
 
 	/** Handles the input change of the box. (The state must be changed.)
@@ -101,6 +112,26 @@ export default class DropDownInput extends React.Component{
 			inputBoxRawValue: event.target.value,
 			inputBoxValue: event.value,
 		});
+	}
+
+	/** Imperative React: selects a given value, that is:
+	 * 	enters this value to the input box
+	 * 	closes the drop-down.
+	 * 	Triggers the onClosed event.
+	 * 
+	 * 	@param {string} value 	The value that shall be selected
+	 * 	@return {undefined}
+	 * 
+	 */
+	selectValue(value){
+		this.setState({
+			isOpened: false,
+			inputBoxRawValue: value,
+			inputBoxValue: value,
+		});
+		if (this.props.onClosed){
+			this.props.onClosed({});
+		}
 	}
 
 	/** Renders children inside the drop down
@@ -132,6 +163,18 @@ export default class DropDownInput extends React.Component{
 					{this.renderChildren()}
 			</DropDown>
 		);
+	}
+
+	componentDidUpdate(prevProps, prevState){
+		if (this.props.isOpened !== undefined && this.state.isOpened !== this.props.isOpened){
+			this.setState({isOpened: this.props.isOpened});
+		}
+		if (this.props.inputBoxRawValue !== undefined && this.state.inputBoxRawValue !== this.props.inputBoxRawValue){
+			this.setState({inputBoxRawValue: this.props.inputBoxRawValue});
+		}
+		if (this.props.inputBoxValue !== undefined && this.state.inputBoxValue !== this.props.inputBoxValue){
+			this.setState({inputBoxValue: this.props.inputBoxValue});
+		}
 	}
 
 }

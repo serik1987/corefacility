@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from .entity_set import EntitySet
+from ..entity_exceptions import EntityNotFoundException
 from ..entity_readers.log_reader import LogReader
 
 
@@ -21,6 +22,23 @@ class LogSet(EntitySet):
         "ip_address": [str, None],
         "user": ["core.entity.user.User", None],
     }
+
+    def get(self, lookup):
+        """
+        Finds the entity by id or alias
+        Entity ID is an entity unique number assigned by the database storage engine during the entity save
+        to the database.
+        Entity alias is a unique string name assigned by the user during the entity post.
+
+        The function must be executed in one request
+
+        :param lookup: either entity id or entity alias
+        :return: the Entity object or DoesNotExist if such entity have not found in the database
+        """
+        if isinstance(lookup, str):
+            raise EntityNotFoundException()
+        else:
+            return super().get(lookup)
 
     def rotate(self, up_to: datetime) -> str:
         """
