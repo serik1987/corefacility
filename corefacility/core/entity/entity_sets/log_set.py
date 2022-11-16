@@ -22,6 +22,8 @@ class LogSet(EntitySet):
         "ip_address": [str, None],
         "user": ["core.entity.user.User", None],
         "is_anonymous": [bool, None],
+        "is_success": [bool, None],
+        "is_fail": [bool, None],
     }
 
     def get(self, lookup):

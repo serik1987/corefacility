@@ -26,6 +26,13 @@ const IpFilterOption = {
 }
 Object.freeze(IpFilterOption);
 
+const ResponseStatusFilterOption = {
+	ANY: Symbol("any"),
+	SUCCESSES: Symbol("successes"),
+	FAILS: Symbol("fails"),
+}
+Object.freeze(ResponseStatusFilterOption);
+
 
 /** Represents list of all logs, allows to filter them by some criteria.
  * 
@@ -205,6 +212,7 @@ export default class LogListLoader extends CoreListLoader{
 		this.handleIpFilterSelect = this.handleIpFilterSelect.bind(this);
 		this.handleIpInput = this.handleIpInput.bind(this);
 		this.handleIpFilter = this.handleIpFilter.bind(this);
+		this.handleStatusFilter = this.handleStatusFilter.bind(this);
 
 		this.state = {
 			...this.state,
@@ -216,6 +224,7 @@ export default class LogListLoader extends CoreListLoader{
 			ip: null,
 			ipInput: null,
 			ipError: null,
+			statusFilter: ResponseStatusFilterOption.ANY,
 		}
 	}
 
@@ -253,6 +262,15 @@ export default class LogListLoader extends CoreListLoader{
 		if (state.ipFilter === IpFilterOption.CERTAIN){
 			queryParams.ip_address = state.ip;
 		}
+		switch (state.statusFilter){
+			case ResponseStatusFilterOption.SUCCESSES:
+				queryParams.successes = "yes";
+				break;
+			case ResponseStatusFilterOption.FAILS:
+				queryParams.fails = "yes";
+				break;
+			default:
+		}
 		return queryParams;
 	}
 
@@ -270,8 +288,10 @@ export default class LogListLoader extends CoreListLoader{
 		let requestDateTo = state.requestDateTo ? state.requestDateTo.toISOString() : "";
 		let userFilter = state.userFilter ? state.userFilter.toString() : UserFilterOption.ALL.toString();
 		let user = state.user ? state.user.id : "null";
-		let ip = (state.ipFilter === IpFilterOption.CERTAIN && state.ip !== null) ? state.ip : "";	
-		return `${requestDateFrom};${requestDateTo};${userFilter};${user};${ip}`;
+		let ip = (state.ipFilter === IpFilterOption.CERTAIN && state.ip !== null) ? state.ip : "";
+		let responseStatus = state.statusFilter ? state.statusFilter.toString() :
+		    ResponseStatusFilterOption.ANY.toString();
+		return `${requestDateFrom};${requestDateTo};${userFilter};${user};${ip};${responseStatus}`;
 	}
 
 	/** The header to be displayed on the top.
@@ -334,6 +354,12 @@ export default class LogListLoader extends CoreListLoader{
 				ipError: t("Enter a valid IPv4 or IPv6 address."),
 			});
 		}
+	}
+
+	/** Handles the status filter
+	 */
+	handleStatusFilter(event){
+		this.setState({statusFilter: event.value});
 	}
 
 	/**	Renders the filter
@@ -434,7 +460,34 @@ export default class LogListLoader extends CoreListLoader{
 				</div>
 
 				<Label>{t("Response status")}</Label>
-				<TextInput inactive={this.isLoading}/>
+				<RadioInput
+					value={this.state.statusFilter}
+					className={styles.radio_layout}
+					onInputChange={this.handleStatusFilter}
+					inactive={this.isLoading}
+					>
+						<RadioButton
+						    value={ResponseStatusFilterOption.ANY}
+						    tooltip={t("Display all responses")}
+						    inactive={this.isLoading}
+						    >
+							    {t("any")}
+						</RadioButton>
+						<RadioButton
+						    value={ResponseStatusFilterOption.SUCCESSES}
+						    tooltip={t("Display successful responses only")}
+						    inactive={this.isLoading}
+						    >
+							    {t("200-299 only")}
+						</RadioButton>
+						<RadioButton
+						    value={ResponseStatusFilterOption.FAILS}
+						    tooltip={t("Display failed responses only")}
+						    inactive={this.isLoading}
+						    >
+							    {t("400-599 only")}
+						</RadioButton>
+				</RadioInput>
 			</div>
 		);
 	}

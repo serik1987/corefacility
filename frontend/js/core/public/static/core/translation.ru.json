@@ -142,6 +142,8 @@
 	"IP address": "IP-адрес",
 	"Response status": "Статус ответа",
 	"All users": "Все пользователи",
+	"200-299 only": "только 200-299",
+	"400-599 only": "только 400-599",
 	"Anonymous requests only": "Только анонимные запросы",
 	"Requests from a given user": "Запросы только от определённого пользователя",
 	"Shows only those requests that has been sent by a certain user.": "Показать только те запросы, которые были отправлены конкретным пользователем.",
@@ -149,6 +151,9 @@
 	"Show requests sent from any IP address": "Показать запросы, сделанные с любого IP-адреса",
 	"Show requests from a certain IP address": "Показать запросы, сделанные с определённого IP-адреса",
 	"Enter a valid IPv4 or IPv6 address.": "Введите корректный IPv4 или IPv6-адрес",
+	"Display all responses": "Отобразить все ответы",
+	"Display successful responses only": "Отобразить только успешные ответы",
+	"Display failed responses only": "Отобразить только ошибки",
 
 	"Applications Settings": "Настройки приложений"
 }

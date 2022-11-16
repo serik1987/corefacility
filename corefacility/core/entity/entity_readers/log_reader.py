@@ -100,6 +100,30 @@ class LogReader(RawSqlQueryReader):
             for builder in [self.items_builder, self.count_builder]:
                 builder.main_filter &= StringQueryFilter("core_log.user_id IS NULL")
 
+    def apply_is_success_filter(self, is_success):
+        """
+        Selects only logs related to successive responses
+
+        :param is_success: True if you need to apply this filter, False if you need to discard this filter
+        :return: nothing
+        """
+        if is_success:
+            for builder in [self.items_builder, self.count_builder]:
+                builder.main_filter &= StringQueryFilter("core_log.response_status >= 200") & \
+                    StringQueryFilter("core_log.response_status < 299")
+
+    def apply_is_fail_filter(self, is_fail):
+        """
+        Selects only logs related to failed responses
+
+        :param is_fail: True if you need to apply this filter, False if you need to discard this filter
+        :return: nothing
+        """
+        if is_fail:
+            for builder in [self.items_builder, self.count_builder]:
+                builder.main_filter &= StringQueryFilter("core_log.response_status >= 400") & \
+                    StringQueryFilter("core_log.response_status < 599")
+
     def create_external_object(self, log_id, request_date, log_address, request_method, operation_description,
                                request_body, input_data, ip_address, geolocation, response_status, response_body,
                                output_data,
