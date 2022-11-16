@@ -59,7 +59,9 @@ import {ReactComponent as ExclamationMark} from '../base-svg/error.svg';
  * 									will be substituted.
  * 
  * 		@param {function} on404		The function will be evoked when the server received
- * 									error 404 during the reload or update.
+ * 									error 404 during the reload or update. We recommend
+ * 									you to use this.handle404 when the parent widget is
+ * 									an instance of CoreWindow
  * 
  * State:
  * 		@param {object} rawValues	values as they have been entered by the user

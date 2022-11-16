@@ -8,6 +8,7 @@ import App from './base/App.jsx';
 import UserListWindow from './user-list/UserListWindow.jsx';
 import UserDetailWindow from './user-list/UserDetailWindow.jsx';
 import LogListWindow from './logs/LogListWindow.jsx';
+import LogDetailWindow from './logs/LogDetailWindow.jsx';
 import Window404 from './base/Window404.jsx';
 
 
@@ -22,6 +23,7 @@ export default class CoreApp extends App{
 	renderAllRoutes(){
 		return (
 			<Routes>
+				<Route path="/logs/:lookup/" element={<LogDetailWindow/>} />
 				<Route path="/logs/" element={<LogListWindow/>} />
 				<Route path="/users/:lookup/" element={<UserDetailWindow/>} />
 				<Route path="/users/" element={<UserListWindow/>} />

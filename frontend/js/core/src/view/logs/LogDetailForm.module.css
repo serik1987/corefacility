@@ -1,0 +1,61 @@
+.form{
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+
+}
+
+.general_info{
+	display: flex;
+	gap: 20px;
+}
+
+.general_info_section:first-child{
+	flex: 1;
+}
+
+.general_info_section:nth-child(2){
+	flex: 2;
+}
+
+.general_info_section p{
+	margin: 0;
+	font-style: italic;
+}
+
+.detailed_info{
+	display: flex;
+	gap: 16px;
+}
+
+.input_data{
+	flex: 1;
+}
+
+.output_data{
+	flex: 1;
+}
+
+.grid_section{
+	display: grid;
+	grid-template-columns: auto 1fr;
+	grid-gap: 10px;
+	align-items: start;
+}
+
+.grid_section a, .grid_section i{
+	padding-top: 8px;
+}
+
+.grid_section textarea{
+	resize: none;
+	height: 200px;
+	border: 1px solid rgb(217, 217, 217);
+	background-color: rgb(252, 252, 252);
+	padding: 5px;
+	overflow: auto;
+}
+
+.grid_section textarea:focus{
+	outline: none;
+}

@@ -50,6 +50,12 @@ export default class Log extends Entity{
 				.setDescription("Response status"),
 			"user": new RelatedField(User)
 				.setDescription("User"),
+			"log_address": new ReadOnlyField()
+				.setDescription("Request address"),
+			"request_body": new ReadOnlyField()
+				.setDescription("Request body"),
+			"response_body": new ReadOnlyField()
+				.setDescription("Response body"),
 		}
 	}
 

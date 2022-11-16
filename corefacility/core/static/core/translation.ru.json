@@ -17,6 +17,7 @@
 	"Add": "Добавить",
 	"Cancel": "Отменить",
 	"Not Found": "Не найдено",
+	"Not found": "Не найдено",
 	"Save": "Сохранить",
 	"Save and close": "Сохранить и закрыть",
 	"Close without save": "Закрыть без сохранения",
@@ -133,6 +134,7 @@
 	"Synchronization": "Синхронизация",
 
 	"Logs": "Журнал посещений",
+	"Log information": "Информация о посещении",
 	"There are no requests satisfying given filter conditions.": "Не обнаружено ни одного запроса, удовлетворяющего критериям фильтров.",
 	"Viewing logs": "Просмотр журнала посещений",
 	"anonymous": "анонимный",
@@ -140,7 +142,6 @@
 	"Response status": "Статус ответа",
 	"Request date": "Дата посещения",
 	"IP address": "IP-адрес",
-	"Response status": "Статус ответа",
 	"All users": "Все пользователи",
 	"200-299 only": "только 200-299",
 	"400-599 only": "только 400-599",
@@ -154,6 +155,13 @@
 	"Display all responses": "Отобразить все ответы",
 	"Display successful responses only": "Отобразить только успешные ответы",
 	"Display failed responses only": "Отобразить только ошибки",
+	"Input data": "Входные данные",
+	"Output data": "Выходные данные",
+	"Request address": "Адрес запроса",
+	"Request body": "Тело запроса",
+	"Response body": "Тело ответа",
 
-	"Applications Settings": "Настройки приложений"
+	"Applications Settings": "Настройки приложений",
+
+	"User login.": "Авторизация пользователя"
 }
