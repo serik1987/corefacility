@@ -4,14 +4,28 @@
 	grid-gap: 10px;
 }
 
-.user_selector{
+.col_layout{
 	display: flex;
 	flex-direction: column;
 	gap: 5px;
 	align-items: stretch;
 }
 
-.user_filter_selector{
+.radio_layout{
 	display: flex;
 	gap: 30px;
+}
+
+.row_layout{
+	display: flex;
+	align-items: start;
+	gap: 10px;
+}
+
+.row_layout :global .text-input{
+	flex-basis: 300px;
+}
+
+.row_layout :global .primary-button{
+	margin: 0;
 }

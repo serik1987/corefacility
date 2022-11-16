@@ -73,6 +73,19 @@ class EntityViewMixin(SetCookieMixin):
         return filter_function
 
     @classmethod
+    def boolean_filter_function(cls, filter_param):
+        """
+        Returns the boolean filter function. The boolean filter function transforms any value of the query parameter
+        to true and absence of such parameter to False.
+
+        :param filter_param: the parameter to query
+        :return:a boolean filter function
+        """
+        def filter_function(query_params):
+            return filter_param in query_params
+        return filter_function
+
+    @classmethod
     def date_filter_function(cls, filter_param):
         """
         Returns a filter function that finds for an appropriate filter parameter and transforms it to the naive

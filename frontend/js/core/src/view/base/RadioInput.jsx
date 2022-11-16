@@ -82,7 +82,6 @@ export default class RadioInput extends React.Component{
     }
 
     render(){
-        console.log("Rendering radio input...");
         return (
             <div className={this.props.className} onClick={this.handleClick}>
                 {this.props.children.map(component => {

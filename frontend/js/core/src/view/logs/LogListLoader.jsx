@@ -7,6 +7,7 @@ import TextInput from '../base/TextInput.jsx';
 import DateRange from '../base/DateRange.jsx';
 import RadioInput from '../base/RadioInput.jsx';
 import RadioButton from '../base/RadioButton.jsx';
+import PrimaryButton from '../base/PrimaryButton.jsx';
 import UserInput from '../user-list/UserInput.jsx';
 import LogList from './LogList.jsx';
 import styles from './LogListLoader.module.css';
@@ -18,6 +19,12 @@ const UserFilterOption = {
 	CERTAIN: Symbol("certain"),
 }
 Object.freeze(UserFilterOption);
+
+const IpFilterOption = {
+	ANY: Symbol("any"),
+	CERTAIN: Symbol("certain"),
+}
+Object.freeze(IpFilterOption);
 
 
 /** Represents list of all logs, allows to filter them by some criteria.
@@ -38,11 +45,166 @@ Object.freeze(UserFilterOption);
  */
 export default class LogListLoader extends CoreListLoader{
 
+	/** Validates the IPv4 address
+	 * 
+	 * 	@param {string} value 		a value to be validated
+	 * 	@return {boolean} 			true if the value is a valid IP address, false otherwise
+	 */
+	static validateIpv4(value){
+		if (value === null){
+			return false;
+		}
+
+		let isValidIp4 = false;
+		let octets = value.split(".");
+
+		if (octets.length === 4){
+			let invalidOctetFound = false;
+			for (let octet of octets){
+				let octetByte = parseInt(octet);
+				if (!(0 <= octetByte && octetByte <= 255)){
+					invalidOctetFound = true;
+					break;
+				}
+			}
+			isValidIp4 = !invalidOctetFound;
+		}
+
+		return isValidIp4;
+	}
+
+	/** Validates the IPv6 address
+	 * 
+	 * 	@param {string} value 		a value to be validated
+	 * 	@return {boolean} 			true if the value is valid, false otherwise
+	 */
+	static validateIpv6(value){
+	    /* This code is converted from ipaddress.ipaddress._ip_int_from_string using the Python-to-Javacript converter:
+	    	https://extendsclass.com/python-to-javascript.html
+	   	*/
+	   	const _min_parts = 3;
+	   	const _HEXTET_COUNT = 8;
+	   	const _max_parts = _HEXTET_COUNT + 1;
+	   	let _pj;
+		let ip_int, ipv4_int, parts, parts_hi, parts_lo, parts_skipped, skip_index;
+		let i, _pj_a, newParts;
+
+	  	function _pj_snippets(container) {
+  			function in_es6(left, right) {
+    			if (right instanceof Array || typeof right === "string") {
+      				return right.indexOf(left) > -1;
+    			} else {
+      				if (right instanceof Map || right instanceof Set || right instanceof WeakMap || right instanceof WeakSet) {
+        				return right.has(left);
+      				} else {
+        				return left in right;
+      				}
+    			}
+  			}
+
+  			container["in_es6"] = in_es6;
+  			return container;
+		}
+
+		_pj = {};
+		_pj_snippets(_pj);
+
+		if (!value) {
+			return false;
+  		}
+
+  		parts = value.split(":");
+  		if (parts.length < _min_parts) {
+    		return false;
+  		}
+
+  		if (_pj.in_es6(".", parts.slice(-1)[0])) {
+  			let lastPart = parts.pop();
+  			if (!LogListLoader.validateIpv4(lastPart)){
+  				return false;
+  			}
+  			let ipv4Parts = lastPart.split(".")
+  				.map(part => parseInt(part));
+  			let hexReducer = (accumulator, currentValue)  => (accumulator << 8) + currentValue;
+  			let ip4High = ipv4Parts.slice(0, 2).reduce(hexReducer).toString(16);
+  			let ip4Low = ipv4Parts.slice(2, 4).reduce(hexReducer).toString(16);
+  			parts.push(ip4High);
+  			parts.push(ip4Low);
+		}
+
+		if (parts.length > _max_parts){
+			return false;
+		}
+
+		skip_index = null;
+		for (i = 1, _pj_a = parts.length - 1; i < _pj_a; i += 1) {
+			if (!parts[i]) {
+				if (skip_index !== null) {
+					return false;
+				}
+
+				skip_index = i;
+			}
+		}
+
+		if (skip_index !== null) {
+			parts_hi = skip_index;
+			parts_lo = parts.length - skip_index - 1;
+
+			if (!parts[0]) {
+				parts_hi -= 1;
+
+				if (parts_hi) {
+					return false;
+				}
+			}
+
+			if (!parts.slice(-1)[0]) {
+				parts_lo -= 1;
+
+				if (parts_lo) {
+					return false;
+				}
+			}
+
+			parts_skipped = _HEXTET_COUNT - (parts_hi + parts_lo);
+
+			if (parts_skipped < 1) {
+				return false;
+			}
+		} else {
+	    	if (parts.length !== _HEXTET_COUNT) {
+	    		return false;
+	    	}
+
+			if (!parts[0]) {
+				return false;
+	    	}
+
+			if (!parts.slice(-1)[0]) {
+				return false;
+			}
+
+			parts_hi = parts.length;
+			parts_lo = 0;
+			parts_skipped = 0;
+		}
+
+		return parts
+		    .filter(part => part)
+		    .filter(part => !part.match(/^[0-9abcdef]{1,4}$/i))
+		    .length
+		    	=== 0;
+	}
+
 	constructor(props){
 		super(props);
 		this.handleRequestDate = this.handleRequestDate.bind(this);
 		this.handleUserFilterSelect = this.handleUserFilterSelect.bind(this);
 		this.handleUserSelect = this.handleUserSelect.bind(this);
+		this.handleIpFilterSelect = this.handleIpFilterSelect.bind(this);
+		this.handleIpInput = this.handleIpInput.bind(this);
+		this.handleIpFilter = this.handleIpFilter.bind(this);
 
 		this.state = {
 			...this.state,
@@ -50,6 +212,10 @@ export default class LogListLoader extends CoreListLoader{
 			requestDateTo: null,
 			userFilter: UserFilterOption.ALL,
 			user: null,
+			ipFilter: IpFilterOption.ANY,
+			ip: null,
+			ipInput: null,
+			ipError: null,
 		}
 	}
 
@@ -73,8 +239,19 @@ export default class LogListLoader extends CoreListLoader{
 		if (state.requestDateTo){
 			queryParams.to = state.requestDateTo.toISOString();
 		}
-		if (state.user){
-			queryParams.user = state.user.id;
+		switch (state.userFilter){
+			case UserFilterOption.ANONYMOUS:
+				queryParams.anonymous = "yes";
+				break;
+			case UserFilterOption.CERTAIN:
+				if (state.user){
+					queryParams.user = state.user.id;
+				}
+				break;
+			default:
+		}
+		if (state.ipFilter === IpFilterOption.CERTAIN){
+			queryParams.ip_address = state.ip;
 		}
 		return queryParams;
 	}
@@ -91,8 +268,10 @@ export default class LogListLoader extends CoreListLoader{
 	deriveFilterIdentityFromPropsAndState(props, state){
 		let requestDateFrom = state.requestDateFrom ? state.requestDateFrom.toISOString() : "";
 		let requestDateTo = state.requestDateTo ? state.requestDateTo.toISOString() : "";
+		let userFilter = state.userFilter ? state.userFilter.toString() : UserFilterOption.ALL.toString();
 		let user = state.user ? state.user.id : "null";
-		return `${requestDateFrom};${requestDateTo};${user}`;
+		let ip = (state.ipFilter === IpFilterOption.CERTAIN && state.ip !== null) ? state.ip : "";	
+		return `${requestDateFrom};${requestDateTo};${userFilter};${user};${ip}`;
 	}
 
 	/** The header to be displayed on the top.
@@ -122,6 +301,41 @@ export default class LogListLoader extends CoreListLoader{
 		this.setState({userFilter: event.value});
 	}
 
+	/** Handles selection of the type of IP address filter.
+	 */
+	handleIpFilterSelect(event){
+		this.setState({
+			ipFilter: event.value,
+			ipError: null,
+		});
+	}
+
+	/** Handles change in current IP address
+	 */
+	handleIpInput(event){
+		this.setState({
+			ipInput: event.value,
+			ipError: null,
+		});
+	}
+
+	/** Handles submission of the current IP address
+	 */
+	handleIpFilter(event){
+		let value = this.state.ipInput;
+
+		if (LogListLoader.validateIpv4(value) || LogListLoader.validateIpv6(value)){
+			this.setState({
+				ip: this.state.ipInput,
+				ipError: null,
+			});
+		} else {
+			this.setState({
+				ipError: t("Enter a valid IPv4 or IPv6 address."),
+			});
+		}
+	}
+
 	/**	Renders the filter
 	 * 	@return {React.Component} all filter widgets to be rendered
 	 */
@@ -140,10 +354,11 @@ export default class LogListLoader extends CoreListLoader{
 					dateFrom={this.state.requestDateFrom}
 					dateTo={this.state.requestDateTo}
 				/>
-				<Label>{t("User")}</Label>
-				<div className={styles.user_selector}>
+
+				<Label>{t("Users")}</Label>
+				<div className={styles.col_layout}>
 					<RadioInput
-					    className={styles.user_filter_selector}
+					    className={styles.radio_layout}
 					    onInputChange={this.handleUserFilterSelect}
 					    value={this.state.userFilter}
 					    >
@@ -169,15 +384,55 @@ export default class LogListLoader extends CoreListLoader{
                                     {t("certain")}
                             </RadioButton>
 					</RadioInput>
-					<UserInput
-						inactive={this.isLoading}
-						tooltip={t("Shows only those requests that has been sent by a certain user.")}
-						placeholder={t("Please, specify surname, name or login of such a user...")}
-						onItemSelect={this.handleUserSelect}
-					/>
+					{this.state.userFilter === UserFilterOption.CERTAIN &&
+						<UserInput
+							inactive={this.isLoading}
+							tooltip={t("Shows only those requests that has been sent by a certain user.")}
+							placeholder={t("Please, specify surname, name or login of such a user...")}
+							onItemSelect={this.handleUserSelect}
+						/>
+					}
 				</div>
+
 				<Label>{t("IP address")}</Label>
-				<TextInput inactive={this.isLoading}/>
+				<div className={styles.col_layout}>
+					<RadioInput
+						className={styles.radio_layout}
+						onInputChange={this.handleIpFilterSelect}
+						value={this.state.ipFilter}
+						>
+							<RadioButton
+								value={IpFilterOption.ANY}
+								tooltip={t("Show requests sent from any IP address")}
+								inactive={this.isLoading}
+								>
+									{t("any")}
+							</RadioButton>
+							<RadioButton
+								value={IpFilterOption.CERTAIN}
+								tooltip={t("Show requests from a certain IP address")}
+								inactive={this.isLoading}
+								>
+									{t("certain")}
+							</RadioButton>
+					</RadioInput>
+					{this.state.ipFilter === IpFilterOption.CERTAIN &&
+						<div className={styles.row_layout}>
+							<TextInput
+								value={this.state.ipInput}
+								inactive={this.isLoading}
+								tooltip={t("Show requests from a certain IP address")}
+								placeholder={t("Please, specify...")}
+								onInputChange={this.handleIpInput}
+								error={this.state.ipError}
+							/>
+							<PrimaryButton type="submit" onClick={this.handleIpFilter} inactive={this.isLoading}>
+								{t("Apply")}
+							</PrimaryButton>
+						</div>
+					}
+				</div>
+
 				<Label>{t("Response status")}</Label>
 				<TextInput inactive={this.isLoading}/>
 			</div>
@@ -185,6 +440,7 @@ export default class LogListLoader extends CoreListLoader{
 	}
 
 	/** Renders the item list
+	 *  @return {undefined} nothing
 	 */
 	renderItemList(){
 		return <LogList

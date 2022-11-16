@@ -89,6 +89,17 @@ class LogReader(RawSqlQueryReader):
         for builder in [self.items_builder, self.count_builder]:
             builder.main_filter &= StringQueryFilter("core_log.user_id=%s", user.id)
 
+    def apply_is_anonymous_filter(self, is_anonymous):
+        """
+        Selects only logs from anonymous users
+
+        :param is_anonymous: True if you need to select logs from anonymous users only, False otherwise
+        :return: nothing
+        """
+        if is_anonymous:
+            for builder in [self.items_builder, self.count_builder]:
+                builder.main_filter &= StringQueryFilter("core_log.user_id IS NULL")
+
     def create_external_object(self, log_id, request_date, log_address, request_method, operation_description,
                                request_body, input_data, ip_address, geolocation, response_status, response_body,
                                output_data,

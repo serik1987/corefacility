@@ -21,6 +21,7 @@ class LogSet(EntitySet):
         "request_date_to": [datetime, None],
         "ip_address": [str, None],
         "user": ["core.entity.user.User", None],
+        "is_anonymous": [bool, None],
     }
 
     def get(self, lookup):
