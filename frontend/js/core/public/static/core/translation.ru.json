@@ -161,6 +161,13 @@
 	"Request body": "Тело запроса",
 	"Response body": "Тело ответа",
 
+	"Log records": "Дополнительные записи",
+	"Record date": "Дата записи",
+	"Record time": "Время записи",
+	"Severity level": "Уровень значимости",
+	"Message": "Сообщение",
+
+
 	"Applications Settings": "Настройки приложений",
 
 	"User login.": "Авторизация пользователя"

@@ -12,10 +12,14 @@ export default class RelatedField extends ReadOnlyField{
 
 	/** Constructs the field
 	 * 	@param {function} entityClass class for the related entity
+	 * 	@param {boolean} many kind of entity-to-entity relation:
+	 * 		true if the field gives an access to an array of properties,
+	 * 		false if the field gives an access to a single property
 	 */
-	constructor(entityClass){
+	constructor(entityClass, many = false){
 		super();
 		this.__entityClass = entityClass;
+		this.__many = many;
 	}
 
 	/** converts the entity field to an object
@@ -28,7 +32,18 @@ export default class RelatedField extends ReadOnlyField{
 		if (internalValue === null){
 			return null;
 		}
+		if (this.__many){
+			return internalValue.map(this._internalValueToEntity.bind(this));
+		} else {
+			return this._internalValueToEntity(internalValue);
+		}
+	}
 
+	/** Transforms internal value to the entity
+	 * 	@param {object} internalValue 		parsed JSON data related to the entity
+	 * 	@return {Entity} 					the entity itself
+	 */
+	_internalValueToEntity(internalValue){
 		let relatedEntity = new this.__entityClass();
 		Object.assign(relatedEntity._entityFields, internalValue);
 		relatedEntity._state = EntityState.found;

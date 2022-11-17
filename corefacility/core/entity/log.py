@@ -1,6 +1,6 @@
 from . import entity_exceptions as e
 from .entity import Entity
-from .log_record import LogRecord
+from .log_record import LogRecord, LogRecordSet
 from .entity_sets.log_set import LogSet
 from .entity_fields import EntityField, RelatedEntityField, ManagedEntityField, CurrentTimeManager, IpAddressField
 from .entity_providers.model_providers.log_provider import LogProvider
@@ -96,6 +96,15 @@ class Log(Entity):
         log_record = LogRecord(level=level, message=message, log=self)
         log_record.record_time.mark()
         log_record.create()
+
+    @property
+    def records(self):
+        """
+        All record sets attached to a given log
+        """
+        record_set = LogRecordSet()
+        record_set.log = self
+        return record_set
 
     def __eq__(self, other):
         """

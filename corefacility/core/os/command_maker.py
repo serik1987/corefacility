@@ -197,7 +197,11 @@ class CommandMaker:
         kwargs.update(capture_output=True, check=True)
         try:
             result = subprocess.run(*args, **kwargs)
-            self._message_queue.append({"level": "INF", "message": result.stdout.decode("utf-8")})
+            cmd = args[0]
+            if isinstance(cmd, list) or isinstance(cmd, tuple):
+                cmd = " ".join(cmd)
+            msg = "[%s] %s" % (cmd, result.stdout.decode("utf-8"))
+            self._message_queue.append({"level": "INF", "message": msg})
         except subprocess.CalledProcessError as err:
             cmd = err.cmd
             if isinstance(cmd, list) or isinstance(cmd, tuple):

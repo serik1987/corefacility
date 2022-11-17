@@ -3,6 +3,7 @@ import {ReadOnlyField, ReadOnlyDateField} from '../fields/fields.mjs';
 import RelatedField from '../fields/related-field.mjs';
 import Entity from './base.mjs';
 import User from './user.mjs';
+import LogRecord from './log-record.mjs';
 
 
 /** Viewing logs
@@ -56,6 +57,8 @@ export default class Log extends Entity{
 				.setDescription("Request body"),
 			"response_body": new ReadOnlyField()
 				.setDescription("Response body"),
+			"records": new RelatedField(LogRecord, true)
+				.setDescription("Log records"),
 		}
 	}
 

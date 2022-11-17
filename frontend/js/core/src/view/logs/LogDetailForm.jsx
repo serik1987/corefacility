@@ -100,6 +100,7 @@ export default class LogDetailForm extends UpdateForm{
 			"log_address",
 			"request_body",
 			"response_body",
+			"records",
 		];
 	}
 
@@ -107,10 +108,10 @@ export default class LogDetailForm extends UpdateForm{
 	 * 		@return {React.Component} Rendered content.
 	 */
 	renderContent(){
-		console.log(this.state.rawValues);
 		let requestTime = this.state.rawValues.request_date ?? new Date(0);
 		let user = this.state.rawValues.user;
 		let userWidget = null;
+		let records = this.state.rawValues.records;
 		if (user === null || user === undefined){
 			userWidget = <i>{t("anonymous")}</i>;
 		} else {
@@ -164,6 +165,48 @@ export default class LogDetailForm extends UpdateForm{
 									</div>
 								</section>
 							</div>
+							{records && records.length !== 0 && 
+								<section>
+									<h2>{t("Log records")}</h2>
+									<div className={styles.records}>
+										<div className={`${styles.record_cell} ${styles.record_header}`}>
+											{t("Record date")}
+										</div>
+										<div className={`${styles.record_cell} ${styles.record_header}`}>
+											{t("Record time")}
+										</div>
+										<div className={`${styles.record_cell} ${styles.record_header}`}>
+											{t("Severity level")}
+										</div>
+										<div className={`${styles.record_cell} ${styles.record_header}`}>
+											{t("Message")}
+										</div>
+										<hr/>
+										{records.map(record => {
+											let recordTime = record.record_time;
+											return [
+												<div className={styles.record_cell}>
+													{recordTime.toLocaleDateString()}
+												</div>,
+												<div className={styles.record_cell}>
+													{recordTime.toLocaleTimeString()}.{recordTime.getMilliseconds()}
+												</div>,
+												<div className={styles.record_cell}>
+													{record.level.toUpperCase()}
+												</div>,
+												<div className={styles.record_cell}>
+													{record.message
+														.split("\n")
+														.map(messageLine => {
+															return <div>{messageLine}</div>;
+														}
+													)}
+												</div>,
+											];
+										})}
+									</div>
+								</section>
+							}
 						</form>
 					</Scrollable>
 			</CoreWindowHeader>

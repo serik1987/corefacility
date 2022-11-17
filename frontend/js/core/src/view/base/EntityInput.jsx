@@ -58,8 +58,7 @@ export default class EntityList extends ListLoader{
 	async reload(){
 		if (!this.state.isOpened){
 			return;
-		}
-		console.log("Reloading...");
+		}	
 		await super.reload();
 	}
 
