@@ -1,6 +1,6 @@
 import {translate as t} from '../../utils.mjs';
-import Module from '../../model/entity/module.mjs';
-import EntryPoint from '../../model/entity/entry-point.mjs';
+import ModuleTreeItem from '../../model/tree/module-tree-item.mjs';
+import Hyperlink from '../base/Hyperlink.jsx';
 
 import CoreWindow from '../base/CoreWindow.jsx';
 import CoreWindowHeader from '../base/CoreWindowHeader.jsx';
@@ -13,9 +13,20 @@ import CoreWindowHeader from '../base/CoreWindowHeader.jsx';
  */
 class _SettingsWindow extends CoreWindow{
 
+	constructor(props){
+		super(props);
+		this.resetModuleTree();
+	}
+
 	/** A string to be show at the web browser tab */
 	get browserTitle(){
 		return t("Application Settings");
+	}
+
+	/** Removes all nodes from the module tree except the root node.
+	 */
+	resetModuleTree(){
+		this._moduleTree = new ModuleTreeItem(window.application.model);
 	}
 
 	/** Process the click for reload button
@@ -23,32 +34,7 @@ class _SettingsWindow extends CoreWindow{
 	 *  @return {undefined}
 	 */
 	async onReload(event){
-		let rootModule = window.application.model;
-		let allEntryPoints = {};
-		console.log(rootModule.toString());
-		for (let entryPoint of await rootModule.findEntryPoints()){
-			allEntryPoints[entryPoint.alias] = entryPoint.id;
-			console.log(entryPoint.toString());
-		}
-		for (let corefacilityModule of await Module.find({entry_point: allEntryPoints.synchronizations})){
-			console.log(corefacilityModule.toString());
-		}
-		for (let corefacilityModule of await Module.find({entry_point: allEntryPoints.settings})){
-			console.log(corefacilityModule.toString());
-		}
-		for (let corefacilityModule of await Module.find({entry_point: allEntryPoints.projects})){
-			console.log(corefacilityModule.toString());
-			for (let entryPoint of await corefacilityModule.findEntryPoints()){
-				console.log(entryPoint.toString());
-				allEntryPoints[entryPoint.alias] = entryPoint.id;
-			}
-		}
-		for (let corefacilityModule of await Module.find({entry_point: allEntryPoints.processors})){
-			console.log(corefacilityModule.toString());
-		}
-		for (let corefacilityModule of await Module.find({entry_point: allEntryPoints.authorizations})){
-			console.log(corefacilityModule.toString());
-		}
+		this.resetModuleTree();
 	}
 
 	/** Renders the area on the top of the Web browser window;
@@ -66,6 +52,8 @@ class _SettingsWindow extends CoreWindow{
 	 *                            Such a component must implement the reload() method
 	 */
 	renderContent(){
+		console.log("Tree rendering...");
+
 		return (
 			<CoreWindowHeader
 				isLoading={false}
@@ -73,9 +61,38 @@ class _SettingsWindow extends CoreWindow{
 				error={null}
 				header={t("Application Settings")}
 				>
-					Layouting the form...
+					<Hyperlink onClick={event => this.loadNodes()}>Load nodes</Hyperlink>
+					{" "}
+					<Hyperlink onClick={event => this.printNodes()}>Print nodes</Hyperlink>
 			</CoreWindowHeader>
 		);
+	}
+
+	loadNodes(branch = null){
+		let isRootNode = false;
+		if (branch === null){
+			branch = this._moduleTree;
+			isRootNode = true;
+		}
+		let promise = null;
+		if (branch.childrenState === ModuleTreeItem.ChildrenState.ready){
+			for (let childBranch of branch.children){
+				promise = this.loadNodes(childBranch);
+				if (promise){
+					break;
+				}
+			}
+		} else {
+			promise = branch.loadChildren();
+		}
+		if (isRootNode){
+			this.printNodes();
+		}
+		return promise;
+	}
+
+	printNodes(){
+		console.log(this._moduleTree.toString());
 	}
 
 }
