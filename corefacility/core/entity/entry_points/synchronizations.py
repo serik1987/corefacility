@@ -1,3 +1,5 @@
+from django.utils.translation import gettext_lazy as _
+
 from .entry_point import EntryPoint
 from core.entity.corefacility_module import CorefacilityModule
 
@@ -45,6 +47,7 @@ class SynchronizationsEntryPoint(EntryPoint):
 
         :return: the entry point name
         """
+        _("Account synchronization")
         return "Account synchronization"
 
     def get_type(self):

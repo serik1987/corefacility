@@ -89,6 +89,8 @@ export default class RadioInput extends React.Component{
                         return React.cloneElement(component, {
                             _value: component.props.value === this.value,
                         });
+                    } else {
+                        return null;
                     }
                 })}
             </div>

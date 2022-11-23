@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-06 10:44+0300\n"
+"POT-Creation-Date: 2022-11-23 05:09+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -82,6 +82,18 @@ msgstr ""
 #: core/api_exceptions.py:91
 msgid "The following problem occured during the mail delivery: "
 msgstr "При отправке сообщения пользователю возникла следующая проблема: "
+
+#: core/authorizations/auto.py:41
+msgid "Automatic authorization"
+msgstr "Автоматическая авторизация"
+
+#: core/authorizations/password_recovery.py:40
+msgid "Password recovery function"
+msgstr "Функция восстановления пароля"
+
+#: core/authorizations/standard.py:39
+msgid "Standard authorization"
+msgstr "Стандартная авторизация"
 
 #: core/entity/entity_exceptions/__init__.py:11
 msgid "The requested resource was not found here"
@@ -162,6 +174,22 @@ msgstr "Проект"
 #: core/entity/entity_sets/user_set.py:11
 msgid "User"
 msgstr "Пользователь"
+
+#: core/entity/entry_points/authorizations.py:32
+msgid "Authorization methods"
+msgstr "Способы авторизации"
+
+#: core/entity/entry_points/projects.py:33
+msgid "Project applications"
+msgstr "Работа с научными проектами"
+
+#: core/entity/entry_points/settings.py:31
+msgid "Other settings"
+msgstr "Прочие настройки"
+
+#: core/entity/entry_points/synchronizations.py:50
+msgid "Account synchronization"
+msgstr "Синхронизация учётных записей"
 
 #: core/generic_views/file_upload_mixin.py:63
 msgid "The uploaded file is too large"
@@ -261,6 +289,10 @@ msgid "Failed to remove a user: the user has been currently logged in"
 msgstr ""
 "Невозможно удалить пользователя: этот пользователь только что залогинился"
 
+#: core/synchronizations/ihna_employees.py:63
+msgid "IHNA RAS account synchronization"
+msgstr "Синхронизация с сайтом ИВНД и НФ РАН"
+
 #: core/templates/core/index.html:3
 msgid "Loading..."
 msgstr "Загрузка..."
@@ -333,6 +365,10 @@ msgstr ""
 msgid "The target map contains no data"
 msgstr "В ходе обработки была получена карта без данных"
 
+#: imaging/entity/entry_points/processors.py:25
+msgid "Imaging processors"
+msgstr "Обработка функциональных карт"
+
 #: imaging/entity/map/map_set.py:15
 msgid "Functional map"
 msgstr "Функциональная карта"
@@ -376,33 +412,6 @@ msgstr "Выделение ROI"
 #: roi/serializers/rectangular_roi_serializer.py:33
 msgid "Incorrect combination of ROI border values"
 msgstr "Неверно заданы значения границ областей интереса"
-
-#~ msgid "Account synchronization"
-#~ msgstr "Синхронизация учётных записей"
-
-#~ msgid "Authorization methods"
-#~ msgstr "Способы авторизации"
-
-#~ msgid "Standard authorization"
-#~ msgstr "Стандартная авторизация"
-
-#~ msgid "Password recovery function"
-#~ msgstr "Функция восстановления пароля"
-
-#~ msgid "Automatic authorization"
-#~ msgstr "Автоматическая авторизация"
-
-#~ msgid "IHNA RAS account synchronization"
-#~ msgstr "Синхронизация с сайтом ИВНД и НФ РАН"
-
-#~ msgid "Project applications"
-#~ msgstr "Работа с научными проектами"
-
-#~ msgid "Imaging processors"
-#~ msgstr "Обработка функциональных карт"
-
-#~ msgid "Other settings"
-#~ msgstr "Прочие настройки"
 
 #~ msgid "Application usage"
 #~ msgstr "Использование приложения"

@@ -1,6 +1,8 @@
 import {BrowserRouter as Router} from 'react-router-dom';
 
 import {NotImplementedError} from '../../exceptions/model.mjs';
+import Module from '../../model/entity//module.mjs';
+
 import DialogWrapper from './DialogWrapper.jsx';
 import MessageBox from './MessageBox.jsx';
 import QuestionBox from './QuestionBox.jsx';
@@ -12,6 +14,12 @@ import PosixActionBox from './PosixActionBox.jsx';
  */
 export default class App extends DialogWrapper{
 
+	/** Class of the application model, if applicable
+	 */
+	static get applicationModelClass(){
+		return Module;
+	}
+
 	/** Set up the initial state. The Web server sent
 	 *  the initial state during the index.html file rendering
 	 *  and put this state inside the <script> elemen
@@ -21,18 +29,18 @@ export default class App extends DialogWrapper{
 		this.registerModal("message", MessageBox);
 		this.registerModal("question", QuestionBox);
 		this.registerModal("posix_action", PosixActionBox);
+		this._module = this.constructor.applicationModelClass.getIdentity();
 
 		this.state = {
-			token: window.SETTINGS.authorization_token,
-			uuid: window.SETTINGS.app_uuid
+			token: window.SETTINGS.authorization_token
 		}
 
 		window.application = this;
 	}
 
-	/** UUID for the current application */
-	get uuid(){
-		return this.state.uuid;
+	/** Returns the application model */
+	get model(){
+		return this._module;
 	}
 
 	/** Authorization token.

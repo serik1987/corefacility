@@ -1,3 +1,4 @@
+from django.utils.translation import gettext_lazy as _
 from django.core.signing import Signer
 
 from core.entity import CorefacilityModule
@@ -28,6 +29,7 @@ class AuthorizationsEntryPoint(EntryPoint):
 
         :return: the entry point name visible in the UI
         """
+        _("Authorization methods")
         return "Authorization methods"
 
     def get_type(self):

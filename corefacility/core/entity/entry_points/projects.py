@@ -1,5 +1,8 @@
-from .entry_point import EntryPoint
+from django.utils.translation import gettext_lazy as _
+
+
 from core.entity.corefacility_module import CorefacilityModule
+from .entry_point import EntryPoint
 
 
 class ProjectsEntryPoint(EntryPoint):
@@ -27,6 +30,7 @@ class ProjectsEntryPoint(EntryPoint):
 
         :return: the entry point name
         """
+        _("Project applications")
         return "Project applications"
 
     def get_type(self):

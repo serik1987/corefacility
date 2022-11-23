@@ -33,6 +33,7 @@ export default class Entity{
 		this._state = 'creating';
 		this._tag = undefined;
 		this._propertiesChanged = new Set();
+		this._parentIdList = [];
 		this._defineProperties();
 		if (entityInfo !== null && entityInfo !== undefined){
 			this._setInitialProperties(entityInfo);
@@ -201,12 +202,19 @@ export default class Entity{
 	}
 
 	toString(){
-		let string = `${this.constructor._entityName} (ID = ${this.id}) [${this.state.toUpperCase()}]\n` + 
-			"----------------------------------------------------------\n";
+		let string = `${this.constructor._entityName} (ID = ${this.id}) [${this.state.toUpperCase()}]\n`;
+		string += this._getAllPropertiesString()
+		return string;
+	}
+
+	_getAllPropertiesString(){
 		let propertyDescription = this.constructor._propertyDescription;
+		let string = "----------------------------------------------------------\n";
+
 		for (let field in propertyDescription){
 			string += `${propertyDescription[field].description} [${field}]: ${this[field]}\n`;
 		}
+		
 		return string;
 	}
 
@@ -271,6 +279,23 @@ export default class Entity{
 			}
 			this[propertyName] = entityInfo[propertyName];
 		}
+	}
+
+	/** Returns the child entities of this current entity.
+	 * 	Child entities are such entities which seek is impossible without telling the
+	 * 	parent entity ID
+	 * 	@async
+	 * 	@param {function} childEntityClass that class belonging to the child entity
+	 * 	@return {iterator} the iterable over all child entities
+	 */
+	async _getChildEntities(childEntityClass, searchParams){
+		if (!searchParams){
+			searchParams = {};
+		}
+		if (!("_parentIdList" in searchParams)){
+			searchParams._parentIdList = [...this._parentIdList, this.id];
+		}
+		return childEntityClass.find(searchParams);
 	}
 
 	/** Returns the human-readable entity name

@@ -18,6 +18,10 @@ import {ReactComponent as SettingsImage} from '../base-svg/settings.svg';
  *  Such window also have logo at the left top of the Web browser window
  *  as well as controls at the right top of the Web browser window
  *  The window has no props
+ * 
+ * 	State:
+ * 	@param {boolean} error404 true will display the error404 window indicating
+ * 	that such an entity was not found. false will do nothing
  */
 export default class CoreWindow extends Window{
 

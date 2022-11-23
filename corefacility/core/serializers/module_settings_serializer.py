@@ -10,6 +10,7 @@ class ModuleSettingsSerializer(EntitySerializer):
     """
 
     uuid = serializers.UUIDField(read_only=True, help_text="Module UUID")
+    alias = serializers.ReadOnlyField(help_text="Module alias")
     name = serializers.SerializerMethodField(help_text="Human-readable module name")
     is_enabled = serializers.BooleanField(required=True, help_text="True if the module is enabled, False otherwise")
 

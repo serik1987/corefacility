@@ -93,8 +93,8 @@ export default class LogListLoader extends CoreListLoader{
 	   	const _HEXTET_COUNT = 8;
 	   	const _max_parts = _HEXTET_COUNT + 1;
 	   	let _pj;
-		let ip_int, ipv4_int, parts, parts_hi, parts_lo, parts_skipped, skip_index;
-		let i, _pj_a, newParts;
+		let parts, parts_hi, parts_lo, parts_skipped, skip_index;
+		let i, _pj_a;
 
 	  	function _pj_snippets(container) {
   			function in_es6(left, right) {
@@ -366,11 +366,6 @@ export default class LogListLoader extends CoreListLoader{
 	 * 	@return {React.Component} all filter widgets to be rendered
 	 */
 	renderFilter(){
-		let userIdentity = null;
-		if (this.state.user){
-			userIdentity = this.state.user.surname || this.state.user.login;
-		}
-
 		return (
 			<div className={styles.filter}>
 				<Label>{t("Request date")}</Label>

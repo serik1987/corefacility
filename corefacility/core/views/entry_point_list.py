@@ -17,6 +17,7 @@ class EntryPointListView(EntityListView):
     entity_set_class = EntryPointSet
     list_serializer_class = EntryPointSerializer
     detail_serializer_class = None
+    pagination_class = None
 
     def filter_queryset(self, entry_point_set):
         """

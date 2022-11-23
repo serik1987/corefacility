@@ -8,6 +8,7 @@
 	"The form was filled incorrectly.": "Форма заполнена неверно.",
 	"The requested resource was not found": "Запрашиваемый ресурс не обнаружен",
 	"May be, the resource has been deleted, moved permanently or never existed.": "Возможно, он был удалён, перемещён на своё новое постоянное место или никогда не существовал.",
+	"The API request to non-existent resource": "API-запрос к несуществующему ресурсу",
 	"Loading...": "Загрузка...",
 	"Please, specify...": "Пожалуйста, уточните...",
 	"Apply": "Применить",
@@ -169,6 +170,8 @@
 
 
 	"Applications Settings": "Настройки приложений",
+	"Provides list of all entry points connected to a given module": "Список всех точек доступа, подключённых к данному модулю",
+	"Module settings, install and/or uninstall": "Настройка, установка и/или удаление модуля",
 
 	"User login.": "Авторизация пользователя"
 }

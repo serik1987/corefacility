@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 
 from core.entity.entry_points.authorizations import AuthorizationModule
 from core.entity.user import UserSet
@@ -37,6 +38,7 @@ class AutomaticAuthorization(AuthorizationModule):
 
         :return: the method name
         """
+        _("Automatic authorization")
         return "Automatic authorization"
 
     def get_html_code(self):

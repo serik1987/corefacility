@@ -1,3 +1,5 @@
+from django.utils.translation import gettext_lazy as _
+
 from core.entity.entry_points.authorizations import AuthorizationModule
 
 
@@ -35,6 +37,7 @@ class PasswordRecoveryAuthorization(AuthorizationModule):
 
         :return: some method name
         """
+        _("Password recovery function")
         return "Password recovery function"
 
     def get_html_code(self):

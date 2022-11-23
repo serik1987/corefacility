@@ -1,3 +1,5 @@
+from django.utils.translation import gettext_lazy as _
+
 from core.entity.entry_points.entry_point import EntryPoint
 from core.entity.entry_points.projects import ProjectApp
 
@@ -20,6 +22,7 @@ class ProcessorsEntryPoint(EntryPoint):
 
         :return: the entry point name
         """
+        _("Imaging processors")
         return "Imaging processors"
 
     def get_type(self):

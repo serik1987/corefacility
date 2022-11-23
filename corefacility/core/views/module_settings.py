@@ -1,6 +1,6 @@
 from uuid import UUID
 from rest_framework.response import Response
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, PermissionDenied
 
 from core.entity.corefacility_module import CorefacilityModuleSet
 from core.entity.entry_points.entry_point_set import EntryPointSet
@@ -19,6 +19,13 @@ class ModuleSettingsViewSet(EntityViewSet):
     entity_set_class = CorefacilityModuleSet
     list_serializer_class = ModuleSerializer
     detail_serializer_class = None
+    pagination_class = None
+
+    def create(self, request, *args, **kwargs):
+        raise PermissionDenied(detail="TO-DO: install module routines")
+
+    def destroy(self, request, *args, **kwargs):
+        raise PermissionDenied(detail="TO-DO: delete module routines")
 
     def retrieve(self, request, *args, **kwargs):
         """

@@ -1,6 +1,7 @@
 import urllib3
 import json
 
+from django.utils.translation import gettext_lazy as _
 from rest_framework import status
 
 from .full_mode_synchronization import FullModeSynchronization
@@ -59,6 +60,7 @@ class IhnaSynchronization(FullModeSynchronization):
 
         :return: the synchronization name
         """
+        _("IHNA RAS account synchronization")
         return "IHNA RAS account synchronization"
 
     def get_ihna_website(self):

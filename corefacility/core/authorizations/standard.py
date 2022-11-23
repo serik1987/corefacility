@@ -1,3 +1,5 @@
+from django.utils.translation import gettext_lazy as _
+
 from core.entity.user import User, UserSet
 from core.entity.entity_exceptions import EntityNotFoundException
 
@@ -34,6 +36,7 @@ class StandardAuthorization(LoginPasswordAuthorization):
 
         :return: always 'Standard authorization'
         """
+        _("Standard authorization")
         return "Standard authorization"
 
     def authorize(self, login: str, password: str) -> User:

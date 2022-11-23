@@ -24,10 +24,6 @@ import styles from './UserInputList.module.css';
  */
 export default class UserInputList extends EntityInputList{
 
-    constructor(props){
-        super(props);
-    }
-
     handleItemSelect(user){
         if (this.props.onItemSelect){
             this.props.onItemSelect(user);

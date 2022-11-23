@@ -17,7 +17,10 @@ export default class EntityProvider{
 
 	/** Filter parameters.
 	 *  When the provider will provide the whole entity list, the list will contain
-	 *  only those entities that satisfy these filter conditions
+	 *  only those entities that satisfy these filter conditions.
+	 * 	A special property field _parentEntityId defines array of all parent entities.
+	 * 	All property fields starting from _parentEntityId are special and MUST be ignored during the
+	 * 	search
 	 * @return {object} object containing names and values of filter parameters
 	 */
 	get searchParams(){
@@ -25,7 +28,7 @@ export default class EntityProvider{
     }
 
     /** Sets the filter parameters (see get searchParams for details)
-     *  @param {object} value Search parameters to be set (e.g., {q: 'user'})
+     *  @param {object} value Search parameters to be set (e.g., {q: 'user'}).
      */
     set searchParams(value){
         if (value instanceof Object){

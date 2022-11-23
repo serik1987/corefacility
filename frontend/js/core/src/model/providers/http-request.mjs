@@ -12,6 +12,8 @@ export default class HttpRequestProvider extends EntityProvider{
      *                  between the API version and the entity lookup
      *                  e.g., for url like 'http://corefacility.ru/api/v1/users/serik1987/'
      *                  the path segment will be 'users'
+     *                  If the path segment contains IDs of parent entities use :id: placeholder
+     *                  to tell the system about it.
      *  @param {function} entityClass a class which the providing entity belongs to
      */
     constructor(pathSegment, entityClass){
@@ -25,7 +27,13 @@ export default class HttpRequestProvider extends EntityProvider{
     _getEntityListUrl(){
         let origin = window.SETTINGS.origin || window.origin;
         let apiVersion = window.SETTINGS.client_version;
-        return new URL(`${origin}/api/${apiVersion}/${this.pathSegment}/`);
+        let url = `${origin}/api/${apiVersion}/${this.pathSegment}/`;
+        if (typeof this._searchParams === "object" && "_parentIdList" in this.searchParams){
+            for (let parentId of this.searchParams._parentIdList){
+                url = url.replace(":id:", parentId);
+            }
+        }
+        return new URL(url);
     }
 
     /** Returns URL that will be used for searching a given entity.
@@ -39,7 +47,9 @@ export default class HttpRequestProvider extends EntityProvider{
     _getEntitySearchUrl(searchParams){
         let url = this._getEntityListUrl();
         for (let name in searchParams){
-            url.searchParams.append(name.toString(), searchParams[name].toString());
+            if (name[0] !== "_"){
+                url.searchParams.append(name.toString(), searchParams[name].toString());
+            }
         }
         return url;
     }

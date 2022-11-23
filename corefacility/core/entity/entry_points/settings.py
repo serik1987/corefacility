@@ -1,3 +1,5 @@
+from django.utils.translation import gettext_lazy as _
+
 from .entry_point import EntryPoint
 from ..corefacility_module import CorefacilityModule
 
@@ -26,6 +28,7 @@ class SettingsEntryPoint(EntryPoint):
 
         :return: the settings name
         """
+        _("Other settings")
         return "Other settings"
 
     def get_type(self):

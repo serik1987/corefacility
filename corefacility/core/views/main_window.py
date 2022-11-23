@@ -111,11 +111,10 @@ class MainWindow(SetCookieMixin, TemplateView):
         """
         if uuid is None:
             app = App()
-            uuid = str(app.uuid)
         else:
             app = self.module_set.get(uuid)
-            uuid = str(uuid)
-        self.kwargs['app_uuid'] = uuid
+        serializer = app.get_serializer_class()(app)
+        self.kwargs['app'] = serializer.data
         self._app_module = app.__module__
 
     def _authorize_user(self):
