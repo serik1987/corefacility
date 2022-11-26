@@ -1,9 +1,12 @@
 import {translate as t} from '../../utils.mjs';
 import ModuleTreeItem from '../../model/tree/module-tree-item.mjs';
-import Hyperlink from '../base/Hyperlink.jsx';
+import Module from '../../model/entity/module.mjs';
 
 import CoreWindow from '../base/CoreWindow.jsx';
 import CoreWindowHeader from '../base/CoreWindowHeader.jsx';
+import TreeView from '../base/TreeView.jsx';
+import Scrollable from '../base/Scrollable.jsx';
+import styles from './SettingsWindow.module.css';
 
 
 /** Defines the application settings
@@ -15,7 +18,13 @@ class _SettingsWindow extends CoreWindow{
 
 	constructor(props){
 		super(props);
-		this.resetModuleTree();
+		this._moduleTree = new ModuleTreeItem(window.application.model);
+		this.handleInputChange = this.handleInputChange.bind(this);
+
+		this.state = {
+			...this.state,
+			module: window.application.model,
+		}
 	}
 
 	/** A string to be show at the web browser tab */
@@ -23,18 +32,20 @@ class _SettingsWindow extends CoreWindow{
 		return t("Application Settings");
 	}
 
-	/** Removes all nodes from the module tree except the root node.
-	 */
-	resetModuleTree(){
-		this._moduleTree = new ModuleTreeItem(window.application.model);
-	}
-
 	/** Process the click for reload button
 	 * 	@param {SyntheticEvent} the event object
 	 *  @return {undefined}
 	 */
 	async onReload(event){
-		this.resetModuleTree();
+		console.log("The reload button will NOT reload the module tree! (Just reloading current module settings...");
+	}
+
+	/** Triggers when the user selectes a given module (or, probably, entry point)
+	 */
+	handleInputChange(event){
+		if (event.value instanceof Module){
+			this.setState({module: event.value});
+		}
 	}
 
 	/** Renders the area on the top of the Web browser window;
@@ -61,38 +72,20 @@ class _SettingsWindow extends CoreWindow{
 				error={null}
 				header={t("Application Settings")}
 				>
-					<Hyperlink onClick={event => this.loadNodes()}>Load nodes</Hyperlink>
-					{" "}
-					<Hyperlink onClick={event => this.printNodes()}>Print nodes</Hyperlink>
+					<div className={styles.base_container}>
+						<Scrollable cssSuffix={` ${styles.tree_container}`}>
+							<TreeView
+								tree={this._moduleTree}
+								value={this.state.module}
+								onInputChange={this.handleInputChange}
+							/>
+						</Scrollable>
+						<div className={styles.options_container}>
+							Layouting options container...
+						</div>
+					</div>
 			</CoreWindowHeader>
 		);
-	}
-
-	loadNodes(branch = null){
-		let isRootNode = false;
-		if (branch === null){
-			branch = this._moduleTree;
-			isRootNode = true;
-		}
-		let promise = null;
-		if (branch.childrenState === ModuleTreeItem.ChildrenState.ready){
-			for (let childBranch of branch.children){
-				promise = this.loadNodes(childBranch);
-				if (promise){
-					break;
-				}
-			}
-		} else {
-			promise = branch.loadChildren();
-		}
-		if (isRootNode){
-			this.printNodes();
-		}
-		return promise;
-	}
-
-	printNodes(){
-		console.log(this._moduleTree.toString());
 	}
 
 }

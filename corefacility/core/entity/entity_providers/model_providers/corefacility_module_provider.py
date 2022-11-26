@@ -74,6 +74,7 @@ class CorefacilityModuleProvider(ModelProvider):
         module._user_settings = external_object.user_settings
         module._is_application = external_object.is_application
         module._is_enabled = external_object.is_enabled
+        module._node_number = external_object.node_number
         module._state = "loaded"
         return module
 

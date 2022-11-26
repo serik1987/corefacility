@@ -73,7 +73,6 @@
 	"Home Page": "Главная страница",
 	"Reload": "Обновить",
 	"Account Settings": "Настройки учётной записи",
-	"Application Settings": "Настройки приложения",
 	"Required field.": "Обязательное поле.",
 	"Copy to clipboard": "Копировать в буфер обмена",
 	"This field allows letters, digits, underscores and hyphens": "Это поле допускает только латинские буквы, дефисы, цифры и знаки подчёркивания",
@@ -169,7 +168,7 @@
 	"Message": "Сообщение",
 
 
-	"Applications Settings": "Настройки приложений",
+	"Application Settings": "Настройки приложений",
 	"Provides list of all entry points connected to a given module": "Список всех точек доступа, подключённых к данному модулю",
 	"Module settings, install and/or uninstall": "Настройка, установка и/или удаление модуля",
 

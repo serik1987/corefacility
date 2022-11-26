@@ -61,6 +61,7 @@ class CorefacilityModule(Entity):
                                             description="The user-controlled module settings"),
         "is_application": ReadOnlyField(description="Is module an application"),
         "is_enabled": EntityField(bool, description="Is module enabled"),
+        "node_number": ReadOnlyField(description="Number of entry points the module has"),
     }
 
     _module_installation = False

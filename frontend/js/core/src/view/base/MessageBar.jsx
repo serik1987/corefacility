@@ -96,7 +96,7 @@ export default class MessageBar extends React.Component{
 		}
 
 		return (
-			<div className={`${styles.message_bar}${messageBoxClass}${animatableClass}${inlineClass}${cssClasses}`}>
+			<div className={`${styles.message_bar}${messageBoxClass}${animatableClass}${inlineClass}${cssClasses} message_bar`}>
 				{icon}
 				<p>{message}</p>
 			</div>

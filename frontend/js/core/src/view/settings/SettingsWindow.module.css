@@ -1,0 +1,23 @@
+.base_container{
+	display: flex;
+	align-items: stretch;
+	height: 100%;
+}
+
+.base_container .tree_container{
+	flex: 0 max-content;
+	margin: 0;
+	border-right: 1px solid rgb(218, 220, 224);
+	padding: 0;
+}
+
+.base_container .tree_container > div{
+	margin: 0;
+	padding: 16px 8px;
+}
+
+.base_container .options_container{
+	flex: 1;
+	margin: 0;
+	padding: 16px;
+}

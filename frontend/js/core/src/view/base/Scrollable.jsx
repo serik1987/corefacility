@@ -27,6 +27,8 @@ import styles from '../base-styles/Scrollable.module.css';
  *                                          event.detail.top - distance from the top border of the scrollable to the top border of the visible area
  *                                          event.detail.right - distance from the right border of the scrollable to the right border of the visible area
  *                                          event.detail.bottom - distance from the bottom border of the scrollable to the bottom border of the visible area
+ * 
+ *      @param {string} cssSuffix       The suffix to be attached to the end of the item
  */
 export default class Scrollable extends React.Component{
 
@@ -81,8 +83,9 @@ export default class Scrollable extends React.Component{
 		let overflowY = this.props.overflowY === undefined ? true : this.props.overflowY;
 		let overflowXClass = overflowX ? ` ${styles.overflow_x}` : '';
 		let overflowYClass = overflowY ? ` ${styles.overflow_y}` : '';
+        let cssSuffix = this.props.cssSuffix ? this.props.cssSuffix : '';
 
-		return(<div className={`scrollable ${styles.scrollable}${overflowXClass}${overflowYClass}`}
+		return(<div className={`scrollable ${styles.scrollable}${overflowXClass}${overflowYClass}${cssSuffix}`}
                 onScroll={this.handleScroll} ref={this.scrollContainer}>
 			{this.props.children}
 		</div>);

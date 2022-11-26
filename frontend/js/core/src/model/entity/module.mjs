@@ -48,6 +48,8 @@ export default class Module extends Entity{
 				.setDescription("Alias"),
 			"name": new ReadOnlyField()
 				.setDescription("Name"),
+			"node_number": new ReadOnlyField()
+				.setDescription("Number of entry points"),
 		};
 	}
 

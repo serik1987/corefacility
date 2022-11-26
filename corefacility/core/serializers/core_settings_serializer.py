@@ -2,6 +2,8 @@ from datetime import timedelta
 from rest_framework import serializers
 
 from core import App
+from core.entity.entry_points.entry_point_set import EntryPointSet
+
 from .module_settings_serializer import ModuleSettingsSerializer
 
 
@@ -31,3 +33,5 @@ class CoreSettingsSerializer(ModuleSettingsSerializer):
         default=App.DEFAULT_USER_CAN_CHANGE_HIS_PASSWORD,
         help_text="True if the user can change his password, False if only administrator can do this"
     )
+
+    node_number = serializers.ReadOnlyField(help_text="Number of entry points attached to the module")

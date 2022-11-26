@@ -48,6 +48,14 @@ class CorefacilityModuleReader(RawSqlQueryReader):
             builder.data_source.add_join(builder.JoinType.LEFT, "core_entrypoint",
                                          "ON (core_entrypoint.id=core_module.parent_entry_point_id)")
 
+        # Counting the number of child entry points
+        self.items_builder\
+            .add_select_expression(self.items_builder.select_total_count("ep_child.id"))\
+            .add_group_term("core_module.uuid")
+        self.items_builder.data_source\
+            .add_join(builder.JoinType.LEFT, "core_entrypoint AS ep_child",
+                      "ON (ep_child.belonging_module_id = core_module.uuid)")
+
     def apply_is_root_module_filter(self, filter_value):
         """
         The filter selects core module only
@@ -98,7 +106,7 @@ class CorefacilityModuleReader(RawSqlQueryReader):
             builder.main_filter &= StringQueryFilter("core_projectapplication.project_id=%s", project.id)
 
     def create_external_object(self, uuid, alias, name, html_code, app_class, user_settings,
-                               is_application, is_enabled):
+                               is_application, is_enabled, node_number):
         """
         Creates an external object that in turn will be transformed to the corefacility module
 
@@ -110,6 +118,7 @@ class CorefacilityModuleReader(RawSqlQueryReader):
         :param user_settings: specific module settings
         :param is_application: defines whether the module is application
         :param is_enabled: defines whether the module is enabled
+        :param node_number: total number of entry points that the module have
         :return: an external object that will be transformed by the CorefacilityModuleProvider to an appropriate module.
         """
         if isinstance(user_settings, str):
@@ -129,5 +138,6 @@ class CorefacilityModuleReader(RawSqlQueryReader):
             user_settings=user_settings,
             is_application=bool(is_application),
             is_enabled=bool(is_enabled),
+            node_number=int(node_number),
         )
         return emulator

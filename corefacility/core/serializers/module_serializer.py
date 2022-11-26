@@ -1,6 +1,8 @@
 from django.utils.translation import gettext
 from rest_framework import serializers
 
+from core.entity.entry_points.entry_point_set import EntryPointSet
+
 from .entity_serializer import EntitySerializer
 
 
@@ -12,6 +14,7 @@ class ModuleSerializer(EntitySerializer):
     uuid = serializers.SerializerMethodField(help_text="Unique module ID")
     alias = serializers.ReadOnlyField(help_text="Module string identifier (alias or slug)")
     name = serializers.SerializerMethodField(help_text="Human-readable module name")
+    node_number = serializers.ReadOnlyField(help_text="Number of entry points that the module has")
 
     def get_uuid(self, module):
         """

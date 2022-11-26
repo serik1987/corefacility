@@ -1,0 +1,82 @@
+.item_wrapper{
+}
+
+.item{
+	padding: 8px;
+	padding-right: 10px;
+	cursor: pointer;
+}
+
+.item.inactive{
+	cursor: default;
+}
+
+.item:hover, .item.selected{
+	background-color: rgb(235, 236, 240);
+}
+
+.item.inactive:hover{
+	background-color: rgba(0, 0, 0, 0);
+}
+
+.content_wrapper{
+	display: flex;
+	gap: 4px;
+	height: 24px;
+}
+
+.item_opener{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 24px;
+	height: 24px;
+}
+
+.chevron_wrapper{
+	border: 1px solid rgba(0, 0, 0, 0);
+	width: 5px;
+	height: 8px;
+	overflow: hidden;
+}
+
+.item.opened .chevron_wrapper{
+	transform: rotate(90deg);
+}
+
+.chevron_wrapper > svg{
+	display: block;
+	margin-top: -8px;
+	margin-left: -10px;
+	width: 24px;
+	height: 24px;
+	fill: rgb(60, 64, 67);
+}
+
+.no_child_button{
+	width: 3px;
+	height: 3px;
+	background: rgb(60, 64, 67);
+	border-radius: 50%;
+}
+
+.item_name{
+	line-height: 24px;
+}
+
+.item.selected .item_name{
+	color: rgb(20, 103, 210);
+}
+
+.error_wrapper{
+	padding: 0 8px;
+	padding-right: 10px;
+}
+
+.error_wrapper .message_bar_wrapper{
+	margin-left: 28px;
+}
+
+.error_wrapper :global .message_bar{
+	height: 20px;
+}

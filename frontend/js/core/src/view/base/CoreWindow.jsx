@@ -111,7 +111,7 @@ export default class CoreWindow extends Window{
 							items={[
 								<Hyperlink href="/users/">{t("Users")}</Hyperlink>,
 								<Hyperlink href="/logs/">{t("Logs")}</Hyperlink>,
-								<Hyperlink href="/settings/">{t("Applications Settings")}</Hyperlink>,
+								<Hyperlink href="/settings/">{t("Application Settings")}</Hyperlink>,
 							]}
 						/>
 					</div>
