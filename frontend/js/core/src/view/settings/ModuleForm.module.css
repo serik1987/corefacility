@@ -1,0 +1,16 @@
+.widgets_grid{
+	display: grid;
+	grid-template-columns: max-content 300px;
+	grid-row-gap: 5px;
+	grid-column-gap: 10px;
+}
+
+.info_grid{
+	margin-top: 10px;
+}
+
+.button_grid{
+	display: block;
+	margin-top: 20px;
+	text-align: center;
+}

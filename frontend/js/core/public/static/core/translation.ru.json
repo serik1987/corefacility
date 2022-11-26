@@ -27,6 +27,7 @@
 	"undefined": "неизвестно",
 	"Action Required": "Требуется действие",
 	"Continue": "Продолжить",
+	"Enabled": "Активен",
 	"Yes": "Да",
 	"No": "Нет",
 	"From": "От",
@@ -171,6 +172,9 @@
 	"Application Settings": "Настройки приложений",
 	"Provides list of all entry points connected to a given module": "Список всех точек доступа, подключённых к данному модулю",
 	"Module settings, install and/or uninstall": "Настройка, установка и/или удаление модуля",
+	"Module status": "Состояние модуля",
+	"Save Settings": "Сохранить настройки",
+	"The module doesn't work until this is enabled.": "Модуль не будет работать до тех пор, пока он неактивен.",
 
 	"User login.": "Авторизация пользователя"
 }

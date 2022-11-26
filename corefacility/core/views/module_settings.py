@@ -1,6 +1,6 @@
 from uuid import UUID
 from rest_framework.response import Response
-from rest_framework.exceptions import ValidationError, PermissionDenied
+from rest_framework.exceptions import ValidationError, PermissionDenied, NotFound
 
 from core.entity.corefacility_module import CorefacilityModuleSet
 from core.entity.entry_points.entry_point_set import EntryPointSet
@@ -77,6 +77,9 @@ class ModuleSettingsViewSet(EntityViewSet):
         :return: an instance of the core.entity.corefacility_module.CorefacilityModule class
         """
         entity_set = self.filter_queryset(self.get_queryset())
-        lookup_value = UUID(self.kwargs['lookup'])
+        try:
+            lookup_value = UUID(self.kwargs['lookup'])
+        except ValueError:
+            raise NotFound()
         module = self.get_entity_or_404(entity_set, lookup_value)
         return module

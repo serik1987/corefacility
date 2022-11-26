@@ -64,6 +64,17 @@ export default class App extends DialogWrapper{
 		return typeof this.state.token === "string";
 	}
 
+	/** Reloads the application model.
+	 * 	Simply speaking, the function simply reloads all application settings	
+	 * 	@async
+	 * 	@return {Module} the reloaded model. Additionally, the reloaded module sets to the
+	 * 	internal application fields.
+	 */
+	async reloadModel(){
+		this._module = await this.constructor.applicationModelClass.get(this._module.uuid);
+		return this._module;
+	}
+
 	/** Hides the general wait bar */
 	componentDidMount(){
 		let waitBar = document.getElementById("waitbar");

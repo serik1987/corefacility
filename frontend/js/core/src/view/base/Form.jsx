@@ -411,7 +411,7 @@ export default class Form extends Loader{
 	 * 	@param {Error} error Javascript exception
 	 * 	@param {function} tryAgainFunction an optional parameter. If tryAgainFunction is not null or undefined,
 	 * 		the user receives "Action required" dialog box and presses Continue, the tryAgainFunction will be executed.
-	 * 	@return {undefined}
+	 * 	@return {string} globalError the global error to lift up the state
 	 */
 	async handleError(error, tryAgainFunction){
 		if (error instanceof networkErrors.UnauthorizedError){
@@ -447,6 +447,7 @@ export default class Form extends Loader{
 			errors: {...this.state.errors, ...fieldErrors},
 			globalError: globalError,
 		});
+		return globalError;
 	}
 
 	/** Sets the message to some arbitrary field error. Execution of this function will not result to

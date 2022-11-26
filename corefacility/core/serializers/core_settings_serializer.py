@@ -33,5 +33,3 @@ class CoreSettingsSerializer(ModuleSettingsSerializer):
         default=App.DEFAULT_USER_CAN_CHANGE_HIS_PASSWORD,
         help_text="True if the user can change his password, False if only administrator can do this"
     )
-
-    node_number = serializers.ReadOnlyField(help_text="Number of entry points attached to the module")

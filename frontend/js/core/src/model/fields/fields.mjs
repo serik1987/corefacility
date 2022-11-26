@@ -175,7 +175,7 @@ export class ReadOnlyField extends EntityField{
 
 	/** Always throw an exception to indicate that setting this field is not allowed */
 	proofread(entity, propertyName, value){
-		throw new ReadOnlyPropertyError(entity._entityName, propertyName);
+		throw new ReadOnlyPropertyError(entity.constructor._entityName, propertyName);
 	}
 
 }

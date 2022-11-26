@@ -13,6 +13,7 @@ class ModuleSettingsSerializer(EntitySerializer):
     alias = serializers.ReadOnlyField(help_text="Module alias")
     name = serializers.SerializerMethodField(help_text="Human-readable module name")
     is_enabled = serializers.BooleanField(required=True, help_text="True if the module is enabled, False otherwise")
+    node_number = serializers.ReadOnlyField(help_text="Number of entry points attached to the module")
 
     def get_name(self, module):
         """

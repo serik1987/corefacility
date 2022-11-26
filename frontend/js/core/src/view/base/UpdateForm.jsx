@@ -56,7 +56,8 @@ import {ReactComponent as ExclamationMark} from '../base-svg/error.svg';
  * 									the main menu. When the prop equals to object,
  * 									the resetForm() will be invoked during the mount
  * 									or press the reload() button and these input data
- * 									will be substituted.
+ * 									will be substituted. Such an object must contain
+ * 									the 'lookup' button
  * 
  * 		@param {function} on404		The function will be evoked when the server received
  * 									error 404 during the reload or update. We recommend
@@ -176,7 +177,6 @@ export default class UpdateForm extends Form{
 	 * 	If client-side validation fails, the function must just change and throw
 	 * 	ValidationError with no arguments.
 	 * 
-	 * 	@abstract
 	 *  @async
 	 * 	@return {undefined} all the result is changes in this._formObject
 	 * 		The function should throw an exception when server-side validation fails or

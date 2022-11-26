@@ -1,6 +1,6 @@
 import Entity from './base.mjs';
 import HttpRequestProvider from '../providers/http-request.mjs';
-import {ReadOnlyField} from '../fields/fields.mjs';
+import {ReadOnlyField, BooleanField} from '../fields/fields.mjs';
 import EntryPoint from './entry-point.mjs';
 import EntityState from './entity-state.mjs';
 
@@ -50,6 +50,8 @@ export default class Module extends Entity{
 				.setDescription("Name"),
 			"node_number": new ReadOnlyField()
 				.setDescription("Number of entry points"),
+			"is_enabled": new BooleanField()
+				.setDescription("Is module enabled"),
 		};
 	}
 
@@ -66,7 +68,7 @@ export default class Module extends Entity{
 
 	/** Modules doesn't have IDs - they have UUIDs */
 	get id(){
-		return undefined;
+		return this.uuid;
 	}
 
 	toString(){
