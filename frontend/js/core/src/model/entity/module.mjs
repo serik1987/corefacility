@@ -31,7 +31,7 @@ export default class Module extends Entity{
 	 */
 	static _defineEntityProviders(){
 		return [
-			new HttpRequestProvider("settings", Module),
+			new HttpRequestProvider("settings", this),
 		];
 	}
 

@@ -22,7 +22,7 @@
 .content_wrapper{
 	display: flex;
 	gap: 4px;
-	height: 24px;
+	/* height: 24px; */
 }
 
 .item_opener{

@@ -97,7 +97,6 @@ export default class HttpRequestProvider extends EntityProvider{
         }
         return client.patch(url, inputData)
             .then(responseData => {
-                entity._entityFields = {};
                 Object.assign(entity._entityFields, responseData);
             });
     }

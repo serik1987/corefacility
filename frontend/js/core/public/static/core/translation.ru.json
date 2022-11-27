@@ -9,6 +9,9 @@
 	"The requested resource was not found": "Запрашиваемый ресурс не обнаружен",
 	"May be, the resource has been deleted, moved permanently or never existed.": "Возможно, он был удалён, перемещён на своё новое постоянное место или никогда не существовал.",
 	"The API request to non-existent resource": "API-запрос к несуществующему ресурсу",
+	"The value must be an integer value": "Значение должно быть целым числом",
+	"The entered value can't be less than ": "Введённое значение не может быть меньше, чем ",
+	"The entered value can't be greater than": "Введённое значение не может быть больше, чем ",
 	"Loading...": "Загрузка...",
 	"Please, specify...": "Пожалуйста, уточните...",
 	"Apply": "Применить",
@@ -175,6 +178,11 @@
 	"Module status": "Состояние модуля",
 	"Save Settings": "Сохранить настройки",
 	"The module doesn't work until this is enabled.": "Модуль не будет работать до тех пор, пока он неактивен.",
+	"User password": "Пароль пользователя",
+	"The user can change his password": "Пользователь может изменить свой пароль",
+	"The password change functionality will be appeared above the user profile": "Функция смены пароля появится в профиле пользователя",
+	"Number of symbols in the password": "Количество символов в пароле",
+	"All auto-generated password will have exactly this number of symbols": "Все автоматически сгенерированные пароли будут иметь указанное число символов",
 
 	"User login.": "Авторизация пользователя"
 }

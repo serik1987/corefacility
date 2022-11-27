@@ -2,12 +2,14 @@ import {translate as t} from '../../utils.mjs';
 import EntityState from '../../model/entity/entity-state.mjs';
 import ModuleTreeItem from '../../model/tree/module-tree-item.mjs';
 import Module from '../../model/entity/module.mjs';
+import CoreModule from '../../model/entity/core-module.mjs';
 
 import CoreWindow from '../base/CoreWindow.jsx';
 import CoreWindowHeader from '../base/CoreWindowHeader.jsx';
 import TreeView from '../base/TreeView.jsx';
 import Scrollable from '../base/Scrollable.jsx';
-import DefaultModuleForm from './DefaultModuleForm';
+import DefaultModuleForm from './DefaultModuleForm.jsx';
+import CoreModuleForm from './CoreModuleForm.jsx';
 import styles from './SettingsWindow.module.css';
 
 
@@ -33,6 +35,14 @@ class _SettingsWindow extends CoreWindow{
 		this.handleSettingsAfterSave = this.handleSettingsAfterSave.bind(this);
 		this.handleSettingsSaveError = this.handleSettingsSaveError.bind(this);
 
+		this._moduleClasses = {
+			[window.application.model.uuid]: CoreModule,
+		}
+
+		this._moduleForms = {
+			[window.application.model.uuid]: CoreModuleForm,
+		}
+
 		this.state = {
 			...this.state,
 			module: window.application.model,
@@ -53,21 +63,33 @@ class _SettingsWindow extends CoreWindow{
 	async loadModule(loadingModule){
 		try{
 			this.setState({loadedModule: null, isLoading: true, error: null});
-			let loadedModule = null;
-			if (loadingModule.uuid === window.application.model.uuid){
-				loadedModule = await window.application.reloadModel();
-
-			} else {
-				loadedModule = await Module.get(loadingModule.uuid);
-			}
-			this.setState({
-				loadedModule: loadedModule,
-				isLoading: false,
-				error: null,
-			});
+			let ModuleClass = await this._getModuleClass(loadingModule);
+			let loadedModule = await this._getLoadedModule(loadingModule, ModuleClass);
+			this.setState({loadedModule: loadedModule, isLoading: false, error: null});
 		} catch (error){
 			this.setState({loadedModule: null, isLoading: false, error: error});
 		}
+	}
+
+	async _getModuleClass(loadingModule){
+		if (!(loadingModule.uuid in this._moduleClasses)){
+			this._moduleClasses[loadingModule.uuid] = Module;
+			this._moduleForms[loadingModule.uuid] = DefaultModuleForm;
+		}
+
+		return this._moduleClasses[loadingModule.uuid];
+	}
+
+	async _getLoadedModule(loadingModule, ModuleClass){
+		let loadedModule = null;
+
+		if (loadingModule.uuid === window.application.model.uuid){
+			loadedModule = await window.application.reloadModel();
+		} else {
+			loadedModule = await ModuleClass.get(loadingModule.uuid);
+		}
+
+		return loadedModule;
 	}
 
 	/** Process the click for reload button
@@ -92,13 +114,13 @@ class _SettingsWindow extends CoreWindow{
 	/** Triggers before the user saves settings
 	 */
 	handleSettingsBeforeSave(){
-		this.setState({isLoading: true});
+		this.setState({isLoading: true, error: null});
 	}
 
 	/** Triggers after the user saves settings
 	 */
 	handleSettingsAfterSave(){
-		this.setState({isLoading: false});
+		this.setState({isLoading: false, error: null});
 	}
 
 	/** Triggers an error occured during the settings save
@@ -106,10 +128,7 @@ class _SettingsWindow extends CoreWindow{
 	 * 	@param {string} error 		The error that is required to be displayed
 	 */
 	handleSettingsSaveError(error){
-		this.setState({
-			isLoading: false,
-			error: error,
-		})
+		this.setState({isLoading: false, error: error});
 	}
 
 	/** Renders the area on the top of the Web browser window;
@@ -127,7 +146,8 @@ class _SettingsWindow extends CoreWindow{
 	 *                            Such a component must implement the reload() method
 	 */
 	renderContent(){
-		console.log("Window rendering started.");
+		let ModuleForm = this._moduleForms[this.state.module.uuid];
+		console.log(this.state.loadedModule && this.state.loadedModule.toString());
 
 		return (
 			<CoreWindowHeader
@@ -143,7 +163,7 @@ class _SettingsWindow extends CoreWindow{
 								onInputChange={this.handleInputChange}/>
 						</Scrollable>
 						<div className={styles.options_container}>
-							{ this.state.loadedModule && <DefaultModuleForm
+							{ this.state.loadedModule && <ModuleForm
 								inputData={this.state.loadedModule}
 								on404={this.handle404}
 								onSettingsBeforeSave={this.handleSettingsBeforeSave}

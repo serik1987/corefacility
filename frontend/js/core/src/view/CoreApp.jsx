@@ -4,6 +4,8 @@ import {
 	Navigate
 } from 'react-router-dom';
 
+import CoreModule from '../model/entity/core-module.mjs';
+
 import App from './base/App.jsx';
 import UserListWindow from './user-list/UserListWindow.jsx';
 import UserDetailWindow from './user-list/UserDetailWindow.jsx';
@@ -17,6 +19,12 @@ import Window404 from './base/Window404.jsx';
  *  The component requires no props
  */
 export default class CoreApp extends App{
+
+	/** Class of the application model, if applicable
+	 */
+	static get applicationModelClass(){
+		return CoreModule;
+	}
 
 	/** Renders all routes.
 	 * 	@return {React.Component} the component must be <Routes> from 'react-dom-routes'.

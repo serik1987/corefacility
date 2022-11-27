@@ -153,16 +153,68 @@ export class StringField extends EntityField{
 /** Fields that accept only two values: true or false */
 export class BooleanField extends EntityField{
 	constructor(){
-		super('boolean')
+		super('boolean');
 	}
 }
 
 
 /** Fields that accepts any numbers */
 export class NumberField extends EntityField{
+
 	constructor(){
 		super('number');
 	}
+	
+}
+
+/** Field that accepts integer numbers only */
+export class IntegerField extends EntityField{
+
+	mask = /^[+\-]?\d+$/;
+
+	constructor(){
+		super('number');
+		this._minValue = -Infinity;
+		this._maxValue = Infinity;
+	}
+
+	setMinValue(value){
+		this._minValue = value;
+		return this;
+	}
+
+	/** Sets the maximum value of the widget.
+	 * 
+	 * 	Nobody can't be greater than this maximum value.111
+	 */
+	setMaxValue(value){
+		this._maxValue = value;
+		return this;
+	}
+
+	/** Accepts value from the React.js component and returns the value that will be sent to the
+	 * 		external source.
+	 * 	Also this method provides validation and must throw ValidationError if the value provided
+	 * 		by the React.js components are not valid
+	 *  @param {Entity} entity 		The Entity this value belongs to
+	 * 	@param {string} name 		Name of the entity field
+	 * 	@param {any} value 			Value received from React.js components
+	 * 	@return {any} 				Value that will be sent to external source
+	 */
+	proofread(entity, propertyName, value){
+		if (value === null || !value.match(this.mask)){
+			throw new ValidationError(t("The value must be an integer value"));
+		}
+		let internalValue = parseInt(value);
+		if (internalValue < this._minValue){
+			throw new ValidationError(t("The entered value can't be less than ") + this._minValue);
+		}
+		if (internalValue > this._maxValue){
+			throw new ValidationError(t("The entered value can't be greater than ") + this._maxValue);
+		}
+		return internalValue;
+	}
+
 }
 
 
