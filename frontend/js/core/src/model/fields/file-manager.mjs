@@ -27,7 +27,6 @@ export class FileManager extends FieldManager{
 
 	/** Uploads the file to the external server
 	 * 	@param {File} file the File object
-	 * 	@return {undefined}
 	 */
 	async upload(file){
 		this._uploadingFile = file;

@@ -2,12 +2,13 @@ import styled from 'styled-components';
 
 import {translate as t} from '../../utils.mjs';
 import CoreModule from '../../model/entity/core-module.mjs';
-
+import {DurationManager} from '../../model/fields/duration.mjs';
 
 import ModuleForm from './ModuleForm.jsx';
 import Label from '../base/Label.jsx';
 import CheckboxInput from '../base/CheckboxInput.jsx';
 import TextInput from '../base/TextInput.jsx';
+import PositiveDurationInput from '../base/PositiveDurationInput.jsx';
 import PrimaryButton from '../base/PrimaryButton.jsx';
 import baseStyles from './ModuleForm.module.css';
 
@@ -112,6 +113,7 @@ export default class CoreModuleForm extends ModuleForm{
 	 */
 	get fieldList(){
 		return [
+			"auth_token_lifetime",
 			"is_user_can_change_password",
 			"max_password_symbols",
 		];
@@ -124,6 +126,10 @@ export default class CoreModuleForm extends ModuleForm{
 		return (
 			<form className="settings_form">
 				<div className={`widgets_grid ${baseStyles.widgets_grid}`}>
+					<Label>{t("Session lifetime")}</Label>
+					<PositiveDurationInput
+						{...this.getFieldProps("auth_token_lifetime")}
+						tooltip={t("The user will be automatically logout after this given period of inactivity")}/>
 					<Label>{t("User password")}</Label>
 					<div>
 						<CheckboxInput

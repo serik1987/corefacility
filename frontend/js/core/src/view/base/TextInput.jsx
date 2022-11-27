@@ -48,6 +48,8 @@ import styles from '../base-styles/TextInput.module.css';
  * 
  * 		@param {boolean} inactive			When the input box is inactive, the user can't enter value to it
  * 
+ *      @param {Number} maxLength           Maximum number of symbols in the widget can't exceed this value
+ * 
  * 
  *  The input box has the state 'value' which correspond to the value entered by the user but this is not clear
  *  whether you shall trust on this state value or trust the value of the 'value' prop. So, this is recommended

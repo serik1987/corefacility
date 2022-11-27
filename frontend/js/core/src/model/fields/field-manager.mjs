@@ -1,4 +1,5 @@
-import {ReadOnlyField} from './fields.mjs';
+import {ReadOnlyPropertyError} from '../../exceptions/model.mjs';
+import EntityField from './fields.mjs';
 
 
 /** Sometimes the server doesn't allow to modify the field directly
@@ -34,6 +35,16 @@ export default class FieldManager{
 		this._internalValue = defaultValue;
 	}
 
+	/** The entity to which the field is attached */
+	get entity(){
+        return this._entity;
+    }
+
+    /** The field name inside the entity to which the field is attached */
+    get propertyName(){
+    	return this._propertyName;
+    }
+
 	/** The internal value*/
 	get internalValue(){
 		return this._internalValue;
@@ -53,7 +64,7 @@ export default class FieldManager{
  * a given class. It should NOT contain information related to a given
  * entity (i.e., field values, field managers etc.)
  */
-export class ManagedField extends ReadOnlyField{
+export class ManagedField extends EntityField{
 
 	/** Constructs the managed entity field
 	 * 	@param {function} managerClass 		an instance of this class will be
@@ -78,6 +89,11 @@ export class ManagedField extends ReadOnlyField{
 				this.defaultValue, this._options);
 		this._manager.internalValue = internalValue;
 		return this._manager;
+	}
+
+	/** Always throw an exception to indicate that setting this field is not allowed */
+	proofread(entity, propertyName, value){
+		throw new ReadOnlyPropertyError(entity.constructor._entityName, propertyName);
 	}
 
 }

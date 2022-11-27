@@ -1,5 +1,6 @@
 import {BooleanField, IntegerField} from '../fields/fields.mjs';
 import Module from './module.mjs';
+import DurationField from '../fields/duration.mjs';
 
 
 export default class CoreModule extends Module{
@@ -20,11 +21,14 @@ export default class CoreModule extends Module{
 	static _definePropertyDescription(){
 		return {
 			...Module._definePropertyDescription(),
+			auth_token_lifetime: new DurationField()
+				.setDescription("Authorization token lifetime"),
 			is_user_can_change_password: new BooleanField()
 				.setDescription("Can user change its password?"),
 			max_password_symbols: new IntegerField()
 				.setDescription("Maximum password symbols")
 				.setMinValue(6),
+
 		}
 	}
 

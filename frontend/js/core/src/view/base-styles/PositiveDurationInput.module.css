@@ -1,0 +1,33 @@
+.duration_container{
+	display: flex;
+	flex-wrap: wrap;
+	gap: 15px;
+}
+
+.duration_item{
+	white-space: pre-wrap;
+}
+
+.duration_item > div{
+	display: inline-block;
+	margin-right: 5px;
+	width: 35px;
+}
+
+.duration_item:last-child > div{
+	width: 65px;
+}
+
+.duration_item > span{
+	line-height: 32px;
+}
+
+.duration_item:last-child > span{
+	margin-right: 0;
+}
+
+.error_container{
+	margin: 0;
+	padding: 5px 0;
+	color: rgb(197, 57, 41);
+}
