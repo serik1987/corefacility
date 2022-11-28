@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import status
 
 from .full_mode_synchronization import FullModeSynchronization
+from .ihna_employees_serializer import IhnaEmployeesSerializer
 from .exceptions import RemoteServerError
 
 
@@ -23,8 +24,20 @@ class IhnaSynchronization(FullModeSynchronization):
     _http_client = None
     """ The urllib3 client """
 
+    def get_serializer_class(self):
+        """
+        Defines the serializer class. The serializer class is used to represent module settings in JSON format
+        :return: instance of rest_framework.serializers.Serializer class
+        """
+        return IhnaEmployeesSerializer
+
     @staticmethod
     def validate_page_number(page_number):
+        """
+        Checks that the page number is positive integer
+        :param page_number: the page number of string representation of the page number
+        :return: the page number or 0 if page number is not valid
+        """
         try:
             page_number = int(page_number)
             if page_number < 0:
@@ -35,6 +48,11 @@ class IhnaSynchronization(FullModeSynchronization):
 
     @property
     def http_client(self):
+        """
+        At first call, the function creates urllib3.PoolManager object.
+        At each subsequent call the function gets the previously created urllib3.PoolManager object
+        :return: the urllib3.PoolManager object
+        """
         if self._http_client is None:
             self._http_client = urllib3.PoolManager()
         return self._http_client
