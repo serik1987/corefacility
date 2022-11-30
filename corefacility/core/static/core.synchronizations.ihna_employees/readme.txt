@@ -1,1 +1,0 @@
-These are static files for the IhnaSynchronization module.

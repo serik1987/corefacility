@@ -16,13 +16,12 @@ do
     echo Creating CSS and JS for $app_name, frame = $frame_name...
     cd js/$dir_name
     npm run build
+    if (( $? != 0 ))
+    then
+      echo Compilation failed.
+      exit -1
+    fi
     cd ../..
-
-    # for output_file in `ls js/$dir_name/build/static/js`
-    # do
-    #  new_output_file=`sed -e "s/main/${frame_name}/" <<< "$output_file"`
-    #  mv -v js/$dir_name/build/static/js/$output_file js/$dir_name/build/static/js/$new_output_file
-    # done
 
     django_app_name=$app_name
 
@@ -37,6 +36,14 @@ do
     rm -rvf ../corefacility/$django_app_name/static/$app_name/$frame_name.*.css
     rm -rvf ../corefacility/$django_app_name/static/$app_name/$frame_name.*.css.map
     cp -v js/$dir_name/build/static/js/$frame_name.*.js ../corefacility/$django_app_name/static/$app_name
+    if (($? != 0 ))
+    then
+      echo You see this error because
+      echo    either the frontend compilation process has failed,
+      echo    or you did not run "'npm run eject'",
+      echo    or you did not change the "'[name]'" string in "'[name].[contenthash:8].js'" and "'[name].[contenthash:8].css'" string in the "config/webpack.config.js" file
+      echo We need the following output files: $frame_name.[hash-code].js and $frame_name.[hash-code].css
+    fi
     cp -v js/$dir_name/build/static/js/$frame_name.*.js.map ../corefacility/$django_app_name/static/$app_name
     cp -v js/$dir_name/build/static/css/$frame_name.*.css ../corefacility/$django_app_name/static/$app_name
     if (( $? != 0  ))

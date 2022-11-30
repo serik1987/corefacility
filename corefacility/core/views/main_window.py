@@ -48,6 +48,7 @@ class MainWindow(BaseWindow):
         self._evaluate_uuid(uuid)
         self._authorize_user()
         self._set_static_options()
+        kwargs['module_path'] = self._app_module
         dump = json.dumps(kwargs)
         return super().get_context_data(js_settings=dump, **kwargs)
 

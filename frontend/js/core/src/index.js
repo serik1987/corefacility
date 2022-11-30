@@ -1,33 +1,5 @@
-import {createRoot} from 'react-dom/client';
-import i18next from 'i18next'
-import {initReactI18next} from 'react-i18next';
-import CoreApp from './view/CoreApp.jsx';
+import App from 'corefacility-base/view/App';
+import CoreApp from 'corefacility-core/view/App';
 
 
-let app = <CoreApp/>;
-let backendLang = window.SETTINGS.lang;
-let root = createRoot(document.getElementById("root"));
-
-
-fetch(`/static/core/translation.${backendLang}.json`)
-	.then(response => response.json())
-	.then(result => {
-		i18next
-			.use(initReactI18next)
-			.init({
-				resources: {
-					[backendLang]: {
-						translation: result,
-					}
-				},
-				lng: backendLang,
-				fallbackLng: 'en',
-		});
-	})
-	.catch(error => {
-		console.error(error);
-		console.error("Failed to fetch language file. The language module will be switched off");
-	})
-	.finally(() => {
-		root.render(app);
-	});
+App.renderApp(CoreApp);

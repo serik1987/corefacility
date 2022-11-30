@@ -15,7 +15,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'common.min.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static css %}">
     <script>
-        {% block settings %}{% endblock %}
+        window.SETTINGS={{js_settings|safe}};
     </script>
     <script src="{% static js %}" defer></script>
 </head>
