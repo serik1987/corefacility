@@ -79,6 +79,9 @@ import styles from './style.module.css';
  * 		@param {boolean} canBeActivated true if the module can be activated, false otherwise
  * 
  * 		@param {string} whyCantBeActivated why the module can't be activated?
+ * 
+ * 		@param {string} additionalNotification An additional error message that shall be placed on the module
+ * 											   when the module can be activated and the field value is valid.
  *
  * 		@param {string} redirect	if string, the form will be redirect to the React.js
  * 									route pointed out in this property. If null, no redirection
@@ -93,6 +96,7 @@ export default class ModuleForm extends UpdateForm{
             ...this.state,
             canBeActivated: true,
             whyCantBeActivated: null,
+            additionalNotification: null,
         }
     }
 
@@ -165,6 +169,12 @@ export default class ModuleForm extends UpdateForm{
 		throw new NotImplementedError("renderAuxiliarySettings");
 	}
 
+	/** Renders auxiliary control buttons. These buttons will be place at the right of the 'Save Settings' button.
+	 */
+	renderAuxiliaryControls(){
+		return null;
+	}
+
 	/** Renders the form given that the updating entity was successfully loaded.
 	 * 	@return {React.Component} Rendered content.
 	 */
@@ -176,7 +186,8 @@ export default class ModuleForm extends UpdateForm{
 					<CheckboxInput
 						{...this.getFieldProps("is_enabled")}
 						value={this._formValues && this._formValues.is_enabled}
-						error={this.state.errors.is_enabled || this.state.whyCantBeActivated}
+						error={this.state.additionalNotification ||
+							this.state.errors.is_enabled || this.state.whyCantBeActivated}
 						disabled={!this.state.canBeActivated}
 						label={t("Enabled")}
 						tooltip={t("The module doesn't work until this is enabled.")}/>
@@ -189,6 +200,7 @@ export default class ModuleForm extends UpdateForm{
 					<PrimaryButton {...this.getSubmitProps()}>
 						{t("Save Settings")}
 					</PrimaryButton>
+					{this.renderAuxiliaryControls()}
 				</div>
 			</form>
 		);

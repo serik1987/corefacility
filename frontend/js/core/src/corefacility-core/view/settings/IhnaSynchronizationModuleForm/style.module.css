@@ -1,0 +1,18 @@
+.language_container{
+	display: flex;
+	gap: 15px;
+}
+
+.action_aligner{
+		display: none;
+	}
+
+@media screen and (max-width: 1010px){
+	.action_aligner{
+		display: block;
+	}
+
+	.action_container{
+		grid-column: 1 / span 2;
+	}
+}

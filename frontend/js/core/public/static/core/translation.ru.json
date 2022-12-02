@@ -210,6 +210,8 @@
 	"Loading page length": "Длина загружаемой страницы",
 	"Number of user accounts that shall be downloaded from the IHNA website per one request": "Количество учётные записей пользователей, которые будут скачаны с сайта ИВНД и НФ РАН за один раз",
 	"To activate the module please, turn on at least one Synchronization action": "Чтобы активировать модуль, включите хотя бы одно Действие при синхронизации",
+	"Save and Synchronize": "Сохранить и синхронизовать",
+	"The synchronization can't be started until this module is disabled": "Нельзя запустить синхронизацию, пока модуль неактивен",
 
 	"User login.": "Авторизация пользователя"
 }
