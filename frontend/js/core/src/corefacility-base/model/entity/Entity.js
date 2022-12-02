@@ -315,7 +315,7 @@ export default class Entity{
 	 * 	@return {list[EntityProvider]} list of entity provider objects
 	 */
 	static get _entityProviders(){
-	    if (this.__internalEntityProviders === undefined){
+	    if (!Object.hasOwnProperty(this.__internalEntityProviders)){
 	        this.__internalEntityProviders = this._defineEntityProviders();
 	    }
 	    return this.__internalEntityProviders;
@@ -337,7 +337,7 @@ export default class Entity{
 	 *  @return {object} field description for all fields
 	 */
 	static get _propertyDescription(){
-		if (this.__internalPropertyDescription === undefined){
+		if (!Object.hasOwnProperty(this.__internalEntityProviders)){
 			this.__internalPropertyDescription = this._definePropertyDescription();
 		}
 		return this.__internalPropertyDescription;

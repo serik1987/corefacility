@@ -31,6 +31,14 @@ class IhnaSynchronization(FullModeSynchronization):
         """
         return IhnaEmployeesSerializer
 
+    def get_pseudomodule_identity(self):
+        """
+        If the module is pseudo-module, the function returns some short string that is required for the frontend to
+        identify the pseudo-module.
+        :return: a string containing the pseudo-module identity
+        """
+        return "ihna_employees"
+
     @staticmethod
     def validate_page_number(page_number):
         """

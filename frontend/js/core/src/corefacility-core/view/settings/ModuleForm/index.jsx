@@ -75,12 +75,26 @@ import styles from './style.module.css';
  * 		@param {boolean} inactive	When the form interacts with the server
  * 			(e.g., fetches or posts the data) its interaction with the rest of
  * 			the world is also impossible
+ * 
+ * 		@param {boolean} canBeActivated true if the module can be activated, false otherwise
+ * 
+ * 		@param {string} whyCantBeActivated why the module can't be activated?
  *
  * 		@param {string} redirect	if string, the form will be redirect to the React.js
  * 									route pointed out in this property. If null, no redirection
  * 									will be provided.
  */
 export default class ModuleForm extends UpdateForm{
+
+	constructor(props){
+        super(props);
+
+        this.state = {
+            ...this.state,
+            canBeActivated: true,
+            whyCantBeActivated: null,
+        }
+    }
 
 	/** Return default values. The function is required if you want the resetForm to work correctly
 	 * 	Each field must be mentioned!
@@ -162,6 +176,8 @@ export default class ModuleForm extends UpdateForm{
 					<CheckboxInput
 						{...this.getFieldProps("is_enabled")}
 						value={this._formValues && this._formValues.is_enabled}
+						error={this.state.errors.is_enabled || this.state.whyCantBeActivated}
+						disabled={!this.state.canBeActivated}
 						label={t("Enabled")}
 						tooltip={t("The module doesn't work until this is enabled.")}/>
 					{this.renderAuxiliarySettings()}

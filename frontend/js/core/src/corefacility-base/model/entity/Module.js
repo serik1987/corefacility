@@ -52,6 +52,8 @@ export default class Module extends Entity{
 				.setDescription("Number of entry points"),
 			"is_enabled": new BooleanField()
 				.setDescription("Is module enabled"),
+			"pseudomodule_identity": new ReadOnlyField()
+				.setDescription("Identity of the pseudo-module"),
 		};
 	}
 

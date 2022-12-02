@@ -312,10 +312,18 @@ class CorefacilityModule(Entity):
         """
         return _(self.get_name())
 
+    def get_pseudomodule_identity(self):
+        """
+        If the module is pseudo-module, the function returns some short string that is required for the frontend to
+        identify the pseudo-module.
+        :return: a string containing the pseudo-module identity
+        """
+        return None
+
     def install(self):
         """
         Installs the module by making changes to the module itself, to the file system and to the code of
-        a parent module and the core module (if applicable)
+        a parent module and the core module (if applicable).
         """
         self._install_database()
         self._install_routes()

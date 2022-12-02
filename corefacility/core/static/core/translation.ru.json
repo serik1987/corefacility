@@ -16,6 +16,7 @@
 	"The value must be a number": "Значение должно быть числом",
 	"The value must not be less than ": "Значение не должно быть меньше, чем ",
 	"The value must not be greater than ": "Значение не должно быть больше, чем ",
+	"Invalid URL": "Неверный URL",
 	"Loading...": "Загрузка...",
 	"Please, specify...": "Пожалуйста, уточните...",
 	"Apply": "Применить",
@@ -181,7 +182,6 @@
 	"Severity level": "Уровень значимости",
 	"Message": "Сообщение",
 
-
 	"Application Settings": "Настройки приложений",
 	"Provides list of all entry points connected to a given module": "Список всех точек доступа, подключённых к данному модулю",
 	"Module settings, install and/or uninstall": "Настройка, установка и/или удаление модуля",
@@ -195,6 +195,21 @@
 	"All auto-generated password will have exactly this number of symbols": "Все автоматически сгенерированные пароли будут иметь указанное число символов",
 	"The user will be automatically logout after this given period of inactivity": "Пользователь автоматически выйдет из приложения, если не будет пользоваться им в течение данного времени",
 	"Session lifetime": "Время жизни сессии",
+	"Synchronization actions": "Действия при синхронизации",
+	"Add missed user accounts": "Добавить пропущенные учётные записи пользователей",
+	"Creates accounts for all users that exist in the IHNA Website but doesn't exist in Corefacility": "Создаст все учётные записи, которые присутствуют на сайте ИВНД и НФ РАН, но отсутствуют в Corefacility",
+	"Update user accounts": "Обновить учётные записи пользователей",
+	"Modifies all accounts in such a way as information entered there is line with the information published on the IHNA Website": "Изменяет учётные записи таким образом, чтобы они содержали ту же информацию, которая содержится и на сайте ИВНД и НФ РАН",
+	"Remove redundant users": "Удалить лишних пользователей",
+	"Removes all accounts that exist in Corefacility but doesn't exist in the IHNA website": "Удаляет все учётные записи пользователей, которые присутствуют в Corefacility, но отсутствуют на сайте ИВНД и НФ РАН",
+	"The website address": "Адрес сайта",
+	"Enter the address containing protocol name, domain name and the port only": "Введите только ту часть адреса, которая содержит только название протокола, название домена и номер порта",
+	"Website language": "Язык сайта",
+	"Russian": "Русский",
+	"English": "Английский",
+	"Loading page length": "Длина загружаемой страницы",
+	"Number of user accounts that shall be downloaded from the IHNA website per one request": "Количество учётные записей пользователей, которые будут скачаны с сайта ИВНД и НФ РАН за один раз",
+	"To activate the module please, turn on at least one Synchronization action": "Чтобы активировать модуль, включите хотя бы одно Действие при синхронизации",
 
 	"User login.": "Авторизация пользователя"
 }

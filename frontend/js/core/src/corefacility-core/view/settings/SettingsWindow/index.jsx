@@ -5,12 +5,14 @@ import TreeView from 'corefacility-base/shared-view/components/TreeView';
 import Scrollable from 'corefacility-base/shared-view/components/Scrollable';
 
 import CoreModule from 'corefacility-core/model/entity/CoreModule';
+import IhnaSynchronizationModule from 'corefacility-core/model/entity/IhnaSynchronizationModule';
 import ModuleTreeItem from 'corefacility-core/model/tree/ModuleTreeItem';
 
 import CoreWindow from '../../base/CoreWindow';
 import CoreWindowHeader from '../../base/CoreWindowHeader';
 import DefaultModuleForm from '../DefaultModuleForm';
 import CoreModuleForm from '../CoreModuleForm';
+import IhnaSynchronizationModuleForm from '../IhnaSynchronizationModuleForm';
 import styles from './style.module.css';
 
 
@@ -40,8 +42,16 @@ class _SettingsWindow extends CoreWindow{
 			[window.application.model.uuid]: CoreModule,
 		}
 
+		this._pseudomoduleClasses = {
+			ihna_employees: IhnaSynchronizationModule,
+		}
+
 		this._moduleForms = {
 			[window.application.model.uuid]: CoreModuleForm,
+		}
+
+		this._pseudomoduleForms = {
+			ihna_employees: IhnaSynchronizationModuleForm,
 		}
 
 		this.state = {
@@ -73,7 +83,14 @@ class _SettingsWindow extends CoreWindow{
 	}
 
 	async _getModuleClass(loadingModule){
-		if (!(loadingModule.uuid in this._moduleClasses)){
+		if (loadingModule.uuid in this._moduleClasses){
+			return this._moduleClasses[loadingModule.uuid];
+		}
+
+		if (loadingModule.pseudomodule_identity in this._pseudomoduleClasses){
+			this._moduleClasses[loadingModule.uuid] = this._pseudomoduleClasses[loadingModule.pseudomodule_identity];
+			this._moduleForms[loadingModule.uuid] = this._pseudomoduleForms[loadingModule.pseudomodule_identity];
+		} else {
 			this._moduleClasses[loadingModule.uuid] = Module;
 			this._moduleForms[loadingModule.uuid] = DefaultModuleForm;
 		}

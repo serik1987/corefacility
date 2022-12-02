@@ -45,7 +45,7 @@ body #small-size-message{
 
 
 /* CSS for wait bar */
-@media screen and (max-width: 700px){
+@media screen and (max-width: 800px){
 	body #small-size-message{
 		display: block;
 		position: fixed;
