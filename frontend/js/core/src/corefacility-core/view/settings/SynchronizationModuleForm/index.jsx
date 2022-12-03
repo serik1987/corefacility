@@ -3,6 +3,10 @@ import client from 'corefacility-base/model/HttpClient';
 import Label from 'corefacility-base/shared-view/components/Label';
 import ProgressBar from 'corefacility-base/shared-view/components/ProgressBar';
 import PrimaryButton from 'corefacility-base/shared-view/components/PrimaryButton';
+import {ReactComponent as AddIcon} from 'corefacility-base/shared-view/icons/add.svg';
+import {ReactComponent as EditIcon} from 'corefacility-base/shared-view/icons/edit.svg';
+import {ReactComponent as RemoveIcon} from 'corefacility-base/shared-view/icons/delete.svg';
+import {ReactComponent as DefaultIcon} from 'corefacility-base/shared-view/icons/person.svg';
 
 import ModuleForm from '../ModuleForm';
 import styles from './style.module.css';
@@ -122,6 +126,8 @@ import styles from './style.module.css';
             options: null,
             completedStages: 0,
         }
+
+        this._details = null;
     }
 
     /** Starts the synchronization process
@@ -145,6 +151,13 @@ import styles from './style.module.css';
                     options: result.next_options,
                     completedStages: this.state.completedStages + 1
                 });
+                this._details = [...this._details, ...result.details.map(errorInfo => {
+                    return {
+                        action: errorInfo.action,
+                        user: `${errorInfo.surname} ${errorInfo.name}`,
+                        message: errorInfo.message,
+                    }
+                })];
                 options = result.next_options;
                 if (isInterrupted){
                     return;
@@ -190,6 +203,10 @@ import styles from './style.module.css';
             return;
         }
         await this.handleSubmit(event);
+        if (window.SETTINGS.suggest_administration){
+            await window.application.openModal("posix_action", {bashScript: ["python3 manage.py synchronize"]});
+            return;
+        }
         this.setState({
             synchronizationState: SynchronizationState.starting,
             percent: 0,
@@ -310,6 +327,32 @@ import styles from './style.module.css';
                 <div className={synchronizationMessageClasses}>{synchronizationMessage}</div>
                 <ProgressBar progress={this.state.percent}/>
                 <div className={styles.synchronization_controls}>{controls}</div>
+                {this._details !== null && this._details.length !== 0 && (
+                    <div className={styles.error_container}>
+                        {this._details.map(detailInfo => {
+                            let {action, user, message} = detailInfo;
+                            let icon = null;
+                            switch (action){
+                            case "add":
+                                icon = <AddIcon/>;
+                                break;
+                            case "edit":
+                                icon = <EditIcon/>;
+                                break;
+                            case "remove":
+                                icon = <RemoveIcon/>;
+                                break;
+                            default:
+                                icon = <DefaultIcon/>;
+                            }
+                            return [
+                                icon,
+                                <div>{user}</div>,
+                                <div>{message}</div>
+                            ];
+                        })}
+                    </div>
+                )}
             </div>
         );
     }
@@ -324,6 +367,7 @@ import styles from './style.module.css';
                 completedStages: 0,
             });
             this._stageNumber = 0;
+            this._details = [];
             this.synchronize();
         }
     }

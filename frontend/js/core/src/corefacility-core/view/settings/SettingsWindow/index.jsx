@@ -179,7 +179,7 @@ class _SettingsWindow extends CoreWindow{
 								value={this.state.module}
 								onInputChange={this.handleInputChange}/>
 						</Scrollable>
-						<div className={styles.options_container}>
+						<Scrollable cssSuffix={` ${styles.options_container}`}>
 							{ this.state.loadedModule && <ModuleForm
 								inputData={this.state.loadedModule}
 								on404={this.handle404}
@@ -187,7 +187,7 @@ class _SettingsWindow extends CoreWindow{
 								onSettingsAfterSave={this.handleSettingsAfterSave}
 								onSettingsSaveError={this.handleSettingsSaveError}/>
 							}
-						</div>
+						</Scrollable>
 					</div>
 			</CoreWindowHeader>
 		);

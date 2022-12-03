@@ -3,9 +3,10 @@ from time import sleep
 from django.core.management import BaseCommand
 
 from core.entity.entry_points import SynchronizationsEntryPoint
+from core.os.os_command import OsCommand
 
 
-class Command(BaseCommand):
+class Command(OsCommand):
     """
     Provides an account synchronization process
     """
@@ -28,7 +29,7 @@ class Command(BaseCommand):
         while not synchronization_started or options is not None:
             if options is None:
                 options = {}
-            print("Synchronization step: {step}. Synchronization options: {options}".format(
+            print("\033[32mSynchronization step: {step}.\033[0m Synchronization options: {options}".format(
                 step=synchronization_step, options=options
             ))
             synchronization_result = SynchronizationsEntryPoint.synchronize(**options)
@@ -36,13 +37,13 @@ class Command(BaseCommand):
             options = synchronization_result["next_options"]
             for error_details in synchronization_result["details"]:
                 print("\033[31m[{message_code}] {message}\033[0m".format(
-                    message_code=options["message_code"],
-                    message=options["message"]
+                    message_code=error_details["message_code"],
+                    message=error_details["message"]
                 ))
                 print("Error source: {name} {surname} ({login})".format(
                     name=error_details["name"],
                     surname=error_details["surname"],
                     login=error_details["login"],
                 ))
-            synchronization_step = 1
+            synchronization_step += 1
             sleep(self.TECHNICAL_PAUSE)
