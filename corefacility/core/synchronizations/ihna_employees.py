@@ -1,3 +1,4 @@
+import math
 import urllib3
 import json
 
@@ -23,6 +24,9 @@ class IhnaSynchronization(FullModeSynchronization):
 
     _http_client = None
     """ The urllib3 client """
+
+    _total_count = None
+    """ Total number of users downloaded during the last request """
 
     def get_serializer_class(self):
         """
@@ -138,7 +142,15 @@ class IhnaSynchronization(FullModeSynchronization):
                 raise RuntimeError("The result is not success")
         except Exception as err:
             raise RemoteServerError()
+        self._total_count = response_body['output']['count']
         return response_body['output']
+
+    def get_download_total_steps(self):
+        """
+        Estimates the total number of steps required for downloading.
+        :return: the total number of steps
+        """
+        return math.ceil(self._total_count / self.get_page_length())
 
     def find_user(self, raw_data, **options):
         """

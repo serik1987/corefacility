@@ -96,6 +96,31 @@ export default class IhnaSynchronizationModuleForm extends SynchronizationModule
         return ["auto_add", "auto_update", "auto_remove", "ihna_website", "language", "page_length"];
     }
 
+    /** Calculates the percent of synchronization completed.
+     *  @return {object} result             The response body
+     *  @return {number} percent            Completed percent number
+     */
+    calculatePercentage(result){
+    	let completedStages = this.state.completedStages + 1;
+
+    	console.log(result);
+    	console.log(completedStages);
+
+
+    	if (result.next_options === null){
+    		return 100;
+    	}
+
+        switch (result.next_options.action){
+        case "inverse":
+        	return completedStages / (completedStages + 2) * 100;
+        case "remove":
+        	return completedStages / (completedStages + 1) * 100;
+        default:
+        	return super.calculatePercentage(result);
+        }
+    }
+
     /** Renders all settings for the module widget except Application status -> Enabled checkbox,
      *  Save Settings button and 'Settings was not saved' message
      */
@@ -175,6 +200,8 @@ export default class IhnaSynchronizationModuleForm extends SynchronizationModule
         		this._formObject.is_enabled = false;
         	}
         }
+
+        super.componentDidUpdate(prevProps, prevState);
     }
 
 }

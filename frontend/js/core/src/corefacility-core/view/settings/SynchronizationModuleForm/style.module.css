@@ -1,0 +1,23 @@
+.synchronization_container{
+	
+}
+
+.synchronization_message, .synchronization_error{
+	margin: 20px 0;
+	text-align: center;
+}
+
+.synchronization_error{
+	color: rgb(197, 57, 41);
+}
+
+.synchronization_controls{
+	display: flex;
+	margin-top: 30px;
+	justify-content: center;
+	gap: 10px;
+}
+
+.synchronization_controls button{
+	margin: 0;
+}

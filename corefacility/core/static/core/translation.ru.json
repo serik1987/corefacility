@@ -25,9 +25,12 @@
 	"Try again.": "Попытаться снова...",
 	"Add": "Добавить",
 	"Cancel": "Отменить",
-	"Not Found": "Не найдено",
+	"Not Found": "е найдено",
 	"Not found": "Не найдено",
 	"Save": "Сохранить",
+	"Pause": "Пауза",
+	"Close": "Закрыть",
+	"Resume": "Возобновить",
 	"Save and close": "Сохранить и закрыть",
 	"Close without save": "Закрыть без сохранения",
 	"Remove": "Удалить",
@@ -147,6 +150,9 @@
 	"The user password is: {PASSWORD} Please, set this password in the operating system using the following command:": "Пароль пользователя: {PASSWORD} Пожалуйста, установите пароль в операционной системе, используя следующую команду:",
 
 	"Synchronization": "Синхронизация",
+	"Synchronization completed.": "Синхронизация завершена.",
+	"Stopping synchronization...": "Остановка синхронизации...",
+	"The synchronization was stopped.": "Синхронизация остановлена.",
 
 	"Logs": "Журнал посещений",
 	"Log information": "Информация о посещении",

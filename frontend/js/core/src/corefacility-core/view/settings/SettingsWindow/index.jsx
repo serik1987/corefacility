@@ -165,7 +165,6 @@ class _SettingsWindow extends CoreWindow{
 	 */
 	renderContent(){
 		let ModuleForm = this._moduleForms[this.state.module.uuid];
-		console.log(this.state.loadedModule && this.state.loadedModule.toString());
 
 		return (
 			<CoreWindowHeader

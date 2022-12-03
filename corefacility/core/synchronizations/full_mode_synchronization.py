@@ -126,7 +126,15 @@ class FullModeSynchronization(SynchronizationModule):
         return {
             "next_options": next_options,
             "details": details,
+            "total_steps": self.get_download_total_steps() + 2,
         }
+
+    def get_download_total_steps(self):
+        """
+        Estimates the total number of steps required for downloading.
+        :return: the total number of steps
+        """
+        return -2
 
     def inverse(self, **options):
         """
@@ -153,7 +161,7 @@ class FullModeSynchronization(SynchronizationModule):
             }
         except Exception as exc:
             details = [self.error_message({}, "inverse", exc)]
-        return {"next_options": next_options, "details": details}
+        return {"next_options": next_options, "details": details, "total_steps": 0}
 
     def remove(self, **options):
         next_options = None
@@ -171,7 +179,7 @@ class FullModeSynchronization(SynchronizationModule):
                     next_options = {"action": "remove", "removing_users": list(removing_users)}
             except Exception as exc:
                 details = [self.error_message({}, "remove", exc)]
-        return {"next_options": next_options, "details": details}
+        return {"next_options": next_options, "details": details, "total_steps": 0}
 
     def create_user(self, user_kwargs, updated_users, details):
         """
@@ -244,7 +252,8 @@ class FullModeSynchronization(SynchronizationModule):
 
     def get_raw_data(self, **options):
         """
-        Makes an HTTP request to the external server that uploads certain amount of the user list
+        Makes an HTTP request to the external server that uploads certain amount of the user list.
+        Auxiliary, the method should set the _percent protected field that reflects the percentage completed.
 
         :param options: some request options
         :return: the response body represented as Python's primitives
