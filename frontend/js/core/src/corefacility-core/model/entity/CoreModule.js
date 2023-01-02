@@ -28,7 +28,6 @@ export default class CoreModule extends Module{
 			max_password_symbols: new IntegerField()
 				.setDescription("Maximum password symbols")
 				.setMinValue(6),
-
 		}
 	}
 

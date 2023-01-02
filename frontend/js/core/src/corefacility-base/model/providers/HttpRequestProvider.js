@@ -171,4 +171,8 @@ export default class HttpRequestProvider extends EntityProvider{
         });
     }
 
+    getObjectFromResult(result){
+        return this._resultToListMapper([result])[0];
+    }
+
 }

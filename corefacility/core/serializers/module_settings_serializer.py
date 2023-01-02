@@ -1,5 +1,5 @@
 from django.utils.translation import gettext
-from rest_framework import serializers
+from rest_framework import serializers, exceptions
 
 from .entity_serializer import EntitySerializer
 
@@ -30,6 +30,8 @@ class ModuleSettingsSerializer(EntitySerializer):
         :param validated_data: input data after they have been validated
         :return: the updated entity
         """
+        if "is_enabled" in validated_data and validated_data["is_enabled"] != module.is_enabled:
+            module.is_enableable(validated_data['is_enabled'])
         if 'user_settings' in validated_data:
             for key, value, in validated_data['user_settings'].items():
                 module.user_settings.set(key, value)

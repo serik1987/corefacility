@@ -201,6 +201,14 @@ class CorefacilityModule(Entity):
             self._autoload()
         return super().is_enabled()
 
+    def is_enableable(self, new_value):
+        """
+        Checks whether the module can be enabled or disabled
+        :param new_value: new module value to set
+        :return: nothing. If the operation is impossible, raise exception
+        """
+        pass
+
     @property
     def state(self):
         """

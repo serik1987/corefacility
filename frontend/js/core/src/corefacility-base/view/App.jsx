@@ -62,6 +62,16 @@ export default class App extends DialogWrapper{
 		this.setState({token: value});
 	}
 
+	/** Currently authorized user */
+	get user(){
+		return this._user;
+	}
+
+	/** Sets the currently authorized user */
+	set user(value){
+		this._user = value
+	}
+
 	/** true if the user was authorized, false otherwise */
 	get isAuthorized(){
 		return typeof this.state.token === "string";

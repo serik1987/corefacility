@@ -1,5 +1,7 @@
+from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from django.core.signing import Signer
+from rest_framework.exceptions import ValidationError
 
 from core.entity import CorefacilityModule
 from .entry_point import EntryPoint
@@ -116,6 +118,19 @@ class AuthorizationModule(CorefacilityModule):
         :return: always False
         """
         return False
+
+    def is_enableable(self, new_value):
+        """
+        Checks whether authorization modules can be enabled
+        :param new_value: new value
+        :return: nothing, ValidationError will be risen in case of failure
+        """
+        entry_point = AuthorizationsEntryPoint()
+        total_modules_enabled = 0
+        for _ in entry_point.modules():
+            total_modules_enabled += 1
+        if total_modules_enabled <= 1 and not new_value:
+            raise ValidationError({"is_enabled": gettext("At least one authorization module must be enabled")})
 
     def try_ui_authorization(self, request):
         """

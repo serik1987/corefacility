@@ -13,6 +13,7 @@ import LogListWindow from './logs/LogListWindow';
 import LogDetailWindow from './logs/LogDetailWindow';
 import SettingsWindow from './settings/SettingsWindow';
 import Window404 from './base/Window404';
+import AuthorizationForm from './AuthorizationForm';
 
 
 /** This is the root component for the core application
@@ -30,17 +31,21 @@ export default class App extends BaseApp{
 	 * 	@return {React.Component} the component must be <Routes> from 'react-dom-routes'.
 	 */
 	renderAllRoutes(){
-		return (
-			<Routes>
-				<Route path="/logs/:lookup/" element={<LogDetailWindow/>} />
-				<Route path="/logs/" element={<LogListWindow/>} />
-				<Route path="/settings/" element={<SettingsWindow/>} />
-				<Route path="/users/:lookup/" element={<UserDetailWindow/>} />
-				<Route path="/users/" element={<UserListWindow/>} />
-				<Route path="/" element={<Navigate to="/users/"/>} />
-				<Route path="*" element={<Window404/>}/>
-			</Routes>
-		);
+		if (this.token !== null){
+			return (
+				<Routes>
+					<Route path="/logs/:lookup/" element={<LogDetailWindow/>} />
+					<Route path="/logs/" element={<LogListWindow/>} />
+					<Route path="/settings/" element={<SettingsWindow/>} />
+					<Route path="/users/:lookup/" element={<UserDetailWindow/>} />
+					<Route path="/users/" element={<UserListWindow/>} />
+					<Route path="/" element={<Navigate to="/users/"/>} />
+					<Route path="*" element={<Window404/>}/>
+				</Routes>
+			);
+		} else {
+			return <AuthorizationForm/>;
+		}
 	}
 
 }

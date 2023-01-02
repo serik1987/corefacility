@@ -2,6 +2,7 @@ from django.utils.translation import gettext_lazy as _
 
 from core.entity.user import User, UserSet
 from core.entity.entity_exceptions import EntityNotFoundException
+from core.serializers import ModuleSettingsSerializer
 
 from .login_password import LoginPasswordAuthorization
 
@@ -39,7 +40,7 @@ class StandardAuthorization(LoginPasswordAuthorization):
         _("Standard authorization")
         return "Standard authorization"
 
-    def authorize(self, login: str, password: str) -> User:
+    def authorize(self, login: str, password: str):
         """
         Performs an immediate user's authorization
 
@@ -54,3 +55,11 @@ class StandardAuthorization(LoginPasswordAuthorization):
         except EntityNotFoundException:
             return None
         return user if user.password_hash.check(password) else None
+
+    def get_serializer_class(self):
+        """
+        The settings serializer class transforms module settings to Python primitives and vice versa.
+        The module settings serializer can also provide the serialization process
+        :return:
+        """
+        return ModuleSettingsSerializer

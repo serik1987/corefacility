@@ -14,7 +14,6 @@ class IhnaEmployeesSerializer(ModuleSettingsSerializer):
                                            help_text="Update users")
     auto_remove = serializers.BooleanField(source="user_settings.auto_remove", default=True,
                                            help_text="Remove users")
-
     ihna_website = serializers.URLField(source="user_settings.ihna_website", default="https://www.ihna.ru",
                                         help_text="Ihna website URL")
     language = serializers.ChoiceField(source="user_settings.language", default="ru",

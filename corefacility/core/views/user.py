@@ -60,7 +60,8 @@ class UserViewSet(AvatarMixin, EntityViewSet):
         from core.os.command_maker import CommandMaker
         with CorefacilityTransaction():
             user = self.get_object()
-            symbol_alphabet = EntityPasswordManager.SMALL_LATIN_LETTERS + EntityPasswordManager.DIGITS
+            symbol_alphabet = EntityPasswordManager.SMALL_LATIN_LETTERS + EntityPasswordManager.DIGITS + \
+                EntityPasswordManager.BIG_LATIN_LETTERS
             max_symbols = App().get_max_password_symbols()
             new_password = user.password_hash.generate(symbol_alphabet, max_symbols)
             if PosixProvider().is_provider_on() and not settings.CORE_SUGGEST_ADMINISTRATION:

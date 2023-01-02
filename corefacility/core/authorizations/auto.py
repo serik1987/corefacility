@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from core.entity.entry_points.authorizations import AuthorizationModule
 from core.entity.user import UserSet
+from core.serializers import ModuleSettingsSerializer
 
 
 class AutomaticAuthorization(AuthorizationModule):
@@ -104,3 +105,11 @@ class AutomaticAuthorization(AuthorizationModule):
         user = UserSet().get("support")
         if user.is_support and not user.is_locked:
             return user
+
+    def get_serializer_class(self):
+        """
+        The settings serializer class transforms module settings to Python primitives and vice versa.
+        The module settings serializer can also provide the serialization process
+        :return:
+        """
+        return ModuleSettingsSerializer

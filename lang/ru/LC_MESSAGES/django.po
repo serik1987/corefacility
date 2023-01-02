@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-23 05:09+0300\n"
+"POT-Creation-Date: 2023-01-01 12:04+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -83,7 +83,7 @@ msgstr ""
 msgid "The following problem occured during the mail delivery: "
 msgstr "При отправке сообщения пользователю возникла следующая проблема: "
 
-#: core/authorizations/auto.py:41
+#: core/authorizations/auto.py:42
 msgid "Automatic authorization"
 msgstr "Автоматическая авторизация"
 
@@ -91,7 +91,7 @@ msgstr "Автоматическая авторизация"
 msgid "Password recovery function"
 msgstr "Функция восстановления пароля"
 
-#: core/authorizations/standard.py:39
+#: core/authorizations/standard.py:40
 msgid "Standard authorization"
 msgstr "Стандартная авторизация"
 
@@ -175,9 +175,13 @@ msgstr "Проект"
 msgid "User"
 msgstr "Пользователь"
 
-#: core/entity/entry_points/authorizations.py:32
+#: core/entity/entry_points/authorizations.py:34
 msgid "Authorization methods"
 msgstr "Способы авторизации"
+
+#: core/entity/entry_points/authorizations.py:133
+msgid "At least one authorization module must be enabled"
+msgstr "Хотя бы один из способов авторизации должен быть активен"
 
 #: core/entity/entry_points/projects.py:33
 msgid "Project applications"
@@ -289,21 +293,21 @@ msgid "Failed to remove a user: the user has been currently logged in"
 msgstr ""
 "Невозможно удалить пользователя: этот пользователь только что залогинился"
 
-#: core/synchronizations/ihna_employees.py:63
+#: core/synchronizations/ihna_employees.py:93
 msgid "IHNA RAS account synchronization"
 msgstr "Синхронизация с сайтом ИВНД и НФ РАН"
 
-#: core/templates/core/index.html:3
+#: core/templates/core/base.html:3
 msgid "Loading..."
 msgstr "Загрузка..."
 
-#: core/templates/core/index.html:24
+#: core/templates/core/index.html:6
 msgid "You need to enable Javascript to run this application"
 msgstr ""
 "Вам необходимо включить поддержку Javascript в браузере для того, чтобы "
 "запустить это приложение"
 
-#: core/templates/core/index.html:36
+#: core/templates/core/index.html:17
 msgid ""
 "The device screen resolution is too small. Please, use this application on "
 "another device"

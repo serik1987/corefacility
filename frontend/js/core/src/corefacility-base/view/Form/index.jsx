@@ -432,7 +432,11 @@ export default class Form extends Loader{
 		/* When server-side field validation fails, error.info contains information about all invalid fields */
 		for (let name in error.info){
 			if (name in this._formValues){
-				fieldErrors[name] = error.info[name].join(" ");
+				let message = error.info[name];
+				if (message instanceof Array){
+					message = message.join(" ");
+				}
+				fieldErrors[name] = message;
 			}
 		}
 		/* When server-side field validation fails, the error has no message but has information */

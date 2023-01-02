@@ -219,5 +219,7 @@
 	"Save and Synchronize": "Сохранить и синхронизовать",
 	"The synchronization can't be started until this module is disabled": "Нельзя запустить синхронизацию, пока модуль неактивен",
 
-	"User login.": "Авторизация пользователя"
+	"User login.": "Авторизация пользователя",
+	"Log in": "Авторизация в системе",
+	"Authorize": "Войти"
 }

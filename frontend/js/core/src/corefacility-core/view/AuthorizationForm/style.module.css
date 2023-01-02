@@ -1,0 +1,73 @@
+.form_wrapper{
+	display: flex;
+	position: fixed;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	align-items: center;
+	justify-content: center;
+}
+
+.form{
+	border: 1px solid rgb(218, 220, 224);
+	border-radius: 8px;
+	padding: 48px 40px 36px 40px;
+}
+
+.logo_wrapper{
+	text-align: center;
+}
+
+.logo_wrapper svg{
+	display: inline-block;
+	width: 50.34px;
+	height: 52px;
+}
+
+.form h1{
+	margin: 0;
+	padding-top: 16px;
+	text-align: center;
+	line-height: 32px;
+	font-size: 24px;
+	font-weight: 300;
+}
+
+.form h2{
+	margin: 0;
+	padding: 0;
+	text-align: center;
+	line-height: 24px;
+	letter-spacing: 0.1px;
+	font-family: Roboto, Arial, Sans-Serif;
+	font-size: 16px;
+	font-weight: 400;
+}
+
+.main_wrapper{
+	margin-top: 31px;
+	margin-bottom: 45px;
+}
+
+.main_wrapper :global .text-input{
+	width: 250px;
+}
+
+.button_wrapper{
+	text-align: right;
+}
+
+.button_wrapper button{
+	display: inline-block;
+	margin: 0;
+}
+
+.system_message{
+	max-width: 250px;
+}
+
+.system_message p{
+	margin: 0;
+	padding: 0;
+}
