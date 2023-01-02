@@ -12,3 +12,4 @@ from .external_authorization_session import ExternalAuthorizationSession
 from .log import Log
 from .log_record import LogRecord
 from .project_application import ProjectApplication
+from .failed_authorizations import FailedAuthorizations

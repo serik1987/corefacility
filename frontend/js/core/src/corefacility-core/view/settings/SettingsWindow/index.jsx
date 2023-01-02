@@ -6,6 +6,7 @@ import Scrollable from 'corefacility-base/shared-view/components/Scrollable';
 
 import CoreModule from 'corefacility-core/model/entity/CoreModule';
 import IhnaSynchronizationModule from 'corefacility-core/model/entity/IhnaSynchronizationModule';
+import StandardAuthorizationModule from 'corefacility-core/model/entity/StandardAuthorizationModule';
 import ModuleTreeItem from 'corefacility-core/model/tree/ModuleTreeItem';
 
 import CoreWindow from '../../base/CoreWindow';
@@ -13,6 +14,7 @@ import CoreWindowHeader from '../../base/CoreWindowHeader';
 import DefaultModuleForm from '../DefaultModuleForm';
 import CoreModuleForm from '../CoreModuleForm';
 import IhnaSynchronizationModuleForm from '../IhnaSynchronizationModuleForm';
+import StandardAuthorizationModuleForm from '../StandardAuthorizationModuleForm';
 import styles from './style.module.css';
 
 
@@ -44,6 +46,7 @@ class _SettingsWindow extends CoreWindow{
 
 		this._pseudomoduleClasses = {
 			ihna_employees: IhnaSynchronizationModule,
+			standard: StandardAuthorizationModule,
 		}
 
 		this._moduleForms = {
@@ -52,6 +55,7 @@ class _SettingsWindow extends CoreWindow{
 
 		this._pseudomoduleForms = {
 			ihna_employees: IhnaSynchronizationModuleForm,
+			standard: StandardAuthorizationModuleForm,
 		}
 
 		this.state = {

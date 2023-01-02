@@ -1,6 +1,8 @@
 from django.conf import settings
 
-from ..entity.log import Log
+from core.utils import get_ip
+from core.entity.log import Log
+
 import logging
 
 
@@ -42,11 +44,7 @@ class LogMiddleware:
         """
         if settings.DEBUG or request.method not in self.NON_LOGGING_METHOD:
             try:
-                if "HTTP_X_FORWARDED_FOR" in request.META:
-                    x_forwarded_for = request.META['HTTP_X_FORWARDED_FOR'].split(",", 1)
-                    ip_address = x_forwarded_for[0]
-                else:
-                    ip_address = request.META['REMOTE_ADDR']
+                ip_address = get_ip(request)
                 log = Log(log_address=request.path, request_method=request.method, ip_address=ip_address)
                 """
                 if len(request.FILES) == 0:

@@ -203,4 +203,16 @@ class Migration(migrations.Migration):
             name='entrypoint',
             unique_together={('alias', 'belonging_module')},
         ),
+
+        migrations.CreateModel(
+            name='FailedAuthorizations',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('auth_time', models.DateTimeField(db_index=True, editable=False, help_text='Authorization time')),
+                ('ip', models.GenericIPAddressField(editable=False, help_text='The IP address defined')),
+                ('user',
+                 models.ForeignKey(editable=False, help_text='The user that is trying to be authorized', null=True,
+                                   on_delete=django.db.models.deletion.SET_NULL, to='core.user')),
+            ],
+        ),
     ]

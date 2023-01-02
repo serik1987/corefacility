@@ -51,6 +51,8 @@ import styles from './style.module.css';
  * 
  *      @param {Number} maxLength           Maximum number of symbols in the widget can't exceed this value
  * 
+ *      @param {String} cssSuffix           Additional CSS classes to apply
+ * 
  * 
  *  The input box has the state 'value' which correspond to the value entered by the user but this is not clear
  *  whether you shall trust on this state value or trust the value of the 'value' prop. So, this is recommended
@@ -63,6 +65,9 @@ export default class TextInput extends Input{
 		if (this.props.disabled){
 			boxClasses += ` ${styles.disabled}`;
 		}
+        if (this.props.cssSuffix){
+            boxClasses += ` ${this.props.cssSuffix}`;
+        }
 		return boxClasses;
 	}
 

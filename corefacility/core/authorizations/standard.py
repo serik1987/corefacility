@@ -1,10 +1,10 @@
 from django.utils.translation import gettext_lazy as _
 
-from core.entity.user import User, UserSet
+from core.entity.user import UserSet
 from core.entity.entity_exceptions import EntityNotFoundException
-from core.serializers import ModuleSettingsSerializer
 
 from .login_password import LoginPasswordAuthorization
+from .standard_serializer import StandardAuthorizationSerializer
 
 
 class StandardAuthorization(LoginPasswordAuthorization):
@@ -54,7 +54,11 @@ class StandardAuthorization(LoginPasswordAuthorization):
             user = user_set.get(login)
         except EntityNotFoundException:
             return None
-        return user if user.password_hash.check(password) else None
+        self._throttle_authorization(user)
+        if not user.password_hash.check(password):
+            self._notify_failed_authorization(user)
+            user = None
+        return user
 
     def get_serializer_class(self):
         """
@@ -62,4 +66,12 @@ class StandardAuthorization(LoginPasswordAuthorization):
         The module settings serializer can also provide the serialization process
         :return:
         """
-        return ModuleSettingsSerializer
+        return StandardAuthorizationSerializer
+
+    def get_pseudomodule_identity(self):
+        """
+        If the module is pseudo-module, the function returns some short string that is required for the frontend to
+        identify the pseudo-module.
+        :return: a string containing the pseudo-module identity
+        """
+        return "standard"

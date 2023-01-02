@@ -221,5 +221,7 @@
 
 	"User login.": "Авторизация пользователя",
 	"Log in": "Авторизация в системе",
-	"Authorize": "Войти"
+	"Authorize": "Войти",
+	"Maximum number of failed authorizations": "Максимальное число неудачных попыток авторизации",
+	"when the user will not be successfully authorized for more than this amount of time, throttling will be applied": "Если пользователь не сможет успешно авторизоваться большее число раз, чем значение этого поля, то в дальнейшем количество попыток входа за единицу времени будет ограничено"
 }
