@@ -39,6 +39,7 @@ class LoginView(SetCookieMixin, APIView):
         user_serializer = UserListSerializer(user)
         if hasattr(request, "corefacility_log"):
             request.corefacility_log.response_body = "***"
+        request.user = user  # Otherwise cookies will not work
         return Response({
             "token": token,
             "user": user_serializer.data,

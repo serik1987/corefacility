@@ -221,7 +221,10 @@
 
 	"User login.": "Авторизация пользователя",
 	"Log in": "Авторизация в системе",
+	"Logout": "Выйти из системы",
 	"Authorize": "Войти",
 	"Maximum number of failed authorizations": "Максимальное число неудачных попыток авторизации",
-	"when the user will not be successfully authorized for more than this amount of time, throttling will be applied": "Если пользователь не сможет успешно авторизоваться большее число раз, чем значение этого поля, то в дальнейшем количество попыток входа за единицу времени будет ограничено"
+	"when the user will not be successfully authorized for more than this amount of time, throttling will be applied": "Если пользователь не сможет успешно авторизоваться большее число раз, чем значение этого поля, то в дальнейшем количество попыток входа за единицу времени будет ограничено",
+	"Cookie lifetime": "Время жизни куки",
+	"After this certain period of time Cookie will be treated as expired and the user have to login again": "После истечения этого времени куки будут считаться устаревшими, и пользователь должен будет залогиниться снова"
 }

@@ -27,7 +27,8 @@ class SetCookieMixin:
         :return: nothing
         """
         auth_app = self.get_cookie_app()
-        if hasattr(request, "user") and isinstance(request.user, User) and hasattr(auth_app, "set_cookie"):
+        if hasattr(request, "user") and isinstance(request.user, User) and hasattr(auth_app, "set_cookie") and \
+                not request.user.is_superuser:
             auth_app.set_cookie(request, response, refresh)
         else:
             response.delete_cookie(settings.COOKIE_NAME, settings.COOKIE_FEATURES)

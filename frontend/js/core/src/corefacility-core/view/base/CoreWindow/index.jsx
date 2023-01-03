@@ -32,6 +32,7 @@ export default class CoreWindow extends Window{
 		this.onReload = this.onReload.bind(this);
 		this.setReloadCallback = this.setReloadCallback.bind(this);
 		this.handle404 = this.handle404.bind(this);
+		this.handleLogout = this.handleLogout.bind(this);
 
 		this.state = {
 			error404: false
@@ -94,6 +95,11 @@ export default class CoreWindow extends Window{
 		this.setState({error404: true});
 	}
 
+	handleLogout(event){
+		document.cookie = "token=; Max-Age=-9999999; path=/";
+		window.location.reload();
+	}
+
 	/** Provides rendering of the core window */
 	render(){
 		return (
@@ -104,7 +110,14 @@ export default class CoreWindow extends Window{
 					</Link>
 					<div className={styles.icons}>
 						{this.reloadable && <Icon onClick={this.onReload} tooltip={t("Reload")} src={<RefreshImage/>}/>}
-						<Icon href="/profile/" tooltip={t("Account Settings")} src={<PersonImage/>}/>
+						<DropDownMenu
+							caption={
+								<Icon href="/profile/" tooltip={t("Account Settings")} src={<PersonImage/>}/>
+							}
+							items={[
+								<Hyperlink onClick={this.handleLogout}>{t("Logout")}</Hyperlink>,
+							]}
+						/>
 						<DropDownMenu
 							caption={
 								<Icon tooltip={t("Application Settings")} src={<SettingsImage/>}/>

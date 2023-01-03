@@ -8,6 +8,7 @@ import CoreModule from 'corefacility-core/model/entity/CoreModule';
 import IhnaSynchronizationModule from 'corefacility-core/model/entity/IhnaSynchronizationModule';
 import StandardAuthorizationModule from 'corefacility-core/model/entity/StandardAuthorizationModule';
 import ModuleTreeItem from 'corefacility-core/model/tree/ModuleTreeItem';
+import CookieAuthorizationModule from 'corefacility-core/model/entity/CookieAuthorizationModule';
 
 import CoreWindow from '../../base/CoreWindow';
 import CoreWindowHeader from '../../base/CoreWindowHeader';
@@ -15,6 +16,7 @@ import DefaultModuleForm from '../DefaultModuleForm';
 import CoreModuleForm from '../CoreModuleForm';
 import IhnaSynchronizationModuleForm from '../IhnaSynchronizationModuleForm';
 import StandardAuthorizationModuleForm from '../StandardAuthorizationModuleForm';
+import CookieAuthorizationModuleForm from '../CookieAuthorizationModuleForm';
 import styles from './style.module.css';
 
 
@@ -47,6 +49,7 @@ class _SettingsWindow extends CoreWindow{
 		this._pseudomoduleClasses = {
 			ihna_employees: IhnaSynchronizationModule,
 			standard: StandardAuthorizationModule,
+			cookie: CookieAuthorizationModule,
 		}
 
 		this._moduleForms = {
@@ -56,6 +59,7 @@ class _SettingsWindow extends CoreWindow{
 		this._pseudomoduleForms = {
 			ihna_employees: IhnaSynchronizationModuleForm,
 			standard: StandardAuthorizationModuleForm,
+			cookie: CookieAuthorizationModuleForm,
 		}
 
 		this.state = {

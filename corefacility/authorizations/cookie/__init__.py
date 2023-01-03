@@ -1,7 +1,5 @@
 from datetime import timedelta
-
 from django.conf import settings
-
 from core.entity.entry_points.authorizations import AuthorizationModule
 from core.entity.entity_exceptions import EntityNotFoundException
 
@@ -113,3 +111,19 @@ class App(AuthorizationModule):
         :return: the cookie lifetime
         """
         return self.user_settings.get("cookie_lifetime", self.DEFAULT_COOKIE_LIFETIME)
+
+    def get_serializer_class(self):
+        """
+        Defines the serializer class. The serializer class is used to represent module settings in JSON format
+        :return: instance of rest_framework.serializers.Serializer class
+        """
+        from .serializers import CookieSettingsSerializer
+        return CookieSettingsSerializer
+
+    def get_pseudomodule_identity(self):
+        """
+        If the module is pseudo-module, the function returns some short string that is required for the frontend to
+        identify the pseudo-module.
+        :return: a string containing the pseudo-module identity
+        """
+        return "cookie"
