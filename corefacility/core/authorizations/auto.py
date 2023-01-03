@@ -74,6 +74,8 @@ class AutomaticAuthorization(AuthorizationModule):
         :return: an authorized user in case of successful authorization. None if authorization fails. The function
         shall not generate authorization token, just return the user. The user if core.entity.user.User instance.
         """
+        if 'activation_code' in request.GET: # We shall not allow two types of authorization cointeract!
+            return None
         user = None
         cookie_name = settings.COOKIE_NAME
         if cookie_name not in request.COOKIES or len(request.COOKIES[cookie_name]) == 0:

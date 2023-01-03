@@ -1,0 +1,10 @@
+@media screen and (max-width: 1150px){
+
+	.activation_code_lifetime_label{
+	}
+
+	.activation_code_lifetime_widget{
+		grid-column-start: span 2;
+	}
+
+}

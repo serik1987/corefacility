@@ -251,7 +251,7 @@ export default class PositiveDurationInput extends React.Component{
                         <span>{t("microseconds")}</span>
                     </div>
                 </div>
-                {this.error !== null && <p className={styles.error_container}>{this.error}</p>}
+                {this.error && <p className={styles.error_container}>{this.error}</p>}
             </div>
         );
 	}

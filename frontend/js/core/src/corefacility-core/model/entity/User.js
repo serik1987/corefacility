@@ -83,6 +83,9 @@ export default class User extends Entity{
 
 			"home_dir": new ReadOnlyField()
 				.setDescription("POSIX home directory"),
+
+			"can_be_activated_using_email": new ReadOnlyField()
+				.setDescription("The activation mail can be sent to the user"),
 		}
 	}
 

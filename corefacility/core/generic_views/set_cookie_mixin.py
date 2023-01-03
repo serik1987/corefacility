@@ -28,7 +28,8 @@ class SetCookieMixin:
         """
         auth_app = self.get_cookie_app()
         if hasattr(request, "user") and isinstance(request.user, User) and hasattr(auth_app, "set_cookie") and \
-                not request.user.is_superuser:
+                not request.user.is_superuser and \
+                (not hasattr(request, 'no_cookie') or not request.no_cookie):
             auth_app.set_cookie(request, response, refresh)
         else:
             response.delete_cookie(settings.COOKIE_NAME, settings.COOKIE_FEATURES)

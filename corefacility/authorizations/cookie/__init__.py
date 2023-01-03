@@ -83,6 +83,8 @@ class App(AuthorizationModule):
         :return: an authorized user in case of successful authorization. None if authorization fails. The function
         shall not generate authorization token, just return the user. The user if core.entity.user.User instance.
         """
+        if 'activation_code' in request.GET:
+            return None
         user = None
         expiry_term = self.get_cookie_lifetime()
         token = request.get_signed_cookie(settings.COOKIE_NAME, default="", max_age=expiry_term)

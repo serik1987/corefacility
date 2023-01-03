@@ -27,11 +27,16 @@ export default class App extends BaseApp{
 		return CoreModule;
 	}
 
+	/** Activation code in case activation link was detected, null otherwise */
+	get activationCode(){
+		return new URLSearchParams(window.location.search).get('activation_code');
+	}
+
 	/** Renders all routes.
 	 * 	@return {React.Component} the component must be <Routes> from 'react-dom-routes'.
 	 */
 	renderAllRoutes(){
-		if (this.token !== null){
+		if (this.token !== null && this.activationCode === null){
 			return (
 				<Routes>
 					<Route path="/logs/:lookup/" element={<LogDetailWindow/>} />

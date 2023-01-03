@@ -19,6 +19,8 @@
 	"Invalid URL": "Неверный URL",
 	"Loading...": "Загрузка...",
 	"Please, specify...": "Пожалуйста, уточните...",
+	"Main Page": "На главную",
+	"Application URL": "Адрес приложения",
 	"Apply": "Применить",
 	"Ready.": "Готово.",
 	"More...": "Ещё...",
@@ -226,5 +228,10 @@
 	"Maximum number of failed authorizations": "Максимальное число неудачных попыток авторизации",
 	"when the user will not be successfully authorized for more than this amount of time, throttling will be applied": "Если пользователь не сможет успешно авторизоваться большее число раз, чем значение этого поля, то в дальнейшем количество попыток входа за единицу времени будет ограничено",
 	"Cookie lifetime": "Время жизни куки",
-	"After this certain period of time Cookie will be treated as expired and the user have to login again": "После истечения этого времени куки будут считаться устаревшими, и пользователь должен будет залогиниться снова"
+	"After this certain period of time Cookie will be treated as expired and the user have to login again": "После истечения этого времени куки будут считаться устаревшими, и пользователь должен будет залогиниться снова",
+	"Activation code lifetime": "Время жизни активационного кода",
+	"After this given amount of time the activation code becomes invalid": "По истечению этого времени активационный код станет неверным",
+	"This activation link is wrong or has been expired. Please, try again.": "Эта активационная ссылка неверна, либо уже неактуальна. Попробуйте снова.",
+	"Your account has been successfully activated. Please, use the following credentials to login:": "Ваша учётная запись успешно активирована. Пожалуйста, используйте следующие параметры учётной записи для входа:",
+	"Please, remember or write down these credentials since you will see them just once": "Пожалуйста, сохраните эти параметры, поскольку Вы их увидите всего один раз"
 }

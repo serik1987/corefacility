@@ -19,6 +19,8 @@ class UserDetailSerializer(UserListSerializer):
     is_support = serializers.ReadOnlyField(label="Is support")
     unix_group = serializers.ReadOnlyField(label="Unix group")
     home_dir = serializers.ReadOnlyField(label="Home directory")
+    can_be_activated_using_email = serializers.SerializerMethodField(
+        help_text="True if the password recovery module has been switched on")
 
     def get_password_set(self, user):
         """
@@ -28,3 +30,13 @@ class UserDetailSerializer(UserListSerializer):
         :return: True if the user has set its password, False otherwise
         """
         return len(repr(user.password_hash)) > 0
+
+
+    def get_can_be_activated_using_email(self, user):
+        """
+        Returns true if the activation mail can be sent to the user, false otherwise
+        """
+        from core.authorizations.password_recovery import PasswordRecoveryAuthorization
+        PasswordRecoveryAuthorization.reset()
+        password_recovery_module = PasswordRecoveryAuthorization()
+        return password_recovery_module.is_enabled

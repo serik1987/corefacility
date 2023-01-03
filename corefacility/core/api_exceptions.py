@@ -91,6 +91,17 @@ class MailFailedException(CorefacilityAPIException):
         super().__init__(code="mail_delivery_failed", detail=_("The following problem occured during the mail delivery: ") + str(origin))
 
 
+class PasswordRecoverySwitchedOff(CorefacilityAPIException):
+    """
+    Raises when the user tries to send the activation mail while the activation mail feature did not switched on
+    """
+
+    status_code = status.HTTP_400_BAD_REQUEST
+
+    def __init__(self):
+        super().__init__(code="mail_delivery_failed", detail="The 'Password Recovery' authorization module was switched off")
+
+
 def exception_handler(exc, context):
     """
     Defines standard exception handler for all corefacility project.

@@ -34,7 +34,8 @@ def mail(template_prefix: str = None, context_data=None, subject: str = "Test me
 		html = get_template("%s.en-GB.html" % template_prefix).render(context_data)
 	mail_object = EmailMultiAlternatives(subject, plain_text, None, [recipient])
 	mail_object.attach_alternative(html, "text/html")
-	mail_object.send(fail_silently)
+	result = mail_object.send(fail_silently)
+	print(result)
 
 
 def get_ip(request):

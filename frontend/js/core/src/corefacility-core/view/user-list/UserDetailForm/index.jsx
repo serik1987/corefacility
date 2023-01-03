@@ -52,6 +52,7 @@ export default class UserDetailForm extends UpdateForm{
 			'home_dir',
 			'is_locked',
 			'is_superuser',
+			'can_be_activated_using_email',
 		];
 	}
 
@@ -172,6 +173,11 @@ export default class UserDetailForm extends UpdateForm{
 			passwordSetMessage = t("The password was not set.");
 		}
 
+		let can_be_activated_using_email = false;
+		if (this._formValues){
+			can_be_activated_using_email = this._formValues.can_be_activated_using_email;
+		}
+
 		return (
 			<CoreWindowHeader
 				{...this.getMessageBarProps()}
@@ -244,7 +250,7 @@ export default class UserDetailForm extends UpdateForm{
 											{t("Print password")}
 										</Hyperlink>
 									</div>
-									{window.SETTINGS.email_support && !window.SETTINGS.suggest_administration &&
+									{window.SETTINGS.email_support && !window.SETTINGS.suggest_administration && can_be_activated_using_email &&
 										<div className={styles.changer_button}>
 											<Hyperlink onClick={event => this.changePassword(event, this.sendActivationCode)} inactive={this.state.inactive}>
 												{t("Send activation code")}

@@ -7,6 +7,10 @@ from core import App
 # The core application has one unique feature: you don't have to give its UUID.
 # Any other applications require UUID!
 
+from core.authorizations.password_recovery import PasswordRecoveryAuthorization
+# Password recovery authorization is needed to detect whether the activation mail
+# can be sent to the user or not
+
 from core.entity.entry_points import AuthorizationsEntryPoint
 
 from .base_window import BaseWindow
@@ -105,3 +109,6 @@ class MainWindow(BaseWindow):
         self.kwargs['lang'] = str(self.language_code)
         self.kwargs['email_support'] = settings.EMAIL_SUPPORT
         self.kwargs['suggest_administration'] = settings.CORE_SUGGEST_ADMINISTRATION
+        if hasattr(self.request, 'password'):
+            self.kwargs['login'] = self.request.user.login
+            self.kwargs['password'] = self.request.password

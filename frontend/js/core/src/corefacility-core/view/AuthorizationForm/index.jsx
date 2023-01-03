@@ -136,6 +136,53 @@ export default class AuthorizationForm extends Form{
 	}
 
 	render(){
+		let loginForm = null;
+
+		if (window.application.activationCode === null){
+			loginForm = [
+				<h2>{t("Log in")}</h2>,
+				<div className={style.main_wrapper}>
+					<div class={style.system_message}>
+						{this.renderSystemMessage()}
+					</div>
+					<Label>{t("Login")}</Label>
+					<TextInput {...this.getFieldProps("login")}/>
+					<Label>{t("Password")}</Label>
+					<TextInput {...this.getFieldProps("password")} htmlType="password"/>
+				</div>,
+				<div className={style.button_wrapper}>
+					<PrimaryButton {...this.getSubmitProps()}>{t("Authorize")}</PrimaryButton>
+				</div>,
+			];
+		}
+		if (window.application.activationCode !== null && window.application.token === null){
+			loginForm = [
+				<h2>{t("Account activation")}</h2>,
+				<p>{t("This activation link is wrong or has been expired. Please, try again.")}</p>,
+				<div className={style.button_wrapper}>
+					<a href="/">{t("Main Page")}</a>
+				</div>
+			];
+		}
+		if (window.application.activationCode !== null && window.application.token !== null){
+			loginForm = [
+				<h2>{t("Account activation")}</h2>,
+				<p>{t("Your account has been successfully activated. Please, use the following credentials to login:")}</p>,
+				<dl>
+					<dt>{t("Application URL")}</dt>
+					<dd>{window.location.origin}</dd>
+					<dt>{t("Login")}</dt>
+					<dd>{window.SETTINGS.login}</dd>
+					<dt>{t("Password")}</dt>
+					<dd>{t(window.SETTINGS.password)}</dd>
+				</dl>,
+				<p>{t("Please, remember or write down these credentials since you will see them just once")}</p>,
+				<div className={style.button_wrapper}>
+					<a href="/">{t("Main Page")}</a>
+				</div>
+			];
+		}
+
 		return (
 			<div className={style.form_wrapper}>
 				<div className={style.form}>
@@ -143,19 +190,7 @@ export default class AuthorizationForm extends Form{
 						<Logo/>
 					</div>
 					<h1>Corefacility</h1>
-					<h2>{t("Log in")}</h2>
-					<div className={style.main_wrapper}>
-						<div class={style.system_message}>
-							{this.renderSystemMessage()}
-						</div>
-						<Label>{t("Login")}</Label>
-						<TextInput {...this.getFieldProps("login")}/>
-						<Label>{t("Password")}</Label>
-						<TextInput {...this.getFieldProps("password")} htmlType="password"/>
-					</div>
-					<div className={style.button_wrapper}>
-						<PrimaryButton {...this.getSubmitProps()}>{t("Authorize")}</PrimaryButton>
-					</div>
+					{loginForm}
 				</div>
 			</div>
 		);

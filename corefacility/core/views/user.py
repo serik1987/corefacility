@@ -9,8 +9,9 @@ from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 
 from core import App
+from core.authorizations.password_recovery import PasswordRecoveryAuthorization
 from core.utils import mail
-from core.api_exceptions import MailAddressUndefinedException, MailFailedException
+from core.api_exceptions import MailAddressUndefinedException, MailFailedException, PasswordRecoverySwitchedOff
 from core.os.user import PosixUser, OperatingSystemUserNotFoundException
 from core.transaction import CorefacilityTransaction
 from ..entity.user import UserSet
@@ -60,10 +61,7 @@ class UserViewSet(AvatarMixin, EntityViewSet):
         from core.os.command_maker import CommandMaker
         with CorefacilityTransaction():
             user = self.get_object()
-            symbol_alphabet = EntityPasswordManager.SMALL_LATIN_LETTERS + EntityPasswordManager.DIGITS + \
-                EntityPasswordManager.BIG_LATIN_LETTERS
-            max_symbols = App().get_max_password_symbols()
-            new_password = user.password_hash.generate(symbol_alphabet, max_symbols)
+            new_password = user.generate_password()
             if PosixProvider().is_provider_on() and not settings.CORE_SUGGEST_ADMINISTRATION:
                 try:
                     posix_user = PosixUser.find_by_login(user.unix_group)
@@ -78,14 +76,18 @@ class UserViewSet(AvatarMixin, EntityViewSet):
 
     @action(detail=True, methods=['post'], url_path="activation-mail")
     def activation_mail(self, request, *args, **kwargs):
+        PasswordRecoveryAuthorization.reset()
         app = App()
+        auth_app = PasswordRecoveryAuthorization()
+        if not auth_app.is_enabled:
+            raise PasswordRecoverySwitchedOff()
         user = self.get_object()
         if not user.email or user.email == "":
             raise MailAddressUndefinedException()
         alphabet = EntityPasswordManager.ALL_SYMBOLS
         code_size = app.get_max_activation_code_symbols()
         user_activation_code = user.activation_code_hash.generate(alphabet, code_size)
-        user.activation_code_expiry_date.set(app.get_activation_code_lifetime())
+        user.activation_code_expiry_date.set(auth_app.get_password_recovery_lifetime())
         user.update()
         signer = Signer()
         activation_code = signer.sign_object({

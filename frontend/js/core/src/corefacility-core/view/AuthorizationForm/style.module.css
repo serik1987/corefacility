@@ -45,6 +45,15 @@
 	font-weight: 400;
 }
 
+.form dt{
+	font-weight: 600;
+}
+
+.form dd{
+	margin-left: 40px;
+	font-family: 'Courier New', Courier, Serif;
+}
+
 .main_wrapper{
 	margin-top: 31px;
 	margin-bottom: 45px;

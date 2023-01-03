@@ -1,6 +1,7 @@
 from django.templatetags.static import static
 from django.db import transaction
 
+from core import App
 from core.transaction import CorefacilityTransaction
 
 from .entity import Entity
@@ -153,3 +154,10 @@ class User(Entity):
 
     def _get_transaction_mechanism(self):
         return CorefacilityTransaction() if not PosixProvider.force_disable else transaction.atomic()
+
+    def generate_password(self):
+        symbol_alphabet = EntityPasswordManager.SMALL_LATIN_LETTERS + EntityPasswordManager.DIGITS + \
+            EntityPasswordManager.BIG_LATIN_LETTERS
+        max_symbols = App().get_max_password_symbols()
+        new_password = self.password_hash.generate(symbol_alphabet, max_symbols)
+        return new_password
