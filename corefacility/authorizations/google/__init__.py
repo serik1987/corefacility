@@ -39,11 +39,11 @@ class App(AuthorizationModule):
         """
         return False
 
-    def try_ui_authorization(self, request):
+    def process_auxiliary_request(self, request):
+        pass
+
+    def try_ui_authorization(self, request, view):
         pass
 
     def try_api_authorization(self, request):
-        pass
-
-    def process_auxiliary_request(self, request):
         pass

@@ -1,5 +1,6 @@
 import {translate as t} from 'corefacility-base/utils';
 import {NotImplementedError} from 'corefacility-base/exceptions/model';
+import ModuleWidget from 'corefacility-base/model/ModuleWidget';
 import UpdateForm from 'corefacility-base/view/UpdateForm';
 import Label from 'corefacility-base/shared-view/components/Label';
 import CheckboxInput from 'corefacility-base/shared-view/components/CheckboxInput';
@@ -138,6 +139,7 @@ export default class ModuleForm extends UpdateForm{
 		try{
 			await super.modifyFormObject();
 			this._formValues.is_enabled = this._formObject.is_enabled;
+			ModuleWidget.initializeResultCache(true);
 		} catch (error){
 			throw error;
 		} finally{

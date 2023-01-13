@@ -1,9 +1,11 @@
+import urllib.parse
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from django.core.signing import Signer
 from rest_framework.exceptions import ValidationError
 
 from core.entity import CorefacilityModule
+from core.entity.entity_exceptions import AuthorizationException
 from .entry_point import EntryPoint
 
 
@@ -132,7 +134,33 @@ class AuthorizationModule(CorefacilityModule):
         if total_modules_enabled <= 1 and not new_value:
             raise ValidationError({"is_enabled": gettext("At least one authorization module must be enabled")})
 
-    def try_ui_authorization(self, request):
+    def get_user_settings(self, user):
+        """
+        If there is a widget for a module, this method shall return all settings that shall be adjusted personally
+        for each user
+        :param user: identity which settings shall be returned
+        :return: settings to be adjusted personally for each user
+        """
+        raise NotImplementedError("get_user_settings")
+
+    def get_user_settings_serializer_class(self, user):
+        """
+        Returns the serializer object that allows to validate the user settings
+        :param user: identity which serializer must be returned
+        :return: the validation object
+        """
+        raise NotImplementedError("get_user_settings_serializer_class")
+
+    def set_user_settings(self, user, settings):
+        """
+        Adjusts all module settings created personally for a given particular user
+        :param user: a user for which settings should be adjusted
+        :param settings: settings to be adjusted
+        :return: nothing
+        """
+        raise NotImplementedError("set_user_settings")
+
+    def try_ui_authorization(self, request, view):
         """
         Performs the UI authorization.
         The UI authorization will be performed automatically during the UI application loading. The authorization
@@ -140,6 +168,7 @@ class AuthorizationModule(CorefacilityModule):
         Javascript constant.
 
         :param request: The HTTP request that shall be authorized.
+        :param view: the MainWindow view. You can adjust settings view upon the authorization process
         :return: an authorized user in case of successful authorization. None if authorization fails. The function
         shall not generate authorization token, just return the user. The user if core.entity.user.User instance.
         """
@@ -163,7 +192,51 @@ class AuthorizationModule(CorefacilityModule):
         Performs an auxiliary request processing.
         The auxiliary request processing is required when the application shall be redirected to the 3rd party site.
 
-        :param request: REST framework request
+        :param request: the request received from the Web browser. request.session_id contains unique session ID that
+            avoid confuse between different authorization sessions
         :return: redirection URL
         """
         raise NotImplementedError("AuthorizationModule.process_auxiliary_request")
+
+    def get_state(self, request):
+        """
+        Returns the URL-encoded authorization state. The authorization state is a string that is needed to fully restore
+        the authorization session after redirection to the external source (i.e., Google or Mail.Ru).
+        Such state contains the following information:
+        (a) unique session ID. Such an ID also contains in cookie so the session ID can be used to avoid confusion
+        between two different authorization sessions. Also, unique session ID is highly recommended by the mail.ru
+        authorization service
+        (b) alias of the authorization module. Shall be used to prevent confusions created by two different
+        authorization modules
+        (c) client route to which the application must be redirected
+        (c) client route to which the application must be redirected
+        :param request: the HttpRequest object received from the client application
+        :return: a string that you shall transmit to the external authorization service and which external authroization
+        service shall transmit to you.
+        """
+        return urllib.parse.urlencode({
+            'session': request.session_id,
+            'module': self.get_alias(),
+            'route': request.GET['route'],
+        })
+
+    def restore_state(self, request, state):
+        """
+        Restores the authorization state created by in the previous authorization request
+        :param request: current request received from the Web browser
+        :param state: authorization state created in the previous request
+        :return: In case of successful authorization session recovery - a string containing the route restores in the
+        session. In case when the state doesn't belong to a given authorization module or is not provided in the
+        request query params - None. Otherwise, an error will be thrown
+        """
+        session_properties = {key: value[0] for key, value in urllib.parse.parse_qs(state).items()}
+        if 'module' in session_properties and session_properties['module'] == self.get_alias():
+            if 'route' in session_properties:
+                route = session_properties['route']
+            else:
+                route = None
+            expected_session_id = session_properties['session']
+            actual_session_id = request.COOKIES.get(self.get_alias())
+            if expected_session_id != actual_session_id:
+                raise AuthorizationException(route, _("Bad session ID"))
+            return route

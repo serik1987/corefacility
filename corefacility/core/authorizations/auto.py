@@ -63,7 +63,7 @@ class AutomaticAuthorization(AuthorizationModule):
         """
         return True
 
-    def try_ui_authorization(self, request):
+    def try_ui_authorization(self, request, view):
         """
         Performs the UI authorization.
         The UI authorization will be performed automatically during the UI application loading. The authorization
@@ -71,10 +71,11 @@ class AutomaticAuthorization(AuthorizationModule):
         Javascript constant.
 
         :param request: The HTTP request that shall be authorized.
+        :param view: The MainWindow view that has invoked this method.
         :return: an authorized user in case of successful authorization. None if authorization fails. The function
         shall not generate authorization token, just return the user. The user if core.entity.user.User instance.
         """
-        if 'activation_code' in request.GET: # We shall not allow two types of authorization cointeract!
+        if len(request.GET) > 0:
             return None
         user = None
         cookie_name = settings.COOKIE_NAME

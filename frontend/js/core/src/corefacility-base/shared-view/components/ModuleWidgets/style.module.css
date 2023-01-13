@@ -1,0 +1,38 @@
+.widgets{
+}
+
+.container{
+	
+}
+
+.widget_wrapper{
+	display: inline-block;
+	margin-right: 15px;
+	height: 50px;
+	cursor: pointer;
+}
+
+.inactive .widget_wrapper{
+	cursor: default;
+}
+
+.widget_wrapper > *{
+	height: 100%;
+}
+
+.widget_wrapper:last-child{
+	margin-right: 0;
+}
+
+.widget_wrapper :global .auth{
+	width: 50px;
+}
+
+.widget_wrapper :global .mailru{
+	background: url('corefacility-base/shared-view/icons/mailru.png') no-repeat 0 0;
+	background-size: 100%;
+}
+
+.error{
+	color: rgb(197, 57, 41);
+}

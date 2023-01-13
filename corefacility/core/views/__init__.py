@@ -1,5 +1,6 @@
 from .main_window import MainWindow
 
+from .authorize import AuthorizationView
 from .user import UserViewSet
 from .group import GroupViewSet
 from .project import ProjectViewSet
@@ -16,3 +17,4 @@ from .projects_module_list_view import ProjectModulesListView
 from .project_application import ProjectApplicationViewSet
 from .module_settings import ModuleSettingsViewSet
 from .entry_point_list import EntryPointListView
+from .authorization_method_setup import AuthorizationMethodSetupView

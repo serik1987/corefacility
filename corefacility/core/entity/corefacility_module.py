@@ -70,6 +70,17 @@ class CorefacilityModule(Entity):
 
     _desired_uuid = None
 
+    @staticmethod
+    def get_base_uri(request):
+        """
+        Returns the base URI for the request. The base URI contains protocol name (HTTP or HTTPS), hostname and
+        port number. Example: http://localhost:8000 or https://corefacility.ru
+        :param request: the request received from the client. Such request is required for getting information about
+        current request scheme and environment variable
+        :return: string containing the base URI
+        """
+        return "%s://%s" % (request.scheme, request.META['HTTP_HOST'])
+
     @classmethod
     def reset(cls):
         """

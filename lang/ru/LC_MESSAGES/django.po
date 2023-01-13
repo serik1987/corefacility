@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-04 01:04+0300\n"
+"POT-Creation-Date: 2023-01-13 10:53+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,119 +17,153 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: corefacility/authorizations/cookie/migrations/0002_install.py:13
+#: authorizations/cookie/migrations/0002_install.py:13
 msgid "Authorization through Cookie"
 msgstr "Авторизация через Cookie"
 
-#: corefacility/authorizations/google/migrations/0002_install.py:13
+#: authorizations/google/migrations/0002_install.py:13
 msgid "Authorization through Google"
 msgstr "Авторизация через Google"
 
-#: corefacility/authorizations/ihna/migrations/0002_install.py:13
+#: authorizations/ihna/migrations/0002_install.py:13
 msgid "Authorization through IHNA website"
 msgstr "Авторизация через сайт ИВНД и НФ РАН"
 
-#: corefacility/authorizations/mailru/migrations/0002_install.py:13
+#: authorizations/mailru/__init__.py:95
+msgid "User's email in the Mail.Ru mailbox"
+msgstr "E-mail пользователя в почтовом ящике Mail.Ru"
+
+#: authorizations/mailru/__init__.py:156
+msgid ""
+"To authorize through the Mail.Ru you need to grant a read-only access to "
+"your personal details"
+msgstr ""
+"Для того, чтобы авторизоваться через Mail.Ru Вам необходимо открыть доступ "
+"на чтение Ваших персональных данных из аккаунта Mail.Ru. Это не предполагает "
+"наличие доступа на их изменение"
+
+#: authorizations/mailru/__init__.py:159
+msgid "Authorization code did not received from the Mail.Ru server"
+msgstr "Код авторизации не был получен через сервер Mail.Ru"
+
+#: authorizations/mailru/__init__.py:186
+msgid ""
+"Your mail.ru account has not been attached to your corefacility account. "
+"Please, login using another authorization method and attach your mail.ru "
+"account to your corefacility account in your profile settings"
+msgstr "Ваша учётная запись на mail.ru не привязана к Вашей учётной записи corefacility. Пожалуйста, авторизуйтесь, используя другой способ авторизации, после чего привяжите Вашу учётную запись mail.ru к учётной записи corefacility, используя для этого настройки Вашего профиля."
+
+#: authorizations/mailru/__init__.py:255 authorizations/mailru/__init__.py:257
+msgid "To turn this field on please, ensure that this is not empty"
+msgstr "Для того, чтобы включить модуль, убедитесь, что это поле не пустое"
+
+#: authorizations/mailru/__init__.py:259
+msgid "The authorization process will not work when this value equals to zero"
+msgstr ""
+"Процесс авторизации не будет работать, если значение этого поля равно нулю"
+
+#: authorizations/mailru/migrations/0002_install.py:13
 msgid "Authorization through Mail.ru"
 msgstr "Авторизация через Mail.ru"
 
-#: corefacility/core/__init__.py:165
+#: core/__init__.py:165
 msgid "Add application"
 msgstr "Добавление приложения в проект"
 
-#: corefacility/core/__init__.py:167
+#: core/__init__.py:167
 msgid "Add application (superuser permission required)"
 msgstr "Добавление приложения в проект (с согласия суперпользователя)"
 
-#: corefacility/core/__init__.py:168
+#: core/__init__.py:168
 msgid "Full access"
 msgstr "Полный доступ"
 
-#: corefacility/core/__init__.py:169
+#: core/__init__.py:169
 msgid "Dealing with data"
 msgstr "Работа с данными"
 
-#: corefacility/core/__init__.py:170
+#: core/__init__.py:170
 msgid "Data adding and processing only"
 msgstr "Только добавление и обработка данных"
 
-#: corefacility/core/__init__.py:171
+#: core/__init__.py:171
 msgid "Data processing only"
 msgstr "Только обработка данных"
 
-#: corefacility/core/__init__.py:172
+#: core/__init__.py:172
 msgid "Viewing the data"
 msgstr "Только просмотр данных"
 
-#: corefacility/core/__init__.py:173
+#: core/__init__.py:173
 msgid "No access"
 msgstr "Доступ закрыт"
 
-#: corefacility/core/api_exceptions.py:54
-#: corefacility/core/generic_views/file_upload_mixin.py:113
+#: core/api_exceptions.py:54 core/generic_views/file_upload_mixin.py:113
 msgid "This file type is not uploadable"
 msgstr "Невозможно загрузить данный тип файла"
 
-#: corefacility/core/api_exceptions.py:65
+#: core/api_exceptions.py:65
 msgid "The image resolution is too small"
 msgstr "Разрешение изображения слишком мало"
 
-#: corefacility/core/api_exceptions.py:76
+#: core/api_exceptions.py:76
 msgid "Can't send e-mail to this user because it's e-mail field was not filled"
 msgstr ""
 "Невозможно отправить e-mail этому пользователю, поскольку поле E-mail в его "
 "профиле не заполнено"
 
-#: corefacility/core/api_exceptions.py:91
+#: core/api_exceptions.py:91
 msgid "The following problem occured during the mail delivery: "
 msgstr "При отправке сообщения пользователю возникла следующая проблема: "
 
-#: corefacility/core/authorizations/auto.py:42
+#: core/authorizations/auto.py:42
 msgid "Automatic authorization"
 msgstr "Автоматическая авторизация"
 
-#: corefacility/core/authorizations/password_recovery.py:47
+#: core/authorizations/password_recovery.py:47
 msgid "Password recovery function"
 msgstr "Функция восстановления пароля"
 
-#: corefacility/core/authorizations/password_recovery.py:128
+#: core/authorizations/password_recovery.py:128
 msgid "The module can't be enabled in partial server configuration"
 msgstr "Этот модуль нельзя включить в конфигурации частичного сервера"
 
-#: corefacility/core/authorizations/password_recovery.py:130
+#: core/authorizations/password_recovery.py:130
 msgid "The module can't be enabled without email support"
-msgstr "Этот модуль нельзя включить, так как Ваш сервер не поддерживает отправку E-mail"
+msgstr ""
+"Этот модуль нельзя включить, так как Ваш сервер не поддерживает отправку E-"
+"mail"
 
-#: corefacility/core/authorizations/standard.py:40
+#: core/authorizations/standard.py:40
 msgid "Standard authorization"
 msgstr "Стандартная авторизация"
 
-#: corefacility/core/entity/entity_exceptions/__init__.py:11
+#: core/entity/entity_exceptions/__init__.py:11
 msgid "The requested resource was not found here"
 msgstr "Запрашиваемый ресурс не обнаружен"
 
-#: corefacility/core/entity/entity_exceptions/__init__.py:16
+#: core/entity/entity_exceptions/__init__.py:16
 msgid ""
 "Unable to create the requested resource because it has already been created"
 msgstr "Невозможно создать требуемый ресурс, так как он уже был создан"
 
-#: corefacility/core/entity/entity_exceptions/__init__.py:22
+#: core/entity/entity_exceptions/__init__.py:22
 #, python-format
 msgid "%s with such values can't exist"
 msgstr "Поле %s с подобными значениями не существует"
 
-#: corefacility/core/entity/entity_exceptions/__init__.py:35
+#: core/entity/entity_exceptions/__init__.py:35
 msgid "The entity operation is not permitted"
 msgstr "Указанная операция над сущностью невозможна"
 
-#: corefacility/core/entity/entity_exceptions/__init__.py:47
+#: core/entity/entity_exceptions/__init__.py:47
 msgid ""
 "This feature is not supported for current database engine. Use another one"
 msgstr ""
 "Данное свойство не поддерживается на установленной Вами СУБД. Установка "
 "PostgreSQL решит эту проблему"
 
-#: corefacility/core/entity/entity_exceptions/__init__.py:52
+#: core/entity/entity_exceptions/__init__.py:52
 msgid ""
 "The user is a governor of at least one group. Its delete will automatically "
 "remove these groups and reflect another user rights. Are you sure?"
@@ -139,7 +173,7 @@ msgstr ""
 "изменению прав доступа других пользователей к тому или иному функционалу. Вы "
 "желаете продолжить?"
 
-#: corefacility/core/entity/entity_exceptions/__init__.py:59
+#: core/entity/entity_exceptions/__init__.py:59
 msgid ""
 "The group is a root group for at least one project. Its delete will "
 "automatically remove these projects and reflect another user rights. Are you "
@@ -149,112 +183,116 @@ msgstr ""
 "удаление приведёт к автоматическому уничтожению этих проектов, а также "
 "изменит права доступа других пользователей к функционалу. Продолжить?"
 
-#: corefacility/core/entity/entity_exceptions/__init__.py:65
+#: core/entity/entity_exceptions/__init__.py:65
 #, python-format
 msgid "Unable to write to %s directory."
 msgstr "Невозможно произвести запись в директорию %s"
 
-#: corefacility/core/entity/entity_exceptions/__init__.py:149
+#: core/entity/entity_exceptions/__init__.py:149
 msgid "Error during installation of the module"
 msgstr "Ошибка в процессе установки модуля"
 
-#: corefacility/core/entity/entity_exceptions/__init__.py:161
+#: core/entity/entity_exceptions/__init__.py:161
 msgid ""
 "This module has a parent module that have not been completely installed yet"
 msgstr ""
 "Данный модуль имеет родительский модуль, который не был полностью установлен"
 
-#: corefacility/core/entity/entity_sets/corefacility_module_set.py:14
+#: core/entity/entity_sets/corefacility_module_set.py:14
 msgid "Corefacility module"
 msgstr "Модуль"
 
-#: corefacility/core/entity/entity_sets/group_set.py:11
+#: core/entity/entity_sets/group_set.py:11
 msgid "Scientific Group"
 msgstr "Научный коллектив"
 
-#: corefacility/core/entity/entity_sets/project_application_set.py:14
+#: core/entity/entity_sets/project_application_set.py:14
 msgid "Project application"
 msgstr "Приложение в проекте"
 
-#: corefacility/core/entity/entity_sets/project_set.py:11
+#: core/entity/entity_sets/project_set.py:11
 msgid "Project"
 msgstr "Проект"
 
-#: corefacility/core/entity/entity_sets/user_set.py:11
+#: core/entity/entity_sets/user_set.py:11
 msgid "User"
 msgstr "Пользователь"
 
-#: corefacility/core/entity/entry_points/authorizations.py:34
+#: core/entity/entry_points/authorizations.py:36
 msgid "Authorization methods"
 msgstr "Способы авторизации"
 
-#: corefacility/core/entity/entry_points/authorizations.py:133
+#: core/entity/entry_points/authorizations.py:135
 msgid "At least one authorization module must be enabled"
 msgstr "Хотя бы один из способов авторизации должен быть активен"
 
-#: corefacility/core/entity/entry_points/projects.py:33
+#: core/entity/entry_points/authorizations.py:239
+msgid "Bad session ID"
+msgstr "Идентификатор сессии неверен или устарел"
+
+#: core/entity/entry_points/projects.py:33
 msgid "Project applications"
 msgstr "Работа с научными проектами"
 
-#: corefacility/core/entity/entry_points/settings.py:31
+#: core/entity/entry_points/settings.py:31
 msgid "Other settings"
 msgstr "Прочие настройки"
 
-#: corefacility/core/entity/entry_points/synchronizations.py:50
+#: core/entity/entry_points/synchronizations.py:50
 msgid "Account synchronization"
 msgstr "Синхронизация учётных записей"
 
-#: corefacility/core/generic_views/file_upload_mixin.py:63
+#: core/generic_views/file_upload_mixin.py:63
 msgid "The uploaded file is too large"
 msgstr "Загружаемый Вами файл имеет слишком большой размер"
 
-#: corefacility/core/migrations/0002_install.py:24
+#: core/migrations/0002_install.py:24
 msgid "Core functionality"
 msgstr "Базовый функционал"
 
-#: corefacility/core/models/enums/entry_point_type.py:9
+#: core/models/enums/entry_point_type.py:9
 msgid ""
 "As list (the user can enable arbitrary amount of modules in this entry point)"
 msgstr ""
 "Список (пользователь может включить произвольное количество модулей для "
 "данной точки доступа)"
 
-#: corefacility/core/models/enums/entry_point_type.py:10
+#: core/models/enums/entry_point_type.py:10
 msgid ""
 "As select (the user must choice which module in this entry point to enable)"
 msgstr ""
 "Выбор (пользователь может включить только один модуль для данной точки "
 "доступа)"
 
-#: corefacility/core/models/enums/level_type.py:13
+#: core/models/enums/level_type.py:13
 msgid "Project access level"
 msgstr "Уровень доступа к проекту"
 
-#: corefacility/core/models/enums/level_type.py:14
+#: core/models/enums/level_type.py:14
 msgid "Application access level"
 msgstr "Уровень доступа к приложению"
 
-#: corefacility/core/models/enums/log_level.py:9
+#: core/models/enums/log_level.py:9
 msgid "Debugging message"
 msgstr "Сообщение для разработчика"
 
-#: corefacility/core/models/enums/log_level.py:10
+#: core/models/enums/log_level.py:10
 msgid "Information message"
 msgstr "Информация"
 
-#: corefacility/core/models/enums/log_level.py:11
+#: core/models/enums/log_level.py:11
 msgid "The system warning"
 msgstr "Предупреждение"
 
-#: corefacility/core/models/enums/log_level.py:12
+#: core/models/enums/log_level.py:12
 msgid "The system error"
 msgstr "Ошибка"
 
-#: corefacility/core/models/enums/log_level.py:13
+#: core/models/enums/log_level.py:13
 msgid "The system was down"
 msgstr "Сервер экстренно прекратил работу"
 
-#: corefacility/core/os/exceptions.py:27
+#: core/os/exceptions.py:27
 msgid ""
 "Please, login to the server using SSH, execute the commands listed below \n"
 "and press Continue to finish this action\n"
@@ -265,58 +303,58 @@ msgstr ""
 " после чего нажмите Продолжить для завершения этого действия\n"
 "\n"
 
-#: corefacility/core/serializers/project_detail_serializer.py:46
+#: core/serializers/project_detail_serializer.py:46
 msgid ""
 "You don't have permission to assign this group as the project root group"
 msgstr ""
 "У Вас нет достаточных полномочий, чтобы назначить этот коллектив в качестве "
 "управляющего коллектива проекта."
 
-#: corefacility/core/serializers/user_detail_serializer.py:15
+#: core/serializers/user_detail_serializer.py:15
 msgid "Enter a valid phone number."
 msgstr "Введите корректный номер телефона."
 
-#: corefacility/core/serializers/user_list_serializer.py:21
+#: core/serializers/user_list_serializer.py:21
 msgid ""
 "Enter a valid login consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "Введите корректное имя пользователя, состоящее из латинских букв, цифр, "
 "дефисов и знаков подчёркивания."
 
-#: corefacility/core/synchronizations/exceptions.py:21
+#: core/synchronizations/exceptions.py:21
 msgid ""
 "Unable to perform synchronization because all synchronizers were switched off"
 msgstr ""
 "Невозможно осуществить синхронизацию, так как все модули синхронизации "
 "выключены"
 
-#: corefacility/core/synchronizations/exceptions.py:32
+#: core/synchronizations/exceptions.py:32
 msgid ""
 "Unable to perform synchronization due to the temporary problems on remote "
 "server"
 msgstr ""
 "Невозможно провести синхронизацию вследствие проблем на внешнем сервере"
 
-#: corefacility/core/synchronizations/exceptions.py:41
+#: core/synchronizations/exceptions.py:41
 msgid "Failed to remove a user: the user has been currently logged in"
 msgstr ""
 "Невозможно удалить пользователя: этот пользователь только что залогинился"
 
-#: corefacility/core/synchronizations/ihna_employees.py:93
+#: core/synchronizations/ihna_employees.py:93
 msgid "IHNA RAS account synchronization"
 msgstr "Синхронизация с сайтом ИВНД и НФ РАН"
 
-#: corefacility/core/templates/core/base.html:3
+#: core/templates/core/base.html:3
 msgid "Loading..."
 msgstr "Загрузка..."
 
-#: corefacility/core/templates/core/index.html:6
+#: core/templates/core/index.html:6
 msgid "You need to enable Javascript to run this application"
 msgstr ""
 "Вам необходимо включить поддержку Javascript в браузере для того, чтобы "
 "запустить это приложение"
 
-#: corefacility/core/templates/core/index.html:17
+#: core/templates/core/index.html:17
 msgid ""
 "The device screen resolution is too small. Please, use this application on "
 "another device"
@@ -324,19 +362,19 @@ msgstr ""
 "Ваше устройство имеет монитор со слишком малым разрешением. Пожалуйста, "
 "запустите это приложение на устройстве с большим разрешением"
 
-#: corefacility/core/views/login.py:37
+#: core/views/login.py:37
 msgid "Incorrect credentials."
 msgstr "Неверные учётные данные."
 
-#: corefacility/core/views/user.py:45
+#: core/views/user.py:45
 msgid "You can't delete yourself."
 msgstr "Вы не можете удалить самого себя"
 
-#: corefacility/core/views/user.py:108
+#: core/views/user.py:108
 msgid "Account activation"
 msgstr "Активация аккаунта"
 
-#: corefacility/imaging/api_exceptions.py:19
+#: imaging/api_exceptions.py:19
 msgid ""
 "Project's home directory was not defined for the project. Please, ask system "
 "administrator to cope with troubles"
@@ -344,22 +382,22 @@ msgstr ""
 "Домащняя директория проекта не определена для данного проекта. Пожалуйста, "
 "обратитесь к системному администратору для решения данной проблемы"
 
-#: corefacility/imaging/api_exceptions.py:26
+#: imaging/api_exceptions.py:26
 msgid "Number of variables in the NPZ file is not correct"
 msgstr "Данный NPZ-файл должен содержать ровно одно поле"
 
-#: corefacility/imaging/api_exceptions.py:32
+#: imaging/api_exceptions.py:32
 msgid "The file doesn't contain 2D map consisting from complex numbers"
 msgstr ""
 "данный файл не содержит двумерную матрицу, состоящую из комплексных чисел"
 
-#: corefacility/imaging/api_exceptions.py:39
+#: imaging/api_exceptions.py:39
 msgid "Please, upload the functional map to apply this map processor"
 msgstr ""
 "Пожалуйста, загрузите функциональную карту на сервер для выполнения этого "
 "действия"
 
-#: corefacility/imaging/api_exceptions.py:46
+#: imaging/api_exceptions.py:46
 msgid ""
 "The functional map has been permanently removed from the server or "
 "corrupted. Please, upload it again"
@@ -367,62 +405,62 @@ msgstr ""
 "Функциональная карта безвозвратно удалена с сервера, либо повреждена. "
 "Пожалуйста, загрузите её снова"
 
-#: corefacility/imaging/api_exceptions.py:54
+#: imaging/api_exceptions.py:54
 #, python-format
 msgid "Can't process this map because another map with alias '%s' exists"
 msgstr ""
 "Невозможно обработать функциональную карту, поскольку другая карта с "
 "псевдонимом '%s' уже создана"
 
-#: corefacility/imaging/api_exceptions.py:61
+#: imaging/api_exceptions.py:61
 msgid "The target map contains no data"
 msgstr "В ходе обработки была получена карта без данных"
 
-#: corefacility/imaging/entity/entry_points/processors.py:25
+#: imaging/entity/entry_points/processors.py:25
 msgid "Imaging processors"
 msgstr "Обработка функциональных карт"
 
-#: corefacility/imaging/entity/map/map_set.py:15
+#: imaging/entity/map/map_set.py:15
 msgid "Functional map"
 msgstr "Функциональная карта"
 
-#: corefacility/imaging/migrations/0002_install.py:13
+#: imaging/migrations/0002_install.py:13
 msgid "Basic functional maps processing"
 msgstr "Базовая обработка функциональных карт"
 
-#: corefacility/imaging/models/enums/map_type.py:9
+#: imaging/models/enums/map_type.py:9
 msgid "Orientation map"
 msgstr "Карта ориентационной настройки"
 
-#: corefacility/imaging/models/enums/map_type.py:10
+#: imaging/models/enums/map_type.py:10
 msgid "Direction map"
 msgstr "Карта дирекциональной настройки"
 
-#: corefacility/imaging/serializers/map_serializer.py:10
+#: imaging/serializers/map_serializer.py:10
 msgid "This value shall not be zero"
 msgstr "Данное значение не должно быть равно нулю"
 
-#: corefacility/roi/api_exceptions.py:10
+#: roi/api_exceptions.py:10
 msgid "To process the map please, give map dimensions in um"
 msgstr ""
 
-#: corefacility/roi/api_exceptions.py:17
+#: roi/api_exceptions.py:17
 msgid "To process the map please, mark at least one pinwheel center"
 msgstr ""
 
-#: corefacility/roi/entity/pinwheel/pinwheel_set.py:14
+#: roi/entity/pinwheel/pinwheel_set.py:14
 msgid "Pinwheel"
 msgstr "Центр ориентационной гиперколонки"
 
-#: corefacility/roi/entity/rectangular_roi/rectangular_roi_set.py:13
+#: roi/entity/rectangular_roi/rectangular_roi_set.py:13
 msgid "Rectangular ROI"
 msgstr "Прямоугольная область интереса"
 
-#: corefacility/roi/migrations/0002_install.py:13
+#: roi/migrations/0002_install.py:13
 msgid "ROI definition"
 msgstr "Выделение ROI"
 
-#: corefacility/roi/serializers/rectangular_roi_serializer.py:33
+#: roi/serializers/rectangular_roi_serializer.py:33
 msgid "Incorrect combination of ROI border values"
 msgstr "Неверно заданы значения границ областей интереса"
 

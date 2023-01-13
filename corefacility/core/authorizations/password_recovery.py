@@ -63,7 +63,13 @@ class PasswordRecoveryAuthorization(AuthorizationModule):
         """
         return False
 
-    def try_ui_authorization(self, request):
+    def try_ui_authorization(self, request, view):
+        """
+        Provides the authorization process
+        :param request: the request received from the client
+        :param view: the view that invoked this method
+        :return:
+        """
         if not 'activation_code' in request.GET:
             return None
         try:
@@ -86,6 +92,7 @@ class PasswordRecoveryAuthorization(AuthorizationModule):
             return None
         request.no_cookie = True
         request.password = user.generate_password()
+        user.activation_code_hash.clear()
         user.update()
         return user
 

@@ -122,7 +122,7 @@ export default class Form extends Loader{
 		}
 
 		for (let field in this._formValues){
-			if (this.entityClass.isFieldRequired(field) && this._formValues[field] === null){
+			if (this.entityClass !== null && this.entityClass.isFieldRequired(field) && this._formValues[field] === null){
 				return false;
 			}
 		}

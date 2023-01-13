@@ -1,0 +1,10 @@
+.settings_wrapper{
+	margin-bottom: 20px;
+	display: grid;
+	grid-template-columns: fit-content(250px) 250px;
+	grid-gap: 5px;
+}
+
+.controls_wrapper{
+	text-align: center;
+}

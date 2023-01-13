@@ -12,6 +12,7 @@ from core.authorizations.password_recovery import PasswordRecoveryAuthorization
 # can be sent to the user or not
 
 from core.entity.entry_points import AuthorizationsEntryPoint
+from core.entity.entity_exceptions import AuthorizationException
 
 from .base_window import BaseWindow
 
@@ -48,7 +49,7 @@ class MainWindow(BaseWindow):
         :return: nothing
         """
         self.kwargs = kwargs
-        self._split_application_path(path)
+        self.split_application_path(path)
         self._evaluate_uuid(uuid)
         self._authorize_user()
         self._set_static_options()
@@ -56,7 +57,20 @@ class MainWindow(BaseWindow):
         dump = json.dumps(kwargs)
         return super().get_context_data(js_settings=dump, **kwargs)
 
-    def _split_application_path(self, path):
+    def render_to_response(self, context, **response_kwargs):
+        """
+        Return a response, using the `response_class` for this view, with a
+        template rendered with the given context.
+
+        Pass response_kwargs to the constructor of the response class.
+        """
+        response = super().render_to_response(context, **response_kwargs)
+        entry_point = AuthorizationsEntryPoint()
+        for module in entry_point.modules():
+            response.delete_cookie(module.get_alias())
+        return response
+
+    def split_application_path(self, path):
         routes = path.split("/apps/", 1)
         if len(routes) == 2:
             another_routes = routes[1].split("/", 1)
@@ -69,7 +83,7 @@ class MainWindow(BaseWindow):
         else:
             self.kwargs['frontend_route'] = path
             self.kwargs['iframe_route'] = ""
-        self.kwargs['frontend_route'] = ("/%s/" % self.kwargs['frontend_route']).replace("//", "/")
+        self.kwargs['frontend_route'] = ("/%s/" % self.kwargs['frontend_route']).replace("//", "/").replace("//", "/")
         self.kwargs['iframe_route'] = ("%s/" % self.kwargs['iframe_route']).replace("//", "/")
         if self.kwargs['iframe_route'][0] == "/":
             self.kwargs['iframe_route'] = self.kwargs['iframe_route'][1:]
@@ -89,20 +103,29 @@ class MainWindow(BaseWindow):
         self._app_module = app.__module__
 
     def _authorize_user(self):
-        entry_point = AuthorizationsEntryPoint()
-        auth_user = None
-        for auth_module in entry_point.modules():
-            auth_user = auth_module.try_ui_authorization(self.request)
-            if auth_user is not None and auth_user.is_locked:
-                auth_user = None
+        try:
+            entry_point = AuthorizationsEntryPoint()
+            auth_user = None
+            module_alias = None
+            for auth_module in entry_point.modules():
+                auth_user = auth_module.try_ui_authorization(self.request, self)
+                if auth_user is not None and auth_user.is_locked:
+                    auth_user = None
+                if auth_user is not None:
+                    self.request.user = auth_user
+                    module_alias = auth_module.get_alias()
+                    break
             if auth_user is not None:
-                self.request.user = auth_user
-                break
-        if auth_user is not None:
-            token = auth_module.issue_token(auth_user)
-            self.kwargs['authorization_token'] = token
-        else:
+                token = auth_module.issue_token(auth_user)
+                self.kwargs['authorization_token'] = token
+            else:
+                self.kwargs['authorization_token'] = None
+            self.kwargs['authorization_error'] = None
+        except AuthorizationException as exception:
+            self.split_application_path(exception.route)
             self.kwargs['authorization_token'] = None
+            self.kwargs['authorization_error'] = str(exception)
+
 
     def _set_static_options(self):
         self.kwargs['client_version'] = str(self.client_version)

@@ -2,10 +2,11 @@ import {useParams} from 'react-router-dom';
 
 import {translate as t} from 'corefacility-base/utils';
 
+import Hyperlink from 'corefacility-base/shared-view/components/Hyperlink';
 import NavigationWindow from '../base/NavigationWindow';
 import Window404 from '../base/Window404';
 import UserDetailForm from './UserDetailForm';
-import Hyperlink from 'corefacility-base/shared-view/components/Hyperlink';
+import AuthorizationSettingsForm from './AuthorizationSettingsForm';
 
 
 /** Provides viewing, modification and deletion of
@@ -16,6 +17,8 @@ class _UserDetailWindow extends NavigationWindow{
 	constructor(props){
 		super(props);
 		this.handleNameChange = this.handleNameChange.bind(this);
+		this.handleAuthorizationMethodSetup = this.handleAuthorizationMethodSetup.bind(this);
+		this.registerModal('authorization-method-setup', AuthorizationSettingsForm);
 
 		this.state = {
 			userInformation: null,
@@ -31,6 +34,14 @@ class _UserDetailWindow extends NavigationWindow{
 		this._setBrowserTitle(newName);
 		this.setState({
 			userInformation: newName,
+		});
+	}
+
+	async handleAuthorizationMethodSetup(user, widget){
+		return this.openModal('authorization-method-setup', {
+			userId: user.id,
+			moduleAlias: widget.alias,
+			moduleName: widget.name,
 		});
 	}
 
@@ -62,6 +73,7 @@ class _UserDetailWindow extends NavigationWindow{
 			inputData={{lookup: this.props.lookup}}
 			on404={this.handle404}
 			onNameChange={this.handleNameChange}
+			onAuthorizationMethodSetup={this.handleAuthorizationMethodSetup}
 		/>)
 	}
 

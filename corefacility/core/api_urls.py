@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 from .testviews.test_transaction import TestTransaction
 from .views import View404, UserViewSet, GroupViewSet, ProjectViewSet, LoginView, ProfileView, AccessLevelView, \
     ProjectPermissionViewSet, SynchronizationView, LogViewSet, LogRecordViewSet, WidgetsView, ProjectModulesListView, \
-    ProjectApplicationViewSet, ModuleSettingsViewSet, EntryPointListView
+    ProjectApplicationViewSet, ModuleSettingsViewSet, EntryPointListView, AuthorizationMethodSetupView
 from .views.profile_avatar import ProfileAvatarView
 
 router = DefaultRouter()
@@ -27,6 +27,8 @@ urlpatterns = [
     path(r'login/', LoginView.as_view(), name="login"),
     path(r'profile/', ProfileView.as_view(), name="profile"),
     path(r'profile/avatar/', ProfileAvatarView.as_view(), name="profile-avatar"),
+    path(r'users/<int:user_id>/authorizations/<str:module_alias>/', AuthorizationMethodSetupView.as_view(),
+         name='authorization-method-setup'),
     path(r'access-levels/', AccessLevelView.as_view(), name="access-level"),
     path(r'account-synchronization/', SynchronizationView.as_view(), name="account-synchronization"),
     path(r'widgets/<uuid:module_uuid>/<str:entry_point_alias>/', WidgetsView.as_view(), name="widgets"),

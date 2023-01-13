@@ -14,7 +14,7 @@ class RefreshTokenManager(EntityValueManager):
         self.entity.update()
 
     def __str__(self):
-        return self._field_value
+        return self._field_value if self._field_value is not None else "<undefined>"
 
     def __eq__(self, other):
         if isinstance(other, RefreshTokenManager):

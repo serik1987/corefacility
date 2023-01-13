@@ -39,12 +39,13 @@ class LoginPasswordAuthorization(AuthorizationModule):
             user = self.authorize(credentials.validated_data['login'], credentials.validated_data['password'])
             return user
 
-    def try_ui_authorization(self, request):
+    def try_ui_authorization(self, request, view):
         """
         Performs the UI authorization.
         Please, note that UI authorization is not available for all methods that require login and password
 
-        :param request: REST framework request
+        :param request: the HttpRequest received from the Web browser
+        :param view: the view that has called this method
         :return: always None
         """
         return None

@@ -244,3 +244,19 @@ class EntryPointTypeIncorrectException(CorefacilityModuleException):
         super().__init__("Can't install the entry point '%s' "
                          "because its type is not a string being equal to either 'lst' or 'sel'"
                          % entry_point.get_entity_name())
+
+
+class AuthorizationException(CorefacilityModuleException):
+    """
+    Occurs when the external authorization is finally failed
+    """
+
+    __route = None
+
+    def __init__(self, route, message):
+        super().__init__(message)
+        self.__route = route
+
+    @property
+    def route(self):
+        return self.__route

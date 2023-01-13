@@ -30,10 +30,10 @@ class ModuleSettingsSerializer(EntitySerializer):
         :param validated_data: input data after they have been validated
         :return: the updated entity
         """
-        if "is_enabled" in validated_data and validated_data["is_enabled"] != module.is_enabled:
-            module.is_enableable(validated_data['is_enabled'])
         if 'user_settings' in validated_data:
-            for key, value, in validated_data['user_settings'].items():
+            for key, value in validated_data['user_settings'].items():
                 module.user_settings.set(key, value)
             del validated_data['user_settings']
+        if "is_enabled" in validated_data and validated_data["is_enabled"] != module.is_enabled:
+            module.is_enableable(validated_data['is_enabled'])
         return super().update(module, validated_data)

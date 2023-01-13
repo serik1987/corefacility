@@ -6,6 +6,7 @@ import Form from 'corefacility-base/view/Form';
 import Label from 'corefacility-base/shared-view/components/Label';
 import TextInput from 'corefacility-base/shared-view/components/TextInput';
 import PrimaryButton from 'corefacility-base/shared-view/components/PrimaryButton';
+import ModuleWidgets from 'corefacility-base/shared-view/components/ModuleWidgets';
 
 import style from './style.module.css';
 import {ReactComponent as Logo} from 'corefacility-base/shared-view/icons/logo.svg';
@@ -79,6 +80,18 @@ import {ReactComponent as Logo} from 'corefacility-base/shared-view/icons/logo.s
  */
 export default class AuthorizationForm extends Form{
 
+	constructor(props){
+		super(props);
+		this.handleAuthorizationMethodClick = this.handleAuthorizationMethodClick.bind(this);
+		this.handleAuxiliaryAuthorizationMethodsHide = 
+			this.handleAuxiliaryAuthorizationMethodsHide.bind(this);
+
+		this.state = {
+			...this.state,
+			extraAuthorizationMethods: true,
+		}
+	}
+
 	/** The entity class. The formObject will be exactly an instance of this class.
 	 * 	The formObject is implied to be an instance of Entity
 	 */
@@ -135,6 +148,17 @@ export default class AuthorizationForm extends Form{
 		window.application.token = result.token;
 	}
 
+	handleAuthorizationMethodClick(widget){
+		let url = new URL(window.location.href);
+		url.pathname = `/authorize/${widget.alias}/`;
+		url.searchParams.set('route', window.location.pathname);
+		window.location = url;
+	}
+
+	handleAuxiliaryAuthorizationMethodsHide(event){
+		this.setState({extraAuthorizationMethods: false});
+	}
+
 	render(){
 		let loginForm = null;
 
@@ -154,6 +178,17 @@ export default class AuthorizationForm extends Form{
 					<PrimaryButton {...this.getSubmitProps()}>{t("Authorize")}</PrimaryButton>
 				</div>,
 			];
+			if (this.state.extraAuthorizationMethods){
+				loginForm.splice(2, 0, <div className={style.widgets_wrapper}>
+					<h2>{t("... or authorize through")}</h2>
+					<ModuleWidgets
+						parentModuleUuid={window.application.model.uuid}
+						entryPointAlias="authorizations"
+						onClick={this.handleAuthorizationMethodClick}
+						onWidgetsEmpty={this.handleAuxiliaryAuthorizationMethodsHide}
+					/>
+				</div>);
+			}
 		}
 		if (window.application.activationCode !== null && window.application.token === null){
 			loginForm = [
@@ -197,8 +232,14 @@ export default class AuthorizationForm extends Form{
 	}
 
 	componentDidMount(){
-		document.getElementsByTagName("title")[0].innerText = t("Log in");
 		this.resetForm();
+		document.getElementsByTagName("title")[0].innerText = t("Log in");
+		if (window.SETTINGS.authorization_error !== null && window.SETTINGS.authorization_error !== undefined){
+			this.setState({
+				globalError: window.SETTINGS.authorization_error
+			});
+			window.SETTINGS.authorization_error = null;
+		}
 	}
 
 }

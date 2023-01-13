@@ -72,7 +72,7 @@ class App(AuthorizationModule):
         response.set_signed_cookie(settings.COOKIE_NAME, token,
                                    max_age=expiry_term.total_seconds(), **settings.COOKIE_FEATURES)
 
-    def try_ui_authorization(self, request):
+    def try_ui_authorization(self, request, view):
         """
         Performs the UI authorization.
         The UI authorization will be performed automatically during the UI application loading. The authorization
@@ -80,6 +80,7 @@ class App(AuthorizationModule):
         Javascript constant.
 
         :param request: The HTTP request that shall be authorized.
+        :param view: view that has called this method
         :return: an authorized user in case of successful authorization. None if authorization fails. The function
         shall not generate authorization token, just return the user. The user if core.entity.user.User instance.
         """

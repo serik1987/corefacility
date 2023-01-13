@@ -21,14 +21,15 @@
 
 .content_wrapper{
 	display: flex;
+	align-items: center;
 	gap: 4px;
-	/* height: 24px; */
 }
 
 .item_opener{
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	flex: 0 0 24px;
 	width: 24px;
 	height: 24px;
 }
@@ -61,7 +62,7 @@
 }
 
 .item_name{
-	line-height: 24px;
+	line-height: 1.2;
 }
 
 .item.selected .item_name{

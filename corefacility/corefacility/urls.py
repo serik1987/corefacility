@@ -4,7 +4,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-from core.views import MainWindow, View404
+from core.views import MainWindow, View404, AuthorizationView
 
 from core.testviews.config import config
 from core.testviews.test_ui import test_ui
@@ -20,6 +20,7 @@ urlpatterns = [
 
     path('api/v<version>/', include(("core.api_urls", "core"))),
     path('api/', View404.as_view(), name="no-api-version"),
+    path('authorize/<slug:module_alias>/', AuthorizationView.as_view(), name='auth-view'),
     path('ui/<uuid:uuid>/<path:path>/', MainWindow.as_view(), name="subwindow"),
     path('ui/<uuid:uuid>/', MainWindow.as_view(), name="subwindow"),
     path('', MainWindow.as_view(), {'path': ''}, name="main_window"),

@@ -54,9 +54,14 @@
 	font-family: 'Courier New', Courier, Serif;
 }
 
-.main_wrapper{
-	margin-top: 31px;
-	margin-bottom: 45px;
+.widgets_wrapper, .main_wrapper{
+	margin: 31px 0;
+}
+
+.widgets_wrapper h2{
+	margin-bottom: 10px;
+	font-size: 13px;
+	font-weight: 700;
 }
 
 .main_wrapper :global .text-input{
@@ -64,6 +69,7 @@
 }
 
 .button_wrapper{
+	margin-top: 45px;
 	text-align: right;
 }
 

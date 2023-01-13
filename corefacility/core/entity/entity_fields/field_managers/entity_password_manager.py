@@ -17,6 +17,21 @@ class EntityPasswordManager(EntityValueManager):
     SPECIAL_SYMBOLS = "!@#$%^&*()_+=-~`\\\";:'/?.>,<"
     ALL_SYMBOLS = LATIN_LETTERS + DIGITS + SPECIAL_SYMBOLS
 
+    @classmethod
+    def generate_password(cls, allowed_symbols: str, size: int) -> str:
+        """
+        The function generates new password and just saves it
+        :param size: the password size
+        :param allowed_symbols: symbols that can be contained in the password.
+        :return: newly generated password
+        """
+        password = ""
+        for i in range(size):
+            index = randrange(len(allowed_symbols))
+            symbol = allowed_symbols[index]
+            password += symbol
+        return password
+
     def generate(self, allowed_symbols: str, size: int) -> str:
         """
         The function generates new password, saves the password to the private entity field (not to the database!)
@@ -26,11 +41,7 @@ class EntityPasswordManager(EntityValueManager):
         :param allowed_symbols: symbols that can be contained in the password.
         :return: the newly generated password
         """
-        password = ""
-        for i in range(size):
-            index = randrange(len(allowed_symbols))
-            symbol = allowed_symbols[index]
-            password += symbol
+        password = self.generate_password(allowed_symbols, size)
         password_hash = make_password(password)
         setattr(self.entity, "_" + self.field_name, password_hash)
         self.entity.notify_field_changed(self.field_name)

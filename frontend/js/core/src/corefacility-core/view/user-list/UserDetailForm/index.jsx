@@ -10,7 +10,7 @@ import CheckboxInput from 'corefacility-base/shared-view/components/CheckboxInpu
 import PrimaryButton from 'corefacility-base/shared-view/components/PrimaryButton';
 import Hyperlink from 'corefacility-base/shared-view/components/Hyperlink';
 import AvatarUploader from 'corefacility-base/shared-view/components/AvatarUploader';
-
+import ModuleWidgets from 'corefacility-base/shared-view/components/ModuleWidgets';
 import User from 'corefacility-core/model/entity/User';
 
 import CoreWindowHeader from '../../base/CoreWindowHeader';
@@ -29,6 +29,13 @@ export default class UserDetailForm extends UpdateForm{
 		this.changePassword = this.changePassword.bind(this);
 		this.printPassword = this.printPassword.bind(this);
 		this.sendActivationCode = this.sendActivationCode.bind(this);
+		this.setupAuthorizationMethod = this.setupAuthorizationMethod.bind(this);
+		this.onAuthorizationWidgetsEmpty = this.onAuthorizationWidgetsEmpty.bind(this);
+
+		this.state = {
+			...this.state,
+			showAuthorizationWidgets: true,
+		}
 	}
 
 	/** The entity class. The formObject will be exactly an instance of this class.
@@ -153,6 +160,23 @@ export default class UserDetailForm extends UpdateForm{
 		});
 	}
 
+	/** Adjusts the authorization widget settings
+	 * 	@param {ModuleWidget} authorizationWidget the widget to be adjusted
+	 */
+	async setupAuthorizationMethod(authorizationWidget){
+		if (this.props.onAuthorizationMethodSetup){
+			this.props.onAuthorizationMethodSetup(this._formObject, authorizationWidget);
+		}
+	}
+
+	/** Triggers when no active authorization widgets have been loaded
+	 */
+	onAuthorizationWidgetsEmpty(){
+		this.setState({
+			showAuthorizationWidgets: false,
+		});
+	}
+
 	renderContent(){
 		let unset = <i className={styles.unset}>{t('Not defined.')}</i>;
 		let header
@@ -273,6 +297,18 @@ export default class UserDetailForm extends UpdateForm{
 									/>
 								</section>
 							</div>
+							{this.state.showAuthorizationWidgets && <div className={styles.widgets_row}>
+								<section>
+									<h2>{t("Authorization methods")}</h2>
+									<ModuleWidgets
+										parentModuleUuid={window.application.model.uuid}
+										entryPointAlias="authorizations"
+										onClick={this.setupAuthorizationMethod}
+										inactive={this.state.inactive}
+										onWidgetsEmpty={this.onAuthorizationWidgetsEmpty}
+									/>
+								</section>
+							</div>}
 							{this.renderEntityState()}
 							<div className={styles.controls_row}>
 								<PrimaryButton {...this.getSubmitProps()}>{t('Save')}</PrimaryButton>
@@ -298,7 +334,7 @@ export default class UserDetailForm extends UpdateForm{
 		);
 	}
 
-	componentDidUpdate(prevProps, prevState){
+	async componentDidUpdate(prevProps, prevState){
 		if ((prevState.rawValues.name !== this.state.rawValues.name ||
 			prevState.rawValues.surname !== this.state.rawValues.surname) &&
 			this.props.onNameChange){

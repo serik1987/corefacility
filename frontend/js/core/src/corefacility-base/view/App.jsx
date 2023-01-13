@@ -1,5 +1,5 @@
 import {createRoot} from 'react-dom/client';
-import {BrowserRouter as Router} from 'react-router-dom';
+import {BrowserRouter as Router, Navigate} from 'react-router-dom';
 import i18next from 'i18next'
 import {initReactI18next} from 'react-i18next';
 
@@ -105,6 +105,11 @@ export default class App extends DialogWrapper{
 	}
 
 	render(){
+		if (window.SETTINGS.frontend_route && window.SETTINGS.frontend_route !== '/'){
+			window.history.replaceState(null, null, window.SETTINGS.frontend_route);
+			window.SETTINGS.frontend_route = undefined;
+		}
+
 		return (
 			<Router>
 				{ this.renderAllRoutes() }
