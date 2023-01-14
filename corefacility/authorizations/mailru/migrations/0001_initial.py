@@ -14,16 +14,6 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='AuthorizationToken',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('access_token', models.CharField(max_length=256)),
-                ('expires_in', models.DateTimeField()),
-                ('refresh_token', models.CharField(max_length=256)),
-                ('authentication', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='mailru_token', to='core.authentication')),
-            ],
-        ),
-        migrations.CreateModel(
             name='Account',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),

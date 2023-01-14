@@ -11,6 +11,7 @@ import ModuleTreeItem from 'corefacility-core/model/tree/ModuleTreeItem';
 import CookieAuthorizationModule from 'corefacility-core/model/entity/CookieAuthorizationModule';
 import PasswordRecoveryAuthorizationModule from 'corefacility-core/model/entity/PasswordRecoveryAuthorizationModule';
 import MailruAuthorizationModule from 'corefacility-core/model/entity/MailruAuthorizationModule';
+import GoogleAuthorizationModule from 'corefacility-core/model/entity/GoogleAuthorizationModule';
 
 import CoreWindow from '../../base/CoreWindow';
 import CoreWindowHeader from '../../base/CoreWindowHeader';
@@ -21,6 +22,7 @@ import StandardAuthorizationModuleForm from '../StandardAuthorizationModuleForm'
 import CookieAuthorizationModuleForm from '../CookieAuthorizationModuleForm';
 import PasswordRecoveryAuthorizationModuleForm from '../PasswordRecoveryAuthorizationModuleForm';
 import MailruAuthorizationModuleForm from '../MailruAuthorizationModuleForm';
+import GoogleAuthorizationModuleForm from '../GoogleAuthorizationModuleForm';
 
 import styles from './style.module.css';
 
@@ -56,7 +58,8 @@ class _SettingsWindow extends CoreWindow{
 			standard: StandardAuthorizationModule,
 			cookie: CookieAuthorizationModule,
 			password_recovery: PasswordRecoveryAuthorizationModule,
-			'mailru_authorization': MailruAuthorizationModule,
+			mailru_authorization: MailruAuthorizationModule,
+			google_authorization: GoogleAuthorizationModule,
 		}
 
 		this._moduleForms = {
@@ -68,7 +71,8 @@ class _SettingsWindow extends CoreWindow{
 			standard: StandardAuthorizationModuleForm,
 			cookie: CookieAuthorizationModuleForm,
 			password_recovery: PasswordRecoveryAuthorizationModuleForm,
-			'mailru_authorization': MailruAuthorizationModuleForm,
+			mailru_authorization: MailruAuthorizationModuleForm,
+			google_authorization: GoogleAuthorizationModuleForm,
 		}
 
 		this.state = {

@@ -71,21 +71,29 @@ class AuthorizationModule(CorefacilityModule):
         return AuthorizationModule._signer
 
     @staticmethod
-    def issue_token(user):
+    def issue_token(user, get_token=False):
         """
         Issues authentication token for a particular user
 
         :param user: a user to which the token must be issued
-        :return: a string containing an authentication token
+        :param get_token: True return a tuple containing authentication token and authentication object itself,
+            False return just one string containing an authentication token
+        :return: see above
         """
         from core import App
         from core.entity.authentication import Authentication
 
         expiry_term = App().get_auth_token_lifetime()
         Authentication.clear_all_expired_tokens()
-        token = Authentication.issue(user, expiry_term)
+        if get_token:
+            token, authentication = Authentication.issue(user, expiry_term, True)
+        else:
+            token = Authentication.issue(user, expiry_term)
         signed_token = AuthorizationModule.get_signer().sign(token)
-        return signed_token
+        if get_token:
+            return signed_token, authentication
+        else:
+            return signed_token
 
     @staticmethod
     def apply_token(token: str):
@@ -139,7 +147,9 @@ class AuthorizationModule(CorefacilityModule):
         If there is a widget for a module, this method shall return all settings that shall be adjusted personally
         for each user
         :param user: identity which settings shall be returned
-        :return: settings to be adjusted personally for each user
+        :return: a dictionary with the following fields:
+            'values': a dictionary like settings name => settings value
+            'description': a dictionary like settings name => settings description
         """
         raise NotImplementedError("get_user_settings")
 

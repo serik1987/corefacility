@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-13 10:53+0300\n"
+"POT-Creation-Date: 2023-01-14 15:09+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,9 +21,46 @@ msgstr ""
 msgid "Authorization through Cookie"
 msgstr "Авторизация через Cookie"
 
+#: authorizations/google/__init__.py:90
+msgid ""
+"To authorize through Google you need to provide access of this application "
+"to some personal details stored in Google"
+msgstr ""
+"Для того, чтобы авторизоваться через Google, Вам необходимо обеспечить "
+"доступ нашему приложению к некоторым персональным данным, которые у Вас "
+"храняться в Google"
+
+#: authorizations/google/__init__.py:137
+msgid "Google account name (an e-mail)"
+msgstr "Название учётной записи Google (e-mail)"
+
+#: authorizations/google/__init__.py:180 authorizations/google/__init__.py:184
+msgid "To enable this module ensure that this field is not empty"
+msgstr "Для того, чтобы включить модуль, убедитесь, что это поле не пустое"
+
+#: authorizations/google/entity/authorization_token/google_provider.py:57
+#: authorizations/google/entity/authorization_token/google_provider.py:77
+msgid "Invalid client ID or client secret"
+msgstr "Неверный Client ID или Client Secret"
+
+#: authorizations/google/entity/authorization_token/google_provider.py:85
+msgid ""
+"Your Google account was not attached to the corefacility account. Please, "
+"login using another authorization method and attach your Google account to "
+"the corefacility account"
+msgstr ""
+"Ваша учётная запись Google не привязана к Вашей учётной записи "
+"corefacility. Пожалуйста, авторизуйтесь, используя другой способ "
+"авторизации, после чего привяжите Вашу учётную запись Google к учётной "
+"записи corefacility, используя для этого настройки Вашего профиля."
+
 #: authorizations/google/migrations/0002_install.py:13
 msgid "Authorization through Google"
 msgstr "Авторизация через Google"
+
+#: authorizations/google/serializers/user_settings_serializer.py:22
+msgid "The e-mail must be ended to @gmail.com"
+msgstr "E-mail должен заканчиваться на @gmail.com"
 
 #: authorizations/ihna/migrations/0002_install.py:13
 msgid "Authorization through IHNA website"
@@ -33,7 +70,7 @@ msgstr "Авторизация через сайт ИВНД и НФ РАН"
 msgid "User's email in the Mail.Ru mailbox"
 msgstr "E-mail пользователя в почтовом ящике Mail.Ru"
 
-#: authorizations/mailru/__init__.py:156
+#: authorizations/mailru/__init__.py:157
 msgid ""
 "To authorize through the Mail.Ru you need to grant a read-only access to "
 "your personal details"
@@ -42,22 +79,26 @@ msgstr ""
 "на чтение Ваших персональных данных из аккаунта Mail.Ru. Это не предполагает "
 "наличие доступа на их изменение"
 
-#: authorizations/mailru/__init__.py:159
+#: authorizations/mailru/__init__.py:160
 msgid "Authorization code did not received from the Mail.Ru server"
 msgstr "Код авторизации не был получен через сервер Mail.Ru"
 
-#: authorizations/mailru/__init__.py:186
+#: authorizations/mailru/__init__.py:187
 msgid ""
 "Your mail.ru account has not been attached to your corefacility account. "
 "Please, login using another authorization method and attach your mail.ru "
 "account to your corefacility account in your profile settings"
-msgstr "Ваша учётная запись на mail.ru не привязана к Вашей учётной записи corefacility. Пожалуйста, авторизуйтесь, используя другой способ авторизации, после чего привяжите Вашу учётную запись mail.ru к учётной записи corefacility, используя для этого настройки Вашего профиля."
+msgstr ""
+"Ваша учётная запись на mail.ru не привязана к Вашей учётной записи "
+"corefacility. Пожалуйста, авторизуйтесь, используя другой способ "
+"авторизации, после чего привяжите Вашу учётную запись mail.ru к учётной "
+"записи corefacility, используя для этого настройки Вашего профиля."
 
-#: authorizations/mailru/__init__.py:255 authorizations/mailru/__init__.py:257
+#: authorizations/mailru/__init__.py:257 authorizations/mailru/__init__.py:259
 msgid "To turn this field on please, ensure that this is not empty"
 msgstr "Для того, чтобы включить модуль, убедитесь, что это поле не пустое"
 
-#: authorizations/mailru/__init__.py:259
+#: authorizations/mailru/__init__.py:261
 msgid "The authorization process will not work when this value equals to zero"
 msgstr ""
 "Процесс авторизации не будет работать, если значение этого поля равно нулю"
@@ -124,11 +165,11 @@ msgstr "Автоматическая авторизация"
 msgid "Password recovery function"
 msgstr "Функция восстановления пароля"
 
-#: core/authorizations/password_recovery.py:128
+#: core/authorizations/password_recovery.py:135
 msgid "The module can't be enabled in partial server configuration"
 msgstr "Этот модуль нельзя включить в конфигурации частичного сервера"
 
-#: core/authorizations/password_recovery.py:130
+#: core/authorizations/password_recovery.py:137
 msgid "The module can't be enabled without email support"
 msgstr ""
 "Этот модуль нельзя включить, так как Ваш сервер не поддерживает отправку E-"
@@ -226,7 +267,7 @@ msgstr "Способы авторизации"
 msgid "At least one authorization module must be enabled"
 msgstr "Хотя бы один из способов авторизации должен быть активен"
 
-#: core/entity/entry_points/authorizations.py:239
+#: core/entity/entry_points/authorizations.py:243
 msgid "Bad session ID"
 msgstr "Идентификатор сессии неверен или устарел"
 

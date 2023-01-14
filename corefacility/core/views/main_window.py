@@ -116,8 +116,11 @@ class MainWindow(BaseWindow):
                     module_alias = auth_module.get_alias()
                     break
             if auth_user is not None:
-                token = auth_module.issue_token(auth_user)
-                self.kwargs['authorization_token'] = token
+                if not hasattr(self, 'authentication_token'):
+                    token = auth_module.issue_token(auth_user)
+                    self.kwargs['authorization_token'] = token
+                else:
+                    self.kwargs['authorization_token'] = self.authentication_token
             else:
                 self.kwargs['authorization_token'] = None
             self.kwargs['authorization_error'] = None

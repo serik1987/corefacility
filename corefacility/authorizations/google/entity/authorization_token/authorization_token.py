@@ -3,7 +3,7 @@ from core.entity.entity_fields import ReadOnlyField, ManagedEntityField
 
 from .authorization_token_set import AuthorizationTokenSet
 from .model_provider import ModelProvider
-from .mock_provider import MockProvider
+from .google_provider import GoogleProvider
 from .refresh_token_manager import RefreshTokenManager
 
 
@@ -39,10 +39,13 @@ class AuthorizationToken(ExternalAuthorizationToken):
 
     _entity_set_class = AuthorizationTokenSet
 
-    _entity_provider_list = [MockProvider(), ModelProvider()]
+    _entity_provider_list = [GoogleProvider(), ModelProvider()]
+
+    _required_fields = ['code']
 
     _intermediate_field_description = {
         "access_token": ReadOnlyField(description="Access token"),
         "expires_in": ReadOnlyField(description="Access token expiration time"),
-        "refresh_token": ManagedEntityField(RefreshTokenManager, description="Refresh token")
+        "refresh_token": ManagedEntityField(RefreshTokenManager, description="Refresh token"),
+        "authentication_token": ReadOnlyField(description="The authentication token created during the authorization")
     }

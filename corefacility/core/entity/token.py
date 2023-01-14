@@ -78,12 +78,14 @@ class Token(Entity):
         return token_entity
 
     @classmethod
-    def issue(cls, user, expiry_term: timedelta) -> str:
+    def issue(cls, user, expiry_term: timedelta, get_token_object: bool = False):
         """
         Creates new authentication
 
         :param user: the user that wants to get a token
         :param expiry_term: the token expiration term
+        :param get_token_object: True returns a tuple where the first element is token and the second one is token
+            object, False - just return a string containing a token
         :return: authentication token that shall be provided by the client application during each API request
         """
         token_entity = cls(user=user)
@@ -93,7 +95,11 @@ class Token(Entity):
         token_entity.create()
         token_id = token_entity.id
         token = "%s:%s" % (token_id, token_password)
-        return b64encode(token.encode("utf-8")).decode("utf-8")
+        final_token = b64encode(token.encode("utf-8")).decode("utf-8")
+        if get_token_object:
+            return final_token, token_entity
+        else:
+            return final_token
 
     @classmethod
     def clear_all_expired_tokens(cls):

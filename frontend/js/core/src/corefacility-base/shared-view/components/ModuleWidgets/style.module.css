@@ -26,11 +26,17 @@
 
 .widget_wrapper :global .auth{
 	width: 50px;
+	background-repeat: no-repeat;
+	background-position: 0 0;
+	background-size: 100%;
 }
 
 .widget_wrapper :global .mailru{
-	background: url('corefacility-base/shared-view/icons/mailru.png') no-repeat 0 0;
-	background-size: 100%;
+	background-image: url('corefacility-base/shared-view/icons/mailru.png');
+}
+
+.widget_wrapper :global .google{
+	background-image: url('corefacility-base/shared-view/icons/google.png');
 }
 
 .error{
