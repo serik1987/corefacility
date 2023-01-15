@@ -15,7 +15,7 @@ class Command(BaseCommand):
     requires_system_checks = []
 
     DEFAULT_APPLICATION_LIST = [
-        "core", "authorizations.cookie", "authorizations.google", "authorizations.mailru", "authorizations.ihna",
+        "core", "authorizations.cookie", "authorizations.google", "authorizations.mailru",
         "imaging", "roi",
     ]
 

@@ -140,15 +140,6 @@ class Migration(migrations.Migration):
             name='user',
             field=models.ForeignKey(editable=False, help_text='User that is authorized or null if no user is authorized', null=True, on_delete=django.db.models.deletion.SET_NULL, to='core.user'),
         ),
-        migrations.CreateModel(
-            name='ExternalAuthorizationSession',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('session_key', models.CharField(editable=False, help_text='The session key is used to prove that external authorization system redirects the same user which actually types loging and password', max_length=256)),
-                ('session_key_expiry_date', models.DateTimeField(editable=False, help_text='The session key is valid for approximately 1 hour')),
-                ('authorization_module', models.ForeignKey(editable=False, help_text='The authorization module through which the authorization is provided', on_delete=django.db.models.deletion.CASCADE, to='core.module')),
-            ],
-        ),
         migrations.AddField(
             model_name='entrypoint',
             name='belonging_module',
