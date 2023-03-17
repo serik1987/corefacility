@@ -23,6 +23,8 @@ class TokenReader(RawSqlQueryReader):
             .add_select_expression("core_user.is_superuser")\
             .add_select_expression("core_user.is_support")\
             .add_select_expression("core_user.avatar")\
+            .add_select_expression("core_user.unix_group")\
+            .add_select_expression("core_user.home_dir")\
             .add_data_source(self._lookup_table_name)\
             .add_order_term(self._lookup_table_name + ".id")
         self.items_builder.data_source\
@@ -35,7 +37,8 @@ class TokenReader(RawSqlQueryReader):
 
     def create_external_object(self, auth_id, auth_token_hash, auth_expiration_date, user_id, user_login, user_name,
                                user_surname, user_email, user_phone,
-                               user_is_locked, user_is_superuser, user_is_support, user_avatar):
+                               user_is_locked, user_is_superuser, user_is_support, user_avatar,
+                               unix_group, home_dir):
         return ModelEmulator(
             id=auth_id,
             token_hash=auth_token_hash,
@@ -51,5 +54,7 @@ class TokenReader(RawSqlQueryReader):
                 is_superuser=user_is_superuser,
                 is_support=user_is_support,
                 avatar=ModelEmulatorFileField(name=user_avatar),
+                unix_group=unix_group,
+                home_dir=home_dir
             )
         )

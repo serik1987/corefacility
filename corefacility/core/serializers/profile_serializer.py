@@ -10,6 +10,6 @@ class ProfileSerializer(UserDetailSerializer):
 
     login = serializers.ReadOnlyField(label="Username (login)")
     is_password_set = None
-    is_locked = None
-    is_superuser = None
-    is_support = None
+    is_locked = serializers.ReadOnlyField(label="Is locked (is_locked)")
+    is_superuser = serializers.ReadOnlyField(label="Is superuser (is_superuser")
+    is_support = serializers.ReadOnlyField(label="Is support (is_support)")

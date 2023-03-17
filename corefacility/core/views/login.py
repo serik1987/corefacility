@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 
 from core.entity.entry_points import AuthorizationsEntryPoint
 from core.generic_views import SetCookieMixin
-from core.serializers import UserListSerializer
+from core.serializers import ProfileSerializer
 
 
 class LoginView(SetCookieMixin, APIView):
@@ -36,7 +36,7 @@ class LoginView(SetCookieMixin, APIView):
         if user is None:
             raise NotAuthenticated(_("Incorrect credentials."), code="authorization_failed")
         token = auth_module.issue_token(user)
-        user_serializer = UserListSerializer(user)
+        user_serializer = ProfileSerializer(user)
         if hasattr(request, "corefacility_log"):
             request.corefacility_log.response_body = "***"
         request.user = user  # Otherwise cookies will not work

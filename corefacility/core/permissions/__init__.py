@@ -19,6 +19,25 @@ class AdminOnlyPermission(IsAuthenticated):
         return bool(super().has_permission(request, view) and request.user.is_superuser)
 
 
+class AdminOrSelfPermission(AdminOnlyPermission):
+    """
+    The permission gives full access to superuser and access to its own account to all other users.
+    """
+
+    def has_permission(self, request, view):
+        """
+        Checks whether the user is allowed to change the settings
+        :param request: the request
+        :param view: the view
+        :return: True if given action is allowed, False if this is denied
+        """
+        if super().has_permission(request, view):
+            return True
+        actual_id = request.user.id
+        desired_id = int(view.kwargs['user_id'])
+        return actual_id == desired_id
+
+
 class ModuleSettingsPermission(AdminOnlyPermission):
     """
     admins can do everything, any other users can list all modules under ?enabled_apps_only app

@@ -120,7 +120,6 @@ export default class UserDetailForm extends UpdateForm{
 		if (window.SETTINGS.suggest_administration){
 			let user = this._formObject;
 			let oldLock = user.is_locked;
-			console.log(oldLock);
 			if (!oldLock){
 				user.is_locked = true;
 				if (!(await this.doSuggestedAction(() => user.update()))){

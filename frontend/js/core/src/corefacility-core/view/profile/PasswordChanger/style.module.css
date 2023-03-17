@@ -1,0 +1,17 @@
+.password_modifier{
+	display: flex;
+	padding-top: 8px;
+	align-items: center;
+	gap: 10px;
+}
+
+.password_modifier p{
+	margin: 0;
+	font-style: italic;
+}
+
+.error{
+	margin: 0;
+	padding: 5px 0;
+	color: rgb(197, 57, 41);
+}

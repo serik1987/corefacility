@@ -1,6 +1,6 @@
 import {translate as t} from 'corefacility-base/utils';
 import client from 'corefacility-base/model/HttpClient';
-import User from 'corefacility-core/model/entity/User';
+import Profile from 'corefacility-core/model/entity/Profile';
 
 import Form from 'corefacility-base/view/Form';
 import Label from 'corefacility-base/shared-view/components/Label';
@@ -135,7 +135,7 @@ export default class AuthorizationForm extends Form{
 	async modifyFormObject(){
 		let url = `/api/${window.SETTINGS.client_version}/login/`;
 		let result = await client.post(url, this._formValues);
-		let user = User._entityProviders[User.SEARCH_PROVIDER_INDEX].getObjectFromResult(result.user);
+		let user = Profile._entityProviders[Profile.SEARCH_PROVIDER_INDEX].getObjectFromResult(result.user);
 
 		this.setState({
 			rawValues: {

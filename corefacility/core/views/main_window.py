@@ -13,6 +13,7 @@ from core.authorizations.password_recovery import PasswordRecoveryAuthorization
 
 from core.entity.entry_points import AuthorizationsEntryPoint
 from core.entity.entity_exceptions import AuthorizationException
+from core.serializers import ProfileSerializer
 
 from .base_window import BaseWindow
 
@@ -116,6 +117,8 @@ class MainWindow(BaseWindow):
                     module_alias = auth_module.get_alias()
                     break
             if auth_user is not None:
+                auth_user_serializer = ProfileSerializer(auth_user)
+                self.kwargs['auth_user'] = auth_user_serializer.data
                 if not hasattr(self, 'authentication_token'):
                     token = auth_module.issue_token(auth_user)
                     self.kwargs['authorization_token'] = token
@@ -123,10 +126,12 @@ class MainWindow(BaseWindow):
                     self.kwargs['authorization_token'] = self.authentication_token
             else:
                 self.kwargs['authorization_token'] = None
+                self.kwargs['auth_user'] = None
             self.kwargs['authorization_error'] = None
         except AuthorizationException as exception:
             self.split_application_path(exception.route)
             self.kwargs['authorization_token'] = None
+            self.kwargs['auth_user'] = None
             self.kwargs['authorization_error'] = str(exception)
 
 

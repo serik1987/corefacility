@@ -13,7 +13,7 @@ import styles from './style.module.css';
  * 		@param {boolean} disabled	if the button is disabled, it is inactive and is shown as grey
  * 		@param {string} href		the route to be moved when you click the button
  * 		@param {tooltip}			Detailed description of this button
- * 		@param {React.Component} img The image to be displaced to the button.
+ * 		@param {React.Component} src The image to be displaced to the button.
  * 	The onClick prop always override the href prop
  * 
  *  The component has internal states.

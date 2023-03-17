@@ -1,7 +1,6 @@
 import urllib
 
 from django.core.signing import Signer
-from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from rest_framework import status
 from rest_framework.decorators import action
@@ -12,17 +11,15 @@ from core import App
 from core.authorizations.password_recovery import PasswordRecoveryAuthorization
 from core.utils import mail
 from core.api_exceptions import MailAddressUndefinedException, MailFailedException, PasswordRecoverySwitchedOff
-from core.os.user import PosixUser, OperatingSystemUserNotFoundException
-from core.transaction import CorefacilityTransaction
 from ..entity.user import UserSet
-from ..entity.entity_providers.posix_providers.user_provider import UserProvider as PosixProvider
 from ..entity.entity_fields.field_managers.entity_password_manager import EntityPasswordManager
 from ..generic_views import EntityViewSet, AvatarMixin
 from ..serializers import UserListSerializer, UserDetailSerializer
 from ..permissions import AdminOnlyPermission
+from .password_reset_mixin import PasswordResetMixin
 
 
-class UserViewSet(AvatarMixin, EntityViewSet):
+class UserViewSet(AvatarMixin, PasswordResetMixin, EntityViewSet):
     """
     Deals with list of users.
     """
@@ -51,28 +48,7 @@ class UserViewSet(AvatarMixin, EntityViewSet):
 
     @action(detail=True, methods=['post'], url_path="password-reset")
     def password_reset(self, request, *args, **kwargs):
-        """
-        Resets the user password
-        :param request: REST framework request
-        :param args: position arguments
-        :param kwargs: dictionary arguments
-        :return: REST framework response
-        """
-        from core.os.command_maker import CommandMaker
-        with CorefacilityTransaction():
-            user = self.get_object()
-            new_password = user.generate_password()
-            if PosixProvider().is_provider_on() and not settings.CORE_SUGGEST_ADMINISTRATION:
-                try:
-                    posix_user = PosixUser.find_by_login(user.unix_group)
-                    posix_user.set_password(new_password)
-                    if user.is_locked:
-                        posix_user.lock()
-                except OperatingSystemUserNotFoundException:
-                    pass
-            request.corefacility_log.response_body = "***"
-            user.update()
-        return Response({"password": new_password})
+        return super().password_reset(request, *args, **kwargs)
 
     @action(detail=True, methods=['post'], url_path="activation-mail")
     def activation_mail(self, request, *args, **kwargs):

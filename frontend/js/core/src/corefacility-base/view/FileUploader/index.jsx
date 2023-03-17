@@ -39,6 +39,8 @@ import styles from './style.module.css';
  * State:
  * @param {File|string|null} value 		Value of the widget in uncontrollable mode.
  * 										Value of this state is useless in controllable mode.
+ * @param {boolean} disabled			If true, the user can't change the value of this widget and
+ * 										all controls look to be disabled
  * @param {boolean} inactive			if true, the user can't change value of this widget
  * @param {boolean} loading 			If inactive is true, prints the 'Loading...' message below the uploader.
  * 										Otherwise, does nothing.

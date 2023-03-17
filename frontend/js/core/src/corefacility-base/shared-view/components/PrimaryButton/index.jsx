@@ -9,6 +9,7 @@ import styles from './style.module.css';
  *                                      - 'submit' blue button with white text (by default)
  *                                      - 'more'   white button with blue text; the button becomes gray on hover.
  *                                      - 'cancel' white button with black text, becomes white-shadowed on hover.
+ *                                      - 'remove'  red button with white text
  *  	@param {string} onClick		a callback that will be invoked when the user clicks the button
  * 		@param {boolean} inactive   if the button is inactive, clicking on it has no effect
  * 		@param {boolean} disabled	if the button is disabled, it is inactive and is shown as grey

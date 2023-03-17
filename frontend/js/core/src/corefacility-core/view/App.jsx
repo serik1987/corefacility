@@ -5,6 +5,7 @@ import {
 } from 'react-router-dom';
 
 import CoreModule from 'corefacility-core/model/entity/CoreModule';
+import Profile from 'corefacility-core/model/entity/Profile';
 
 import BaseApp from 'corefacility-base/view/App';
 import UserListWindow from './user-list/UserListWindow';
@@ -14,12 +15,23 @@ import LogDetailWindow from './logs/LogDetailWindow';
 import SettingsWindow from './settings/SettingsWindow';
 import Window404 from './base/Window404';
 import AuthorizationForm from './AuthorizationForm';
+import ProfileWindow from './profile/ProfileWindow';
 
 
 /** This is the root component for the core application
  *  The component requires no props
  */
 export default class App extends BaseApp{
+
+	constructor(props){
+		super(props);
+
+		if (window.SETTINGS.auth_user !== null){
+			this._user = Profile._entityProviders[Profile.SEARCH_PROVIDER_INDEX].getObjectFromResult(window.SETTINGS.auth_user);
+		} else {
+			this._user = null;
+		}
+	}
 
 	/** Class of the application model, if applicable
 	 */
@@ -37,14 +49,25 @@ export default class App extends BaseApp{
 	 */
 	renderAllRoutes(){
 		if (this.token !== null && this.activationCode === null){
+			let adminPermissions = window.application.user.is_superuser;
+			let noSupportPermission = !window.application.user.is_support;
+			let defaultUrl = null;
+
+			if (noSupportPermission){
+				defaultUrl = '/profile/';
+			} else {
+				defaultUrl = '/users/';
+			}
+
 			return (
 				<Routes>
-					<Route path="/logs/:lookup/" element={<LogDetailWindow/>} />
-					<Route path="/logs/" element={<LogListWindow/>} />
-					<Route path="/settings/" element={<SettingsWindow/>} />
-					<Route path="/users/:lookup/" element={<UserDetailWindow/>} />
-					<Route path="/users/" element={<UserListWindow/>} />
-					<Route path="/" element={<Navigate to="/users/"/>} />
+					{adminPermissions && <Route path="/logs/:lookup/" element={<LogDetailWindow/>} />}
+					{adminPermissions && <Route path="/logs/" element={<LogListWindow/>} />}
+					{noSupportPermission && <Route path="/profile/" element={<ProfileWindow/>}/>}
+					{adminPermissions && <Route path="/settings/" element={<SettingsWindow/>} />}
+					{adminPermissions && <Route path="/users/:lookup/" element={<UserDetailWindow/>} />}
+					{adminPermissions && <Route path="/users/" element={<UserListWindow/>} />}
+					<Route path="/" element={<Navigate to={defaultUrl}/>} />
 					<Route path="*" element={<Window404/>}/>
 				</Routes>
 			);

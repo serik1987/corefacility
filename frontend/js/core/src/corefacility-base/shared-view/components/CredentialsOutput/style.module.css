@@ -1,0 +1,24 @@
+.box{
+	display: flex;
+	background: #e0e0e0;
+	gap: 10px;
+}
+
+.box > p{
+	flex-grow: 1;
+	margin: 0;
+	display: inline-block;
+	min-width: 200px;
+	padding: 0 10px;
+	font-family: Courier, 'Lucida Console', Serif;
+	line-height: 30px;
+}
+
+.box > a{
+	display: inline-block;
+}
+
+.empty_box{
+	margin: 0;
+	line-height: 32px;
+}

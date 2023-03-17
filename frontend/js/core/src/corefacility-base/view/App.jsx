@@ -35,7 +35,7 @@ export default class App extends DialogWrapper{
 		this._module = this.constructor.applicationModelClass.getIdentity();
 
 		this.state = {
-			token: window.SETTINGS.authorization_token
+			token: window.SETTINGS.authorization_token,
 		}
 
 		window.application = this;

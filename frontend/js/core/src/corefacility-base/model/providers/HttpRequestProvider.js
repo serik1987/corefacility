@@ -171,6 +171,11 @@ export default class HttpRequestProvider extends EntityProvider{
         });
     }
 
+    /**
+     * Transforms the HTTP response output data to a single object
+     * @param {object} result the HTTP response data that represents one given object
+     * @return {Entity} the recovered entity
+     */
     getObjectFromResult(result){
         return this._resultToListMapper([result])[0];
     }

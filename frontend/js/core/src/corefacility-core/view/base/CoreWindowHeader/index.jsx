@@ -13,7 +13,7 @@ import styles from './style.module.css';
  * 		@param {Error} error 			The error class to be shown. This props is inaffected when the
  * 										message bar state is not 'error'
  * 		@param {React.Component} header Header to display
- * 		@param {React.Component} aside 	Components to be displayed at the right of the headert
+ * 		@param {React.Component} aside 	Components to be displayed at the right of the header
  * 		@param {children} children to be displayed
  */
 export default function CoreWindowHeader(props){

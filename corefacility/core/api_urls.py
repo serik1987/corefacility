@@ -26,6 +26,7 @@ urlpatterns = [
 
     path(r'login/', LoginView.as_view(), name="login"),
     path(r'profile/', ProfileView.as_view(), name="profile"),
+    path(r'profile/password-reset/', ProfileView.as_view(action='password_reset'), name="profile-password-reset"),
     path(r'profile/avatar/', ProfileAvatarView.as_view(), name="profile-avatar"),
     path(r'users/<int:user_id>/authorizations/<str:module_alias>/', AuthorizationMethodSetupView.as_view(),
          name='authorization-method-setup'),

@@ -1,0 +1,64 @@
+/* General styles */
+
+.main > div, .main > section{
+	margin: 15px 0;
+}
+
+.main section{
+	box-sizing: border-box;
+}
+
+.information_row{
+	display: flex;
+	gap: 15px;
+}
+
+section.personal{
+	flex-grow: 1;
+	flex-basis: 500px;
+}
+
+section.avatar_wrapper{
+	flex-grow: 0;
+	flex-basis: 200px;
+}
+
+.controls_row{
+	display: flex;
+	justify-content: center;
+	gap: 10px;
+}
+
+
+
+
+
+/* Main profile properties */
+
+section.personal .subsection_main{
+	margin-bottom: 10px;
+	display: grid;
+	grid-auto-flow: column;
+	grid-template: repeat(2, auto) / auto repeat(2, 1fr);
+	gap: 0 15px;
+}
+
+section.personal .subsection_contact{
+	display: grid;
+	grid-auto-flow: column;
+	grid-template: repeat(2, auto) / repeat(2, 1fr);
+	gap: 0 15px;
+}
+
+
+/* Credentials properties */
+
+.main .credentials{
+	display: grid;
+	grid-template-columns: max-content max-content;
+	gap: 10px;
+}
+
+.main .password_editor{
+	outline: 1px solid red;
+}

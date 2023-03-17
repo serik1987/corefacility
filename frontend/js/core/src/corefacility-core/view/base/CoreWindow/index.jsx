@@ -112,13 +112,14 @@ export default class CoreWindow extends Window{
 						{this.reloadable && <Icon onClick={this.onReload} tooltip={t("Reload")} src={<RefreshImage/>}/>}
 						<DropDownMenu
 							caption={
-								<Icon href="/profile/" tooltip={t("Account Settings")} src={<PersonImage/>}/>
+								<Icon tooltip={t("Account Settings")} src={<PersonImage/>}/>
 							}
 							items={[
+								!window.application.user.is_support && <Hyperlink href="/profile/">{t("Profile")}</Hyperlink>,
 								<Hyperlink onClick={this.handleLogout}>{t("Logout")}</Hyperlink>,
 							]}
 						/>
-						<DropDownMenu
+						{window.application.user.is_superuser && <DropDownMenu
 							caption={
 								<Icon tooltip={t("Application Settings")} src={<SettingsImage/>}/>
 							}
@@ -127,7 +128,7 @@ export default class CoreWindow extends Window{
 								<Hyperlink href="/logs/">{t("Logs")}</Hyperlink>,
 								<Hyperlink href="/settings/">{t("Application Settings")}</Hyperlink>,
 							]}
-						/>
+						/>}
 					</div>
 					<div className={styles.controls}>
 						{ this.renderControls() }

@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 
 from core.generic_views import SetCookieMixin
-from core.permissions import AdminOnlyPermission
+from core.permissions import AdminOrSelfPermission
 from core.entity.user import UserSet
 from core.entity.entity_exceptions import EntityNotFoundException
 from core.entity.entry_points.authorizations import AuthorizationsEntryPoint
@@ -14,7 +14,7 @@ class AuthorizationMethodSetupView(SetCookieMixin, APIView):
     Working with authorization properties for a particular user
     """
 
-    permission_classes = [AdminOnlyPermission]
+    permission_classes = [AdminOrSelfPermission]
 
     def get(self, request, *args, **kwargs):
         """

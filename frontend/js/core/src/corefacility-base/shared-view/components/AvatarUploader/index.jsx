@@ -15,6 +15,7 @@ import styles from './style.module.css';
  * Props:
  * @param {callback} onFileSelect		Triggers when the user selects certain file.
  * @param {callback} onFileRemove		Triggers when the user clears certain file.
+ * @param {callback} onError 			Triggers when file upload or delete raises an error.
  * @param {File|string|null} value 		If this prop is given, the widget is stated to
  * 										be in controllable mode. This props reflects the
  * 										value of the widget.
@@ -22,15 +23,19 @@ import styles from './style.module.css';
  * 										uncontrollable mode.
  * @param {File|string} defaultValue	In uncontrollable mode defines value of the widget
  * 										after its first mounting.
- * @param {string} error 				The error message that will be printed below the image uploader
- * @param {boolean} disabled			If true, the user can't change the value of this widget and
- * 										all controls look to be disabled
+ * @param {string} tooltip				The widget's tooltip.
+ * @param {FileManager} fileManager		if this parameter was set, the following will happened:
+ * 			onFileSelect prop will be ignored, FileManagers's upload() method will be called instead
+ *			onFileRemove prop will be ignored, FileManager's delete() method will be called instead
+ * 			value prop will be ignored, FileManager's value property will be used instead
+ * 			when the FileManager is in progress, disabled is always treated as false, inactive is always
+ * 			treated as true
  * @param {boolean} inactive			If true, the user can't change value of this widget
  * @param {boolean} loading 			If inactive is true, prints the 'Loading...' message below the uploader.
  * 										Otherwise, does nothing.
+ * @param {boolean} readonly 			When the widget is read-only, "Upload" and "Delete" buttons are not shown.
  * @param {Number} width 				image width in px
  * @param {Number} height 				image height in px
- * @param {boolean} readonly 			When the widget is read-only, "Upload" and "Delete" buttons are not shown.
  * 
  * State:
  * @param {File|string|null} value 		Value of the widget in uncontrollable mode.
