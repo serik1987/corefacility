@@ -176,6 +176,27 @@ export default class UserDetailForm extends UpdateForm{
 		});
 	}
 
+	/**	Transforms Javascript exception to the error message in the message bar.
+	 * 
+	 * 	@param {Error} error Javascript exception
+	 * 	@param {function} tryAgainFunction an optional parameter. If tryAgainFunction is not null or undefined,
+	 * 		the user receives "Action required" dialog box and presses Continue, the tryAgainFunction will be executed.
+	 * 	@return {string} globalError the global error to lift up the state
+	 */
+	async handleError(error, tryAgainFunction){
+		if (error instanceof BadRequestError && error.name === 'GroupGovernorConstraintFails'){
+			let allowToForce = await window.application.openModal('question', {
+				caption: t("User delete confirmation"),
+				prompt: error.message,
+			});
+			if (allowToForce){
+				tryAgainFunction(true);
+			}
+		} else {
+			return await super.handleError(error, tryAgainFunction);
+		}
+	}
+
 	renderContent(){
 		let unset = <i className={styles.unset}>{t('Not defined.')}</i>;
 		let header

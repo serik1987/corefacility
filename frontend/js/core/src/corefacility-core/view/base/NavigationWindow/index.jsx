@@ -5,6 +5,13 @@ import CoreWindow from '../CoreWindow';
 import styles from './style.module.css';
 
 
+/** 
+ * 	A window with navigation bar (so called 'breadcrumbs')
+ * 
+ * 	State:
+ * 	@param {boolean} error404 true will display the error404 window indicating
+ * 	that such an entity was not found. false will do nothing
+ */
 export default class NavigationWindow extends CoreWindow{
 
 	/**	Renders navigation bar

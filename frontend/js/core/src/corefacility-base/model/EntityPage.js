@@ -27,6 +27,19 @@ export default class EntityPage{
 		this._resultToListMapper = pageInfo.resultToListMapper;
 	}
 
+	/**
+	 *  Returns the entity page with no items
+	 */
+	static empty(){
+		return new EntityPage({
+			count: 0,
+			previous: null,
+			next: null,
+			entities: [],
+			resultToListMapper: null,
+		});
+	}
+
 	/** Total number of entities in the whole list */
 	get totalCount(){
 		return this._count;

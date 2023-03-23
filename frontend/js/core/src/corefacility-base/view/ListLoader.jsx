@@ -21,6 +21,10 @@ import Loader from './Loader.jsx';
  * 		For this reason, please, don't use or set the state directly because
  * 		this may result to damages. Use reportListFetching, reportListSuccess and
  * 		reportListFailure instead of them.
+ * 
+ * 	Also, one of the descendant of the ListEditor should be an instance of the ItemList with the following
+ * 	props defined:
+ * 		@param {callback} onItemSelect			Triggers when the user selects an item
  */
 export default class ListLoader extends Loader{
 
@@ -92,6 +96,9 @@ export default class ListLoader extends Loader{
 		return this.state._itemList;
 	}
 
+	/**
+	 * Component responsible for reproduction of the downloaded item list
+	 */
 	get itemListComponent(){
 		if (this._itemListComponent === null){
 			throw new TypeError("The itemListComponent has not been registered.");
@@ -177,13 +184,22 @@ export default class ListLoader extends Loader{
 		this.reportListFetching();
 		let filterIdentity = this._desiredFilterIdentity;
 		try{
-			let itemList = await this.entityClass.find(this.filter);
+			let itemList = await this._fetchList(this.filter);
 			this.reportFetchSuccess(itemList);
 		} catch (error){
 			this.reportFetchFailure(error);
 		} finally{
 			this._actualFilterIdentity = filterIdentity;
 		}
+	}
+
+	/**
+	 * Downloads the entity list from the Web server
+	 * @param {oject} filter 		Filter options to be applied
+	 * 								(These options will be inserted to the )
+	 */
+	async _fetchList(filter){
+		return await this.entityClass.find(filter);
 	}
 
 	shouldComponentUpdate(props, state){

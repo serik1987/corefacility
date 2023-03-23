@@ -21,6 +21,7 @@ class _UserDetailWindow extends NavigationWindow{
 		this.registerModal('authorization-method-setup', AuthorizationSettingsForm);
 
 		this.state = {
+			...this.state,
 			userInformation: null,
 		}
 	}

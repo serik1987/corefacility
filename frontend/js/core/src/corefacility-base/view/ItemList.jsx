@@ -94,6 +94,32 @@ export default class ItemList extends React.Component{
 		}
 	}
 
+	/**
+	 * Removes the entity from the list
+	 * @param {Entity} entity the entity to be removed
+	 */
+	removeItem(entity){
+		let entityIndex = this.state.itemArray.indexOf(entity);
+		if (entityIndex !== -1){
+			this.state.itemArray.splice(entityIndex, 1);
+		}
+		this.setState({
+			itemArray: [...this.state.itemArray],
+		});
+	}
+
+	/**
+     * Triggers when the user is trying to remove the item
+     *  @param {SyntheticEvent} event   the event invoked by the 'Remove' button
+     *  @param {Entity} item            a group to be removed
+     */
+    handleRemove(event, item){
+        event.detail = item;
+        if (this.props.onItemRemove){
+            this.props.onItemRemove(event);
+        }
+    }
+
 	render(){
 		return (<Scrollable ref={this.registerScroll}>
 			{this.renderContent()}

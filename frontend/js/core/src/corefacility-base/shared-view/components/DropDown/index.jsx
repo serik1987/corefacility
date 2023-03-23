@@ -61,7 +61,8 @@ export default class DropDown extends React.Component{
 	 * 		despite of the menu state (i.e., clicking outside the widget).
 	 */
 	handleMenuClose(event){
-		if (this.props.onMenuClose){
+		let item = event.target.closest('.' + styles.drop_down);
+		if (item !== this.__ref.current && this.props.onMenuClose){
 			this.props.onMenuClose(event);
 		}
 	}
@@ -98,12 +99,12 @@ export default class DropDown extends React.Component{
 
 	componentDidMount(){
 		window.addEventListener("resize", this.changeAlignState);
-		window.addEventListener("click", this.handleMenuClose);
+		window.addEventListener("click", this.handleMenuClose, {capture: true});
 	}
 
 	componentWillUnmount(){
 		window.removeEventListener("resize", this.changeAlignState);
-		window.removeEventListener("click", this.handleMenuClose);
+		window.removeEventListener("click", this.handleMenuClose, {capture: true});
 	}
 
 	componentDidUpdate(prevProps, prevState){

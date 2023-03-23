@@ -8,6 +8,9 @@ import styles from './style.module.css';
 /** Minimum amount of time required for CSS to apply all styles, in ms */
 const MINIMUM_CSS_RESPONSE_TIME = 1;
 
+/** After this time the animation is considered as completely over, even though there is not 'transitionend' event */
+const ANIMATION_TIMEOUT_TIME = 2000;
+
 
 /** All content inside this container has two states: minimized and maximized.
  * 	In minimized state the item height always equal to 0px. In maximized state
@@ -53,6 +56,9 @@ export default class SlideDown extends React.Component{
 			htmlElement.style.height = null;
 			htmlElement.style.overflow = null;
 		}, {once: true});
+		await wait(ANIMATION_TIMEOUT_TIME);
+		htmlElement.style.height = null;
+		htmlElement.style.display = null;
 	}
 
 	/** Slides an arbitrary HTML element up given that height is its
@@ -75,6 +81,9 @@ export default class SlideDown extends React.Component{
 			htmlElement.style.height = null;
 			htmlElement.style.display = null;
 		}, {once: true});
+		await wait(ANIMATION_TIMEOUT_TIME);
+		htmlElement.style.height = null;
+		htmlElement.style.display = null;
 	}
 
 	constructor(props){

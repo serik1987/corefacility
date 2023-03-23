@@ -77,25 +77,11 @@ export default class UserInput extends EntityInput{
 		return UserInputList;
 	}
 
-	/** Triggers when the user picks up an item from the item box.
-	 * 
-	 * 	@param {SyntheticEvent} the event that triggered this handler
-	 * 	@return {undefined}
+	/**
+	 * 	Returns a string that will be put into an input box when the user clicks on it.
 	 */
-	handleSelectItem(user){
-		let userIdentity = user.surname || user.login;
-
-		if (this.isLoading){
-			return;
-		}
-		this.setState({
-			rawSearchTerm: userIdentity,
-			searchTerm: userIdentity,
-			isOpened: false,
-		})
-		if (this.props.onItemSelect){
-			this.props.onItemSelect(user);
-		}
+	getEntityIdentity(user){
+		return user.surname || user.login;
 	}
 
 }

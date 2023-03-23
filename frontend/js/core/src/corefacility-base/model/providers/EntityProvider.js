@@ -27,6 +27,13 @@ export default class EntityProvider{
         return this._searchParams;
     }
 
+    /**
+     *  Tells the entity provider, whether entities must be deleted with ?force parameter or not
+     */
+    set forceDelete(value){
+    	throw new NotImplementedError('set forceDelete');
+    }
+
     /** Sets the filter parameters (see get searchParams for details)
      *  @param {object} value Search parameters to be set (e.g., {q: 'user'}).
      */

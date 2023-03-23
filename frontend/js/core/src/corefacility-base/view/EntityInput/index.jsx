@@ -1,3 +1,5 @@
+import {NotImplementedError} from 'corefacility-base/exceptions/model'
+import Entity from 'corefacility-base/model/entity/Entity';
 import LoadableDropDownInput from 'corefacility-base/shared-view/components/LoadableDropDownInput';
 import MessageBar from 'corefacility-base/shared-view/components/MessageBar';
 
@@ -23,6 +25,9 @@ import styles from './style.module.css';
  *  @param {string} placeholder         The input placeholder
  * 
  * 	@param {string} searchTerm 			The search string to be entered. Overrides rawSearchTerm and searchTerm states.
+ * 
+ * 	@param {Entity} value 				A certain entity provided by the parent component. Has higher priority than the
+ * 										entity chosen by the user
  * 	--------------------------------------------------------------------------------------------------------------------
  *  
  * 	State:
@@ -32,6 +37,8 @@ import styles from './style.module.css';
  * 	@param {string} rawSearchTerm		the hint entered by the user (before pre-processing)
  * 
  * 	@param {string} searchTerm 			the hint entered by the user (after pre-processing)
+ * 
+ * 	@param {Entity} value 				a certain entity chosen by the user or null if no entity has been chosen
  * 	--------------------------------------------------------------------------------------------------------------------
  */
 export default class EntityList extends ListLoader{
@@ -91,6 +98,35 @@ export default class EntityList extends ListLoader{
 		this.setState({isOpened: false});
 	}
 
+	/**
+	 * 	Returns a string that will be put into an input box when the user clicks on it.
+	 */
+	getEntityIdentity(entity){
+		throw new NotImplementedError('getEntityIdentity');
+	}
+
+	/** Triggers when the user picks up an item from the item box.
+	 * 
+	 * 	@param {Entity} item 	The entity picked up by the user
+	 * 	@return {undefined}
+	 */
+	handleSelectItem(item){
+		let identity = this.getEntityIdentity(item);
+
+		if (this.isLoading){
+			return;
+		}
+		this.setState({
+			rawSearchTerm: identity,
+			searchTerm: identity,
+			value: item,
+			isOpened: false,
+		})
+		if (this.props.onItemSelect){
+			this.props.onItemSelect(item);
+		}
+	}
+
 	render(){
 		return (
 			<LoadableDropDownInput
@@ -120,13 +156,32 @@ export default class EntityList extends ListLoader{
 
 	componentDidUpdate(prevProps, prevState, snapshot){
 		super.componentDidUpdate(prevProps, prevState, snapshot);
+
 		if (!prevState.isOpened && this.state.isOpened){
 			this.reload();
 		}
+
 		if (this.props.searchTerm !== undefined && this.props.searchTerm !== this.state.searchTerm){
 			this.setState({
 				searchTerm: this.props.searchTerm,
 				rawSearchTerm: this.props.searchTerm,
+			});
+		}
+
+		if (this.props.value instanceof Entity && this.props.value !== this.state.value){
+			let identity = this.getEntityIdentity(this.props.value);
+			this.setState({
+				searchTerm: identity,
+				rawSearchTerm: identity,
+				value: this.props.value,
+			});
+		}
+
+		if (this.props.value === null && this.props.value !== this.state.value){
+			this.setState({
+				searchTerm: null,
+				rawSearchTerm: null,
+				value: null,
 			});
 		}
 	}

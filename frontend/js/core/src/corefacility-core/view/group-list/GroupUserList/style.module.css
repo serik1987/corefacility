@@ -1,0 +1,15 @@
+.item_box:first-child{
+	margin-top: 15px;
+}
+
+.item_box > *{
+	display: inline-block;
+}
+
+.item_add_box :global .drop-down{
+	width: 300px;
+}
+
+.item_add_box > *{
+	vertical-align: top;
+}

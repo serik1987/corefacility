@@ -84,7 +84,7 @@ export default class Scrollable extends React.Component{
 		let overflowY = this.props.overflowY === undefined ? true : this.props.overflowY;
 		let overflowXClass = overflowX ? ` ${styles.overflow_x}` : '';
 		let overflowYClass = overflowY ? ` ${styles.overflow_y}` : '';
-        let cssSuffix = this.props.cssSuffix ? this.props.cssSuffix : '';
+        let cssSuffix = this.props.cssSuffix ? ' ' + this.props.cssSuffix.trim() : '';
 
 		return(<div className={`scrollable ${styles.scrollable}${overflowXClass}${overflowYClass}${cssSuffix}`}
                 onScroll={this.handleScroll} ref={this.scrollContainer}>

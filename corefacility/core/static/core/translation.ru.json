@@ -16,6 +16,8 @@
 	"The value must be a number": "Значение должно быть числом",
 	"The value must not be less than ": "Значение не должно быть меньше, чем ",
 	"The value must not be greater than ": "Значение не должно быть больше, чем ",
+	"Edit this value": "Отредактировать данное значение",
+	"Finish edit": "Завершить редактирование",
 	"Invalid URL": "Неверный URL",
 	"Loading...": "Загрузка...",
 	"Please, specify...": "Пожалуйста, уточните...",
@@ -110,6 +112,7 @@
 	"Loading the application main window": "Загрузка главного окна Приложения",
 
 	"User List": "Список пользователей",
+	"User list": "Список пользователей",
 	"Deals with list of users.": "Работа со списком пользователей.",
 	"Users": "Пользователи",
 	"User": "Пользователь",
@@ -248,5 +251,25 @@
 	"Profile": "Профиль",
 	"SSH Access Details": "Параметры доступа через SSH",
 	"The password is not known": "Пароль неизвестен",
-	"Change password": "Изменить пароль"
+	"Change password": "Изменить пароль",
+
+
+	"Groups": "Коллективы",
+	"Group list": "Список коллективов",
+	"Add group": "Добавить коллектив",
+	"Search by group name...": "Поиск по названию коллектива...",
+	"There are no groups satisfying the search criteria.": "Коллективы, удовлетворяющие указанным Вами поисковым критериям, не обнаружены.",
+	"Group name": "Название коллектива",
+	"Group leader": "Руководитель коллектива",
+	"Type name of the group leader here...": "Введите имя руководителя коллектива здесь",
+	"You are the group leader": "Вы являетесь руководителем коллектива",
+	"Please, specify the group leader": "Пожалуйста, укажите руководителя коллектива",
+	"You are the leader of this group": "Вы являетесь руководителем данного коллектива",
+	"Remove the group": "Удалить коллектив",
+	"Remove user from the group": "Удалить себя из коллектива",
+	"Do you really want to exclude yourself from this group?": "Вы действительно хотите исключить самого себя из этого коллектива?",
+
+	"Group users list": "Список пользователей коллектива",
+	"New user name": "Имя нового пользователя",
+	"You haven't selected the user here.": "Вы не выбрали пользователя в этом поле."
 }

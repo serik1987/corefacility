@@ -92,7 +92,13 @@ class GroupPermission(IsAuthenticated):
         :param group: some group the user is trying to perform operations
         :return: True if particular operation is granted, False if the operation is denied
         """
-        return request.method in self.SAFE_METHODS or group.governor.id == request.user.id or request.user.is_superuser
+        user_wants_to_exclude_himself = (
+                view.action == 'delete_user' and
+                request.method == 'DELETE' and
+                request.user.id == int(view.kwargs['user_lookup'])
+        )
+        return request.method in self.SAFE_METHODS or group.governor.id == request.user.id \
+            or request.user.is_superuser or user_wants_to_exclude_himself
 
 
 class ProjectPermission(IsAuthenticated):

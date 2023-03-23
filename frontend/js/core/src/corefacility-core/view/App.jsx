@@ -16,6 +16,8 @@ import SettingsWindow from './settings/SettingsWindow';
 import Window404 from './base/Window404';
 import AuthorizationForm from './AuthorizationForm';
 import ProfileWindow from './profile/ProfileWindow';
+import GroupListWindow from './group-list/GroupListWindow';
+import GroupUserWindow from './group-list/GroupUserWindow';
 
 
 /** This is the root component for the core application
@@ -61,6 +63,8 @@ export default class App extends BaseApp{
 
 			return (
 				<Routes>
+					<Route path="/groups/:lookup/" element={<GroupUserWindow/>}/>
+					<Route path="/groups/" element={<GroupListWindow/>}/>
 					{adminPermissions && <Route path="/logs/:lookup/" element={<LogDetailWindow/>} />}
 					{adminPermissions && <Route path="/logs/" element={<LogListWindow/>} />}
 					{noSupportPermission && <Route path="/profile/" element={<ProfileWindow/>}/>}

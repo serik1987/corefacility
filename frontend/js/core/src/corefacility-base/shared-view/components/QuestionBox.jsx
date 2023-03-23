@@ -11,6 +11,11 @@ import PrimaryButton from './PrimaryButton';
  * 	presses Yes, the dialog opening promise always resolves.
  * 	When the user presses No, the dialog opening promise always
  * 	rejects.
+ * 
+ * 	Usage: 
+ * 	let result = await window.application.openModal('question-box', {
+ *		'prompt': 'Are you sure?'
+ *  });
  */
 export default class QuestionBox extends Form{
 

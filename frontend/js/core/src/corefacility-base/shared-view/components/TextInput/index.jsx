@@ -1,5 +1,6 @@
-import Input from 'corefacility-base/view/Input';
+import * as React from 'react';
 
+import Input from 'corefacility-base/view/Input';
 import styles from './style.module.css';
 
 
@@ -20,6 +21,8 @@ import styles from './style.module.css';
  *      @param {callback} onFocus           Triggers when the input element is in focus
  * 
  *      @param {callback} onBlur            Triggers when the input element loss the focus
+ * 
+ *      @param {callback} onEnter           Triggers when the user presses the Enter key
  * 
  *		@param {string} value 				Controllable value of the input field. This means that the input value
  *                                          will be set to the value of this prop during each rendering. This results
@@ -60,6 +63,13 @@ import styles from './style.module.css';
  */
 export default class TextInput extends Input{
 
+    constructor(props){
+        super(props);
+        this.handleKeyPress = this.handleKeyPress.bind(this);
+
+        this.__inputRef = React.createRef();
+    }
+
 	get __boxClasses(){
 		let boxClasses = `${styles.box} input text-input`;
 		if (this.props.disabled){
@@ -70,6 +80,19 @@ export default class TextInput extends Input{
         }
 		return boxClasses;
 	}
+
+    /**
+     * Returns the DOM element <input> which is respponsible for posting user's value
+     */
+    get domInput(){
+        return this.__inputRef.current;
+    }
+
+    handleKeyPress(event){
+        if (event.key === 'Enter' && this.props.onEnter){
+            this.props.onEnter(event);
+        }
+    }
 
 	render(){
 		let isError = this.props.error !== "" && this.props.error !== null && this.props.error !== undefined;
@@ -87,6 +110,8 @@ export default class TextInput extends Input{
 						onChange={this.onInputChange}
                         onFocus={this.props.onFocus}
                         onBlur={this.props.onBlur}
+                        onKeyPress={this.handleKeyPress}
+                        ref={this.__inputRef}
 					/>
 				</div>
 				{ isError && <p className={styles.error}>{this.props.error}</p> }

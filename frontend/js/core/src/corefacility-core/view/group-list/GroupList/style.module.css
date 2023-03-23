@@ -1,0 +1,20 @@
+.main{
+	margin: 5px 0;
+}
+
+.main:first-child{
+	margin-top: 20px;
+}
+
+.main:last-child{
+	margin-bottom: 20px;
+}
+
+.main > a{
+	margin-left: -5px;
+}
+
+.main > :global(.label){
+	display: inline-block;
+	margin-right: 5px;
+}

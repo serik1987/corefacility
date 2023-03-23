@@ -95,7 +95,10 @@ export default class Entity{
 		}
 		this._state = EntityState.pending;
 		let promises = this.constructor._entityProviders
-			.map(provider => provider.createEntity(this));
+			.map(provider => {
+				provider.searchParams = {_parentIdList: this._parentIdList};
+				return provider.createEntity(this)
+			});
 		try{
 			await Promise.all(promises);
 			this._state = EntityState.saved;
@@ -140,7 +143,10 @@ export default class Entity{
 		}
 		this._state = EntityState.pending;
 		let promises = this.constructor._entityProviders
-			.map(provider => provider.updateEntity(this));
+			.map(provider => {
+				provider.searchParams = {_parentidList: this._parentIdList};
+				return provider.updateEntity(this);
+			});
 		try{
 			await Promise.all(promises);
 			this._state = EntityState.saved;
@@ -148,6 +154,25 @@ export default class Entity{
 		} catch (e){
 			this._state = previousState;
 			throw e;
+		}
+	}
+
+	/**
+	 *  Deletes an object with ?force parameter
+	 * 	@async
+	 */
+	async forceDelete(){
+		for (let provider of this.constructor._entityProviders){
+			provider.forceDelete = true;
+		}
+		try{
+			await this.delete();
+		} catch (error){
+			throw error;
+		} finally {
+			for (let provider of this.constructor._entityProviders){
+				provider.forceDelete = false;
+			}
 		}
 	}
 
@@ -162,7 +187,10 @@ export default class Entity{
 		}
 		this._state = EntityState.pending;
 		let promises = this.constructor._entityProviders
-			.map(provider => provider.deleteEntity(this));
+			.map(provider => {
+				provider.searchParams = {_parentIdList: this._parentIdList};
+				return provider.deleteEntity(this);
+			});
 		try{
 			await Promise.all(promises);
 			this._state = EntityState.deleted;
@@ -252,9 +280,16 @@ export default class Entity{
 					if (this._state === "deleted" || this._state === "pending" || this._state === "found"){
 						throw new EntityStateError(this._state, "property change");
 					}
-					let internalValue = propertyDescription[propertyName].proofread(this, propertyName, value);
+					let internalValue;
+					if (value === undefined){
+						internalValue = undefined;
+					} else {
+						internalValue = propertyDescription[propertyName].proofread(this, propertyName, value);
+					}
 					if (internalValue !== undefined){
 						this._entityFields[propertyName] = internalValue;
+					} else if (propertyName in this._entityFields){
+						delete this._entityFields[propertyName];
 					}
 					if (this._state !== "creating"){
 						this._state = "changed";
@@ -295,6 +330,7 @@ export default class Entity{
 		if (!("_parentIdList" in searchParams)){
 			searchParams._parentIdList = [...this._parentIdList, this.id];
 		}
+		searchParams._parent = this;
 		return childEntityClass.find(searchParams);
 	}
 
@@ -315,7 +351,7 @@ export default class Entity{
 	 * 	@return {list[EntityProvider]} list of entity provider objects
 	 */
 	static get _entityProviders(){
-	    if (!Object.hasOwnProperty(this.__internalEntityProviders)){
+	    if (!this.hasOwnProperty('__internalEntityProviders')){
 	        this.__internalEntityProviders = this._defineEntityProviders();
 	    }
 	    return this.__internalEntityProviders;
@@ -337,7 +373,7 @@ export default class Entity{
 	 *  @return {object} field description for all fields
 	 */
 	static get _propertyDescription(){
-		if (!Object.hasOwnProperty(this.__internalEntityProviders)){
+		if (!this.hasOwnProperty('__internalPropertyDescription')){
 			this.__internalPropertyDescription = this._definePropertyDescription();
 		}
 		return this.__internalPropertyDescription;

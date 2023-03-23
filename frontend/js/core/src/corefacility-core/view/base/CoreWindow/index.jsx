@@ -116,6 +116,7 @@ export default class CoreWindow extends Window{
 							}
 							items={[
 								!window.application.user.is_support && <Hyperlink href="/profile/">{t("Profile")}</Hyperlink>,
+								<Hyperlink href="/groups/">{t("Groups")}</Hyperlink>,
 								<Hyperlink onClick={this.handleLogout}>{t("Logout")}</Hyperlink>,
 							]}
 						/>

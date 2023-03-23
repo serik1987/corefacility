@@ -55,7 +55,6 @@ export default class UserInputList extends EntityInputList{
             <li
                 key={user.id}
                 data-id={user.id}
-                onClick={this.onItemSelect}
                 className={styles.item_container}
                 onClick={event => this.handleItemSelect(user)}
                 >

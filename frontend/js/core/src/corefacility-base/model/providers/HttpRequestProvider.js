@@ -19,6 +19,14 @@ export default class HttpRequestProvider extends EntityProvider{
     constructor(pathSegment, entityClass){
     	super(entityClass);
     	this.pathSegment = pathSegment;
+        this._forceDelete = false;
+    }
+
+    /**
+     *  Tells the entity provider, whether entities must be deleted with ?force parameter or not
+     */
+    set forceDelete(value){
+        this._forceDelete = !!value;
     }
 
     /** Returns URL that will be used for downloading entity list and creating new entity
@@ -75,8 +83,12 @@ export default class HttpRequestProvider extends EntityProvider{
      */
     createEntity(entity){
         let url = this._getEntityListUrl();
-        let requestData = Object.assign({}, entity._entityFields);
-        delete requestData['id'];
+        let requestData = {};
+        for (let property in entity._entityFields){
+            if (property[0] !== '_' && property !== 'id'){
+                requestData[property] = entity._entityFields[property];
+            }
+        }
         return client.post(url, requestData)
             .then(responseData => {
                 Object.assign(entity._entityFields, responseData);
@@ -108,6 +120,9 @@ export default class HttpRequestProvider extends EntityProvider{
      */
     deleteEntity(entity){
     	let url = this._getEntityDetailUrl(entity);
+        if (this._forceDelete){
+            url.searchParams.append('force', '');
+        }
         return client.delete(url);
     }
 

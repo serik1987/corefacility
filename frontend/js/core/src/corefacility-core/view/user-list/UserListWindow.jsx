@@ -34,7 +34,7 @@ export default class UserListWindow extends LivesearchWindow{
 	 	return (<UserListEditor
 	 		q={this.state.searchTerm}
 	 		ref={this.setReloadCallback}
-	 		onUserAddOpen={() => this.openModal("add-user")}
+	 		onItemAddOpen={() => this.openModal("add-user")}
 	 	/>);
 	 }
 

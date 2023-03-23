@@ -1,0 +1,14 @@
+.input{
+	display: grid;
+	grid-template-columns: auto 300px;
+	gap: 10px;
+}
+
+.owner_input{
+	display: flex;
+	flex-direction: column;
+}
+
+.controls{
+	text-align: center;
+}

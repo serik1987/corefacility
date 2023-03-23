@@ -8,6 +8,7 @@ import Hyperlink from 'corefacility-base/shared-view/components/Hyperlink';
 import AvatarUploader from 'corefacility-base/shared-view/components/AvatarUploader';
 import CredentialsOutput from 'corefacility-base/shared-view/components/CredentialsOutput';
 import ModuleWidgets from 'corefacility-base/shared-view/components/ModuleWidgets';
+import Scrollable from 'corefacility-base/shared-view/components/Scrollable';
 import Profile from 'corefacility-core/model/entity/Profile';
 import CoreWindowHeader from 'corefacility-core/view/base/CoreWindowHeader';
 
@@ -166,7 +167,7 @@ export default class ProfileForm extends UpdateForm{
 				{...this.getMessageBarProps()}
 				header={this.header}
 			>
-                <div>
+                <Scrollable>
                     <form className={`window-form ${style.main}`}>
                         <div className={style.information_row}>
                             <section className={style.personal}>
@@ -245,7 +246,7 @@ export default class ProfileForm extends UpdateForm{
                             <PrimaryButton {...this.getSubmitProps()} onClick={this.handleSubmitAndClose}>{t("Save and close")}</PrimaryButton>
                         </div>
                     </form>
-                </div>
+                </Scrollable>
 			</CoreWindowHeader>
 		);
 	}

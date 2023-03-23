@@ -111,10 +111,16 @@ class GroupViewSet(EntityViewSet):
         :param kwargs:
         :return:
         """
-        group = self.get_object()
+        group_set = GroupSet()
+        if not request.user.is_superuser and "all" not in request.query_params:
+            group_set.user = request.user
+        group = group_set.get(int(kwargs['lookup']))
+        self.check_object_permissions(request, group)
         group_users = {user.id for user in group.users}
         user_set = UserSet()
         user_set.is_support = False
+        if 'q' in request.query_params:
+            user_set.name = request.query_params['q']
         index = 0
         user_list = []
         for user in user_set:

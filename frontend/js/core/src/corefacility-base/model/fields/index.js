@@ -204,7 +204,7 @@ export class IntegerField extends EntityField{
 	 * 	@return {any} 				Value that will be sent to external source
 	 */
 	proofread(entity, propertyName, value){
-		if (value === null || !value.match(this.mask)){
+		if (value === null || (typeof value === 'string' && !value.match(this.mask))){
 			throw new ValidationError(t("The value must be an integer value"));
 		}
 		let internalValue = parseInt(value);

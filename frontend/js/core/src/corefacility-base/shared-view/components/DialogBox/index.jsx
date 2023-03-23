@@ -20,6 +20,7 @@ import styles from './style.module.css';
  * 			as the third argument.
  * 		@param {boolean} inactive The inactive dialog can't be closed by the user.
  * 		@param {string} title The title to be displayed above the dialog box.
+ * 		@param {cssSuffix} the CSS suffix for the
  * 
  * 	State:
  * 		The most of state variables are not allowed to change even though you inherit from the
@@ -34,6 +35,8 @@ export default class DialogBox extends React.Component{
 	DEFAULT_TRANSITION_DURATION = 270; /* Transition duration during the dialog opening and closing in ms */
 	MINIMUM_TRANSITION_DURATION = 1; /* Minimum amount of time required to update all CSS stylesheet */
 
+	DIALOG_HEIGHT_BIAS = 85;
+
 	constructor(props){
 		super(props);
 		this.handleMouseDown = this.handleMouseDown.bind(this);
@@ -41,12 +44,14 @@ export default class DialogBox extends React.Component{
 		this.handleMouseUp = this.handleMouseUp.bind(this);
 		this.handleOutsideClick = this.handleOutsideClick.bind(this);
 		this.handleOutApp = this.handleOutApp.bind(this);
+		this.handleResize = this.handleResize.bind(this);
 
 		this.state = {
 			inputData: null,
 			__isOpening: false, /* CSS animation is going on */
 			__isOpened: false,
 			__isClosing: false, /* CSS animation is going on */
+			__scrollBars: true, /* Set up scroll bars */
 			x: null,			/* Position of the dialog box on the screen */
 			y: null,
 		}
@@ -66,6 +71,8 @@ export default class DialogBox extends React.Component{
 		return this.props.options.transitionDuration || this.DEFAULT_TRANSITION_DURATION;
 	}
 
+
+
 	/** For internal use only. */
 	get __wrapperClasses(){
 		let wrapperClasses = styles.dialog_wrapper;
@@ -77,9 +84,12 @@ export default class DialogBox extends React.Component{
 
 	/** For internal use only. */
 	get __wrappedClasses(){
-		let wrappedClasses = styles.dialog_box;
+		let wrappedClasses = styles.dialog_box + ' drop_down_acceptor';
 		if (this.state.__isOpening || this.state.__isClosing){
 			wrappedClasses += ` ${styles.mini}`;
+		}
+		if (!this.state.__scrollBars) {
+			wrappedClasses += ' ' + styles.no_scroll;
 		}
 		return wrappedClasses;
 	}
@@ -197,6 +207,21 @@ export default class DialogBox extends React.Component{
 		this.__mouseX = this.__mouseY = null;
 	}
 
+	/** Triggers on window resize */
+	handleResize(event){
+		if (this.state.__isOpening || this.state.__isOpened || this.state.__isClosing){
+			let dialogElement = this.__dialogRef.current;
+			let dialogContent = dialogElement.querySelector('.' + styles.dialog_content).children[0];
+			let contentHeight = dialogContent.scrollHeight;
+			let windowHeight = window.innerHeight - this.DIALOG_HEIGHT_BIAS;
+			let desiredScrollBarV = contentHeight > windowHeight;
+			let actualScrollBarV = this.state.__scrollBars;
+			if (desiredScrollBarV !== actualScrollBarV){
+				this.setState({__scrollBars: desiredScrollBarV});
+			}
+		}
+	}
+
 	render(){
 		return (
 			<div
@@ -215,11 +240,11 @@ export default class DialogBox extends React.Component{
 						transitionDuration: `${this.transitionDuration}ms`,
 					}}
 					>
-					<div class={styles.dialog_header} onMouseDown={this.handleMouseDown}>
+					<div className={styles.dialog_header} onMouseDown={this.handleMouseDown}>
 						<h1>{this.props.title}</h1>
 					</div>
-					<div class={styles.dialog_content}>
-						<Scrollable overflowX={true} overflowY={true}>
+					<div className={styles.dialog_content}>
+						<Scrollable overflowX={this.state.__scrollBars} overflowY={this.state.__scrollBars} cssSuffix={styles.scroll}>
 							{ this.props.children }
 						</Scrollable>
 					</div>
@@ -228,7 +253,16 @@ export default class DialogBox extends React.Component{
 		);
 	}
 
+	componentDidMount(){
+		window.addEventListener('resize', this.handleResize);
+	}
+
+	componentWillUnmount(){
+		window.addEventListener('resize', this.handleResize);
+	}
+
 	componentDidUpdate(props, state){
+		this.handleResize(null);
 		if (this.state.x === null && this.state.y === null){
 			let dlg = this.__dialogRef.current;
 			this.setState({

@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import {translate as t} from 'corefacility-base/utils';
 import EntityState from 'corefacility-base/model/entity/EntityState';
 import {NotImplementedError} from  'corefacility-base/exceptions/model';
-import {UnauthorizedError, NotFoundError} from 'corefacility-base/exceptions/network';
+import {BadRequestError, UnauthorizedError, NotFoundError} from 'corefacility-base/exceptions/network';
 
 import Form from './Form';
 import Hyperlink from 'corefacility-base/shared-view/components/Hyperlink';
@@ -224,14 +224,18 @@ export default class UpdateForm extends Form{
 		if (!userWantsToDelete){
 			return;
 		}
-		(async function tryAgainFunction(){
+		(async function tryAgainFunction(force = false){
 			try{
 				self.setState({
 					errors: {},
 					globalError: null,
 					inactive: true,
 				});
-				await self._formObject.delete();
+				if (force){
+					await self._formObject.forceDelete();
+				} else {
+					await self._formObject.delete();
+				}
 			} catch (error){
 				self.handleError(error, tryAgainFunction);
 			} finally {

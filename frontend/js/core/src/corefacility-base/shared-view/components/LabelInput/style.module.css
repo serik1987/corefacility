@@ -1,0 +1,19 @@
+.main{
+	display: inline-block;
+}
+
+.main :global .label{
+	display: inline-block;
+}
+
+.main :global .input{
+	display: inline-block;
+}
+
+.main.edit{
+	
+}
+
+.main.no_edit{
+	
+}
