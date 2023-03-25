@@ -15,6 +15,7 @@ import styles from './style.module.css';
  * 		outside the drop down or its active element. The function
  * 		must change the parent's component state in such a way as
  * 		to bring the drop down to CLOSED state.
+ * 	@param {callback} onTransitionEnd triggers when the drop down totally slides up
  *	@param {string} cssSuffix Suffix to be attached to the SlideDown
  * 		class list
  */
@@ -25,6 +26,7 @@ export default class DropDown extends React.Component{
 		this.handleItemClick = this.handleItemClick.bind(this);
 		this.handleMenuClose = this.handleMenuClose.bind(this);
 		this.changeAlignState = this.changeAlignState.bind(this);
+		this.handleTransitionEnd = this.handleTransitionEnd.bind(this);
 		this.__registerSlideDown = this.__registerSlideDown.bind(this);
 		this.__slideDown = null;
 		this.__ref = React.createRef();
@@ -67,8 +69,21 @@ export default class DropDown extends React.Component{
 		}
 	}
 
+	/**
+	 *  Triggers when the user clicks inside the drop-down item
+	 * 	@param {Synthetic Event} event the event that triggered this action
+	 */
 	handleItemClick(event){
 		event.stopPropagation();
+	}
+
+	/**
+	 *  Triggers when the sliding up occured
+	 */
+	handleTransitionEnd(event){
+		if (this.props.onTransitionEnd){
+			this.props.onTransitionEnd(event);
+		}
 	}
 
 	render(){
@@ -89,6 +104,7 @@ export default class DropDown extends React.Component{
 					<SlideDown
 						isOpened={this.props.isOpened}
 						cssSuffix={menuClasses}
+						onTransitionEnd={this.handleTransitionEnd}
 						ref={this.__registerSlideDown}
 						>
 							{this.props.children}

@@ -18,6 +18,7 @@ import AuthorizationForm from './AuthorizationForm';
 import ProfileWindow from './profile/ProfileWindow';
 import GroupListWindow from './group-list/GroupListWindow';
 import GroupUserWindow from './group-list/GroupUserWindow';
+import ProjectListWindow from './project-list/ProjectListWindow';
 
 
 /** This is the root component for the core application
@@ -56,13 +57,14 @@ export default class App extends BaseApp{
 			let defaultUrl = null;
 
 			if (noSupportPermission){
-				defaultUrl = '/profile/';
+				defaultUrl = '/projects/';
 			} else {
 				defaultUrl = '/users/';
 			}
 
 			return (
 				<Routes>
+					<Route path="/projects/" element={<ProjectListWindow/>}/>
 					<Route path="/groups/:lookup/" element={<GroupUserWindow/>}/>
 					<Route path="/groups/" element={<GroupListWindow/>}/>
 					{adminPermissions && <Route path="/logs/:lookup/" element={<LogDetailWindow/>} />}

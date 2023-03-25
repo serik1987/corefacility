@@ -24,12 +24,19 @@ import styles from './style.module.css';
  * 
  *  @param {React.Component} children   The <ul> item to show when the user opens the drop down.
  * 
- *    @oaram {boolean} isOpened           true if the the drop-down is opened, false otherwise. Overrides
+ *  @param {callback} onOpened          Triggers when the user opens the drop-down box
+ * 
+ *  @param {callback} onClosed          Triggers when the user closes the drop-down box
+ * 
+ *  @oaram {boolean} isOpened           true if the the drop-down is opened, false otherwise. Overrides the isOpened state
  * 
  *  @param {string} inputBoxValue       Current value of the input box when it works in fully uncontrolled mode.
  *                                      Useless when it works in fully controlled mode.
+ * 
  *  @param {string} inputBoxRawValue    The same as value but before input preprocessing (removing leading and trailing
  *                                      whitespaces etc.)
+ * 
+ *    @param (string) cssSuffix           CSS class to append
  *  --------------------------------------------------------------------------------------------------------------------
  * 
  *  State:

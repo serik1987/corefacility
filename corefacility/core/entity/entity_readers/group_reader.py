@@ -1,5 +1,5 @@
 from core.entity.entity_providers.model_providers.group_provider import GroupProvider
-from core.entity.entity_readers.model_emulators import ModelEmulator
+from core.entity.entity_readers.model_emulators import ModelEmulator, ModelEmulatorFileField
 from core.entity.entity_readers.query_builders.data_source import SqlTable
 from core.entity.entity_readers.query_builders.query_filters import SearchQueryFilter, StringQueryFilter
 from core.entity.entity_readers.raw_sql_query_reader import RawSqlQueryReader
@@ -36,6 +36,7 @@ class GroupReader(RawSqlQueryReader):
             .add_select_expression("core_user.login") \
             .add_select_expression("core_user.name") \
             .add_select_expression("core_user.surname") \
+            .add_select_expression("core_user.avatar") \
             .add_data_source("core_group") \
             .add_order_term("core_group.name")
         self.items_builder.data_source\
@@ -79,7 +80,7 @@ class GroupReader(RawSqlQueryReader):
                 builder.main_filter &= StringQueryFilter("governors.user_id=%s", governor.id)
 
     def create_external_object(self, group_id, group_name,
-                               governor_id, governor_login, governor_name, governor_surname):
+                               governor_id, governor_login, governor_name, governor_surname, governor_avatar):
         return ModelEmulator(
             id=group_id,
             name=group_name,
@@ -87,6 +88,7 @@ class GroupReader(RawSqlQueryReader):
                 id=governor_id,
                 login=governor_login,
                 name=governor_name,
-                surname=governor_surname
+                surname=governor_surname,
+                avatar=ModelEmulatorFileField(name=governor_avatar)
             )
         )

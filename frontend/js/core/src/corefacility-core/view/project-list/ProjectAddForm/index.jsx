@@ -1,10 +1,18 @@
-import {NotImplementedError, ValidationError} from 'corefacility-base/exceptions/model';
+import {translate as t} from 'corefacility-base/utils';
+import CreateForm from 'corefacility-base/view/CreateForm';
+import DialogBox from 'corefacility-base/shared-view/components/DialogBox';
+import Label from 'corefacility-base/shared-view/components/Label';
+import TextInput from 'corefacility-base/shared-view/components/TextInput';
+import PrimaryButton from 'corefacility-base/shared-view/components/PrimaryButton';
 
-import Form from './Form';
+import Project from 'corefacility-core/model/entity/Project';
+import GroupInput from 'corefacility-core/view/group-list/GroupInput';
+import Group from 'corefacility-core/model/entity/Group';
+
+import style from './style.module.css';
 
 
-/** The superclass for all forms that create the entity
- * 	and posts entity data in the external source
+/** Project add form.
  * 
  * 	Such data have the following flow:
  * 
@@ -65,41 +73,73 @@ import Form from './Form';
  * 			(e.g., fetches or posts the data) its interaction with the rest of
  * 			the world is also impossible
  */
-export default class CreateForm extends Form{
+export default class ProjectAddForm extends CreateForm{
 
-	/** Tells the form what to do if the user presses the 'Submit' buton. It could be
-	 * 		posting new entity on the server, requesting for data processing - whenever
-	 * 		you want!
-	 * 
-	 * 	If the function throws an error, this error become a form's global error.
-	 * 	@abstract
-	 *  @async
-	 * 	@return {undefined} all the result is changes in this._formObject
+		/** The entity class. The formObject will be exactly an instance of this class.
+	 * 	The formObject is implied to be an instance of Entity
 	 */
-	async modifyFormObject(){
-		if (this._formObject === null){
-			this._formObject = new this.entityClass();
-			/* Providing deferred client-side validation */
-			let fieldErrors = {}
-			for (let name in this._formValues){
-				try{
-					this._formObject[name] = this._formValues[name];
-				} catch (error){
-					fieldErrors[name] = error.message;
-				}
-			}
-			/* If client-side validation fails, we need to brake the promise chain */
-			if (Object.keys(fieldErrors).length > 0){
-				this.setState({
-					errors: fieldErrors,
-				});
-				throw new ValidationError();
-			}
+	get entityClass(){
+		return Project;
+	}
+
+	/** Return default values. The function is required if you want the resetForm to work correctly
+	 * 	Each field must be mentioned!
+	 * 	@abstract
+	 * 	@async
+	 * 		@param {object} inputData some input data passed to the form (They could be undefined)
+	 * 		@return {object} the defaultValues
+	 */
+	async getDefaultValues(inputData){
+		return {
+			'name': null,
+			'alias': null,
+			'root_group': null,
 		}
-		/* Sending data to the server where (a) server-side validation will be provided;
-		 *  (b) the entity will be saved to the database or another external source
-		 */
-		await this._formObject.create();
+	}
+
+	/** Renders the component
+	 * 	@abstract
+	 */
+	render(){
+		const PROJECT_NAME_DESCRIPTION =
+			t("The project's name allows to visually distinguish projects between each other");
+		const PROJECT_ALIAS_DESCRIPTION =
+			t("Project alias is an unique sequence of digits, latin letters and undescores " +
+			"participates to forming the project's URL");
+
+		return (
+			<DialogBox
+				{...this.getDialogProps()}
+				title={t("Add New Project")}
+			>
+				{this.renderSystemMessage()}
+				<div className={style.data_block}>
+					<Label>{t("Project name") + '*'}</Label>
+					<TextInput
+						{...this.getFieldProps('name')}
+						tooltip={PROJECT_NAME_DESCRIPTION}
+						maxLength={64}
+					/>
+					<Label>{t("Project alias") + '*'}</Label>
+					<TextInput
+						{...this.getFieldProps('alias')}
+						tooltip={PROJECT_ALIAS_DESCRIPTION}
+						maxLength={64}
+					/>
+					<Label>{t("Governing group") + '*'}</Label>
+					<GroupInput
+						{...this.getFieldProps('root_group')}
+						tooltip={t("All members of this group will also have an access to this project")}
+					/>
+				</div>
+				<div className={style.control_block}>
+					<PrimaryButton {...this.getSubmitProps()}>{t("Continue")}</PrimaryButton>
+					<PrimaryButton type="cancel" onClick={event => this.dialog.closeDialog()}>
+						{t("Cancel")}
+					</PrimaryButton>
+				</div>
+			</DialogBox>
+		);
 	}
 
 }

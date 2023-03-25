@@ -28,7 +28,7 @@ import styles from './style.module.css';
  * 		@param {callback} onItemSelect		The function calls when the user clicks on a single item in the list (optional)
  * 
  * 	State:
- * 		@param {Array of Entity} items 	full list of all items containing in all downloaded entity pages.
+ * 		@param {Array of Entity} itemArray 	full list of all items containing in all downloaded entity pages.
  * 										Items from pages that are not downloaded yet were not shown.
  * 	You should not read or modify any states beginning with underscores (_isLoading, _error, etc.) due to 
  * 	high risk of state damaging. Use getters or setters instead

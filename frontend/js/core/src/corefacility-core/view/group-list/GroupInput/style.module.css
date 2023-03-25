@@ -1,0 +1,88 @@
+/* CSS for non-edit mode */
+
+.group_overview{
+	display: flex;
+	gap: 5px;
+}
+
+.group_icon{
+	padding: 4px;
+	width: 24px;
+	height: 24px;
+}
+
+.group_icon img{
+	border-radius: 50%;
+	width: 100%;
+	height: 100%;
+}
+
+.icon_border{
+	border: 1px solid #3c4043;
+	border-radius: 50%;
+	width: 22px;
+	height: 22px;
+	white-space: nowrap;
+}
+
+.info_area{
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	flex-grow: 1;
+	line-height: 1;
+}
+
+.header{
+	font-size: 16px;
+}
+
+.text{
+	font-size: 10px;
+}
+
+.edit_button > a{
+	width: 32px;
+	height: 32px;
+}
+
+
+
+
+
+/* CSS for edit mode */
+
+.group_list_box > div{
+	margin: 7px 0;
+}
+
+.group_list_box > div:not(:last-child):after{
+	content: '';
+	display: block;
+	margin: 7px 0;
+	border-top: 1px solid rgb(217, 217, 217);
+	height: 0;
+}
+
+.group_list_box .group_list_prompt{
+	padding: 0 10px;
+	font-size: 10px;
+}
+
+.group_list_box .group_list_prompt:after{
+	margin: 7px -10px;
+}
+
+.group_list_box .group_overview{
+	margin: 4px 0;
+	padding: 0 4px;
+	cursor: pointer;
+}
+
+.group_list_box .group_overview:hover{
+	background: #eee;
+}
+
+.group_list_box .info_area{
+	margin: 2px 0;
+}

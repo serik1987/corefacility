@@ -9,7 +9,7 @@ import styles from './style.module.css';
 const MINIMUM_CSS_RESPONSE_TIME = 1;
 
 /** After this time the animation is considered as completely over, even though there is not 'transitionend' event */
-const ANIMATION_TIMEOUT_TIME = 2000;
+const ANIMATION_TIMEOUT_TIME = 1000;
 
 
 /** All content inside this container has two states: minimized and maximized.
@@ -34,6 +34,7 @@ const ANIMATION_TIMEOUT_TIME = 2000;
  * 		correctly given that it doesn't have any padding!
  * 		Slide down's border emerge immeditely and doesn't participate in animation
  * 		process, So, don't make widget borders wider than 1-2 px
+ * 	@param {callback} onTransitionEnd triggers after transition finish
  *
  */
 export default class SlideDown extends React.Component{
@@ -70,8 +71,11 @@ export default class SlideDown extends React.Component{
 	 * 	@param {HTMLElement} htmlElement the element that is needed to slide up.
 	 * 	@param {string} display value of the display CSS property when the element is
 	 * 		in opened state
+	 * 	@param {callback onTransitionEnd triggers when the slide down finishes transition
 	 */
-	static async slideUp(htmlElement, display="block"){
+	static async slideUp(htmlElement, display="block", onTransitionEnd=null){
+		let eventIsTriggered = false;
+
 		htmlElement.style.display = display;
 		let itemHeight = htmlElement.clientHeight;
 		htmlElement.style.height = `${itemHeight}px`;
@@ -80,10 +84,21 @@ export default class SlideDown extends React.Component{
 		htmlElement.addEventListener("transitionend", event => {
 			htmlElement.style.height = null;
 			htmlElement.style.display = null;
+			if (!eventIsTriggered && onTransitionEnd){
+				eventIsTriggered = true;
+				onTransitionEnd(event);
+			}
 		}, {once: true});
 		await wait(ANIMATION_TIMEOUT_TIME);
 		htmlElement.style.height = null;
 		htmlElement.style.display = null;
+		if (!eventIsTriggered && onTransitionEnd){
+			eventIsTriggered = true;
+			onTransitionEnd({
+				target: htmlElement,
+				type: 'timeout',
+			});
+		}
 	}
 
 	constructor(props){
@@ -117,7 +132,11 @@ export default class SlideDown extends React.Component{
 			this.constructor.slideDown(this.htmlElement);
 		}
 		if (prevProps.isOpened && !this.props.isOpened){
-			this.constructor.slideUp(this.htmlElement);
+			if (this.props.onTransitionEnd){
+				this.constructor.slideUp(this.htmlElement, 'block', this.props.onTransitionEnd);	
+			} else {
+				this.constructor.slideUp(this.htmlElement);
+			}
 		}
 	}
 

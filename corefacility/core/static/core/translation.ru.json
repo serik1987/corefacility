@@ -268,8 +268,24 @@
 	"Remove the group": "Удалить коллектив",
 	"Remove user from the group": "Удалить себя из коллектива",
 	"Do you really want to exclude yourself from this group?": "Вы действительно хотите исключить самого себя из этого коллектива?",
-
 	"Group users list": "Список пользователей коллектива",
 	"New user name": "Имя нового пользователя",
-	"You haven't selected the user here.": "Вы не выбрали пользователя в этом поле."
+	"You haven't selected the user here.": "Вы не выбрали пользователя в этом поле.",
+	"Scientific group has not been selected": "Научный коллектив не был выбран",
+	"Click here to select the group": "Нажмите сюда для выбора научного коллектива",
+	"Create new group": "Создать новый коллектив",
+	"Choose a proper scientific group from the list below": "Выберите научный коллектив из списка, указанного ниже",
+	"You must type the name of this new group.": "Вы должны набрать имя этого нового коллектива",
+
+	"Project List": "Список проектов",
+	"Search on project name...": "Поиск по названию проекта...",
+	"Create New Project": "Создать новый проект",
+	"There are no projects satisfying given criteria.": "Не существует проектов, удовлетворяющих условиям поиска.",
+	"Add New Project": "Добавление нового проекта",
+	"Project name": "Название проекта",
+	"Project alias": "Псевдоним проекта",
+	"Governing group": "Управляющий коллектив",
+	"The project's name allows to visually distinguish projects between each other": "Название проекта позволяет визуально отличать два проекта друг от друга",
+	"Project alias is an unique sequence of digits, latin letters and undescores participates to forming the project's URL": "Псевдоним проекта - это уникальная последовательность цифр, латинских букв и символов подчёркивания, которая участвует в формировании URL проекта",
+	"All members of this group will also have an access to this project": "Все члены этого коллектива также будут иметь доступ к указанному проекту"
 }

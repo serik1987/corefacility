@@ -85,7 +85,7 @@ class ProjectReader(RawSqlQueryReader):
         """
         Changes the SQL query in such a way as it retrieves projects where only certain user has an access
 
-        :param user: the user that wants to gain an access
+        :param user: the user that wants to gain access
         :return: nothing
         """
         for builder in [self.items_builder, self.count_builder]:

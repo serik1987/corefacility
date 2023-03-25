@@ -1,0 +1,9 @@
+.data_block{
+	display: grid;
+	grid-template-columns: auto 400px;
+	gap: 10px;
+}
+
+.control_block{
+	text-align: center;
+}

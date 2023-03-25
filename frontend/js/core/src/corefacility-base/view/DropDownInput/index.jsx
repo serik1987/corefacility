@@ -36,6 +36,7 @@ import styles from './style.module.css';
  * 
  * 	@param {string} inputBoxRawValue	The same as value but before input preprocessing (removing leading and trailing
  * 										whitespaces etc.)
+ * 
  * ---------------------------------------------------------------------------------------------------------------------
  * 
  * 	State:
@@ -55,12 +56,21 @@ export default class DropDownInput extends React.Component{
 		this.handleInputChange = this.handleInputChange.bind(this);
 		this.handleFocus = this.handleFocus.bind(this);
 		this.handleMenuClose = this.handleMenuClose.bind(this);
+		this.handleTransitionEnd = this.handleTransitionEnd.bind(this);
+		this.__textInput = React.createRef();
 
 		this.state = {
 			isOpened: false,
 			inputBoxRawValue: null,
 			inputBoxValue: null,
 		}
+	}
+
+	/**
+	 *  The DOM input box for direct React access
+	 */
+	get domInput(){
+		return this.__textInput.current.domInput;
 	}
 
 	/** Value of the input box as it will be printed inside the input box
@@ -115,6 +125,16 @@ export default class DropDownInput extends React.Component{
 		});
 	}
 
+	/**
+	 *  Triggers when the DropDown totally slides up
+	 * 	@param {event|object} information about the triggered event
+	 */
+	handleTransitionEnd(event){
+		if (this.props.onTransitionEnd){
+			this.props.onTransitionEnd(event);
+		}
+	}
+
 	/** Imperative React: selects a given value, that is:
 	 * 	enters this value to the input box
 	 * 	closes the drop-down.
@@ -142,11 +162,17 @@ export default class DropDownInput extends React.Component{
 	}
 
 	render(){
+		let cssSuffix = styles.drop_down;
+		if (this.props.cssSuffix){
+			cssSuffix += ` ${this.props.cssSuffix}`;
+		}
+
 		return (
 			<DropDown
 				isOpened={this.state.isOpened}
 				onMenuClose={this.handleMenuClose}
-				cssSuffix={styles.drop_down}
+				cssSuffix={cssSuffix}
+				onTransitionEnd={this.handleTransitionEnd}
 				caption={
 					<TextInput
 						onInputChange={this.handleInputChange}
@@ -158,6 +184,7 @@ export default class DropDownInput extends React.Component{
 						error={this.props.error}
 						tooltip={this.props.tooltip}
 						placeholder={this.props.placeholder}
+						ref={this.__textInput}
 					/>
 				}
 				>
