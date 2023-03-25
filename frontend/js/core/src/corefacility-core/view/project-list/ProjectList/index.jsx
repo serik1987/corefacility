@@ -1,6 +1,13 @@
+import { Navigate } from "react-router-dom";
+
 import {translate as t} from 'corefacility-base/utils';
 import PaginatedList from 'corefacility-base/view/PaginatedList';
+import ImagedListItem from 'corefacility-base/shared-view/components/ImagedListItem';
+import Icon from 'corefacility-base/shared-view/components/Icon';
+import {ReactComponent as SettingsIcon} from 'corefacility-base/shared-view/icons/settings.svg';
+import {ReactComponent as RemoveIcon} from 'corefacility-base/shared-view/icons/delete.svg';
 
+import style from './style.module.css';
 
 /** Represents the project list
  * 
@@ -27,6 +34,15 @@ import PaginatedList from 'corefacility-base/view/PaginatedList';
  */
 export default class ProjectList extends PaginatedList{
 
+    constructor(props){
+        super(props);
+
+        this.state = {
+            ...this.state,
+            redirectUrl: null,
+        }
+    }
+
     /** Renders content where single item will be shown
      *  @param {project} project the item to show in this content.
      *  @return {Rect.Component} the component to render. The component must be a single
@@ -37,16 +53,56 @@ export default class ProjectList extends PaginatedList{
      *              - its onClick prop must be equal to this.props.onItemSelect
      */
     renderItemContent(project){
-        console.log(project.toString());
-        return <p>{project.name}</p>;
+        let governor = `${project.governor.surname} ${project.governor.name}`.trim();
+        if (!governor){
+            governor = project.governor.login;
+        }
+
+        return (
+            <div className={style.main}>
+                <ImagedListItem
+                    inactive={this.props.isLoading}
+                    href={`/projects/${project.alias}/apps/`}
+                    item={project}
+                    img={project.avatar}
+                    imageWidth={150}
+                    imageHeight={150}
+                >
+                        <h2>{project.name}</h2>
+                        <p>{project.root_group.name}</p>
+                        <small>{t("Project leader")}: {governor}</small>
+                        <div className={style.icons}>
+                            <Icon
+                                onClick={event => this.handleProjectSettings(event, project)}
+                                tooltip={t("Project settings")}
+                                src={<SettingsIcon/>}
+                            />
+                            <Icon
+                                onClick={event => this.handleRemove(event, project)}
+                                tooltip={t("Remove project")}
+                                src={<RemoveIcon/>}
+                            />
+                        </div>
+                </ImagedListItem>
+            </div>
+        );
     }
 
     render(){
+        if (this.state.redirectUrl !== null){
+            return <Navigate to={this.state.redirectUrl}/>
+        }
+
         if (this.state.itemArray.length > 0){
             return super.render();
         } else {
             return <p><i>{t("There are no projects satisfying given criteria.")}</i></p>;
         }
+    }
+
+    handleProjectSettings(event, project){
+        event.stopPropagation();
+        this.setState({redirectUrl: `/projects/${project.alias}/`});
     }
 	
 }

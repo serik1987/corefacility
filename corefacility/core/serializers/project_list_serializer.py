@@ -4,6 +4,7 @@ from core.entity.project import Project
 
 from .entity_serializer import EntitySerializer
 from .group_serializer import GroupSerializer
+from .user_list_serializer import UserListSerializer
 
 
 class ProjectListSerializer(EntitySerializer):
@@ -21,6 +22,8 @@ class ProjectListSerializer(EntitySerializer):
     name = serializers.CharField(read_only=False, write_only=False, required=True, allow_null=False, max_length=64,
                                  label="Project name")
     root_group = GroupSerializer(read_only=True, many=False, label="Governing group")
+    governor = UserListSerializer(read_only=True, many=False,
+                                  label="The user that is claimed to be project leader")
 
     def to_representation(self, project):
         """

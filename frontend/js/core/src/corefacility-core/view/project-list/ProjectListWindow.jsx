@@ -43,6 +43,7 @@ export default class ProjectListWindow extends LivesearchWindow{
 			<ProjectListEditor
 				searchTerm={this.state.searchTerm}
 				onItemAddOpen={this.handleAddProject}
+				ref={this.setReloadCallback}
 			/>
 		);
 	}

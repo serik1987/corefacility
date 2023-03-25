@@ -6,7 +6,6 @@ from core.entity.entity_exceptions import EntityNotFoundException, EntityExcepti
 from core.entity.group import Group, GroupSet
 
 from .project_list_serializer import ProjectListSerializer
-from .user_list_serializer import UserListSerializer
 
 
 class ProjectDetailSerializer(ProjectListSerializer):
@@ -24,8 +23,6 @@ class ProjectDetailSerializer(ProjectListSerializer):
                                             max_length=64,
                                             label="Governing group name (applicable if 'root_group_id field has been "
                                                   "presented but equal to null)")
-    governor = UserListSerializer(read_only=True, many=False,
-                                  label="The user that is claimed to be project leader")
     project_dir = serializers.ReadOnlyField(
         label="The project dir is located within the '/home' directory, if applicable")
     unix_group = serializers.ReadOnlyField(label="Login to be used for SSH authentication, if applicable")

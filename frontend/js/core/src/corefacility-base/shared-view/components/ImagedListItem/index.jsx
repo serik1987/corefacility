@@ -23,6 +23,7 @@ import styles from './style.module.css';
  * 		@param {string|URL}	img		URL of the image that will be shown on the left
  * 		@param {number} imageWidth	The image width in px
  * 		@param {number} imageHeight	The image height in px
+ * 
  * 	Children are entity information that will be placed at the right of the image
  */
 export default class ImagedListItem extends ListItem{

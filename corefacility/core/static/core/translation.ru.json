@@ -285,6 +285,7 @@
 	"Project name": "Название проекта",
 	"Project alias": "Псевдоним проекта",
 	"Governing group": "Управляющий коллектив",
+	"Project leader": "Руководитель проекта",
 	"The project's name allows to visually distinguish projects between each other": "Название проекта позволяет визуально отличать два проекта друг от друга",
 	"Project alias is an unique sequence of digits, latin letters and undescores participates to forming the project's URL": "Псевдоним проекта - это уникальная последовательность цифр, латинских букв и символов подчёркивания, которая участвует в формировании URL проекта",
 	"All members of this group will also have an access to this project": "Все члены этого коллектива также будут иметь доступ к указанному проекту"
