@@ -19,6 +19,8 @@ import ProfileWindow from './profile/ProfileWindow';
 import GroupListWindow from './group-list/GroupListWindow';
 import GroupUserWindow from './group-list/GroupUserWindow';
 import ProjectListWindow from './project-list/ProjectListWindow';
+import {ProjectSettingsWindow, RootGroupSettingsWindow, ProjectAdministrationWindow} 
+	from './project-list/ProjectDetailWindow';
 
 
 /** This is the root component for the core application
@@ -30,7 +32,8 @@ export default class App extends BaseApp{
 		super(props);
 
 		if (window.SETTINGS.auth_user !== null){
-			this._user = Profile._entityProviders[Profile.SEARCH_PROVIDER_INDEX].getObjectFromResult(window.SETTINGS.auth_user);
+			this._user =
+				Profile._entityProviders[Profile.SEARCH_PROVIDER_INDEX].getObjectFromResult(window.SETTINGS.auth_user);
 		} else {
 			this._user = null;
 		}
@@ -64,6 +67,9 @@ export default class App extends BaseApp{
 
 			return (
 				<Routes>
+					<Route path="/projects/:lookup/administration/" element={<ProjectAdministrationWindow/>}/>
+					<Route path="/projects/:lookup/root/" element={<RootGroupSettingsWindow/>}/>
+					<Route path="/projects/:lookup/" element={<ProjectSettingsWindow/>}/>
 					<Route path="/projects/" element={<ProjectListWindow/>}/>
 					<Route path="/groups/:lookup/" element={<GroupUserWindow/>}/>
 					<Route path="/groups/" element={<GroupListWindow/>}/>

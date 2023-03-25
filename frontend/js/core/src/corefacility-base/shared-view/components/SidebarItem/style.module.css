@@ -1,0 +1,50 @@
+.main{
+	display: flex;
+	border-radius: 16px;
+	height: 32px;
+	cursor: pointer;
+}
+
+.main.inactive{
+	cursor: default;
+}
+
+.main.disabled{
+	color: #78797c;
+	fill: #78797c;
+	stroke: #78797c;
+	cursor: not-allowed;
+}
+
+.main:hover{
+	background: rgb(230, 232, 234);
+}
+
+.main.inactive:hover{
+	background: transparent;
+}
+
+.main.current{
+	background: rgb(194, 231, 255);
+	cursor: default;
+}
+
+.icon_wrapper{
+	padding: 6px 14px 6px 15px;
+	width: 20px;
+	height: 20px;
+}
+
+.icon_wrapper svg{
+	width: 20px;
+	height: 20px;
+}
+
+.text{
+	flex: 1;
+	padding-right: 15px;
+	font-family: Roboto, Helvetica, Arial, Sans-Serif;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 32px;
+}

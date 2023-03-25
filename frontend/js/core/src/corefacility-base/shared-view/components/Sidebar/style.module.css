@@ -1,0 +1,59 @@
+.main{
+	display: flex;
+	height: 100%;
+}
+
+.sidebar{
+	transition: all 0.267s cubic-bezier(0.4, 0, 0.2, 1);
+	white-space: nowrap;
+}
+
+.expanded .sidebar{
+	flex: 0 275px;
+	box-sizing: border-box;
+	padding: 32px 16px 0;
+}
+
+.collapsed .sidebar{
+	flex: 0 21px;
+}
+
+.collapsed .sidebar > *{
+	display: none;
+}
+
+.separator{
+	flex: 0 23px;
+	position: relative;
+	border-left: 1px solid rgb(218, 220, 224);
+}
+
+.separator :global .icon{
+	position: absolute;
+	left: -12px;
+	top: 30px;
+	display: none;
+	border: 1px solid rgb(218, 220, 224);
+	background: #fff;
+	width: 22px;
+	height: 22px;
+}
+
+.separator:hover :global .icon,
+.collapsed .separator :global .icon{
+	display: block;
+}
+
+.main .separator :global .icon:hover:not(.sidebar){ /* Because we need more specificity */
+	background-color: rgb(76, 154, 255);
+	stroke-width: 2;
+	stroke: #fff;
+}
+
+.expanded .separator :global .icon{
+	transform: rotate(180deg);
+}
+
+.content{
+	flex: 1;
+}
