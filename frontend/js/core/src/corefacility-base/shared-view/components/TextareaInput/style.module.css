@@ -1,0 +1,52 @@
+.box{
+	
+}
+
+.box .wrapper{
+	
+}
+
+.box textarea{
+	outline: none;
+	margin: 0;
+	background: none;
+	border: 1px solid rgb(217, 217, 217);
+	box-sizing: border-box;
+	width: 100%;
+	min-height: 100px;
+	padding: 10px;
+	cursor: text;
+	font-family: Arial, Sans-Serif;
+	font-size: 13px;
+	font-weight: 500;
+	color: rgb(60, 64, 67);
+	resize: none;
+}
+
+.box textarea:focus{
+	border: 1px solid rgb(24, 90, 188);
+	padding: 10px;
+	box-shadow: inset 0px 1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.box textarea:disabled{
+	cursor: default;
+}
+
+.box textarea:disabled:hover{
+	border: 1px solid rgb(217, 217, 217);
+	padding: 10px;
+}
+
+.box.disabled textarea:disabled{
+	cursor: not-allowed;
+	color: #999;
+	background: rgb(238, 238, 238);
+}
+
+.box .error{
+	margin: 0;
+	padding: 5px 1px;
+	color:  #c53929;
+	font-weight: 500;
+}

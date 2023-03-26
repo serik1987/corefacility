@@ -31,7 +31,7 @@
 .separator :global .icon{
 	position: absolute;
 	left: -12px;
-	top: 30px;
+	top: 37px;
 	display: none;
 	border: 1px solid rgb(218, 220, 224);
 	background: #fff;
@@ -54,6 +54,25 @@
 	transform: rotate(180deg);
 }
 
+
+/* CSS for the side bar content */
+
 .content{
 	flex: 1;
+}
+
+.content :global .epic-fail{
+	padding: 15px 30px;
+	padding-left: 6px;
+}
+
+.content :global .window-header h1,
+.content :global .window-header .message_bar{
+	margin-left: -24px;
+	padding: 0 30px;
+}
+
+.content :global article > * > *{
+	padding-left: 6px;
+	padding-right: 30px;
 }

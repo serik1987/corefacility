@@ -10,6 +10,8 @@ import {ReactComponent as AdministrationIcon} from 'corefacility-base/shared-vie
 
 import NavigationWindow from 'corefacility-core/view/base/NavigationWindow';
 
+import ProjectSettingsForm from './ProjectSettingsForm';
+
 
 /** 
  * 	A combined window that allows to set:
@@ -93,7 +95,10 @@ class _ProjectDetailWindow extends NavigationWindow{
 					/>,
 				]}
 			>
-				<p>Rendering the project detail window...</p>
+				{this.props.subroute === 'settings' && <ProjectSettingsForm
+					inputData={{lookup: this.props.lookup}}
+					ref={this.setReloadCallback}
+				/>}
 			</Sidebar>
 		);
 	}

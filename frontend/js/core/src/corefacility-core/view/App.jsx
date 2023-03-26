@@ -20,7 +20,7 @@ import GroupListWindow from './group-list/GroupListWindow';
 import GroupUserWindow from './group-list/GroupUserWindow';
 import ProjectListWindow from './project-list/ProjectListWindow';
 import {ProjectSettingsWindow, RootGroupSettingsWindow, ProjectAdministrationWindow} 
-	from './project-list/ProjectDetailWindow';
+	from './project-list/project-detail-windows';
 
 
 /** This is the root component for the core application

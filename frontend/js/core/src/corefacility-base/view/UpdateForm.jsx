@@ -302,7 +302,7 @@ export default class UpdateForm extends Form{
 
 		if (this._formObject && this._formObject.state === EntityState.deleted){
 			return (
-				<ErrorMessage>
+				<ErrorMessage className="already-deleted">
 					<i>{t("The requested resource has already been deleted.")}</i>
 					{" "}
 					<Hyperlink href={this.entityListRoute}>
@@ -325,7 +325,7 @@ export default class UpdateForm extends Form{
 		}
 
 		return (
-			<ErrorMessage>
+			<ErrorMessage className="epic-fail">
 				<ErrorElement>{this.state.reloadError.message}</ErrorElement>
 				{" "}
 				<Hyperlink onClick={ event => this.reload() }>

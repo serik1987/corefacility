@@ -23,6 +23,10 @@ import style from './style.module.css';
  *                                          groups in the list and select any group. Also, global search mode doesn't
  *                                          allow user to create new group.
  * 
+ *  @param {boolean} groupAddFeature        Turns on the group add feature. The group add feature allows the user to
+ *                                          add new group together with adding or modifying the form object, but
+ *                                          requires similar implementation on the backend
+ * 
  *	@param {callback} onInputChange			The function invoked each time when the user selects a given widget,
  * 											discards any previous selection or chooses to select another widget.
  * 
@@ -177,6 +181,7 @@ export default class GroupInput extends SmartEntityInput{
             this.isLoading && (!this.itemList || this.itemList.totalCount === 0);
 
         let itemListExists = this.itemList && this.itemList.totalCount > 0;
+        let groupAddFeature = this.props.groupAddFeature ?? true;
 
         return (
             <div className={style.group_list_box}>
@@ -215,7 +220,7 @@ export default class GroupInput extends SmartEntityInput{
                         })}
                     </div>
                 ]}
-                {!this.props.globalSearch && <div className={style.group_overview} onClick={this.handleGroupCreate}>
+                {groupAddFeature && <div className={style.group_overview} onClick={this.handleGroupCreate}>
                     <div className={style.group_icon}>
                         <div className={style.icon_border}>
                             <AddIcon/>

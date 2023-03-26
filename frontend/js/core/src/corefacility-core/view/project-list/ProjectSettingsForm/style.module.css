@@ -1,0 +1,39 @@
+/* CSS for rows */
+
+.form{
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+}
+
+.base_row{
+	display: flex;
+	gap: 15px;
+}
+
+.controls_row{
+	display: flex;
+	justify-content: center;
+	gap: 10px;
+}
+
+
+/* CSS for sections */
+
+.base_settings{
+	flex: 1;
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: 10px;
+}
+
+.base_settings h2{
+	grid-column: 1 / span 2;
+}
+
+.avatar_settings{
+	flex: 0 150px;
+}
+
+.description_row{
+}

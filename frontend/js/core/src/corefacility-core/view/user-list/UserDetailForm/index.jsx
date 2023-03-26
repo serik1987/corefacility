@@ -199,7 +199,7 @@ export default class UserDetailForm extends UpdateForm{
 
 	renderContent(){
 		let unset = <i className={styles.unset}>{t('Not defined.')}</i>;
-		let header
+		let header;
 		if (this._formValues && (this._formValues.surname || this._formValues.name)){
 			header = `${this._formValues.surname || ''} ${this._formValues.name || ''}`;
 		} else {

@@ -20,7 +20,7 @@ export default function CoreWindowHeader(props){
 	const pendingClass = (props.isLoading || props.isError) ? styles.pending : null;
 
 	return (
-		<div className={styles.primary}>
+		<div className={`${styles.primary} window-header`}>
 			<aside>
 				{ props.aside }
 			</aside>
