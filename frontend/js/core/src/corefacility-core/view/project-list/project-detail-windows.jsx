@@ -9,8 +9,10 @@ import {ReactComponent as GroupIcon} from 'corefacility-base/shared-view/icons/g
 import {ReactComponent as AdministrationIcon} from 'corefacility-base/shared-view/icons/administration.svg';
 
 import NavigationWindow from 'corefacility-core/view/base/NavigationWindow';
+import Window404 from 'corefacility-core/view/base/Window404';
 
 import ProjectSettingsForm from './ProjectSettingsForm';
+import RootGroupLoader from './RootGroupLoader';
 
 
 /** 
@@ -98,9 +100,23 @@ class _ProjectDetailWindow extends NavigationWindow{
 				{this.props.subroute === 'settings' && <ProjectSettingsForm
 					inputData={{lookup: this.props.lookup}}
 					ref={this.setReloadCallback}
+					on404={this.handle404}
+				/>}
+				{this.props.subroute === 'root' && <RootGroupLoader
+					projectAlias={this.props.lookup}
+					ref={this.setReloadCallback}
+					on404={this.handle404}
 				/>}
 			</Sidebar>
 		);
+	}
+
+	render(){
+		if (this.state.error404){
+			return <Window404/>;
+		}
+
+		return super.render();
 	}
 
 }

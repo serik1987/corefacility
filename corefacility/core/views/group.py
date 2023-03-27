@@ -143,4 +143,6 @@ class GroupViewSet(EntityViewSet):
         user = self.request.user
         if not user.is_superuser and "all" not in self.request.query_params:
             queryset.user = user
+        if "mustbegovernor" in self.request.query_params:
+            queryset.governor = self.request.user
         return queryset

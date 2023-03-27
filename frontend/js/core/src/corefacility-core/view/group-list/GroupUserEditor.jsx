@@ -20,7 +20,8 @@ import GroupUserList from './GroupUserList';
  * 												the box. The promise can never be rejected.
  * 												Promise must be fulfilled by the entity that has already
  * 												been created or by false if the entity create was failed
- * 		@param {Group} groupId				 	The group which user list shall be displayed
+ * 		@param {int} groupId				 	The group which user list shall be displayed
+ * 		@param {Group} group 					A group to be loaded
  * 		@param {string} name 					The header name
  * 		@param {callback} on404					Triggers when a particular group has not been found
  * 		@param {callback} onGroupFound			Triggers when the group has been found. Arguments:
@@ -99,6 +100,10 @@ export default class GroupListEditor extends CoreListEditor{
      *                              (These options will be inserted to the )
      */
     async _fetchList(filter){
+    	if (this.props.group){
+    		this._group = this.props.group;
+    	}
+
     	if (this._group === null){
     		this._group = await this.getEntityOr404(() => Group.get(this.props.groupId));
     		if (this.props.onGroupFound){

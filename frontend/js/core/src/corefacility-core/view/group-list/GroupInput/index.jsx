@@ -27,6 +27,8 @@ import style from './style.module.css';
  *                                          add new group together with adding or modifying the form object, but
  *                                          requires similar implementation on the backend
  * 
+ *  @param {boolean} mustBeGovernor         Displays only those projects where the user is governor
+ * 
  *	@param {callback} onInputChange			The function invoked each time when the user selects a given widget,
  * 											discards any previous selection or chooses to select another widget.
  * 
@@ -90,6 +92,9 @@ export default class GroupInput extends SmartEntityInput{
         if (props.globalSearch){
             searchParams.all = '';
         }
+        if (props.mustBeGovernor){
+            searchParams.mustbegovernor = '';
+        }
         return searchParams;
     }
 
@@ -108,6 +113,9 @@ export default class GroupInput extends SmartEntityInput{
             filterIdentity = 'global://';
         } else {
             filterIdentity = 'local://';
+        }
+        if (props.mustBeGovernor){
+            filterIdentity += "governor@";
         }
         if (state.searchTerm){
             filterIdentity += state.searchTerm;

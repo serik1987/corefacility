@@ -58,6 +58,8 @@ export default class ProjectList extends PaginatedList{
             governor = project.governor.login;
         }
 
+        let isGovernor = project.governor.id === window.application.user.id;
+
         return (
             <div className={style.main}>
                 <ImagedListItem
@@ -71,7 +73,7 @@ export default class ProjectList extends PaginatedList{
                         <h2>{project.name}</h2>
                         <p>{project.root_group.name}</p>
                         <small>{t("Project leader")}: {governor}</small>
-                        <div className={style.icons}>
+                        {(isGovernor || window.application.user.is_superuser) && <div className={style.icons}>
                             <Icon
                                 onClick={event => this.handleProjectSettings(event, project)}
                                 tooltip={t("Project settings")}
@@ -82,7 +84,7 @@ export default class ProjectList extends PaginatedList{
                                 tooltip={t("Remove project")}
                                 src={<RemoveIcon/>}
                             />
-                        </div>
+                        </div>}
                 </ImagedListItem>
             </div>
         );

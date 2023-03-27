@@ -125,6 +125,7 @@ export default class ProjectSettingsForm extends UpdateForm{
 		let formHeader = (this._formObject && this._formObject.name) || t("Project settings");
 
 		return (
+
 			<CoreWindowHeader
 				{...this.getMessageBarProps()}
 				header={formHeader}
@@ -150,6 +151,8 @@ export default class ProjectSettingsForm extends UpdateForm{
 								<GroupInput
 									{...this.getFieldProps('root_group')}
 									tooltip={PROJECT_ROOT_GROUP_DESCRIPTION}
+									groupAddFeature={false}
+									mustBeGovernor={!window.application.user.is_superuser}
 								/>
 								<Label>{t("UNIX group name")}</Label>
 								<CredentialsOutput>
@@ -188,8 +191,14 @@ export default class ProjectSettingsForm extends UpdateForm{
 		);
 	}
 
-	handleTextAreaInput(event){
-		console.log(event);
+	componentDidUpdate(prevProps, prevState){
+		if (
+			this._formObject &&
+			!window.application.user.is_superuser &&
+			window.application.user.id !== this._formObject.governor.id &&
+			this.props.on404){
+			this.props.on404();
+		}
 	}
 
 }

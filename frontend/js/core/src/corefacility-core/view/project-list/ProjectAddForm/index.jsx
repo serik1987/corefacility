@@ -130,6 +130,7 @@ export default class ProjectAddForm extends CreateForm{
 					<GroupInput
 						{...this.getFieldProps('root_group')}
 						tooltip={t("All members of this group will also have an access to this project")}
+						mustBeGovernor={!window.application.user.is_superuser}
 					/>
 				</div>
 				<div className={style.control_block}>
