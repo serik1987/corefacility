@@ -13,6 +13,7 @@ import Window404 from 'corefacility-core/view/base/Window404';
 
 import ProjectSettingsForm from './ProjectSettingsForm';
 import RootGroupLoader from './RootGroupLoader';
+import ProjectPermissionEditor from './ProjectPermissionEditor';
 
 
 /** 
@@ -34,6 +35,16 @@ import RootGroupLoader from './RootGroupLoader';
  * 	@param {string} projectName name of the project
  */
 class _ProjectDetailWindow extends NavigationWindow{
+
+	constructor(props){
+		super(props);
+		this.handleNoRootGroup = this.handleNoRootGroup.bind(this);
+
+		this.state = {
+			...this.state,
+			noRootGroup: false,
+		}
+	}
 
 	/** A string to be show at the web browser tab */
 	get browserTitle(){
@@ -74,6 +85,8 @@ class _ProjectDetailWindow extends NavigationWindow{
 	 *                            Such a component must implement the reload() method
 	 */
 	renderContent(){
+
+
 		return (
 			<Sidebar
 				items={[
@@ -83,7 +96,7 @@ class _ProjectDetailWindow extends NavigationWindow{
 						icon={<SettingsIcon/>}
 						text={t("Project settings")}
 					/>,
-					<SidebarItem
+					!this.state.noRootGroup && <SidebarItem
 						href={`/projects/${this.props.lookup}/root/`}
 						current={this.props.subroute === 'root'}
 						icon={<GroupIcon/>}
@@ -101,11 +114,19 @@ class _ProjectDetailWindow extends NavigationWindow{
 					inputData={{lookup: this.props.lookup}}
 					ref={this.setReloadCallback}
 					on404={this.handle404}
+					onNoRootGroup={this.handleNoRootGroup}
 				/>}
 				{this.props.subroute === 'root' && <RootGroupLoader
 					projectAlias={this.props.lookup}
 					ref={this.setReloadCallback}
 					on404={this.handle404}
+					onNoRootGroup={this.handleNoRootGroup}
+				/>}
+				{this.props.subroute === 'administration' && <ProjectPermissionEditor
+					projectLookup={this.props.lookup}
+					ref={this.setReloadCallback}
+					on404={this.handle404}
+					onNoRootGroup={this.handleNoRootGroup}
 				/>}
 			</Sidebar>
 		);
@@ -117,6 +138,12 @@ class _ProjectDetailWindow extends NavigationWindow{
 		}
 
 		return super.render();
+	}
+
+	handleNoRootGroup(event){
+		if (!this.state.noRootGroup){
+			this.setState({noRootGroup: true});
+		}
 	}
 
 }

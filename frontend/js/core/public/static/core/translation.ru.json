@@ -256,7 +256,6 @@
 	"The password is not known": "Пароль неизвестен",
 	"Change password": "Изменить пароль",
 
-
 	"Groups": "Коллективы",
 	"Group list": "Список коллективов",
 	"Add group": "Добавить коллектив",
@@ -300,5 +299,9 @@
 
 	"Project settings": "Настройки проекта",
 	"Project's root group": "Управляющий коллектив",
-	"Project administration": "Администрирование проекта"
+	"Project administration": "Администрирование проекта",
+
+	"New permission": "Новое разрешение",
+	"Please, select a group which permission must be added": "Пожалуйста, выберите коллектив, для которого Вы хотите добавить разрешения",
+	"You have already add this group to the access control list": "Вы уже добавили эту группу в список прав доступа"
 }

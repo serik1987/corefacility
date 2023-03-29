@@ -195,9 +195,14 @@ export default class ProjectSettingsForm extends UpdateForm{
 		if (
 			this._formObject &&
 			!window.application.user.is_superuser &&
-			window.application.user.id !== this._formObject.governor.id &&
+			!this._formObject.is_user_governor &&
 			this.props.on404){
 			this.props.on404();
+		} else if (this._formObject &&
+			!window.application.user.is_superuser &&
+			this._formObject.governor.id !== window.application.user.id &&
+			this.props.onNoRootGroup){
+			this.props.onNoRootGroup();
 		}
 	}
 

@@ -32,6 +32,8 @@ class PermissionInputSerializer(serializers.Serializer):
             group = GroupSet().get(validated_data["group_id"])
             access_level = AccessLevelSet().get(validated_data["access_level_id"])
         except EntityNotFoundException:
-            raise ValidationError(detail="the group_id and/or access_level_id fields doesn't refer to valid argument")
+            raise ValidationError({
+                "detail": "the group_id and/or access_level_id fields doesn't refer to valid argument"
+            })
         permission = Permission(group=group, access_level=access_level)
         return permission

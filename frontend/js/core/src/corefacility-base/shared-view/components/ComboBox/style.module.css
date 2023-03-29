@@ -1,0 +1,71 @@
+.main :global .drop-down, .main :global .drop-down > div{
+	width: 100%;
+}
+
+.caption{
+	display: flex;
+	border: 1px solid rgb(116, 119, 117);
+	border-radius: 4px;
+	gap: 4px;
+	min-width: 230px;
+	height: 32px;
+	padding-left: 12px;
+	overflow: hidden;
+	cursor: pointer;
+	font-size: 16px;
+	line-height: 30px;
+	white-space: nowrap;
+}
+
+.inactive .caption{
+	cursor: default;
+}
+
+.disabled .caption{
+	cursor: not-allowed;
+	border-color: rgb(120, 121, 124);
+	color: rgb(120, 121, 124);
+	fill: rgb(120, 121, 124);
+	stroke: rgb(120, 121, 124);
+}
+
+.title{
+	flex: 1;
+}
+
+.button{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex: 0 28px;
+}
+
+.button > svg{
+	width: 24px;
+	height: 24px;
+}
+
+.item{
+	margin: 0;
+	padding: 0 16px;
+	overflow: hidden;
+	cursor: pointer;
+	font-size: 14px;
+	line-height: 32px;
+	white-space: nowrap;
+}
+
+.item:hover, .item:global(.active){
+	background: #dadada;
+}
+
+.item:global(.active){
+	cursor: default;
+}
+
+.error{
+	margin: 0;
+	padding: 5px 1px;
+	color:  #c53929;
+	font-weight: 500;
+}

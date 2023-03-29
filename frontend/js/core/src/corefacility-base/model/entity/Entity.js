@@ -343,6 +343,13 @@ export default class Entity{
 		throw new NotImplementedError('static get _entityName');
 	}
 
+	/**
+	 *  Returns the very first (search) provider
+	 */
+	static get searchEntityProvider(){
+		return this._entityProviders[this.SEARCH_PROVIDER_INDEX];
+	}
+
 	/** Returns the list of all entity providers.
 	 *  Each entity provider should be associated with a certain external source where entities
 	 *  contains and provides entity save or retrieve only for this sources. When you create, update

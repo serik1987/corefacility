@@ -58,7 +58,7 @@ export default class ProjectList extends PaginatedList{
             governor = project.governor.login;
         }
 
-        let isGovernor = project.governor.id === window.application.user.id;
+        let isGovernor = project.is_user_governor;
 
         return (
             <div className={style.main}>

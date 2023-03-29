@@ -10,6 +10,8 @@ import styles from './style.module.css';
  * 	@param {React.Component} caption To open or close the context menu
  * 		the user must click anywhere in this component.
  * 	@param {array of React.Component} component items to be displayed
+ * 	@param {string} cssSuffix additional CSS classes to apply
+ * 	@param {boolean} inactive true to make the drop-down menu inactive
  */
 export default class DropDownMenu extends React.Component{
 
@@ -30,7 +32,9 @@ export default class DropDownMenu extends React.Component{
 	 * 		(i.e., clicking on 'expand' button, right click etc.)
 	 */
 	handleCaptionClick(event){
-		this.setState({isOpened: !this.state.isOpened});
+		if (!this.props.inactive){
+			this.setState({isOpened: !this.state.isOpened});
+		}
 	}
 
 	/** Contracts the menu despite of the menu state.
@@ -53,10 +57,14 @@ export default class DropDownMenu extends React.Component{
 			<DropDown
 				caption={caption}
 				isOpened={this.state.isOpened}
-				onMenuClose={this.handleMenuClose}>
+				onMenuClose={this.handleMenuClose}
+				cssSuffix={this.props.cssSuffix}
+				>
 					<ul className={styles.items}>
 						{this.props.items.map(item => {
-							return <li key={itemIndex++}>{item}</li>;
+							return <li key={itemIndex++} onClick={this.handleMenuClose}>
+								{item}
+							</li>;
 						})}
 					</ul>
 			</DropDown>

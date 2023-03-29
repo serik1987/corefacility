@@ -5,6 +5,7 @@ import FileField from 'corefacility-base/model/fields/FileField';
 import RelatedField from 'corefacility-base/model/fields/RelatedField';
 import {SlugValidator} from 'corefacility-base/model/validators';
 import RootGroupField from 'corefacility-core/model/fields/RootGroupField';
+import ProjectPermissionManager from 'corefacility-core/model/fields/ProjectPermissionManager';
 
 import Group from './Group';
 import User from './User';
@@ -30,6 +31,10 @@ export default class Project extends Entity{
 	 */
 	static _defineEntityProviders(){
 		return [new HttpRequestProvider('projects', Project)];
+	}
+
+	get permissions(){
+		return new ProjectPermissionManager(this);
 	}
 
 	/** Initializes property descriptions.
@@ -59,7 +64,11 @@ export default class Project extends Entity{
 			project_dir: new ReadOnlyField()
 				.setDescription("The project home directory"),
 			unix_group: new ReadOnlyField()
-				.setDescription("UNIX group")
+				.setDescription("UNIX group"),
+			is_user_governor: new ReadOnlyField()
+				.setDescription("The user can change project's settings"),
+			user_access_level: new ReadOnlyField()
+				.setDescription("Access level"),
 		}
 	}
 

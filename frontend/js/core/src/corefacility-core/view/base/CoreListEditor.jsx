@@ -35,6 +35,8 @@ import CoreWindowHeader from './CoreWindowHeader';
  * 
  * 	Also, one of the descendant of the ListEditor must be an instance of the ItemList with the following
  * 	props defined:
+ *      @param {callback} onItemAdd             This method must be triggered the the user adds an entity to
+ *                                              the entity list by means of the entity list facility
  * 		@param {callback} onItemSelect			This method must be triggered when the user changes the entity
  * 												and wants editor to send the changes to the Web server.
  * 		@param {callback} onItemRemove 			This method must be triggered when the user removes the entity
