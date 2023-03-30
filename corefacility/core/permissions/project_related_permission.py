@@ -11,7 +11,7 @@ class ProjectRelatedPermission(IsAuthenticated):
 
     a. The project ID or alias is presented in the request path and its template has a 'project_lookup' name
         (otherwise, error 500 will be returned)
-    b. The user is authorized (otherwise, error 401 will be returned
+    b. The user is authorized (otherwise, error 401 will be returned)
     c. One of the following conditions are satisfied (either error 404 or error 403 will be returned):
         - the user is superuser;
         - the user belongs to the project's root group;

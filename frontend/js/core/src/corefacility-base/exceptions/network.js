@@ -16,6 +16,9 @@ export class NetworkError extends ModelError{
 export class HttpError extends ModelError{
 
 	constructor(responseStatus, errorInfo){
+		if (errorInfo instanceof Array){
+			errorInfo = {detail: errorInfo.join(' ')}
+		}
 		super(errorInfo.detail || t("The server returned error response without any details."));
 		this.status = responseStatus;
 		this.name = errorInfo.code || `${t("Error")} ${responseStatus}`;

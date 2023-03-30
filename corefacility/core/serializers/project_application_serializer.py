@@ -1,7 +1,8 @@
 from django.utils.translation import gettext
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
-from core.entity.entity_exceptions import EntityNotFoundException
+from core.entity.entity_exceptions import EntityNotFoundException, EntityDuplicatedException
 from core.entity.project_application import ProjectApplication
 from core.entity.corefacility_module import CorefacilityModuleSet
 
@@ -81,4 +82,9 @@ class ProjectApplicationSerializer(EntitySerializer):
                 }
             )
         data['project'] = self.context['request'].project
-        return super().create(data)
+        try:
+            return super().create(data)
+        except EntityDuplicatedException:
+            raise ValidationError(
+                detail=gettext("You have already added this application to the application list.")
+            )

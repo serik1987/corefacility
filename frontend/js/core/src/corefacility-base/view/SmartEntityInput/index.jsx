@@ -47,7 +47,7 @@ import style from './style.module.css';
  * 
  * 	Component state:
  * 	--------------------------------------------------------------------------------------------------------------------
- * 	@param {Entity} value 					A certain group selected by the user
+ * 	@param {Entity} value 					A certain entity selected by the user
  * 
  * 	@param {string} rawSearchTerm			Unprocessed search string entered by the user
  * 

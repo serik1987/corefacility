@@ -1,0 +1,14 @@
+.main{
+	display: grid;
+	grid-template-columns: minmax(350px, max-content) max-content;
+	gap: 10px;
+	align-items: start;
+}
+
+.main button{
+	margin: 0;
+}
+
+.disabled_app{
+	text-decoration: line-through;
+}

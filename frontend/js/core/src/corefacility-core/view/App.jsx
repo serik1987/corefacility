@@ -19,7 +19,7 @@ import ProfileWindow from './profile/ProfileWindow';
 import GroupListWindow from './group-list/GroupListWindow';
 import GroupUserWindow from './group-list/GroupUserWindow';
 import ProjectListWindow from './project-list/ProjectListWindow';
-import {ProjectSettingsWindow, RootGroupSettingsWindow, ProjectAdministrationWindow} 
+import {ProjectSettingsWindow, RootGroupSettingsWindow, ProjectAdministrationWindow, ProjectApplicationSettingsWindow} 
 	from './project-list/project-detail-windows';
 
 
@@ -67,6 +67,7 @@ export default class App extends BaseApp{
 
 			return (
 				<Routes>
+					<Route path="/projects/:lookup/appsettings/" element={<ProjectApplicationSettingsWindow/>}/>
 					<Route path="/projects/:lookup/administration/" element={<ProjectAdministrationWindow/>}/>
 					<Route path="/projects/:lookup/root/" element={<RootGroupSettingsWindow/>}/>
 					<Route path="/projects/:lookup/" element={<ProjectSettingsWindow/>}/>

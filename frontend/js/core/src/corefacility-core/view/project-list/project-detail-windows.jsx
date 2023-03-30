@@ -7,6 +7,7 @@ import SidebarItem from 'corefacility-base/shared-view/components/SidebarItem';
 import {ReactComponent as SettingsIcon} from 'corefacility-base/shared-view/icons/settings.svg';
 import {ReactComponent as GroupIcon} from 'corefacility-base/shared-view/icons/group.svg';
 import {ReactComponent as AdministrationIcon} from 'corefacility-base/shared-view/icons/administration.svg';
+import {ReactComponent as AppRegistrationIcon} from 'corefacility-base/shared-view/icons/app_registration.svg';
 
 import NavigationWindow from 'corefacility-core/view/base/NavigationWindow';
 import Window404 from 'corefacility-core/view/base/Window404';
@@ -14,6 +15,7 @@ import Window404 from 'corefacility-core/view/base/Window404';
 import ProjectSettingsForm from './ProjectSettingsForm';
 import RootGroupLoader from './RootGroupLoader';
 import ProjectPermissionEditor from './ProjectPermissionEditor';
+import ProjectApplciationListEditor from './ProjectApplicationListEditor';
 
 
 /** 
@@ -63,6 +65,8 @@ class _ProjectDetailWindow extends NavigationWindow{
 			return t("Project's root group");
 		case 'administration':
 			return t("Project administration");
+		case 'appsettings':
+			return t("Project application list");
 		}
 	}
 
@@ -108,6 +112,12 @@ class _ProjectDetailWindow extends NavigationWindow{
 						icon={<AdministrationIcon/>}
 						text={t("Project administration")}
 					/>,
+					<SidebarItem
+						href={`/projects/${this.props.lookup}/appsettings/`}
+						current={this.props.subroute === 'appsettings'}
+						icon={<AppRegistrationIcon/>}
+						text={t("Application list")}
+					/>
 				]}
 			>
 				{this.props.subroute === 'settings' && <ProjectSettingsForm
@@ -127,6 +137,11 @@ class _ProjectDetailWindow extends NavigationWindow{
 					ref={this.setReloadCallback}
 					on404={this.handle404}
 					onNoRootGroup={this.handleNoRootGroup}
+				/>}
+				{this.props.subroute === 'appsettings' && <ProjectApplciationListEditor
+					projectLookup={this.props.lookup}
+					ref={this.setReloadCallback}
+					on404={this.handle404}
 				/>}
 			</Sidebar>
 		);
@@ -171,4 +186,12 @@ export function RootGroupSettingsWindow(props){
 export function ProjectAdministrationWindow(props){
 	let {lookup} = useParams();
 	return <_ProjectDetailWindow lookup={lookup} subroute="administration"/>
+}
+
+/**
+ * 	Represents applicatoin administration (add to the project, remove from the project)
+ */
+export function ProjectApplicationSettingsWindow(props){
+	let {lookup} = useParams();
+	return <_ProjectDetailWindow lookup={lookup} subroute="appsettings"/>
 }

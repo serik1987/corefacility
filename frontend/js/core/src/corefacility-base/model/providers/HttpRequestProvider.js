@@ -15,11 +15,14 @@ export default class HttpRequestProvider extends EntityProvider{
      *                  If the path segment contains IDs of parent entities use :id: placeholder
      *                  to tell the system about it.
      *  @param {function} entityClass a class which the providing entity belongs to
+     *  @param {string} allPropertiesInTheList true if items contain all properties in the list,
+     *                  false, otherwise
      */
-    constructor(pathSegment, entityClass){
+    constructor(pathSegment, entityClass, allPropertiesInTheList = false){
     	super(entityClass);
     	this.pathSegment = pathSegment;
         this._forceDelete = false;
+        this._allPropertiesInTheList = allPropertiesInTheList;
     }
 
     /**
@@ -181,7 +184,7 @@ export default class HttpRequestProvider extends EntityProvider{
         return responseData.map(entityInfo => {
             let entity = new this.entityClass();
             Object.assign(entity._entityFields, entityInfo);
-            entity._state = EntityState.found;
+            entity._state = this._allPropertiesInTheList ? EntityState.loaded : EntityState.found;
             return entity;
         });
     }

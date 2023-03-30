@@ -144,7 +144,7 @@ export default class Entity{
 		this._state = EntityState.pending;
 		let promises = this.constructor._entityProviders
 			.map(provider => {
-				provider.searchParams = {_parentidList: this._parentIdList};
+				provider.searchParams = {_parentIdList: this._parentIdList};
 				return provider.updateEntity(this);
 			});
 		try{

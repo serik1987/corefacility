@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-14 15:09+0300\n"
+"POT-Creation-Date: 2023-03-31 00:20+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,29 +30,29 @@ msgstr ""
 "доступ нашему приложению к некоторым персональным данным, которые у Вас "
 "храняться в Google"
 
-#: authorizations/google/__init__.py:137
+#: authorizations/google/__init__.py:138
 msgid "Google account name (an e-mail)"
 msgstr "Название учётной записи Google (e-mail)"
 
-#: authorizations/google/__init__.py:180 authorizations/google/__init__.py:184
+#: authorizations/google/__init__.py:181 authorizations/google/__init__.py:185
 msgid "To enable this module ensure that this field is not empty"
 msgstr "Для того, чтобы включить модуль, убедитесь, что это поле не пустое"
 
-#: authorizations/google/entity/authorization_token/google_provider.py:57
-#: authorizations/google/entity/authorization_token/google_provider.py:77
+#: authorizations/google/entity/authorization_token/google_provider.py:58
+#: authorizations/google/entity/authorization_token/google_provider.py:78
 msgid "Invalid client ID or client secret"
 msgstr "Неверный Client ID или Client Secret"
 
-#: authorizations/google/entity/authorization_token/google_provider.py:85
+#: authorizations/google/entity/authorization_token/google_provider.py:90
 msgid ""
 "Your Google account was not attached to the corefacility account. Please, "
 "login using another authorization method and attach your Google account to "
 "the corefacility account"
 msgstr ""
-"Ваша учётная запись Google не привязана к Вашей учётной записи "
-"corefacility. Пожалуйста, авторизуйтесь, используя другой способ "
-"авторизации, после чего привяжите Вашу учётную запись Google к учётной "
-"записи corefacility, используя для этого настройки Вашего профиля."
+"Ваша учётная запись Google не привязана к Вашей учётной записи corefacility. "
+"Пожалуйста, авторизуйтесь, используя другой способ авторизации, после чего "
+"привяжите Вашу учётную запись Google к учётной записи corefacility, "
+"используя для этого настройки Вашего профиля."
 
 #: authorizations/google/migrations/0002_install.py:13
 msgid "Authorization through Google"
@@ -61,10 +61,6 @@ msgstr "Авторизация через Google"
 #: authorizations/google/serializers/user_settings_serializer.py:22
 msgid "The e-mail must be ended to @gmail.com"
 msgstr "E-mail должен заканчиваться на @gmail.com"
-
-#: authorizations/ihna/migrations/0002_install.py:13
-msgid "Authorization through IHNA website"
-msgstr "Авторизация через сайт ИВНД и НФ РАН"
 
 #: authorizations/mailru/__init__.py:95
 msgid "User's email in the Mail.Ru mailbox"
@@ -263,11 +259,11 @@ msgstr "Пользователь"
 msgid "Authorization methods"
 msgstr "Способы авторизации"
 
-#: core/entity/entry_points/authorizations.py:135
+#: core/entity/entry_points/authorizations.py:143
 msgid "At least one authorization module must be enabled"
 msgstr "Хотя бы один из способов авторизации должен быть активен"
 
-#: core/entity/entry_points/authorizations.py:243
+#: core/entity/entry_points/authorizations.py:251
 msgid "Bad session ID"
 msgstr "Идентификатор сессии неверен или устарел"
 
@@ -344,7 +340,12 @@ msgstr ""
 " после чего нажмите Продолжить для завершения этого действия\n"
 "\n"
 
-#: core/serializers/project_detail_serializer.py:46
+#: core/serializers/project_application_serializer.py:89
+msgid "You have already added this application to the application list."
+msgstr "Вы уже добавили это приложение в проект."
+
+#: core/serializers/project_detail_serializer.py:44
+#: core/serializers/project_detail_serializer.py:65
 msgid ""
 "You don't have permission to assign this group as the project root group"
 msgstr ""
@@ -407,11 +408,11 @@ msgstr ""
 msgid "Incorrect credentials."
 msgstr "Неверные учётные данные."
 
-#: core/views/user.py:45
+#: core/views/user.py:42
 msgid "You can't delete yourself."
 msgstr "Вы не можете удалить самого себя"
 
-#: core/views/user.py:108
+#: core/views/user.py:84
 msgid "Account activation"
 msgstr "Активация аккаунта"
 
@@ -504,6 +505,9 @@ msgstr "Выделение ROI"
 #: roi/serializers/rectangular_roi_serializer.py:33
 msgid "Incorrect combination of ROI border values"
 msgstr "Неверно заданы значения границ областей интереса"
+
+#~ msgid "Authorization through IHNA website"
+#~ msgstr "Авторизация через сайт ИВНД и НФ РАН"
 
 #~ msgid "Application usage"
 #~ msgstr "Использование приложения"

@@ -123,7 +123,8 @@ class ProjectApplicationReader(RawSqlQueryReader):
                 is_application=module_is_application,
                 is_enabled=module_is_enabled,
                 app_class=module_app_class,
-                user_settings=module_user_settings
+                user_settings=module_user_settings,
+                node_number=None,
             ),
             project=ModelEmulator(
                 id=project_id,

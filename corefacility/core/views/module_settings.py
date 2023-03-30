@@ -1,4 +1,5 @@
 from uuid import UUID
+from django.utils.translation import gettext
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, PermissionDenied, NotFound
 
@@ -6,6 +7,7 @@ from core.entity.corefacility_module import CorefacilityModuleSet
 from core.entity.entry_points.entry_point_set import EntryPointSet
 from core.entity.entity_exceptions import EntityNotFoundException
 from core.generic_views import EntityViewSet
+from core.pagination import CorePagination
 from core.permissions import ModuleSettingsPermission
 from core.serializers import ModuleSerializer
 
@@ -26,6 +28,32 @@ class ModuleSettingsViewSet(EntityViewSet):
 
     def destroy(self, request, *args, **kwargs):
         raise PermissionDenied(detail="TO-DO: delete module routines")
+
+    def list(self, request, *args, **kwargs):
+        """
+        Retrieves list of all modules
+
+        :param request: the request sent by the user
+        :param args: request arguments
+        :param kwargs: request keyword arguments
+        :return: the response to be sent to the user
+        """
+        if "q" in request.query_params:
+            if request.query_params['profile'] != 'light':
+                raise PermissionDenied(detail="Module search is not available for the basic profile")
+            search_term = request.query_params['q']
+            module_set = self.filter_queryset(self.get_queryset())
+            module_list = []
+            modules_added = 0
+            for module in module_set:
+                if gettext(module.name).find(search_term) != -1:
+                    module_list.append(ModuleSerializer(module).data)
+                    modules_added += 1
+                if modules_added > CorePagination.PAGE_SIZES[request.query_params['profile']]:
+                    break
+            return Response(module_list)
+        else:
+            return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         """

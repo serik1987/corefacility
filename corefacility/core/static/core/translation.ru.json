@@ -16,6 +16,7 @@
 	"The value must be a number": "Значение должно быть числом",
 	"The value must not be less than ": "Значение не должно быть меньше, чем ",
 	"The value must not be greater than ": "Значение не должно быть больше, чем ",
+	"Choose an application from the list below...": "Выберите приложение из списка...",
 	"Basic settings": "Основные настройки",
 	"Edit this value": "Отредактировать данное значение",
 	"Finish edit": "Завершить редактирование",
@@ -300,8 +301,14 @@
 	"Project settings": "Настройки проекта",
 	"Project's root group": "Управляющий коллектив",
 	"Project administration": "Администрирование проекта",
+	"Application list": "Список приложений",
+	"Project application list": "Список приложений проекта",
 
 	"New permission": "Новое разрешение",
 	"Please, select a group which permission must be added": "Пожалуйста, выберите коллектив, для которого Вы хотите добавить разрешения",
-	"You have already add this group to the access control list": "Вы уже добавили эту группу в список прав доступа"
+	"You have already add this group to the access control list": "Вы уже добавили эту группу в список прав доступа",
+
+	"Select an application to add to the project...": "Выберите приложение, которое Вы хотите добавить в проект...",
+	"Please, specify an application to add to the application list.": "Пожалуйста, выберите приложение, которое Вы хотите добавить добавить в список приложений.",
+	"The application has been disabled by the system administrator.": "Приложение было отключено системным администратором"
 }

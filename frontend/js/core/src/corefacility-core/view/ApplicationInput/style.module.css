@@ -1,0 +1,47 @@
+.main{
+	display: flex;
+	gap: 4px;
+	border: 1px solid rgb(60, 64, 67);
+	border-radius: 4px;
+	padding-left: 12px;
+	overflow: hidden;
+	cursor: pointer;
+	font-size: 16px;
+	line-height: 30px;
+	white-space: nowrap;
+}
+
+.main.inactive{
+	cursor: default;
+}
+
+.main.disabled{
+	cursor: not-allowed;
+	color: #78797c;
+	border-color: #78797c;
+	fill: #78797c;
+	stroke: #78797c;
+}
+
+.content{
+	flex: 1;
+}
+
+.icon{
+	flex: 0 28px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 28px;
+}
+
+.icon svg{
+	width: 24px;
+	height: 24px;
+}
+
+.dropdown li{
+	overflow: hidden;
+	font-size: 16px;
+	white-space: nowrap;
+}

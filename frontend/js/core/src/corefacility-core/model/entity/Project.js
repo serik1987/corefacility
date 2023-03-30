@@ -9,6 +9,7 @@ import ProjectPermissionManager from 'corefacility-core/model/fields/ProjectPerm
 
 import Group from './Group';
 import User from './User';
+import ProjectApplication from './ProjectApplication';
 
 
 /**
@@ -33,8 +34,18 @@ export default class Project extends Entity{
 		return [new HttpRequestProvider('projects', Project)];
 	}
 
+	/**
+	 *  Creates and returns the so called 'permission manager' that allows to deal with project permissions
+	 */
 	get permissions(){
 		return new ProjectPermissionManager(this);
+	}
+
+	/**
+	 * 	Returns the application list
+	 */
+	getApplicationList(searchParams){
+		return this._getChildEntities(ProjectApplication, searchParams);
 	}
 
 	/** Initializes property descriptions.
