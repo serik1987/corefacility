@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import {NotImplementedError} from 'corefacility-base/exceptions/model';
-import {HttpError} from 'corefacility-base/exceptions/network';
+import {NotFoundError} from 'corefacility-base/exceptions/network';
 
 
 /** This is the base class for all widgets that have to be filled
@@ -10,8 +10,9 @@ import {HttpError} from 'corefacility-base/exceptions/network';
  * 
  *  Such data are represented as entities or entity lists.
  * 
- * 	Props
- * 	@param {callback} on404 	Triggers when the requested resource has not been found on the Web server
+ * 	Props:
+ * 	--------------------------------------------------------------------------------------------------------------------
+ * 	@param {callback} 		on404 				Triggers when no requested resource was found.
  * 
  * The component doesn't have any state.
  */
@@ -37,7 +38,7 @@ export default class Loader extends React.Component{
 		try{
     		entity = await callback();
     	} catch (error){
-    		if (error instanceof HttpError){
+    		if (error instanceof NotFoundError){
     			if (this.props.on404){
     				this.props.on404();
     			}

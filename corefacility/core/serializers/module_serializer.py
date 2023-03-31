@@ -15,6 +15,7 @@ class ModuleSerializer(EntitySerializer):
     alias = serializers.ReadOnlyField(help_text="Module string identifier (alias or slug)")
     name = serializers.SerializerMethodField(help_text="Human-readable module name")
     node_number = serializers.ReadOnlyField(help_text="Number of entry points that the module has")
+    html_code = serializers.ReadOnlyField(help_text="HTML code to represent the module icon")
     pseudomodule_identity = serializers.SerializerMethodField(
         help_text="A short string that will help the corefacility-core frontend to select proper client model and "
                   "form for the module")

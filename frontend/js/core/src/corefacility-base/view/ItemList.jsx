@@ -13,18 +13,22 @@ import Scrollable from 'corefacility-base/shared-view/components/Scrollable';
  * 	have the same ID (even though they are two different Javascript objects).
  * 
  * 	Props:
- * 		@param {iterable|null} items 		The item list, as it passed by the parent component.
+ * 	--------------------------------------------------------------------------------------------------------------------
+ * 	@param {iterable|null} 	items 			The item list, as it passed by the parent component.
  * 											Can be any iterable component. However, subtypes may require instance
  * 											of a certain class
- * 		@param {boolean} isLoading			true if the parent component is in 'loading' state.
- * 		@param {boolean} isError			true if the parent component is failed to reload this item list.
- * 		@param {callback} onItemSelect		The function calls when the user clicks on a single item in the list (optional)
+ * 	@param {boolean} 		isLoading		true if the parent component is in 'loading' state.
+ * 	@param {boolean} 		isError			true if the parent component is failed to reload this item list.
+ * 	@param {callback} 		onItemSelect	The function calls when the user clicks on a single item in the list
+ * 											(optional)
  * 
- * 	State
- * 		@param {Array} itemArray 			The item list transformed by the component to the Javascript array, and hence
- * 											can be mapped into array of ListItem components during the rendering.
- * 											Such a list contains not only those enitities that have been passed during the
- * 											reloading but also those passed during creation of deletion of items.
+ * 	State:
+ * 	--------------------------------------------------------------------------------------------------------------------
+ * 	@param {Array} 			itemArray 		The item list transformed by the component to the Javascript array,
+ * 											and hence can be mapped into array of ListItem components during the
+ * 											rendering. Such a list contains not only those enitities that have been
+ * 											passed during the reloading but also those passed during creation of
+ * 											deletion of items.
  */
 export default class ItemList extends React.Component{
 

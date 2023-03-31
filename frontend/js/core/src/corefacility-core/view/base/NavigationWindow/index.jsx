@@ -9,8 +9,8 @@ import styles from './style.module.css';
  * 	A window with navigation bar (so called 'breadcrumbs')
  * 
  * 	State:
- * 	@param {boolean} error404 true will display the error404 window indicating
- * 	that such an entity was not found. false will do nothing
+ * 	--------------------------------------------------------------------------------------------------------------------
+ * 	@param {boolean}	error404		true will display the error404 window indicating that such entity was not found.
  */
 export default class NavigationWindow extends CoreWindow{
 
@@ -39,7 +39,7 @@ export default class NavigationWindow extends CoreWindow{
 		);
 	}
 
-	/** Renders natvigation items
+	/** Renders navigation items
 	 * 	@return {array of React.Component} array Hyperlink, p and any
 	 * 		other React components: one component means one navigation item
 	 */

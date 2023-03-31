@@ -21,6 +21,8 @@ import GroupUserWindow from './group-list/GroupUserWindow';
 import ProjectListWindow from './project-list/ProjectListWindow';
 import {ProjectSettingsWindow, RootGroupSettingsWindow, ProjectAdministrationWindow, ProjectApplicationSettingsWindow} 
 	from './project-list/project-detail-windows';
+import ProjectApplicationListWindow from './application-list/ProjectApplicationListWindow';
+import ProjectApplicationWindow from './application-list/ProjectApplicationWindow';
 
 
 /** This is the root component for the core application
@@ -67,6 +69,8 @@ export default class App extends BaseApp{
 
 			return (
 				<Routes>
+					<Route path="/projects/:projectLookup/apps/:appLookup/" element={<ProjectApplicationWindow/>}/>
+					<Route path="/projects/:lookup/apps/" element={<ProjectApplicationListWindow/>}/>
 					<Route path="/projects/:lookup/appsettings/" element={<ProjectApplicationSettingsWindow/>}/>
 					<Route path="/projects/:lookup/administration/" element={<ProjectAdministrationWindow/>}/>
 					<Route path="/projects/:lookup/root/" element={<RootGroupSettingsWindow/>}/>

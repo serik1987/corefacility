@@ -3,28 +3,23 @@ import {NotImplementedError} from 'corefacility-base/exceptions/model';
 import Loader from './Loader.jsx';
 
 
-/** This is the base class for all components that deal with entity lists
- *  The component's job is to receive filter options from the parent or child
- *  components, find all necessary entities using the Entity.find(properties)
- *  method represent them in some children components
+/**
+ * 	Represents list of all installed applications connected to a given entry point.
  * 
- *  Props:
- * 		The component accepts only props responsible for the filter adjustment.
- * 		Such props must be defined by the deriveFilterFromProps and
- * 		deriveFilterIdentityFromProps abstract methods
+ * 	Props:
+ * 	--------------------------------------------------------------------------------------------------------------------
+ * 	The component accepts no props.
  * 
- *	State:
- * 		The component state represents items found and the loading progress for
- * 		the item list.
- * 		The state parameters are interconnected to each other and some states
- * 		are not valid (e.g., the state {loading=true, error=true} is not valid).
- * 		For this reason, please, don't use or set the state directly because
- * 		this may result to damages. Use reportListFetching, reportListSuccess and
- * 		reportListFailure instead of them.
+ * 	State:
+ * 	--------------------------------------------------------------------------------------------------------------------
+ * 	_isLoading, _isError, _error props are nor specified for direct access. Use instead:
+ * 		(a) isLoading, isError, error Javascript properties
+ * 		(b) reportListFetching, reportFetchSuccess(itemList), reportFetchFailure(error) methods
  * 
- * 	Also, one of the descendant of the ListEditor should be an instance of the ItemList with the following
- * 	props defined:
- * 		@param {callback} onItemSelect			Triggers when the user selects an item
+ * 	Props for the descendant items:
+ * 	--------------------------------------------------------------------------------------------------------------------
+ * 	@param {callback} 		onItemSelect 		Triggers when the user selects a given item
+ * 
  */
 export default class ListLoader extends Loader{
 

@@ -9,6 +9,7 @@
 }
 
 .navigation_item_wrapper{
+	display: inline-block;
 }
 
 .navigation_item_wrapper:not(:last-child){
@@ -22,6 +23,14 @@
 	margin: 0;
 	padding: 0 25px;
 	line-height: 64px;
+}
+
+.navigation_item_wrapper > a, .navigation_item_wrapper > p{
+	box-sizing: border-box;
+	max-width: 216px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
 .navigation_item_wrapper :global .hyperlink:first-child{

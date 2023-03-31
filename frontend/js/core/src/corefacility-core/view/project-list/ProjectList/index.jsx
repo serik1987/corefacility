@@ -61,7 +61,6 @@ export default class ProjectList extends PaginatedList{
         let isGovernor = project.is_user_governor;
 
         return (
-            <div className={style.main}>
                 <ImagedListItem
                     inactive={this.props.isLoading}
                     href={`/projects/${project.alias}/apps/`}
@@ -69,24 +68,24 @@ export default class ProjectList extends PaginatedList{
                     img={project.avatar}
                     imageWidth={150}
                     imageHeight={150}
+                    cssSuffix={style.main}
                 >
-                        <h2>{project.name}</h2>
-                        <p>{project.root_group.name}</p>
-                        <small>{t("Project leader")}: {governor}</small>
-                        {(isGovernor || window.application.user.is_superuser) && <div className={style.icons}>
-                            <Icon
-                                onClick={event => this.handleProjectSettings(event, project)}
-                                tooltip={t("Project settings")}
-                                src={<SettingsIcon/>}
-                            />
-                            <Icon
-                                onClick={event => this.handleRemove(event, project)}
-                                tooltip={t("Remove project")}
-                                src={<RemoveIcon/>}
-                            />
-                        </div>}
-                </ImagedListItem>
-            </div>
+                    <h2>{project.name}</h2>
+                    <p>{project.root_group.name}</p>
+                    <small>{t("Project leader")}: {governor}</small>
+                    {(isGovernor || window.application.user.is_superuser) && <div className={style.icons}>
+                        <Icon
+                            onClick={event => this.handleProjectSettings(event, project)}
+                            tooltip={t("Project settings")}
+                            src={<SettingsIcon/>}
+                        />
+                        <Icon
+                            onClick={event => this.handleRemove(event, project)}
+                            tooltip={t("Remove project")}
+                            src={<RemoveIcon/>}
+                        />
+                    </div>}
+            </ImagedListItem>        
         );
     }
 

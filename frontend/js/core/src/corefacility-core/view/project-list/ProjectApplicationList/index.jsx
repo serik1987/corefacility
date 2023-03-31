@@ -7,8 +7,8 @@ import Icon from 'corefacility-base/shared-view/components/Icon';
 import {ReactComponent as DeleteIcon} from 'corefacility-base/shared-view/icons/delete.svg';
 
 import ProjectApplication from 'corefacility-core/model/entity/ProjectApplication';
+import ApplicationInput from 'corefacility-core/view/application-list/ApplicationInput';
 
-import ApplicationInput from '../../ApplicationInput';
 import style from './style.module.css';
 
 

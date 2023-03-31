@@ -54,18 +54,11 @@ export default class ProjectApplicationListEditor extends CoreListEditor{
 	 */
 	async _fetchList(filter){
 		if (this._project === null){
-			try{
-				this._project = await Project.get(this.props.projectLookup);
-			} catch (error){
-				if (error instanceof NotFoundError){
-					if (this.props.on404){
-						this.props.on404();
-					}
-				} else {
-					throw error;
-				}
-				return EntityPage.empty();
-			}
+			this._project = await this.getEntityOr404(() => Project.get(this.props.projectLookup));
+		}
+
+		if (this._project === null){
+			return EntityPage.empty();
 		}
 
 		let searchParams = this.deriveFilterFromPropsAndState(this.props, this.state);

@@ -310,5 +310,12 @@
 
 	"Select an application to add to the project...": "Выберите приложение, которое Вы хотите добавить в проект...",
 	"Please, specify an application to add to the application list.": "Пожалуйста, выберите приложение, которое Вы хотите добавить добавить в список приложений.",
-	"The application has been disabled by the system administrator.": "Приложение было отключено системным администратором"
+	"The application has been disabled by the system administrator.": "Приложение было отключено системным администратором",
+
+	"There are no applications added to the project.": "В проект не добавлено ни одного приложения.",
+	"To add an application follow here.": "Для того, чтобы добавить приложение, проследуйте по этой ссылке.",
+
+	"Project application": "Приложение проекта",
+	"The requested application is absent in the application list.": "Требуемое приложение отсутствует в списке приложений.",
+	"Choose another application from the left list.": "Выберите другое приложение из списка слева."
 }

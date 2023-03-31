@@ -1,0 +1,40 @@
+.item_list{
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+.item{
+	display: inline-flex;
+	flex-direction: column;
+	align-items: center;
+	width: 140px;
+	padding: 20px;
+	border: 1px solid rgb(218, 220, 222);
+	border-radius: 4px;
+	box-shadow: 1px 1px 3px 0 rgba(0, 0, 0, 0.27);
+	cursor: pointer;
+	text-align: center;
+	transition:
+		box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+		height 0.27s ease-in-out;
+}
+
+.item:active{
+	box-shadow: none;
+}
+
+.item img{
+	width: 100px;
+	height: 100px;
+}
+
+.no_items{
+	padding-left: 114px;
+	padding-right: 30px;
+}
+
+p.no_items > i, p.no_items > a{
+	display: inline;
+	padding: 0;
+}

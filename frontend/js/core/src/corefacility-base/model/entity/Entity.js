@@ -396,6 +396,24 @@ export default class Entity{
 		throw new NotImplementedError("static _definePropertyDescription");
 	}
 
+	/**
+	 * 	Recovers the entity from its serialized information
+	 * 	@param {object|array} info the serialized information about the entity (many = false), or
+	 * 			array of such objects (many = true).
+	 * 	@param {boolean} many true to deserialize list of entities, false to deserialize single entity
+	 * 	@return {Entity|array of Entity} the entity itself (many = false) or array of entities (many = true)
+	 */
+	static deserialize(info, many=false){
+		if (many){
+			return info.map(entityInfo => this.deserialize(entityInfo));
+		} else {
+			let entity = new this();
+			Object.assign(entity._entityFields, info);
+			entity._state = EntityState.loaded;
+			return entity;
+		}
+	}
+
 }
 
 

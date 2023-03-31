@@ -21,8 +21,8 @@ import styles from './style.module.css';
  *  The window has no props
  * 
  * 	State:
- * 	@param {boolean} error404 true will display the error404 window indicating
- * 	that such an entity was not found. false will do nothing
+ * 	--------------------------------------------------------------------------------------------------------------------
+ * 	@param {boolean}	error404		true will display the error404 window indicating that such entity was not found.
  */
 export default class CoreWindow extends Window{
 
