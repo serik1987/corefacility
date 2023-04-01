@@ -29,7 +29,7 @@ urlpatterns = [
 urlpatterns += static("/favicon.ico", document_root=os.path.join(settings.BASE_DIR, "corefacility/static/favicon.ico"))
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-# The following path must have the lowest priority because corresponding path pattern is suitable for aby kind of
+# The following path must have the lowest priority because corresponding path pattern is suitable for any kind of
 # path, i.e., any other path below it is unusable
 urlpatterns += [
     path('<path:path>/', MainWindow.as_view(), name="main_window"),

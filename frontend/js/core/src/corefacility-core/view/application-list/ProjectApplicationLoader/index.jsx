@@ -1,10 +1,14 @@
 import {translate as t} from 'corefacility-base/utils';
 import Sidebar from 'corefacility-base/shared-view/components/Sidebar';
 import SidebarItem from 'corefacility-base/shared-view/components/SidebarItem';
+import ChildModuleFrame from 'corefacility-base/shared-view/components/ChildModuleFrame';
+import Icon from 'corefacility-base/shared-view/components/Icon';
+import {ReactComponent as ExpandIcon} from 'corefacility-base/shared-view/icons/expand.svg';
 
 import CoreWindowHeader from 'corefacility-core/view/base/CoreWindowHeader';
 
-import ProjectApplicationListLoader from './ProjectApplicationListLoader';
+import ProjectApplicationListLoader from '../ProjectApplicationListLoader';
+import style from './style.module.css';
 
 
 /**
@@ -37,8 +41,14 @@ export default class ProjectApplicationLoader extends ProjectApplicationListLoad
 
 	constructor(props){
 		super(props);
+		this.handleExpanderClick = this.handleExpanderClick.bind(this);
 
 		this._application = null;
+
+		this.state = {
+			...this.state,
+			expanded: false,
+		}
 	}
 
 	shouldComponentUpdate(nextProps, nextState){
@@ -100,8 +110,18 @@ export default class ProjectApplicationLoader extends ProjectApplicationListLoad
 						isError={this.isError}
 						error={this.error}
 						header={this._project && this._project.name}
+						aside={applicationSelected && <Icon
+							onClick={this.handleExpanderClick}
+							src={<ExpandIcon/>}
+							tooltip={this.state.expanded ? t("Collapse") : t("Expand")}
+							cssSuffix={style.expander}
+						/>}
+						cssSuffix={(this.state.expanded ? style.expanded : '') + ' ' + style.iframe_wrapper}
 					>
-						{applicationSelected && <p>TO-DO: render the right side tomorrow...</p>}
+						{applicationSelected && <ChildModuleFrame
+							application={this._application}
+							cssSuffix={style.iframe}
+						/>}
 						{!applicationSelected && <div>
 							<h2>{t("The requested application is absent in the application list.")}</h2>
 							<p>{t("Choose another application from the left list.")}</p>
@@ -121,6 +141,10 @@ export default class ProjectApplicationLoader extends ProjectApplicationListLoad
 		if (this.props.onApplicationSelect && this._project){
 			this.props.onApplicationSelect(this._project, application);
 		}
+	}
+
+	handleExpanderClick(event){
+		this.setState({expanded: !this.state.expanded});
 	}
 
 }

@@ -85,6 +85,7 @@ class BaseWindow(SetCookieMixin, TemplateView):
         """
         response = super().render_to_response(context, **response_kwargs)
         self.set_cookie(self.request, response, refresh=True)
+        response.headers['X-Frame-Options'] = 'SAMEORIGIN'
         return response
 
     def _find_frontend(self, frontend_template):
