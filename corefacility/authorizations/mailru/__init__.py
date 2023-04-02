@@ -162,12 +162,14 @@ class App(AuthorizationModule):
         token_authorization = "Basic " + \
             base64.b64encode(('%s:%s' % (self.get_client_id(), self.get_client_secret()))
                              .encode('utf-8')).decode('utf-8')
+
         token_response = \
             self.request_oauth2(route,
                                 'POST',
                                 self.AUTHORIZATION_TOKEN_URI,
                                 headers={
-                                    'Authorization': token_authorization
+                                    'Authorization': token_authorization,
+                                    'User-Agent': 'corefacility',   # Fixed 'missing user agent' error
                                 },
                                 body=urlencode({
                                     'code': request.GET['code'],
@@ -212,7 +214,8 @@ class App(AuthorizationModule):
             raise AuthorizationException(route, "This application was unabled to be authorized on the Mail.Ru server." +
                                          " Please, check that both client ID and client secret are correct")
         if 'error' in body and 'error_code' in body and 'error_description' in body:
-            raise AuthorizationException(route, body['error_description'])
+            raise AuthorizationException(route,
+                                         "Authorization code verification failed: " + body['error_description'])
         return body
 
     def get_client_id(self):
