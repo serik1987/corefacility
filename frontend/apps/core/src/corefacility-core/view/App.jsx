@@ -5,7 +5,7 @@ import {
 } from 'react-router-dom';
 
 import CoreModule from 'corefacility-core/model/entity/CoreModule';
-import Profile from 'corefacility-core/model/entity/Profile';
+import Profile from 'corefacility-base/model/entity/Profile';
 
 import BaseApp from 'corefacility-base/view/App';
 import UserListWindow from './user-list/UserListWindow';
@@ -34,11 +34,17 @@ export default class App extends BaseApp{
 		super(props);
 
 		if (window.SETTINGS.auth_user !== null){
-			this._user =
-				Profile._entityProviders[Profile.SEARCH_PROVIDER_INDEX].getObjectFromResult(window.SETTINGS.auth_user);
+			this._user = Profile.deserialize(window.SETTINGS.auth_user);
 		} else {
 			this._user = null;
 		}
+	}
+
+	/**
+	 * 	Returns the application name
+	 */
+	static getApplicationName(){
+		return 'core';
 	}
 
 	/** Class of the application model, if applicable
@@ -56,7 +62,10 @@ export default class App extends BaseApp{
 	 * 	@return {React.Component} the component must be <Routes> from 'react-dom-routes'.
 	 */
 	renderAllRoutes(){
-		if (this.token !== null && this.activationCode === null){
+		if (window.parent !== window.top){
+			return <p style={{color: 'red'}}>The 'core' application can't be launched in the iframe</p>;
+		}
+		else if (this.token !== null && this.activationCode === null){
 			let adminPermissions = window.application.user.is_superuser;
 			let noSupportPermission = !window.application.user.is_support;
 			let defaultUrl = null;

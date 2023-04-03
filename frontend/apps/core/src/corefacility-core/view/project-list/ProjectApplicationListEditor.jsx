@@ -1,8 +1,8 @@
 import {translate as t} from 'corefacility-base/utils';
+import Project from 'corefacility-base/model/entity/Project';
 import {NotFoundError} from 'corefacility-base/exceptions/network';
 import EntityPage from 'corefacility-base/model/EntityPage';
 
-import Project from 'corefacility-core/model/entity/Project';
 import CoreListEditor from 'corefacility-core/view/base/CoreListEditor';
 
 import ProjectApplicationList from './ProjectApplicationList';

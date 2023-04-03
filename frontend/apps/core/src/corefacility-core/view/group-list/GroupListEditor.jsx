@@ -1,7 +1,7 @@
 import {translate as t} from 'corefacility-base/utils';
 import client from 'corefacility-base/model/HttpClient';
+import Group from 'corefacility-base/model/entity/Group';
 
-import Group from 'corefacility-core/model/entity/Group';
 import CoreListEditor from 'corefacility-core/view/base/CoreListEditor';
 
 import GroupList from './GroupList';

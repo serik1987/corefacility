@@ -2,7 +2,7 @@ import HttpRequestProvider from 'corefacility-base/model/providers/HttpRequestPr
 import {ReadOnlyField, ReadOnlyDateField} from 'corefacility-base/model/fields';
 import RelatedField from 'corefacility-base/model/fields/RelatedField';
 import Entity from 'corefacility-base/model/entity/Entity';
-import User from './User';
+import User from 'corefacility-base/model/entity/User';
 import LogRecord from './LogRecord';
 
 

@@ -1,7 +1,8 @@
 import {translate as t} from 'corefacility-base/utils';
 import {tpl_password} from 'corefacility-base/template';
-import client from 'corefacility-base/model/HttpClient';
 import {BadRequestError} from 'corefacility-base/exceptions/network';
+import client from 'corefacility-base/model/HttpClient';
+import User from 'corefacility-base/model/entity/User';
 import UpdateForm from 'corefacility-base/view/UpdateForm';
 import Scrollable from 'corefacility-base/shared-view/components/Scrollable';
 import Label from 'corefacility-base/shared-view/components/Label';
@@ -11,7 +12,6 @@ import PrimaryButton from 'corefacility-base/shared-view/components/PrimaryButto
 import Hyperlink from 'corefacility-base/shared-view/components/Hyperlink';
 import AvatarUploader from 'corefacility-base/shared-view/components/AvatarUploader';
 import ModuleWidgets from 'corefacility-base/shared-view/components/ModuleWidgets';
-import User from 'corefacility-core/model/entity/User';
 
 import CoreWindowHeader from '../../base/CoreWindowHeader';
 import styles from './style.module.css';

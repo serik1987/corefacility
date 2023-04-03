@@ -1,5 +1,6 @@
 import {translate as t} from 'corefacility-base/utils';
 
+import Profile from 'corefacility-base/model/entity/Profile';
 import UpdateForm from 'corefacility-base/view/UpdateForm';
 import Label from 'corefacility-base/shared-view/components/Label';
 import TextInput from 'corefacility-base/shared-view/components/TextInput';
@@ -9,7 +10,7 @@ import AvatarUploader from 'corefacility-base/shared-view/components/AvatarUploa
 import CredentialsOutput from 'corefacility-base/shared-view/components/CredentialsOutput';
 import ModuleWidgets from 'corefacility-base/shared-view/components/ModuleWidgets';
 import Scrollable from 'corefacility-base/shared-view/components/Scrollable';
-import Profile from 'corefacility-core/model/entity/Profile';
+
 import CoreWindowHeader from 'corefacility-core/view/base/CoreWindowHeader';
 
 import PasswordChanger from '../PasswordChanger';

@@ -4,8 +4,8 @@ import {StringField, ReadOnlyField} from 'corefacility-base/model/fields';
 import FileField from 'corefacility-base/model/fields/FileField';
 import RelatedField from 'corefacility-base/model/fields/RelatedField';
 import {SlugValidator} from 'corefacility-base/model/validators';
-import RootGroupField from 'corefacility-core/model/fields/RootGroupField';
-import ProjectPermissionManager from 'corefacility-core/model/fields/ProjectPermissionManager';
+import RootGroupField from 'corefacility-base/model/fields/RootGroupField';
+import ProjectPermissionManager from 'corefacility-base/model/fields/ProjectPermissionManager';
 
 import Group from './Group';
 import User from './User';

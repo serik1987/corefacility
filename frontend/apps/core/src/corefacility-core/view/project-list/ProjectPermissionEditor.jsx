@@ -1,8 +1,8 @@
 import {translate as t} from 'corefacility-base/utils';
 import {NotFoundError} from 'corefacility-base/exceptions/network';
+import Project from 'corefacility-base/model/entity/Project';
+import ProjectPermissionManager from 'corefacility-base/model/fields/ProjectPermissionManager';
 
-import Project from 'corefacility-core/model/entity/Project';
-import ProjectPermissionManager from 'corefacility-core/model/fields/ProjectPermissionManager';
 import CoreListEditor from 'corefacility-core/view/base/CoreListEditor';
 import PermissionList from 'corefacility-core/view/base/PermissionList';
 

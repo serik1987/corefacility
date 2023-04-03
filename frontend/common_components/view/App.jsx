@@ -1,5 +1,5 @@
 import {createRoot} from 'react-dom/client';
-import {BrowserRouter as Router, Navigate} from 'react-router-dom';
+import {BrowserRouter as Router} from 'react-router-dom';
 import i18next from 'i18next'
 import {initReactI18next} from 'react-i18next';
 
@@ -13,11 +13,31 @@ import PosixActionBox from 'corefacility-base/shared-view/components/PosixAction
 
 
 /** Base class for application root components
- *  Requires no props
+ *  
+ * 	Props (core application have no props, the other application contain information transmitted from the parent
+ * 		application to the child one using the props):
+ * 	--------------------------------------------------------------------------------------------------------------------
+ * 	@param {object} 		translationResource 			translation resources for the i18next translation module.
+ * 	@param {string}			token 							Authorization token received from the parent application.
+ * 															undefined for the core application
+ * 
+ * 	State (core application sets its state during the authorization process. Another applications receive part of
+ * 		their states from the parent's <ChildModuleFrame> component):
+ * 	--------------------------------------------------------------------------------------------------------------------
+ * 	@param {string} 		token 							Authorization token received from the authorization
+ * 															routines. null for any application except parent application
  */
 export default class App extends DialogWrapper{
 
-	/** Class of the application model, if applicable
+	/**
+	 * 	Application name
+	 */
+	static getApplicationName(){
+		throw new NotImplementedError('static getApplicationName');
+	}
+
+	/**
+	 * 	Class of the application model, if applicable
 	 */
 	static get applicationModelClass(){
 		return Module;
@@ -41,17 +61,22 @@ export default class App extends DialogWrapper{
 		window.application = this;
 	}
 
-	/** Returns the application model */
+	/**
+	 * 	The application model.
+	 */
 	get model(){
 		return this._module;
 	}
 
-	/** Authorization token.
-	 *  You can't use API without the authorization token,
-	 *  So, if this value is null, render the authorization component
+	/** 
+	 * 	Final authorization token that will be used by the HTTP client for the authorization processes.
 	 */
 	get token(){
-		return this.state.token;
+		if (this.props.token){
+			return this.props.token;
+		} else {
+			return this.state.token;
+		}
 	}
 
 	/** Sets the authorization token. */
@@ -69,7 +94,7 @@ export default class App extends DialogWrapper{
 
 	/** Sets the currently authorized user */
 	set user(value){
-		this._user = value
+		this._user = value;
 	}
 
 	/** true if the user was authorized, false otherwise */
@@ -86,14 +111,6 @@ export default class App extends DialogWrapper{
 	async reloadModel(){
 		this._module = await this.constructor.applicationModelClass.get(this._module.uuid);
 		return this._module;
-	}
-
-	/** Hides the general wait bar */
-	componentDidMount(){
-		let waitBar = document.getElementById("waitbar");
-		if (waitBar !== null){
-			waitBar.remove();
-		}
 	}
 
 	/** Renders all routes.
@@ -118,24 +135,34 @@ export default class App extends DialogWrapper{
 		);
 	}
 
-	static renderApp(ApplicationComponent){
-		let app = <ApplicationComponent/>;
+	/**
+	 * 	Renders the application.
+	 * 	To create and load the application clear your src/index.js file and insert invocation of this
+	 * 	method there.
+	 */
+	static renderApp(){
 		if (typeof window.SETTINGS !== "object"){
-			return <p style="color: red;">The backend settings were not transmitted to frontend
+			return <p style={{color: 'red'}}>The backend settings were not transmitted to frontend
 				as window.SETTINGS object</p>;
 		}
 		let backendLang = window.SETTINGS.lang;
-		let root = createRoot(document.getElementById("root"));
+		let translationResource = null;
+		let token = null;
+		if (window.parent.application){
+			translationResource = window.parent.application.props.translationResource;
+			token = window.parent.application.token;
+		}
 
-		fetch(`/static/core/translation.${backendLang}.json`)
+		fetch(`/static/${this.getApplicationName()}/translation.${backendLang}.json`)
 			.then(response => response.json())
 			.then(result => {
+				translationResource = {...translationResource, ...result};
 				i18next
 					.use(initReactI18next)
 					.init({
 						resources: {
 							[backendLang]: {
-								translation: result,
+								translation: translationResource,
 							}
 						},
 						lng: backendLang,
@@ -143,12 +170,28 @@ export default class App extends DialogWrapper{
 				});
 			})
 			.catch(error => {
+				translationResource = {...translationResource};
 				console.error(error);
 				console.error("Failed to fetch language file. The language module will be switched off");
 			})
 			.finally(() => {
+				let root = createRoot(document.getElementById("root"));
+				let app = <this translationResource={translationResource} token={token}/>;
 				root.render(app);
 			});
+	}
+
+	componentDidMount(){
+		let waitBar = document.getElementById("waitbar");
+		if (waitBar !== null){
+			waitBar.remove();
+		}
+		if (window !== window.parent){
+			window.postMessage({
+				method: 'componentDidMount',
+				info: null,
+			}, window.location.origin);
+		}
 	}
 
 }

@@ -1,6 +1,6 @@
 import {translate as t} from 'corefacility-base/utils';
 import client from 'corefacility-base/model/HttpClient';
-import Profile from 'corefacility-core/model/entity/Profile';
+import Profile from 'corefacility-base/model/entity/Profile';
 
 import Form from 'corefacility-base/view/Form';
 import Label from 'corefacility-base/shared-view/components/Label';

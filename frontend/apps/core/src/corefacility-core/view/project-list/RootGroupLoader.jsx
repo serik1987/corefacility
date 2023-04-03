@@ -2,9 +2,9 @@ import * as React from 'react';
 
 import {translate as t} from 'corefacility-base/utils';
 import {NotFoundError} from 'corefacility-base/exceptions/network';
+import Project from 'corefacility-base/model/entity/Project';
 import Loader from 'corefacility-base/view/Loader';
 
-import Project from 'corefacility-core/model/entity/Project';
 import GroupUserEditor from 'corefacility-core/view/group-list/GroupUserEditor';
 import CoreWindowHeader from 'corefacility-core/view/base/CoreWindowHeader';
 

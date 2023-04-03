@@ -1,11 +1,11 @@
 import {translate as t} from 'corefacility-base/utils';
+import GroupUser from 'corefacility-base/model/entity/GroupUser';
 import PaginatedList from 'corefacility-base/view/PaginatedList';
 import Label from 'corefacility-base/shared-view/components/Label';
 import Icon from 'corefacility-base/shared-view/components/Icon';
 import PrimaryButton from 'corefacility-base/shared-view/components/PrimaryButton';
 import {ReactComponent as RemoveIcon} from 'corefacility-base/shared-view/icons/delete.svg';
 
-import GroupUser from 'corefacility-core/model/entity/GroupUser';
 import UserInput from 'corefacility-core/view/user-list/UserInput';
 
 import SuggestedUserInput from '../SuggestedUserInput';

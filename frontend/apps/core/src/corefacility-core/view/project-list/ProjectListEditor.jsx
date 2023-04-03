@@ -1,6 +1,6 @@
 import {translate as t} from 'corefacility-base/utils';
+import Project from 'corefacility-base/model/entity/Project';
 
-import Project from 'corefacility-core/model/entity/Project';
 import CoreListEditor from 'corefacility-core/view/base/CoreListEditor';
 
 import ProjectList from './ProjectList';

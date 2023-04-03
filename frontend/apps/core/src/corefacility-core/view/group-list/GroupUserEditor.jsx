@@ -1,6 +1,6 @@
 import EntityPage from 'corefacility-base/model/EntityPage';
+import Group from 'corefacility-base/model/entity/Group';
 
-import Group from 'corefacility-core/model/entity/Group';
 import CoreListEditor from 'corefacility-core/view/base/CoreListEditor';
 
 import GroupUserList from './GroupUserList';

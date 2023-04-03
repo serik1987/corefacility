@@ -345,6 +345,7 @@ export default class Entity{
 
 	/**
 	 *  Returns the very first (search) provider
+	 * 	@static
 	 */
 	static get searchEntityProvider(){
 		return this._entityProviders[this.SEARCH_PROVIDER_INDEX];
@@ -368,6 +369,7 @@ export default class Entity{
 	 *  the very first entity object. During the entity development, the functions allows to attach given
 	 *  entity provider to the entity
 	 *  @abstract
+	 * 	@static
 	 *  @return [list{EntityProvider}] list of all entity providers
 	 */
 	static _defineEntityProviders(){
@@ -377,6 +379,7 @@ export default class Entity{
 	/** Returns an object containing propertyName => propertyDescription pairs.
 	 *  Each property description is an instance of the EntityField class that tells the entity
 	 *  how to get or set a given entity field
+	 * 	@static
 	 *  @return {object} field description for all fields
 	 */
 	static get _propertyDescription(){
@@ -390,6 +393,7 @@ export default class Entity{
 	 *  The method invokes only once. When you create new entity class you must redefine this method
 	 *  and describe all entity fields by the {field_name: instance_of_EntityField} pair
 	 *  @abstract
+	 * 	@static
 	 *  @return {objecty} an object that will be used for field value retrievals and set
 	 */
 	static _definePropertyDescription(){
@@ -398,6 +402,7 @@ export default class Entity{
 
 	/**
 	 * 	Recovers the entity from its serialized information
+	 * 	@static
 	 * 	@param {object|array} info the serialized information about the entity (many = false), or
 	 * 			array of such objects (many = true).
 	 * 	@param {boolean} many true to deserialize list of entities, false to deserialize single entity
@@ -412,6 +417,15 @@ export default class Entity{
 			entity._state = EntityState.loaded;
 			return entity;
 		}
+	}
+
+	/**
+	 * 	Transforms entity to its serialized state. The entity can be recovered from its serialized state using the
+	 * 	deserialize() method
+	 * 	@return {object} the serialized state of the entity
+	 */
+	serialize(){
+		return this._entityFields;
 	}
 
 }

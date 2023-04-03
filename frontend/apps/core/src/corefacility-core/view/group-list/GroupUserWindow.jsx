@@ -1,9 +1,9 @@
 import {useParams} from 'react-router-dom';
 
 import {translate as t} from 'corefacility-base/utils';
+import Group from 'corefacility-base/model/entity/Group';
 import Hyperlink from 'corefacility-base/shared-view/components/Hyperlink';
 
-import Group from 'corefacility-core/model/entity/Group';
 import NavigationWindow from 'corefacility-core/view/base/NavigationWindow';
 import Window404 from 'corefacility-core/view/base/Window404';
 

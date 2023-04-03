@@ -1,6 +1,6 @@
 import RelatedField from 'corefacility-base/model/fields/RelatedField';
 import EntityState from 'corefacility-base/model/entity/EntityState';
-import Group from 'corefacility-core/model/entity/Group';
+import Group from 'corefacility-base/model/entity/Group';
 
 
 /**

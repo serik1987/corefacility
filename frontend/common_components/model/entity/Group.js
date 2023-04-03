@@ -1,8 +1,8 @@
 import Entity from 'corefacility-base/model/entity/Entity';
 import {StringField, IntegerField} from 'corefacility-base/model/fields';
 import RelatedField from 'corefacility-base/model/fields/RelatedField';
-import User from 'corefacility-core/model/entity/User';
-import GroupProvider from 'corefacility-core/model/providers/GroupProvider';
+import User from 'corefacility-base/model/entity/User';
+import GroupProvider from 'corefacility-base/model/providers/GroupProvider';
 
 import GroupUser from './GroupUser';
 import SuggestedGroupUser from './SuggestedGroupUser';

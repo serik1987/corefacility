@@ -1,5 +1,6 @@
 import {translate as t} from 'corefacility-base/utils';
 import EntityState from 'corefacility-base/model/entity/EntityState';
+import Group from 'corefacility-base/model/entity/Group';
 import SmartEntityInput from 'corefacility-base/view/SmartEntityInput';
 import Icon from 'corefacility-base/shared-view/components/Icon';
 import Hyperlink from 'corefacility-base/shared-view/components/Hyperlink';
@@ -7,8 +8,6 @@ import MessageBar from 'corefacility-base/shared-view/components/MessageBar';
 import {ReactComponent as CloseIcon} from 'corefacility-base/shared-view/icons/close.svg';
 import {ReactComponent as EditIcon} from 'corefacility-base/shared-view/icons/edit.svg';
 import {ReactComponent as AddIcon} from 'corefacility-base/shared-view/icons/add_simple.svg';
-
-import Group from 'corefacility-core/model/entity/Group';
 
 import style from './style.module.css';
 

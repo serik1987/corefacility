@@ -1,11 +1,10 @@
 import {translate as t} from 'corefacility-base/utils';
+import User from 'corefacility-base/model/entity/User';
 import CreateForm from 'corefacility-base/view/CreateForm';
 import DialogBox from 'corefacility-base/shared-view/components/DialogBox';
 import TextInput from 'corefacility-base/shared-view/components/TextInput';
 import PrimaryButton from 'corefacility-base/shared-view/components/PrimaryButton';
 import Label from 'corefacility-base/shared-view/components/Label';
-
-import User from 'corefacility-core/model/entity/User';
 
 import styles from './style.module.css';
 

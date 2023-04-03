@@ -1,8 +1,9 @@
 import {ReadOnlyField} from 'corefacility-base/model/fields';
 import FileField from 'corefacility-base/model/fields/FileField';
+import ProfileProvider from 'corefacility-base/model/providers/ProfileProvider';
+import PasswordField from 'corefacility-base/model/fields/PasswordField';
+
 import User from './User';
-import ProfileProvider from 'corefacility-core/model/providers/ProfileProvider';
-import PasswordField from 'corefacility-core/model/fields/PasswordField';
 
 
 /** The model is used to represent the current user profile

@@ -172,7 +172,7 @@ export class NumberField extends EntityField{
 /** Field that accepts integer numbers only */
 export class IntegerField extends EntityField{
 
-	mask = /^[+\-]?\d+$/;
+	mask = /^[+-]?\d+$/;
 
 	constructor(){
 		super('number');

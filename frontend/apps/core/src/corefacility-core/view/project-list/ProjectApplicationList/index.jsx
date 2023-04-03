@@ -1,4 +1,5 @@
 import {translate as t} from 'corefacility-base/utils';
+import ProjectApplication from 'corefacility-base/model/entity/ProjectApplication';
 import PaginatedList from 'corefacility-base/view/PaginatedList';
 import Label from 'corefacility-base/shared-view/components/Label';
 import CheckboxInput from 'corefacility-base/shared-view/components/CheckboxInput';
@@ -6,7 +7,6 @@ import PrimaryButton from 'corefacility-base/shared-view/components/PrimaryButto
 import Icon from 'corefacility-base/shared-view/components/Icon';
 import {ReactComponent as DeleteIcon} from 'corefacility-base/shared-view/icons/delete.svg';
 
-import ProjectApplication from 'corefacility-core/model/entity/ProjectApplication';
 import ApplicationInput from 'corefacility-core/view/application-list/ApplicationInput';
 
 import style from './style.module.css';

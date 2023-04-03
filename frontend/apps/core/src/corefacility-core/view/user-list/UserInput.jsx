@@ -1,6 +1,6 @@
 import EntityInput from 'corefacility-base/view/EntityInput';
 
-import User from 'corefacility-core/model/entity/User';
+import User from 'corefacility-base/model/entity/User';
 
 import UserInputList from './UserInputList';
 

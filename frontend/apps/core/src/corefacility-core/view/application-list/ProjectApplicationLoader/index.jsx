@@ -42,6 +42,8 @@ export default class ProjectApplicationLoader extends ProjectApplicationListLoad
 	constructor(props){
 		super(props);
 		this.handleExpanderClick = this.handleExpanderClick.bind(this);
+		this.handleComponentDidMount = this.handleComponentDidMount.bind(this);
+		this._applicationComponent = null;
 
 		this._application = null;
 
@@ -49,6 +51,21 @@ export default class ProjectApplicationLoader extends ProjectApplicationListLoad
 			...this.state,
 			expanded: false,
 		}
+	}
+
+	/**
+	 * 	Reloads the project application list together with its child lists
+	 */
+	async reload(){
+		await super.reload();
+		/*
+		if (this._app){
+			this._app.setState({
+				user: window.application.user,
+				project: this._project,
+			})
+		}
+		*/
 	}
 
 	shouldComponentUpdate(nextProps, nextState){
@@ -120,6 +137,7 @@ export default class ProjectApplicationLoader extends ProjectApplicationListLoad
 					>
 						{applicationSelected && <ChildModuleFrame
 							application={this._application}
+							onComponentDidMount={this.handleComponentDidMount}
 							cssSuffix={style.iframe}
 						/>}
 						{!applicationSelected && <div>
@@ -143,8 +161,23 @@ export default class ProjectApplicationLoader extends ProjectApplicationListLoad
 		}
 	}
 
+	/**
+	 * 	Triggers when the user expands the application
+	 * 	@param {SyntheticEvent} event 		the event triggered by the user
+	 */
 	handleExpanderClick(event){
 		this.setState({expanded: !this.state.expanded});
+	}
+
+	/**
+	 * 	Triggers when the user expands the application
+	 */
+	handleComponentDidMount(event){
+		this._applicationComponent = event.target;
+		this._applicationComponent.setState({
+			user: window.application.user,
+			project: this._project,
+		});
 	}
 
 }

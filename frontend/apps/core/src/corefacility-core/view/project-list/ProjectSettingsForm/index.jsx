@@ -1,4 +1,5 @@
 import {translate as t} from 'corefacility-base/utils';
+import Project from 'corefacility-base/model/entity/Project';
 import UpdateForm from 'corefacility-base/view/UpdateForm';
 import Scrollable from 'corefacility-base/shared-view/components/Scrollable';
 import Label from 'corefacility-base/shared-view/components/Label';
@@ -8,7 +9,6 @@ import AvatarUploader from 'corefacility-base/shared-view/components/AvatarUploa
 import TextareaInput from 'corefacility-base/shared-view/components/TextareaInput';
 import PrimaryButton from 'corefacility-base/shared-view/components/PrimaryButton';
 
-import Project from 'corefacility-core/model/entity/Project';
 import CoreWindowHeader from 'corefacility-core/view/base/CoreWindowHeader';
 import GroupInput from 'corefacility-core/view/group-list/GroupInput';
 

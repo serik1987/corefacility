@@ -212,6 +212,7 @@ export class ChoiceValidator extends Validator{
 		if (this._choices instanceof Array){
 			message += this._choices.join(", ");
 		}
+		return message
 	}
 
 	/** Provides validation itself.

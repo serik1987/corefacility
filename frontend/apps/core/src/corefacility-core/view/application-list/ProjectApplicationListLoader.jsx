@@ -1,7 +1,7 @@
 import {translate as t} from 'corefacility-base/utils';
+import Project from 'corefacility-base/model/entity/Project';
 import InstalledApplicationListLoader from 'corefacility-base/view/InstalledApplicationListLoader';
 
-import Project from 'corefacility-core/model/entity/Project';
 import CoreWindowHeader from 'corefacility-core/view/base/CoreWindowHeader';
 
 import InstalledProjectApplicationList from './InstalledProjectApplicationList';

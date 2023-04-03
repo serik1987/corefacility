@@ -15,8 +15,10 @@ function build(){
   if ! npm run build
   then
     echo "build.sh: Frontend compilation failed."
+    cd "$current_dir" || exit
     return 2
   fi
+  echo "build.sh: Frontend compilation succeed."
   cd "$current_dir" || exit
   rm -f "../corefacility/$app_name/static/$app_name/"*.*.css
   rm -f "../corefacility/$app_name/static/$app_name/"*.*.css.map

@@ -1,6 +1,6 @@
 import {translate as t} from 'corefacility-base/utils';
 
-import User from 'corefacility-core/model/entity/User';
+import User from 'corefacility-base/model/entity/User';
 
 import CoreListEditor from '../base/CoreListEditor';
 import UserList from './UserList';

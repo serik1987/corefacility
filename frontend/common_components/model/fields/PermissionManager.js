@@ -1,9 +1,8 @@
 import {NotImplementedError} from 'corefacility-base/exceptions/model';
+import Group from 'corefacility-base/model/entity/Group';
 import EntityState from 'corefacility-base/model/entity/EntityState';
 import client from 'corefacility-base/model/HttpClient';
-
-import Group from 'corefacility-core/model/entity/Group';
-import AccessLevel from 'corefacility-core/model/entity/AccessLevel';
+import AccessLevel from 'corefacility-base/model/entity/AccessLevel';
 
 
 /**

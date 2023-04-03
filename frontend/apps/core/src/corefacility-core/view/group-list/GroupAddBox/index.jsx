@@ -1,5 +1,6 @@
 import {translate as t} from 'corefacility-base/utils';
 import {ValidationError} from 'corefacility-base/exceptions/model';
+import Group from 'corefacility-base/model/entity/Group';
 import CreateForm from 'corefacility-base/view/CreateForm';
 import DialogBox from 'corefacility-base/shared-view/components/DialogBox';
 import Label from 'corefacility-base/shared-view/components/Label';
@@ -7,7 +8,6 @@ import TextInput from 'corefacility-base/shared-view/components/TextInput';
 import CheckboxInput from 'corefacility-base/shared-view/components/CheckboxInput';
 import PrimaryButton from 'corefacility-base/shared-view/components/PrimaryButton';
 
-import Group from 'corefacility-core/model/entity/Group';
 import UserInput from 'corefacility-core/view/user-list/UserInput';
 
 import style from './style.module.css';

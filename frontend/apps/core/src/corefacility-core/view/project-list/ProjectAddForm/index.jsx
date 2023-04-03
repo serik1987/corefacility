@@ -1,13 +1,13 @@
 import {translate as t} from 'corefacility-base/utils';
+import Group from 'corefacility-base/model/entity/Group';
+import Project from 'corefacility-base/model/entity/Project';
 import CreateForm from 'corefacility-base/view/CreateForm';
 import DialogBox from 'corefacility-base/shared-view/components/DialogBox';
 import Label from 'corefacility-base/shared-view/components/Label';
 import TextInput from 'corefacility-base/shared-view/components/TextInput';
 import PrimaryButton from 'corefacility-base/shared-view/components/PrimaryButton';
 
-import Project from 'corefacility-core/model/entity/Project';
 import GroupInput from 'corefacility-core/view/group-list/GroupInput';
-import Group from 'corefacility-core/model/entity/Group';
 
 import style from './style.module.css';
 
