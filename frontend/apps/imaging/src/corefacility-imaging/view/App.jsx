@@ -1,7 +1,14 @@
+import {Routes, Route, Navigate} from 'react-router-dom';
+
 import {translate as t} from 'corefacility-base/utils';
 import BaseApp from 'corefacility-base/view/App';
 import User from 'corefacility-base/model/entity/User';
-import Project from 'corefacility-base/model/entity/Project';
+import NotificationMessage from 'corefacility-base/shared-view/components/NotificationMessage';
+import Hyperlink from 'corefacility-base/shared-view/components/Hyperlink';
+
+import Project from 'corefacility-imaging/model/entity/Project';
+
+import DataEditor from './DataEditor';
 
 /** The root component in the imaging application
  *  
@@ -44,15 +51,51 @@ export default class App extends BaseApp{
         return this.state.user;
     }
 
-    /** Renders all routes.
-     *  @abstract
+    /**
+     *  Returns the application project
+     */
+    get project(){
+        return this.state.project;
+    }
+
+    /**
+     *  Receives entities from the parent applicatoin through the interframe communication (i.e., parent application
+     *  runs this method to transmit its parent entities to this given application)
+     *  @param {object} entityInfo  It depends on the specification of the parent application. Explore this object for
+     *  more details
+     */
+    receiveParentEntities(entityInfo){
+        this.setState({
+            user: User.deserialize(entityInfo.user),
+            project: Project.deserialize(entityInfo.project),
+        });
+    }
+
+    /** 
+     *  Renders all routes.
      *  @return {React.Component} the component must be <Routes> from 'react-dom-routes'.
      */
     renderAllRoutes(){
         if (this.state.user !== null && this.state.project !== null){
-            return <p>Success!</p>;
+            return (
+                <Routes>
+                    <Route path="/data/" element={<DataEditor reloadTime={this.state.reloadTime}/>}/>
+                    <Route path="/" element={<Navigate to="/data/"/>}/>
+                    <Route path="*" element={
+                        <NotificationMessage>
+                            {t("The requested page was not found.")}
+                            {' '}
+                            <Hyperlink href="/">{t("Switch to the Main Page.")}</Hyperlink>
+                        </NotificationMessage>}
+                    />
+                </Routes>
+            );
         } else {
-            return <p>{t("Please wait while user and project info will be transmitted to the child frame.")}</p>;
+            return (
+                <NotificationMessage>
+                    {t("Please wait while user and project info will be transmitted to the child frame.")}
+                </NotificationMessage>
+            );
         }
     }
 

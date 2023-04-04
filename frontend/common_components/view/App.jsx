@@ -11,6 +11,8 @@ import MessageBox from 'corefacility-base/shared-view/components/MessageBox';
 import QuestionBox from 'corefacility-base/shared-view/components/QuestionBox';
 import PosixActionBox from 'corefacility-base/shared-view/components/PosixActionBox';
 
+const CHILD_FRAME_URL_TEMPLATE = /^\/ui\/[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}(.*)/;
+
 
 /** Base class for application root components
  *  
@@ -26,6 +28,8 @@ import PosixActionBox from 'corefacility-base/shared-view/components/PosixAction
  * 	--------------------------------------------------------------------------------------------------------------------
  * 	@param {string} 		token 							Authorization token received from the authorization
  * 															routines. null for any application except parent application
+ * 	@param {string} 		reloadTime 						Timestamp of the last reload. This is required for the
+ * 															interframe communication.
  */
 export default class App extends DialogWrapper{
 
@@ -56,6 +60,7 @@ export default class App extends DialogWrapper{
 
 		this.state = {
 			token: window.SETTINGS.authorization_token,
+			reloadTime: new Date().valueOf()
 		}
 
 		window.application = this;
@@ -99,7 +104,7 @@ export default class App extends DialogWrapper{
 
 	/** true if the user was authorized, false otherwise */
 	get isAuthorized(){
-		return typeof this.state.token === "string";
+		return typeof this.token === "string";
 	}
 
 	/** Reloads the application model.
@@ -113,6 +118,24 @@ export default class App extends DialogWrapper{
 		return this._module;
 	}
 
+	/**
+	 * 	Receives entities from the parent applicatoin through the interframe communication (i.e., parent application
+	 * 	runs this method to transmit its parent entities to this given application)
+	 * 	@param {object} entityInfo 	It depends on the specification of the parent application. Explore this object for
+	 * 	more details
+	 */
+	receiveParentEntities(entityInfo){
+		throw new NotImplementedError('receiveParentEntities');
+	}
+
+	/**
+	 * 	Reloads the data in child frames after the next application rendering
+	 */
+	reload(){
+		this.setState({reloadTime: new Date().valueOf()});
+	}
+
+
 	/** Renders all routes.
 	 * 	@abstract
 	 * 	@return {React.Component} the component must be <Routes> from 'react-dom-routes'.
@@ -122,6 +145,12 @@ export default class App extends DialogWrapper{
 	}
 
 	render(){
+		let url = window.location.pathname;
+		let matches = url.match(CHILD_FRAME_URL_TEMPLATE);
+		if (matches !== null){
+			window.history.replaceState(null, null, matches[1]);
+		}
+
 		if (window.SETTINGS.frontend_route && window.SETTINGS.frontend_route !== '/'){
 			window.history.replaceState(null, null, window.SETTINGS.frontend_route);
 			window.SETTINGS.frontend_route = undefined;
@@ -187,8 +216,9 @@ export default class App extends DialogWrapper{
 			waitBar.remove();
 		}
 		if (window !== window.parent){
+
 			window.postMessage({
-				method: 'componentDidMount',
+				method: 'applicationMount',
 				info: null,
 			}, window.location.origin);
 		}

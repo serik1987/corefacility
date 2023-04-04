@@ -151,7 +151,11 @@ export default class AuthorizationForm extends Form{
 	handleAuthorizationMethodClick(widget){
 		let url = new URL(window.location.href);
 		url.pathname = `/authorize/${widget.alias}/`;
-		url.searchParams.set('route', window.location.pathname);
+		let path = window.location.pathname;
+		if (window.SETTINGS.iframe_route){
+			path = (path + '/' + window.SETTINGS.iframe_route).replace('//', '/');
+		}
+		url.searchParams.set('route', path);
 		window.location = url;
 	}
 

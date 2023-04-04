@@ -39,9 +39,7 @@ export default class Loader extends React.Component{
     		entity = await callback();
     	} catch (error){
     		if (error instanceof NotFoundError){
-    			if (this.props.on404){
-    				this.props.on404();
-    			}
+    			this.process404();
     			return null;
     		} else {
     			throw error;
@@ -49,6 +47,15 @@ export default class Loader extends React.Component{
     	}
 
     	return entity;
+	}
+
+	/**
+	 * 	Processes the error 404 (the requested resource was not found).
+	 */
+	process404(){
+		if (this.props.on404){
+    		this.props.on404();
+    	}
 	}
 
 	componentDidMount(){

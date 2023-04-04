@@ -151,10 +151,14 @@ export default class ListLoader extends Loader{
 	 */
 	reportFetchSuccess(itemList){
 		this.setState({
-			_itemList: itemList,
 			_isLoading: false,
 			_error: null,
-		})
+		});
+		if (itemList !== undefined){
+			this.setState({
+				_itemList: itemList,
+			})
+		}
 	}
 
 	/** Tells the component that there was unabled to fetch the list.

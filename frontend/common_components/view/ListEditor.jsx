@@ -15,7 +15,8 @@ import ListLoader from './ListLoader';
  * 		Such props must be defined by the deriveFilterFromProps and
  * 		deriveFilterIdentityFromProps abstract methods.
  * 	Also there are the following props responsible for the list CRUD operations
- * 		@param 	{callback}	onItemAddOpen		This is an asynchronous method that opens
+ * 	--------------------------------------------------------------------------------------------------------------------
+ * 	@param 	{callback}	onItemAddOpen			This is an asynchronous method that opens
  * 												add user box (either page or modal box)
  * 												The promise always fulfills when the user closes
  * 												the box. The promise can never be rejected.
@@ -33,11 +34,11 @@ import ListLoader from './ListLoader';
  * 
  * 	Also, one of the descendant of the ListEditor must be an instance of the ItemList with the following
  * 	props defined:
- * 		@param {callback} onItemAdd 			This method must be triggered the the user adds an entity to
+ * 	@param {callback} onItemAddOpen 			This method must be triggered the the user adds an entity to
  * 												the entity list by means of the entity list facility
- * 		@param {callback} onItemSelect			This method must be triggered when the user changes the entity
+ * 	@param {callback} onItemSelect				This method must be triggered when the user changes the entity
  * 												and wants editor to send the changes to the Web server.
- * 		@param {callback} onItemRemove 			This method must be triggered when the user removes the entity
+ * 	@param {callback} onItemRemove 				This method must be triggered when the user removes the entity
  * 												and wants editor to send the changes to the Web Server.
  */
 export default class ListEditor extends ListLoader{

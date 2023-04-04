@@ -4,19 +4,31 @@ import style from './style.module.css';
 
 
 /**
- * 	Represents the child application in the iframe
+ * 	Represents the child application in the iframe.
+ * 
+ *  Props:
  * 	--------------------------------------------------------------------------------------------------------------------
  * 	@param {Module} 	application 			The application to open
- * 	@param {string} 	path 					Application path to open. If not set, the path will be selected
+ * 	@param {string} 	path 					Default application path to open
  * 	@param {string} 	cssSuffix 				Additional CSS classes to append
  *  @param {callback}   onApplicationMount      triggers when the child component of the root application has already
  *                                              been mounted.
+ *  @param {callback}   onFetchList             Triggers when the user fetches the list using the ListEditor
+ *  @param {callback}   onFetchFailure          Triggers when the user failed to fetch the list using the ListEditor
+ * 
+ *  State:
+ *  --------------------------------------------------------------------------------------------------------------------
+ *  @param {string}     path                    Current application path to open.
  */
 export default class ChildModuleFrame extends React.Component{
 
     constructor(props){
         super(props);
         this.handleFrameRendered = this.handleFrameRendered.bind(this);
+
+        this.state = {
+            path: null,
+        }
     }
 
 	render(){
@@ -28,9 +40,8 @@ export default class ChildModuleFrame extends React.Component{
         let path = null;
         if (this.props.path){
             path = this.props.path;
-        } else if (window.SETTINGS.iframe_route){
-            path = window.SETTINGS.iframe_route;
-            window.SETTINGS.iframe_route = undefined;
+        } else if (this.state.path){
+            path = this.state.path;
         } else {
             path = '';
         }
@@ -42,25 +53,46 @@ export default class ChildModuleFrame extends React.Component{
         );
 	}
 
+    componentDidMount(){
+        if (window.SETTINGS.iframe_route){
+            this.setState({path: window.SETTINGS.iframe_route});
+            window.SETTINGS.iframe_route = undefined;
+            this._basePath = window.location.pathname;
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState){
+        if (this.state.path && this.props.path !== prevProps.path){
+            this.setState({path: this.props.path});
+            this._basePath = window.location.pathname;
+        }
+    }
+
     /**
      *  Triggers when the iframe object has been completely rendered to the DOM <iframe> object.
      *  @param {FrameElement} iframe        the DOM object itself
      */
     handleFrameRendered(iframe){
-        iframe.contentWindow.addEventListener("message", event => {
-            if (event.origin !== window.location.origin){
-                return;
-            }
-            let newEvent = {
-                type: event.data.method,
-                target: event.source.application,
-                value: event.data.info,
-            }
-            let eventHandler = 'on' + newEvent.type[0].toUpperCase() + newEvent.type.slice(1);
-            if (eventHandler in this.props){
-                this.props[eventHandler](newEvent);
-            }
-        });
+        if (iframe){
+            this.__iframeListener = iframe.contentWindow.addEventListener("message", event => {
+                if (event.origin !== window.location.origin){
+                    return;
+                }
+                let newEvent = {
+                    type: event.data.method,
+                    target: event.data.target || event.source.application,
+                    source: event.source.application,
+                    value: event.data.info,
+                }
+                let eventHandler = 'on' + newEvent.type[0].toUpperCase() + newEvent.type.slice(1);
+                if (eventHandler in this.props){
+                    this.props[eventHandler](newEvent);
+                }
+            });
+            this.__iframe = iframe;
+        } else if (this.__iframe && this.__iframeListener) {
+            this.__iframe.removeEventListener("message", this.__iframeListener);
+        }
     }
 
 }

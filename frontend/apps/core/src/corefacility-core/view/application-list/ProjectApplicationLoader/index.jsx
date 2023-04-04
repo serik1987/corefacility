@@ -42,10 +42,14 @@ export default class ProjectApplicationLoader extends ProjectApplicationListLoad
 	constructor(props){
 		super(props);
 		this.handleExpanderClick = this.handleExpanderClick.bind(this);
-		this.handleComponentDidMount = this.handleComponentDidMount.bind(this);
+		this.handleApplicationMount = this.handleApplicationMount.bind(this);
+		this.handleFetchList = this.handleFetchList.bind(this);
+		this.handleFetchSuccess = this.handleFetchSuccess.bind(this);
+		this.handleFetchFailure = this.handleFetchFailure.bind(this);
 		this._applicationComponent = null;
 
 		this._application = null;
+		this._applicationComponent = null;
 
 		this.state = {
 			...this.state,
@@ -58,14 +62,13 @@ export default class ProjectApplicationLoader extends ProjectApplicationListLoad
 	 */
 	async reload(){
 		await super.reload();
-		/*
-		if (this._app){
-			this._app.setState({
-				user: window.application.user,
-				project: this._project,
-			})
+		if (this._applicationComponent){
+			this._applicationComponent.receiveParentEntities({
+				user: window.application.user.serialize(),
+				project: this._project.serialize(),
+			});
+			this._applicationComponent.reload();
 		}
-		*/
 	}
 
 	shouldComponentUpdate(nextProps, nextState){
@@ -137,7 +140,10 @@ export default class ProjectApplicationLoader extends ProjectApplicationListLoad
 					>
 						{applicationSelected && <ChildModuleFrame
 							application={this._application}
-							onComponentDidMount={this.handleComponentDidMount}
+							onApplicationMount={this.handleApplicationMount}
+							onFetchList={this.handleFetchList}
+							onFetchSuccess={this.handleFetchSuccess}
+							onFetchFailure={this.handleFetchFailure}
 							cssSuffix={style.iframe}
 						/>}
 						{!applicationSelected && <div>
@@ -170,14 +176,34 @@ export default class ProjectApplicationLoader extends ProjectApplicationListLoad
 	}
 
 	/**
-	 * 	Triggers when the user expands the application
+	 * 	Triggers when the user expands the application.
 	 */
-	handleComponentDidMount(event){
+	handleApplicationMount(event){
 		this._applicationComponent = event.target;
-		this._applicationComponent.setState({
-			user: window.application.user,
-			project: this._project,
+		this._applicationComponent.receiveParentEntities({
+			user: window.application.user.serialize(),
+			project: this._project.serialize(),
 		});
+	}
+
+	/**
+	 * 	Triggers when the list starts fetching in the child application
+	 * 	@param {object} event an event that has triggered this action
+	 */
+	handleFetchList(event){
+		this.reportListFetching();
+	}
+
+	handleFetchSuccess(event){
+		this.reportFetchSuccess(undefined);
+	}
+
+	/**
+	 * 	Triggers when the list fetching was failed by the child frame
+	 * 	@param {object} event an event that has triggered this action
+	 */
+	handleFetchFailure(event){
+		this.reportFetchFailure(new Error(event.value));
 	}
 
 }
