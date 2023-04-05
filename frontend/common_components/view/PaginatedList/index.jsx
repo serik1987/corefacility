@@ -21,15 +21,18 @@ import styles from './style.module.css';
  * 	download the first page. This is considered to be a feature of the parent component.
  * 
  * 	Props:
- * 		@param {EntityPage|null} items 		The item list, as it passed by the parent component.
- * 											Must be an instance of EntityPage
- * 		@param {boolean} isLoading			true if the parent component is in 'loading' state.
- * 		@param {boolean} isError			true if the parent component is failed to reload the list.
- * 		@param {callback} onItemSelect		The function calls when the user clicks on a single item in the list (optional)
+ * 	--------------------------------------------------------------------------------------------------------------------
+ * 	@param {EntityPage|null} 	items 			The item list, as it passed by the parent component.
+ * 												Must be an instance of EntityPage
+ * 	@param {boolean} 			isLoading		true if the parent component is in 'loading' state.
+ * 	@param {boolean} 			isError			true if the parent component is failed to reload the list.
+ * 	@param {callback} 			onItemSelect	The function calls when the user clicks on a single item in the list
+ * 												(optional)
  * 
  * 	State:
- * 		@param {Array of Entity} itemArray 	full list of all items containing in all downloaded entity pages.
- * 										Items from pages that are not downloaded yet were not shown.
+ * 	--------------------------------------------------------------------------------------------------------------------
+ * 	@param {Array of Entity} 	itemArray 		full list of all items containing in all downloaded entity pages.
+ * 												Items from pages that are not downloaded yet were not shown.
  * 	You should not read or modify any states beginning with underscores (_isLoading, _error, etc.) due to 
  * 	high risk of state damaging. Use getters or setters instead
  */
@@ -59,7 +62,9 @@ export default class PaginatedList extends ItemList{
 		return this.props.isError || this.state._error !== null;
 	}
 
-	/** @return {Error|null} If fetching the next page fails, this field equals to the Javascript error class of this failure */
+	/** @return {Error|null} If fetching the next page fails,
+	 * 	this field equals to the Javascript error class of this failure
+	 */
 	get error(){
 		return this.state._error;
 	}

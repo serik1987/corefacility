@@ -19,6 +19,7 @@ import style from './style.module.css';
  * 	@param {boolean}		inactive		if true, the user can't click on a given menu item
  * 	@param {boolean}		disabled 		if true, the item looks as disabled and the user can't click on it
  * 	@param {string}			tooltip			tooltip to show when the user moves mouse to this tooltip
+ * 	@param {string} 		cssSuffix 		Additional CSS classes to apply to the item
  * 
  * 	Component state:
  * 	--------------------------------------------------------------------------------------------------------------------
@@ -35,7 +36,7 @@ export default class SidebarItem extends Button{
 	 * 	work of href prop.
 	 */
 	renderContent(){
-		let cssMain = style.main;
+		let cssMain = `${style.main} sidebar-item`;
 		if (this.props.current){
 			cssMain += ` ${style.current}`;
 		}
@@ -44,6 +45,9 @@ export default class SidebarItem extends Button{
 		}
 		if (this.props.disabled){
 			cssMain += ` ${style.disabled}`;
+		}
+		if (this.props.cssSuffix){
+			cssMain += ` ${this.props.cssSuffix}`;
 		}
 
 		return (

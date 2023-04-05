@@ -1,4 +1,11 @@
-import FrameEditor from './FrameEditor';
+import {translate as t} from 'corefacility-base/utils';
+import Sidebar from 'corefacility-base/shared-view/components/Sidebar';
+import SidebarItem from 'corefacility-base/shared-view/components/SidebarItem';
+import {ReactComponent as AddIcon} from 'corefacility-base/shared-view/icons/add_simple.svg';
+
+import FrameEditor from '../FrameEditor';
+
+import style from './style.module.css';
 
 
 /**
@@ -12,11 +19,14 @@ import FrameEditor from './FrameEditor';
  * 	Also there are the following props responsible for the list CRUD operations
  * 	--------------------------------------------------------------------------------------------------------------------
  * 	@param 	{callback}	onItemAddOpen			This is an asynchronous method that opens
- * 												add user box (either page or modal box)
+ * 												add entity box (either page or modal box)
  * 												The promise always fulfills when the user closes
  * 												the box. The promise can never be rejected.
  * 												Promise must be fulfilled by the entity that has already
  * 												been created or by false if the entity create was failed
+ *  @param {callback} onItemChangeOpen          An asynchronous method that opens each time the user opens the modify
+ *                                              entity box (either page or modal box). The promise always fulfills when
+ *                                              the user close the box. The promise can be never rejected.
  * 
  *	State:
  * 	--------------------------------------------------------------------------------------------------------------------
@@ -30,8 +40,6 @@ import FrameEditor from './FrameEditor';
  * 
  * 	Also, one of the descendant of the ListEditor must be an instance of the ItemList with the following
  * 	props defined:
- * 	@param {callback} onItemAddOpen 			This method must be triggered the the user adds an entity to
- * 												the entity list by means of the entity list facility
  * 	@param {callback} onItemSelect				This method must be triggered when the user changes the entity
  * 												and wants editor to send the changes to the Web server.
  * 	@param {callback} onItemRemove 				This method must be triggered when the user removes the entity
@@ -40,7 +48,36 @@ import FrameEditor from './FrameEditor';
 export default class SidebarEditor extends FrameEditor{
 
 	render(){
-		return <p>Rendering the SidebarEditor component...</p>;
+		return (
+			<Sidebar
+				items={
+					<div className={style.main}>
+                        <SidebarItem
+                            onClick={this.handleAddButton}
+                            icon={<AddIcon/>}
+                            text={t("Add new data")}
+                            inactive={this.isLoading}
+                        />
+						{this.renderItemList()}
+					</div>
+				}
+			>
+				<p>Rendering the sidebar content...</p>
+			</Sidebar>
+		);
 	}
+
+    async handleSelectItem(event){
+        let entity = event.detail || event.value;
+        if (!this.props.onItemChangeOpen){
+            throw new Error("the onItemChangedOpen prop is required.");
+        }
+        let updatedEntity = await this.props.onItemChangeOpen(entity);
+        if (!updatedEntity){
+            return;
+        }
+        event.detail = updatedEntity;
+        await super.handleSelectItem(event);
+    }
 
 }

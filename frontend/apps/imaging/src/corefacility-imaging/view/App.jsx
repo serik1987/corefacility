@@ -9,6 +9,8 @@ import Hyperlink from 'corefacility-base/shared-view/components/Hyperlink';
 import Project from 'corefacility-imaging/model/entity/Project';
 
 import DataEditor from './DataEditor';
+import DataCreateBox from './DataCreateBox';
+import DataChangeBox from './DataChangeBox';
 
 /** The root component in the imaging application
  *  
@@ -36,6 +38,10 @@ export default class App extends BaseApp{
 
     constructor(props){
         super(props);
+        this.createFunctionalMap = this.createFunctionalMap.bind(this);
+        this.changeFunctionalMap = this.changeFunctionalMap.bind(this);
+        this.registerModal('add-data', DataCreateBox, {});
+        this.registerModal('edit-data', DataChangeBox, {});
 
         this.state = {
             ...this.state,
@@ -79,7 +85,13 @@ export default class App extends BaseApp{
         if (this.state.user !== null && this.state.project !== null){
             return (
                 <Routes>
-                    <Route path="/data/" element={<DataEditor reloadTime={this.state.reloadTime}/>}/>
+                    <Route path="/data/" element={
+                        <DataEditor
+                            reloadTime={this.state.reloadTime}
+                            onItemAddOpen={this.createFunctionalMap}
+                            onItemChangeOpen={this.changeFunctionalMap}
+                        />
+                    }/>
                     <Route path="/" element={<Navigate to="/data/"/>}/>
                     <Route path="*" element={
                         <NotificationMessage>
@@ -97,6 +109,26 @@ export default class App extends BaseApp{
                 </NotificationMessage>
             );
         }
+    }
+
+    /**
+     *  Triggers when the user tries to add new functional map.
+     *  @param {SyntheticEvent} the event that triggered this action
+     *  @return {FunctionalMap|boolean} created functional map or false in case of failure.
+     */
+    async createFunctionalMap(event){
+        return await this.openModal('add-data', {});
+    }
+
+    /**
+     *  Triggers when the user tries to remove functional map.
+     *  @param {FunctionalMap}  functionalMap       the functional map before change
+     *  @return {FunctionalMap}                     the functional map after change
+     */
+    async changeFunctionalMap(functionalMap){
+        return await this.openModal('edit-data', {
+            lookup: [window.application.project.id, functionalMap.id]
+        });
     }
 
 }

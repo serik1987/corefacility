@@ -56,7 +56,7 @@ export class FileManager extends FieldManager{
 	/** A short string representation of the file
 	 */
 	toString(){
-		return this.value.toString();
+		return this.value && this.value.toString();
 	}
 
 }

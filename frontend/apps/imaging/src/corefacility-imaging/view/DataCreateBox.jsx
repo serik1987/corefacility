@@ -1,12 +1,14 @@
-import {NotImplementedError, ValidationError} from 'corefacility-base/exceptions/model';
+import CreateForm from 'corefacility-base/view/CreateForm';
 
-import Form from './Form';
+import FunctionalMap from 'corefacility-imaging/model/entity/FunctionalMap';
+
+import MapFormFields from './MapFormFields';
 
 
-/** The superclass for all forms that create the entity
- * 	and posts entity data in the external source
+/**
+ * 	Allows the user to create new functional map object on the server.
  * 
- * 	Such data have the following flow:
+ * 	Functional map data have the following flow:
  * 
  * 	inputData => defaultValues => rawValues => formValues => formObject => modifyFormObject
  * 
@@ -65,49 +67,58 @@ import Form from './Form';
  * 			(e.g., fetches or posts the data) its interaction with the rest of
  * 			the world is also impossible
  */
-export default class CreateForm extends Form{
+export default class DataCreateBox extends CreateForm{
 
-    /**
+	/** The entity class. The formObject will be exactly an instance of this class.
+	 * 	The formObject is implied to be an instance of Entity
+	 */
+	get entityClass(){
+		return FunctionalMap;
+	}
+
+	/**
      *  Creates new entity with the state 'creating'
      *  @return {Entity} entity to create
      */
     createEntity(){
-        return new this.entityClass();
+        return new FunctionalMap({}, window.application.project)
     }
 
-	/** Tells the form what to do if the user presses the 'Submit' buton. It could be
-	 * 		posting new entity on the server, requesting for data processing - whenever
-	 * 		you want!
-	 * 
-	 * 	If the function throws an error, this error become a form's global error.
+	/** Return default values. The function is required if you want the resetForm to work correctly
+	 * 	Each field must be mentioned!
 	 * 	@abstract
-	 *  @async
-	 * 	@return {undefined} all the result is changes in this._formObject
+	 * 	@async
+	 * 		@param {object} inputData some input data passed to the form (They could be undefined)
+	 * 		@return {object} the defaultValues
 	 */
-	async modifyFormObject(){
-		if (this._formObject === null){
-			this._formObject = this.createEntity();
-			/* Providing deferred client-side validation */
-			let fieldErrors = {}
-			for (let name in this._formValues){
-				try{
-					this._formObject[name] = this._formValues[name];
-				} catch (error){
-					fieldErrors[name] = error.message;
-				}
-			}
-			/* If client-side validation fails, we need to brake the promise chain */
-			if (Object.keys(fieldErrors).length > 0){
-				this.setState({
-					errors: fieldErrors,
-				});
-				throw new ValidationError();
-			}
+	async getDefaultValues(inputData){
+		return {
+			'alias': null,
+			'type': 'ori',
+			'width': 12400,
+			'height': 12400,
 		}
-		/* Sending data to the server where (a) server-side validation will be provided;
-		 *  (b) the entity will be saved to the database or another external source
-		 */
-		await this._formObject.create();
+	}
+
+	/** Renders the component
+	 * 	@abstract
+	 */
+	render(){
+		return (
+			<MapFormFields
+				dialogBoxOptions={this.getDialogProps()}
+				messageBar={this.renderSystemMessage()}
+				aliasFieldOptions={this.getFieldProps('alias')}
+				typeFieldOptions={this.getFieldProps('type')}
+				widthFieldOptions={this.getFieldProps('width')}
+				heightFieldOptions={this.getFieldProps('height')}
+				submitProps={this.getSubmitProps()}
+				cancelProps={{
+					onClick: event => this.dialog.closeDialog(false),
+					inactive: this.state.inactive,
+				}}
+			/>
+		);
 	}
 
 }

@@ -1,0 +1,10 @@
+.data_block{
+	margin-bottom: 20px;
+	display: grid;
+	grid-template-columns: auto 300px;
+	gap: 10px;
+}
+
+.controls_block{
+	text-align: center;
+}

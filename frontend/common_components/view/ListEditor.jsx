@@ -79,14 +79,14 @@ export default class ListEditor extends ListLoader{
 		let entity = event.detail || event.value;
 		if (entity.state === EntityState.changed){
 			try{
-				this.setState({_isLoading: true, _error: null});
+				this.reportListFetching();
 				await entity.update();
+				this.reportFetchSuccess(undefined);
 			} catch (error){
-				this.setState({_error: error.message});
-			} finally{
-				this.setState({_isLoading: false});
+				this.reportFetchFailure(error);
 			}
 		}
+		this.itemListComponent.changeItem(entity);
 	}
 
 	/**
@@ -97,20 +97,20 @@ export default class ListEditor extends ListLoader{
 	async handleItemRemove(event){
 		try{
 			let entity = event.detail || event.value;
-			this.setState({_isLoading: true, _error: null});
+			this.reportListFetching();
 			let result = await window.application.openModal('question', {
 				'caption': t("Delete confirmation"),
 				'prompt': t("Do you really want to delete this resource?"),
 			});
 			if (!result){
+				this.reportFetchSuccess(undefined);
 				return;
 			}
 			await entity.delete();
 			this.itemListComponent.removeItem(entity);
+			this.reportFetchSuccess(undefined);
 		} catch (error){
-			this.setState({_error: error.message});
-		} finally {
-			this.setState({_isLoading: false});
+			this.reportFetchFailure(error);
 		}
 	}
 

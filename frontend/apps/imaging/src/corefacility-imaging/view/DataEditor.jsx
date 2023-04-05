@@ -1,5 +1,7 @@
 import SidebarEditor from 'corefacility-base/view/SidebarEditor';
 
+import DataList from './DataList';
+
 
 /**
  * 	Represents list of functional maps together with facilities for uploading and downloading a single map.
@@ -37,6 +39,13 @@ import SidebarEditor from 'corefacility-base/view/SidebarEditor';
  * 												and wants editor to send the changes to the Web Server.
  */
 export default class DataEditor extends SidebarEditor{
+
+	/** Returns the component where list of entities will be printed.
+	 *  This is assumed that the component has 'items' prop
+	 */
+	get entityListComponent(){
+		return DataList;
+	}
 
 	/**
 	 * Downloads the entity list from the Web server

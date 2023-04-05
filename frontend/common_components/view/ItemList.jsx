@@ -99,6 +99,19 @@ export default class ItemList extends React.Component{
 	}
 
 	/**
+	 * 	Changes the entity
+	 * 	@param {Entity} entity the entity to be changed (a copy of current entity)
+	 */
+	changeItem(entity){
+		let itemArray = this.state.itemArray;
+		let entityIndex = itemArray.findIndex(localEntity => localEntity.id === entity.id);
+		itemArray[entityIndex] = entity;
+		this.setState({
+			itemArray: [...itemArray],
+		})
+	}
+
+	/**
 	 * Removes the entity from the list
 	 * @param {Entity} entity the entity to be removed
 	 */

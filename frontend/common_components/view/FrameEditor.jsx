@@ -86,7 +86,6 @@ export default class FrameEditor extends ListEditor{
 		if (window !== window.parent){
 			window.postMessage({
 				method: 'fetchSuccess',
-				info: itemList.totalCount ?? itemList.length ?? undefined,
 			});
 		}
 	}

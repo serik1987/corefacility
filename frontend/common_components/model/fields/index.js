@@ -159,20 +159,8 @@ export class BooleanField extends EntityField{
 	}
 }
 
-
-/** Fields that accepts any numbers */
+/** Base class for IntegerField and FloatField */
 export class NumberField extends EntityField{
-
-	constructor(){
-		super('number');
-	}
-	
-}
-
-/** Field that accepts integer numbers only */
-export class IntegerField extends EntityField{
-
-	mask = /^[+-]?\d+$/;
 
 	constructor(){
 		super('number');
@@ -207,7 +195,7 @@ export class IntegerField extends EntityField{
 		if (value === null || (typeof value === 'string' && !value.match(this.mask))){
 			throw new ValidationError(t("The value must be an integer value"));
 		}
-		let internalValue = parseInt(value);
+		let internalValue = this.proofreadFunction(value);
 		if (internalValue < this._minValue){
 			throw new ValidationError(t("The entered value can't be less than ") + this._minValue);
 		}
@@ -216,6 +204,20 @@ export class IntegerField extends EntityField{
 		}
 		return internalValue;
 	}
+
+}
+
+export class IntegerField extends NumberField{
+
+	mask = /^[+-]?\d+$/;
+	proofreadFunction = parseInt;
+
+}
+
+export class FloatField extends NumberField{
+
+	mask = /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/;
+	proofreadFunction = parseFloat;
 
 }
 

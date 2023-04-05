@@ -77,7 +77,7 @@ export default class Validator{
 export class SlugValidator extends Validator{
 
 	constructor(parent){
-		super(parent, /^[-a-zA-Z0-9_]+$/, "This field allows letters, digits, underscores and hyphens");
+		super(parent, /^[-a-zA-Z0-9_\-]+$/, "This field allows letters, digits, underscores and hyphens");
 	}
 
 }

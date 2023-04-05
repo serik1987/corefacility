@@ -221,7 +221,18 @@ export default class App extends DialogWrapper{
 				method: 'applicationMount',
 				info: null,
 			}, window.location.origin);
+
+			this.__dropDownCloser = window.addEventListener('click', event => {
+				window.postMessage({
+					method: 'click',
+					info: null,
+				}, window.location.origin);
+			});
 		}
+	}
+
+	componentWillUnmount(){
+		window.removeEventListener(this.__dropDownCloser);
 	}
 
 }

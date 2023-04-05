@@ -1,5 +1,16 @@
 {
   "Please wait while user and project info will be transmitted to the child frame.": "Пожалуйста, подождите, пока информация о пользователе и проекте не загрузится в дочернем фрейме.",
   "The requested page was not found.": "Запрашиваемая страница не найдена.",
-  "Switch to the Main Page.": "Перейти на главную страницу."
+  "Switch to the Main Page.": "Перейти на главную страницу.",
+  "Functional map properties": "Свойства функциональной карты",
+  "Add new data": "Добавить новые данные",
+  "Map alias": "Псевдоним карты",
+  "Map type": "Тип карты",
+  "Orientation map": "Ориентационная карта",
+  "Directional map": "Дирекциональная карта",
+  "Width, um": "Ширина, мкм",
+  "Height, um": "Высота, мкм",
+  "Edit": "Редактировать",
+
+  "A short name of the map that participates in URI. Must contain small and capital latin letters, digits, underscores or hypnens": "Короткое имя карты, которое участвует в формировании её URL. Должно содержать большие и маленькие латинские буквы, цифры, дефисы и знаки подчёркивания"
 }

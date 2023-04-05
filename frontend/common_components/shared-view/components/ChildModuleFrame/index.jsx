@@ -14,6 +14,7 @@ import style from './style.module.css';
  *  @param {callback}   onApplicationMount      triggers when the child component of the root application has already
  *                                              been mounted.
  *  @param {callback}   onFetchList             Triggers when the user fetches the list using the ListEditor
+ *  @param {callback}   onFetchSuccess          Triggers when the fetch is successful.
  *  @param {callback}   onFetchFailure          Triggers when the user failed to fetch the list using the ListEditor
  * 
  *  State:
@@ -77,6 +78,9 @@ export default class ChildModuleFrame extends React.Component{
             this.__iframeListener = iframe.contentWindow.addEventListener("message", event => {
                 if (event.origin !== window.location.origin){
                     return;
+                }
+                if (event.data.method === 'click'){
+                    window.document.body.click();
                 }
                 let newEvent = {
                     type: event.data.method,

@@ -15,7 +15,7 @@
 }
 
 .collapsed .sidebar{
-	flex: 0 21px;
+	flex: 0 48px;
 }
 
 .collapsed .sidebar > *{

@@ -115,9 +115,16 @@ export default class Entity{
 	 *  @return {Entity} the entity to be returned
 	 */
 	static async get(lookup){
-		let searchProvider = this._entityProviders[this.SEARCH_PROVIDER_INDEX];
-		let entity = await searchProvider.loadEntity(lookup);
+		let parentIdList = [];
+		this.searchEntityProvider.searchParams = {};
+		if (lookup instanceof Array){
+			parentIdList = lookup;
+			lookup = parentIdList.pop();
+			this.searchEntityProvider.searchParams = {_parentIdList: parentIdList};
+		}
+		let entity = await this.searchEntityProvider.loadEntity(lookup);
 		entity._state = "loaded";
+		entity._parentIdList = parentIdList;
 		return entity;
 	}
 

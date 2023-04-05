@@ -20,7 +20,7 @@ import styles from './style.module.css';
  * 			as the third argument.
  * 		@param {boolean} inactive The inactive dialog can't be closed by the user.
  * 		@param {string} title The title to be displayed above the dialog box.
- * 		@param {cssSuffix} the CSS suffix for the
+ * 		@param {cssSuffix} the CSS suffix for the dialog box
  * 
  * 	State:
  * 		The most of state variables are not allowed to change even though you inherit from the

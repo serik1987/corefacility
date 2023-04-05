@@ -1,0 +1,15 @@
+.item{
+	display: flex;
+	padding-left: 50px;
+	height: 32px;
+}
+
+.item > *{
+	margin: 0;
+	height: 32px;
+	line-height: 32px;
+}
+
+.item :global .icon{
+	width: 32px;
+}
