@@ -1,3 +1,7 @@
+.sidebar :global .sidebar{
+	padding-top: 6px;
+}
+
 .main{
 	display: flex;
 	flex-direction: column;

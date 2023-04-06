@@ -75,12 +75,18 @@ export default class ChildModuleFrame extends React.Component{
      */
     handleFrameRendered(iframe){
         if (iframe){
+            this._basePath = window.location.pathname;
             this.__iframeListener = iframe.contentWindow.addEventListener("message", event => {
                 if (event.origin !== window.location.origin){
                     return;
                 }
                 if (event.data.method === 'click'){
                     window.document.body.click();
+                }
+                if (event.data.method === 'pathChanged'){
+                    let pathname = (this._basePath + event.data.info).replace('//', '/');
+                    window.history.replaceState(null, null, pathname);
+                    window.application.notifyStateChanged();
                 }
                 let newEvent = {
                     type: event.data.method,

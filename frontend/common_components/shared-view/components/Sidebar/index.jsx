@@ -18,6 +18,7 @@ import style from './style.module.css';
  * 	Component props:
  * 	--------------------------------------------------------------------------------------------------------------------
  * 	@param {Array of SidebarItem} items 			All items to display.
+ * 	@param {string} 			  cssSuffix 		Additional CSS classes to attach.
  * 
  * 	Component state:
  * 	--------------------------------------------------------------------------------------------------------------------
@@ -44,20 +45,23 @@ export default class Sidebar extends React.Component{
 			widgetStyle += style.collapsed;
 			sidebarTooltip = t("Expand the sidebar");
 		}
+		if (this.props.cssSuffix){
+			widgetStyle += ` ${this.props.cssSuffix}`;
+		}
 
 		return (
 			<div className={widgetStyle}>
-				<div className={style.sidebar}>
+				<div className={`${style.sidebar} sidebar`}>
 					{this.props.items}
 				</div>
-				<div className={style.separator}>
+				<div className={`${style.separator} separator`}>
 					<Icon
 						onClick={this.handleSidebarChange}
 						tooltip={sidebarTooltip}
 						src={<SeparatorIcon/>}
 					/>
 				</div>
-				<div className={style.content}>
+				<div className={`${style.content} content`}>
 					{this.props.children}
 				</div>
 			</div>

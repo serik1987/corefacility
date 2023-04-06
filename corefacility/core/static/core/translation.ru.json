@@ -319,5 +319,9 @@
 
 	"Project application": "Приложение проекта",
 	"The requested application is absent in the application list.": "Требуемое приложение отсутствует в списке приложений.",
-	"Choose another application from the left list.": "Выберите другое приложение из списка слева."
+	"Choose another application from the left list.": "Выберите другое приложение из списка слева.",
+
+	"Add new data": "Добавить новые данные",
+	"Please, select the data from the left pane.": "Пожалуйста, выберите данные в левой панели",
+	"Edit": "Редактировать"
 }

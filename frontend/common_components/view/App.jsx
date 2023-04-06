@@ -135,6 +135,17 @@ export default class App extends DialogWrapper{
 		this.setState({reloadTime: new Date().valueOf()});
 	}
 
+	notifyStateChanged(){
+		console.log(this.constructor.getApplicationName());
+		console.log(window.location.pathname);
+		if (window.parent !== window){
+			window.postMessage({
+				method: 'pathChanged',
+				info: window.location.pathname
+			});
+		}
+	}
+
 
 	/** Renders all routes.
 	 * 	@abstract

@@ -1,15 +1,15 @@
-.item{
+.item :global .sidebar-item .sidebar-item-text{
 	display: flex;
-	padding-left: 50px;
 	height: 32px;
 }
 
-.item > *{
+.item :global .sidebar-item p,
+.item :global .sidebar-item .icon{
 	margin: 0;
 	height: 32px;
 	line-height: 32px;
 }
 
-.item :global .icon{
+.item :global .sidebar-item .icon{
 	width: 32px;
 }

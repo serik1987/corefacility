@@ -2,6 +2,7 @@ import {translate as t} from 'corefacility-base/utils';
 
 import PaginatedList from 'corefacility-base/view/PaginatedList';
 import Icon from 'corefacility-base/shared-view/components/Icon';
+import SidebarItem from 'corefacility-base/shared-view/components/SidebarItem';
 import {ReactComponent as EditIcon} from 'corefacility-base/shared-view/icons/edit.svg';
 import {ReactComponent as RemoveIcon} from 'corefacility-base/shared-view/icons/close.svg';
 
@@ -15,9 +16,11 @@ import style from './style.module.css';
  * 	--------------------------------------------------------------------------------------------------------------------
  * 	@param {EntityPage|null} 	items 			The item list, as it passed by the parent component.
  * 												Must be an instance of EntityPage
+ *  @param {Number}             itemId          ID of the selected item.
  * 	@param {boolean} 			isLoading		true if the parent component is in 'loading' state.
  * 	@param {boolean} 			isError			true if the parent component is failed to reload the list.
- * 	@param {callback} 			onItemSelect	The function calls when the user clicks on a single item in the list
+ *  @param {callback}           onItemOpen      Triggers when the user clicks on the item to open it on the right pane.
+ * 	@param {callback} 			onItemSelect	Triggers when the user clicks on the 'Edit' button
  *  @param {callback}           onItemRemove    Triggers when the user tries to remove the item
  * 
  * 	State:
@@ -41,33 +44,62 @@ export default class DataList extends PaginatedList{
     renderItemContent(functionalMap){
         return (
             <li key={functionalMap.id} className={style.item}>
-                <p>{functionalMap.alias}</p>
-                <Icon
-                    onClick={event => this.handleEdit(event, functionalMap)}
-                    inactive={this.props.isLoading}
-                    tooltip={t("Edit")}
-                    src={<EditIcon/>}
-                />
-                <Icon
-                    onClick={event => this.handleRemove(event, functionalMap)}
-                    inactive={this.props.isLoading}
-                    tooltip={t("Remove")}
-                    src={<RemoveIcon/>}
+                <SidebarItem
+                    current={functionalMap.id === this.props.itemId}
+                    onClick={event => this.handleSelect(event, functionalMap)}
+                    text={[
+                        <p>{functionalMap.alias}</p>,
+                        <Icon
+                            onClick={event => this.handleEdit(event, functionalMap)}
+                            inactive={this.props.isLoading}
+                            tooltip={t("Edit")}
+                            src={<EditIcon/>}
+                        />,
+                        <Icon
+                            onClick={event => this.handleRemove(event, functionalMap)}
+                            inactive={this.props.isLoading}
+                            tooltip={t("Remove")}
+                            src={<RemoveIcon/>}
+                        />,
+                    ]}
                 />
             </li>
         );
     }
 
     /**
+     *  Triggers when the user clicks on the functional map
+     *  @param {SyntheticEvent}     event           The event to trigger
+     *  @param {FunctionalMap}      functionalMap   a functional map to change
+     */
+    handleSelect(event, functionalMap){
+        if (this.props.onItemOpen){
+            event.detail = functionalMap;
+            this.props.onItemOpen(event);
+        }
+    }
+
+    /**
      *  Triggers when the user tries to edit the functional map.
      *  @param {SyntheticEvent} event               the event to trigger
-     *  @param {FunctionalMap}  functionalMap       a functional map the user deals with.
+     *  @param {FunctionalMap}  functionalMap       a functional map to change
      */
     handleEdit(event, functionalMap){
+        event.stopPropagation();
         if (this.props.onItemSelect){
             event.detail = functionalMap;
             this.props.onItemSelect(event);
         }
+    }
+
+    /**
+     *  Triggers when the user tries to remove the functional map.
+     *  @param {SyntheticEvent} event               the event to trigger
+     *  @param {FunctionalMap} functionalMap        a functional map to remove
+     */
+    handleRemove(event, functionalMap){
+        event.stopPropagation();
+        super.handleRemove(event, functionalMap);
     }
 
 }

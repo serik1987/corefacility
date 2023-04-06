@@ -1,6 +1,8 @@
 import SidebarEditor from 'corefacility-base/view/SidebarEditor';
+import FunctionalMap from 'corefacility-imaging/model/entity/FunctionalMap';
 
-import DataList from './DataList';
+import DataList from '../DataList';
+import style from './style.module.css';
 
 
 /**
@@ -12,33 +14,54 @@ import DataList from './DataList';
  * 		deriveFilterIdentityFromProps abstract methods.
  * 	Also there are the following props responsible for the list CRUD operations
  * 	--------------------------------------------------------------------------------------------------------------------
+ * 	@param 	{Number} 	lookup 					ID of the map to open on the right side. undefined will not open any map
+ * 												on the right side
  * 	@param 	{callback}	onItemAddOpen			This is an asynchronous method that opens
- * 												add user box (either page or modal box)
+ * 												add entity box (either page or modal box)
  * 												The promise always fulfills when the user closes
  * 												the box. The promise can never be rejected.
  * 												Promise must be fulfilled by the entity that has already
  * 												been created or by false if the entity create was failed
+ *  @param {callback} onItemChangeOpen          An asynchronous method that opens each time the user opens the modify
+ *                                              entity box (either page or modal box). The promise always fulfills when
+ *                                              the user close the box. The promise can be never rejected.
  * 
  *	State:
  * 	--------------------------------------------------------------------------------------------------------------------
- * 		The component state represents items found and the loading progress for
- * 		the item list.
- * 		The state parameters are interconnected to each other and some states
- * 		are not valid (e.g., the state {loading=true, error=true} is not valid).
- * 		For this reason, please, don't use or set the state directly because
- * 		this may result to damages. Use reportListFetching, reportListSuccess and
- * 		reportListFailure instead of them.
+ *  You can manage loading state through reportListFetch(), reportFetchSuccess(itemList), reportFetchFailure(error)
+ *  @param {Number} itemId                      ID of the item to open.
+ *  @param {Entity} item                        The item currently selected by the user.
  * 
  * 	Also, one of the descendant of the ListEditor must be an instance of the ItemList with the following
  * 	props defined:
- * 	@param {callback} onItemAddOpen 			This method must be triggered the the user adds an entity to
- * 												the entity list by means of the entity list facility
- * 	@param {callback} onItemSelect				This method must be triggered when the user changes the entity
- * 												and wants editor to send the changes to the Web server.
+ *  @param {Number}   itemId                    ID of the opened item.
+ *  @param {callback} onItemOpen                This method must be triggered when the user tries to open the item on
+ *                                              the right pane.
+ * 	@param {callback} onItemSelect				This method must be triggered when the user tries to change the item.
  * 	@param {callback} onItemRemove 				This method must be triggered when the user removes the entity
  * 												and wants editor to send the changes to the Web Server.
  */
 export default class DataEditor extends SidebarEditor{
+
+	/** Returns class of the entity which list must be downloaded from the external server
+	 *  using this component
+	 */
+	get entityClass(){
+		return FunctionalMap;
+	}
+
+	/**
+     *  Returns item lookup that shall be inserted to the Entity.get method
+     *  @param {Number}     id          ID of the item
+     *  @return {Array}                 Array if IDs that include ID of the item, ID of parent iten etc,,,,
+     *                                  (see Entity,get() for details)
+     */
+    getLookup(id){
+        return {
+        	parent: window.application.project,
+        	id: id,
+        }
+    }
 
 	/** Returns the component where list of entities will be printed.
 	 *  This is assumed that the component has 'items' prop
@@ -50,7 +73,7 @@ export default class DataEditor extends SidebarEditor{
 	/**
 	 * Downloads the entity list from the Web server
 	 * @param {oject} filter 		Filter options to be applied
-	 * 								(These options will be inserted to the )
+	 * 								(These options will be inserted to the request)
 	 */
 	async _fetchList(filter){
 		return await window.application.project.getMaps(filter);
@@ -78,4 +101,21 @@ export default class DataEditor extends SidebarEditor{
 	deriveFilterIdentityFromPropsAndState(props, state){
 		return '';
 	}
+
+	/**
+     *  Renders the right pane of the sidebar.
+     */
+    renderRightPane(){
+    	console.log(this.state.item && this.state.item.toString());
+        return (
+        	<div className={style.main}>
+        		<div className={style.uploader_row}>
+        			<div className={style.uploader}>Rendering the uploader...</div>
+        			<div className={style.mat_downloader}>MAT</div>
+        			<div className={style.npy_downloader}>NPY</div>
+        		</div>
+        		<div className={style.map_viewer}>Rendering the map viewer...</div>
+        	</div>	
+        );
+    }
 }

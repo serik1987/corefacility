@@ -111,20 +111,35 @@ export default class Entity{
 	/** This is a static method that downloads entity with a given ID or alias
 	 *  @async
 	 *  @static
-	 *  @param {int|string} lookup the entity ID or alias
+	 *  @param {int|string|Array|object} lookup to find the entity
+	 * 		int will find the entity by ID
+	 * 		string will find the entity by alias
+	 * 		Array will find the entity by parent ID and parent alias (parent entity will
+	 * 			not be found)
+	 * 		object that contains parent and id field will find an entity that is child
+	 * 			to the entity
 	 *  @return {Entity} the entity to be returned
 	 */
 	static async get(lookup){
 		let parentIdList = [];
+		let parent = null;
 		this.searchEntityProvider.searchParams = {};
 		if (lookup instanceof Array){
 			parentIdList = lookup;
 			lookup = parentIdList.pop();
 			this.searchEntityProvider.searchParams = {_parentIdList: parentIdList};
+		} else if (typeof lookup === 'object'){
+			parent = lookup.parent;
+			parentIdList = [...parent._parentIdList, parent.id];
+			this.searchEntityProvider.searchParams = {_parentIdList: parentIdList};
+			lookup = lookup.id;
 		}
 		let entity = await this.searchEntityProvider.loadEntity(lookup);
 		entity._state = "loaded";
 		entity._parentIdList = parentIdList;
+		if (parent){
+			entity._entityFields.__parent = parent;
+		}
 		return entity;
 	}
 

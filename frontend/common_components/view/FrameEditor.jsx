@@ -105,6 +105,11 @@ export default class FrameEditor extends ListEditor{
 		}
 	}
 
+	componentDidMount(){
+		super.componentDidMount();
+		window.application.notifyStateChanged();
+	}
+
 	componentDidUpdate(prevProps, prevState){
 		super.componentDidUpdate(prevProps, prevState);
 		if (prevProps.reloadTime !== this.props.reloadTime){

@@ -53,7 +53,7 @@ export default class SidebarItem extends Button{
 		return (
 			<div className={cssMain} onClick={this.handleClick} title={this.props.tooltip}>
 				<div className={style.icon_wrapper}>{this.props.icon}</div>
-				<div className={style.text}>{this.props.text}</div>
+				<div className={`${style.text} sidebar-item-text`}>{this.props.text}</div>
 			</div>
 		);
 	}

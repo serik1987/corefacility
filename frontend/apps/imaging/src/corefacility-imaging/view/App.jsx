@@ -8,6 +8,7 @@ import Hyperlink from 'corefacility-base/shared-view/components/Hyperlink';
 
 import Project from 'corefacility-imaging/model/entity/Project';
 
+import DataSelector from './DataSelector';
 import DataEditor from './DataEditor';
 import DataCreateBox from './DataCreateBox';
 import DataChangeBox from './DataChangeBox';
@@ -85,6 +86,15 @@ export default class App extends BaseApp{
         if (this.state.user !== null && this.state.project !== null){
             return (
                 <Routes>
+                    <Route path="/data/:lookup/" element={
+                        <DataSelector>
+                            <DataEditor
+                                reloadTime={this.state.reloadTime}
+                                onItemAddOpen={this.createFunctionalMap}
+                                onItemChangeOpen={this.changeFunctionalMap}
+                            />
+                        </DataSelector>
+                    }/>
                     <Route path="/data/" element={
                         <DataEditor
                             reloadTime={this.state.reloadTime}

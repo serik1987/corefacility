@@ -17,6 +17,10 @@
 	border-right: 1px solid rgb(218, 220, 224);
 }
 
+.navigation_item_wrapper:not(:first-child){
+	border-left: 0;
+}
+
 .navigation_item_wrapper > :first-child{
 	display: inline-block;
 	vertical-align: top;
