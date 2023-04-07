@@ -1,4 +1,6 @@
+import {translate as t} from 'corefacility-base/utils';
 import SidebarEditor from 'corefacility-base/view/SidebarEditor';
+import DataUploader from 'corefacility-base/shared-view/components/DataUploader';
 import FunctionalMap from 'corefacility-imaging/model/entity/FunctionalMap';
 
 import DataList from '../DataList';
@@ -31,6 +33,7 @@ import style from './style.module.css';
  *  You can manage loading state through reportListFetch(), reportFetchSuccess(itemList), reportFetchFailure(error)
  *  @param {Number} itemId                      ID of the item to open.
  *  @param {Entity} item                        The item currently selected by the user.
+ * 	@param {string} uploadError 				An error occured during the file upload.
  * 
  * 	Also, one of the descendant of the ListEditor must be an instance of the ItemList with the following
  * 	props defined:
@@ -42,6 +45,16 @@ import style from './style.module.css';
  * 												and wants editor to send the changes to the Web Server.
  */
 export default class DataEditor extends SidebarEditor{
+
+	constructor(props){
+		super(props);
+		this.handleUploadError = this.handleUploadError.bind(this);
+
+		this.state = {
+			...this.state,
+			uploadError: null,
+		}
+	}
 
 	/** Returns class of the entity which list must be downloaded from the external server
 	 *  using this component
@@ -103,19 +116,85 @@ export default class DataEditor extends SidebarEditor{
 	}
 
 	/**
+	 *  Reloads the data
+	 * 	@async
+	 */
+	async reload(){
+		this.setState({uploadError: null});
+		await super.reload();
+	}
+
+	/**
      *  Renders the right pane of the sidebar.
      */
     renderRightPane(){
-    	console.log(this.state.item && this.state.item.toString());
         return (
         	<div className={style.main}>
         		<div className={style.uploader_row}>
-        			<div className={style.uploader}>Rendering the uploader...</div>
-        			<div className={style.mat_downloader}>MAT</div>
-        			<div className={style.npy_downloader}>NPY</div>
+        			<DataUploader
+        				fileManager={this.state.item && this.state.item.data}
+        				tooltip={t("The functional map must be saved in a special NPY file." +
+        					" Use this facility to upload this.")}
+        				inactive={this.isLoading}
+        				error={this.state.uploadError}
+        				onError={this.handleUploadError}
+        				cssSuffix={style.uploader}
+        				additionalIcons={[
+        					<div
+        						className={style.download_icon}
+        						onClick={event => this.handleItemDownload(event, 'npy')}>
+        						NPY
+        					</div>,
+        					<div
+        						className={style.download_icon}
+        						onClick={event => this.handleItemDownload(event, 'mat')}>
+        						MAT
+        					</div>,
+        				]}
+        			/>
         		</div>
         		<div className={style.map_viewer}>Rendering the map viewer...</div>
         	</div>	
         );
+    }
+
+    /**
+     * 	Triggers when the upload error fails
+     * 	@param {Error} error 		reason why the file upload failed.
+     */
+    handleUploadError(error){
+    	this.setState({uploadError: error});
+    }
+
+    /**
+     *  Triggers when the user tries to open the item for editing
+     *  @param {SyntheticEvent}     event           The event to trigger.
+     */
+    async handleItemOpen(event){
+    	this.setState({uploadError: null});
+    	await super.handleItemOpen(event);
+    }
+
+    /**
+     * 	Triggers when the user tries to download the file
+     * 	@param {SyntheticEvent}		event 			The event to trigger.
+     * 	@param {string} 			format 			File format: 'mat' or 'npy'
+     */
+    async handleItemDownload(event, format){
+    	try{
+    		this.reportListFetching();
+    		let result = await this.state.item.download(format);
+    		let resultUrl = URL.createObjectURL(result);
+    		let link = document.createElement('a');
+    		document.body.append(link);
+    		link.href = resultUrl;
+    		link.download = this.state.item.data.toString().replace(/\.npy$/, `.${format}`);
+    		link.click();
+    		link.remove();
+    		URL.revokeObjectURL(resultUrl);
+    		this.reportFetchSuccess(undefined);
+    	} catch (error){
+    		this.reportFetchFailure(error);
+    	}
     }
 }

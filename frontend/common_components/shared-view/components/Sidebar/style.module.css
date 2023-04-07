@@ -9,7 +9,7 @@
 }
 
 .expanded .sidebar{
-	flex: 0 275px;
+	flex: 0 0 275px;
 	box-sizing: border-box;
 	padding: 32px 16px 0;
 }
@@ -23,7 +23,7 @@
 }
 
 .separator{
-	flex: 0 23px;
+	flex: 0 0 23px;
 	position: relative;
 	border-left: 1px solid rgb(218, 220, 224);
 }
@@ -59,6 +59,7 @@
 
 .content{
 	flex: 1;
+	width: 100px;
 }
 
 .content :global .epic-fail{

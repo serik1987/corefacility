@@ -172,6 +172,44 @@ class HttpClient{
 			});
 	}
 
+	/**
+	 * 	Sends request to download some binary resource to the server
+	 * 	@async
+	 * 	@param {string|URL} the requested URL
+	 * 	@return {Blob} the binary resource itself.
+	 */
+	download(url){
+		this._requestNumber++;
+		document.dispatchEvent(new CustomEvent("request", {detail: this._requestNumber}));
+		let headers = new Headers();
+		if (window.application.isAuthorized){
+			headers.set('Authorization', `Token ${window.application.token}`);
+		}
+		let requestOptions = {
+			method: 'GET',
+			headers: headers,
+		}
+		let self = this;
+		return (function poolingFunction(poolNumber = 0){
+			return fetch(url, requestOptions)
+				.catch(e => {
+					throw new NetworkError(e);
+				})
+				.then(response => {
+					if (!response.ok){
+						return self.processErrorResponse(response, poolingFunction, poolNumber)
+					}
+					else {
+						return response.blob();
+					}
+				})
+		})()
+			.finally(() => {
+				--self._requestNumber;
+				document.dispatchEvent(new CustomEvent("response", {detail: self._requestNumber}));
+			});
+	}
+
 	/** Uploads single file to the server
 	 * 	@async
 	 *  @param {string|URL} the requested URL

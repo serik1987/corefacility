@@ -3,6 +3,7 @@ import HttpRequestProvider from 'corefacility-base/model/providers/HttpRequestPr
 import {StringField, IntegerField, FloatField} from 'corefacility-base/model/fields';
 import FileField from 'corefacility-base/model/fields/FileField';
 import {SlugValidator} from 'corefacility-base/model/validators';
+import client from 'corefacility-base/model/HttpClient';
 
 
 /**
@@ -45,7 +46,7 @@ export default class FunctionalMap extends ChildEntity{
 				.setRequired()
 				.addValidator(SlugValidator)
 					.parent,
-			data: new FileField(entity => `projects/${entity.parent.id}/imaging/data/${entity.id}/npy/`)
+			data: new FileField(entity => `core/projects/${entity.parent.id}/imaging/data/${entity.id}/npy/`)
 				.setDescription("Map file"),
 			type: new StringField()
 				.setDescription("Map alias"),
@@ -62,6 +63,16 @@ export default class FunctionalMap extends ChildEntity{
 				.setDescription("Map height, um")
 				.setMinValue(0.0),
 		}
+	}
+
+	/**
+	 * 	Downloads the map represented in the specified format;
+	 * 	@param {string} format 		Format of the map: 'npy', 'mat', 'amplitude' or 'phase'
+	 * 	@return {Blob} 				The downloaded content
+	 */
+	async download(format){
+		return await client.download(`/api/${window.SETTINGS.client_version}/core/projects/` +
+    		`${this.parent.id}/imaging/data/${this.id}/${format}/`);
 	}
 
 

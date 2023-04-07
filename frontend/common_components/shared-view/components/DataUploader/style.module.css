@@ -1,0 +1,32 @@
+.uploading_pane{
+	display: flex;
+	align-items: center;
+	gap: 5px;
+}
+
+.filename{
+	flex: 1;
+	padding: 0 10px;
+	background: rgb(224, 224, 224);
+	height: 32px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	font-family: Courier;
+	line-height: 32px;
+	white-space: nowrap;
+}
+
+.uploading_pane :global .icon{
+	flex: 0 18px;
+	height: 18px;
+}
+
+.message{
+	margin: 0;
+	padding: 0;
+	padding-top: 5px;
+}
+
+.error{
+	color: rgb(197, 57, 41);
+}

@@ -65,8 +65,12 @@ import styles from './style.module.css';
 		if (!this.props.readonly){
 			controlsWidget = (
 				<div className={styles.controls}>
-					<Hyperlink onClick={this.handleUpload} disabled={this.props.disabled} inactive={this.inactive}>{t("Upload")}</Hyperlink>
-					<Hyperlink onClick={this.handleRemove} disabled={this.props.disabled} inactive={this.inactive}>{t("Delete")}</Hyperlink>
+					<Hyperlink onClick={this.handleUpload} disabled={this.props.disabled} inactive={this.inactive}>
+						{t("Upload")}
+					</Hyperlink>
+					<Hyperlink onClick={this.handleRemove} disabled={this.props.disabled} inactive={this.inactive}>
+						{t("Delete")}
+					</Hyperlink>
 				</div>
 			);
 		}

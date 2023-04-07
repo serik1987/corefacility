@@ -17,6 +17,8 @@
 	"The value must not be less than ": "Значение не должно быть меньше, чем ",
 	"The value must not be greater than ": "Значение не должно быть больше, чем ",
 	"Choose an application from the list below...": "Выберите приложение из списка...",
+	"Please, select a file to upload": "Пожалуйста, выберите файл для загрузки",
+	"The functional map must be saved in a special NPY file. Use this facility to upload this.": "Функциональная карта должна быть сохранена в специальный NPY файл. Используйте этот элемент для того, чтобы закачать файл на диск.",
 	"Basic settings": "Основные настройки",
 	"Edit this value": "Отредактировать данное значение",
 	"Finish edit": "Завершить редактирование",

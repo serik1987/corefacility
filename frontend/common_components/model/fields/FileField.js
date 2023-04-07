@@ -32,9 +32,11 @@ export class FileManager extends FieldManager{
 	async upload(file){
 		this._uploadingFile = file;
 		try{
+			let hiddenFields = this._saveHiddenFields();
 			let result = await client.upload(this._path, file);
 			this._internalValue = result[this._propertyName];
 			this._entity._entityFields = result;
+			this._restoreHiddenFields(hiddenFields);
 		} catch (error){
 			throw error;
 		} finally {
@@ -47,16 +49,40 @@ export class FileManager extends FieldManager{
 	 * 
 	 */
 	async delete(){
+		let hiddenFields = this._saveHiddenFields();
 		let result = await client.request(this._path, "DELETE", null);
 		this._uploadingFile = null;
 		this._internalValue = result[this._propertyName];
 		this._entity._entityFields = result;
+		this._restoreHiddenFields(hiddenFields);
 	}
 
 	/** A short string representation of the file
 	 */
 	toString(){
 		return this.value && this.value.toString();
+	}
+
+	/**
+	 * 	Saves values of the hidden fields before upload/delete the file, since they will be removed.
+	 * 	@return {object} 				Saved hidden fields; to be used as argument to the _restoreHiddenFields method.
+	 */
+	_saveHiddenFields(){
+		let hiddenFields = {};
+		for (let field in this._entity._entityFields){
+			if (field.startsWith('_')){
+				hiddenFields[field] = this._entity._entityFields[field];
+			}
+		}
+		return hiddenFields;
+	}
+
+	/**
+	 * 	Restores values from the hidden fields after upload/delete the value.
+	 * 	@param {object} fields 			Result of the _saveHiddenFields method.
+	 */
+	_restoreHiddenFields(fields){
+		this._entity._entityFields = {...this._entity._entityFields, ...fields};
 	}
 
 }

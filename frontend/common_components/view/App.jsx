@@ -136,8 +136,6 @@ export default class App extends DialogWrapper{
 	}
 
 	notifyStateChanged(){
-		console.log(this.constructor.getApplicationName());
-		console.log(window.location.pathname);
 		if (window.parent !== window){
 			window.postMessage({
 				method: 'pathChanged',
