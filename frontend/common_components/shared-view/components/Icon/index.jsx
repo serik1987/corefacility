@@ -13,6 +13,9 @@ import styles from './style.module.css';
  * 	@param {string} 			type 		icon type: 'default', 'mini'
  * 	@param {boolean}			inactive	if the button is inactive, clicking on it has no effect
  * 	@param {boolean}			disabled	if the button is disabled, it is inactive and is shown as grey
+ * 	@param {boolean} 			toggled 	true if the icon is toggled. The icon is stated to be toggled if:
+ * 												its CSS is similar to the state 'hover' and 'active'
+ * 												clicking on the icon takes no effect
  * 	@param {string}				href		the route to be moved when you click the button, given that onClick prop
  * 											has not been specified
  * 	@param {string}				tooltip		Detailed description of this button
@@ -32,6 +35,9 @@ export default class Icon extends Button{
 		let iconClasses = `${styles.icon_wrapper}${disabled}${inactive}${cssSuffix} icon`;
 		if (this.props.type && this.props.type in styles){
 			iconClasses += ` ${styles[this.props.type]}`;
+		}
+		if (this.props.toggled){
+			iconClasses += ` ${styles.toggled}`;
 		}
 
 		return (

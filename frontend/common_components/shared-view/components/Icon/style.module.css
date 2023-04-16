@@ -12,11 +12,12 @@
 	cursor: not-allowed;
 }
 
-.icon_wrapper:hover:not(.disabled):not(.inactive){
+.icon_wrapper:hover:not(.disabled):not(.inactive),
+.icon_wrapper.toggled:not(.disabled):not(.inactive){
 	background-color: #e0e0e0;
 }
 
-.icon_wrapper.disabled, .icon_wrapper.inactive{
+.icon_wrapper.disabled, .icon_wrapper.inactive, .icon_wrapper.toggled{
 	cursor:  default;
 }
 
@@ -35,7 +36,7 @@
 }
 
 .icon_wrapper.disabled svg{
-	fill:  #e5e5e5;
+	fill:  #aaa;
 }
 
 

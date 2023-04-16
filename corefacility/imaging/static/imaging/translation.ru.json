@@ -1,8 +1,15 @@
 {
+  "um": "мкм",
+  "mm": "мм",
+  "Amplitude map": "Амплитудная карта",
+  "Phase map": "Фазовая карта",
+
   "Please wait while user and project info will be transmitted to the child frame.": "Пожалуйста, подождите, пока информация о пользователе и проекте не загрузится в дочернем фрейме.",
   "The requested page was not found.": "Запрашиваемая страница не найдена.",
   "Switch to the Main Page.": "Перейти на главную страницу.",
   "Functional map properties": "Свойства функциональной карты",
+  "Download as .npy file": "Скачать карту в формате .npy",
+  "Download as .mat file": "Скачать карту в формате .mat",
   "Map alias": "Псевдоним карты",
   "Map type": "Тип карты",
   "Orientation map": "Ориентационная карта",
@@ -10,5 +17,8 @@
   "Width, um": "Ширина, мкм",
   "Height, um": "Высота, мкм",
 
-  "A short name of the map that participates in URI. Must contain small and capital latin letters, digits, underscores or hypnens": "Короткое имя карты, которое участвует в формировании её URL. Должно содержать большие и маленькие латинские буквы, цифры, дефисы и знаки подчёркивания"
+  "A short name of the map that participates in URI. Must contain small and capital latin letters, digits, underscores or hypnens": "Короткое имя карты, которое участвует в формировании её URL. Должно содержать большие и маленькие латинские буквы, цифры, дефисы и знаки подчёркивания",
+  "Corrupted functional map data received from the Web server": "Web-сервер передал повреждённые данные",
+  "Move the cursor to a point on the map to view its coordinates": "Переместите курсор на точку на карте для того, чтобы увидеть её координаты.",
+  "Cancel tool selection": "Отменить действие инструмента"
 }

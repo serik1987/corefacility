@@ -48,7 +48,7 @@ export default class Button extends React.Component{
 	 */
 	handleClick(event){
 		event.preventDefault();
-		if (!this.props.inactive && !this.disabled){
+		if (!this.props.inactive && !this.disabled && !this.props.toggled){
 			if (this.props.onClick){
 				this.props.onClick(event);
 			} else if (this.props.href){

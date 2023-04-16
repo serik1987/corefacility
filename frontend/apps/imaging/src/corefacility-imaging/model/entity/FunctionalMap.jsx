@@ -66,6 +66,18 @@ export default class FunctionalMap extends ChildEntity{
 	}
 
 	/**
+	 * 	Returns the map harmonic
+	 */
+	get harmonic(){
+		switch (this.type){
+		case 'ori':
+			return 2.0;
+		default:
+			return 1.0;
+		}
+	}
+
+	/**
 	 * 	Downloads the map represented in the specified format;
 	 * 	@param {string} format 		Format of the map: 'npy', 'mat', 'amplitude' or 'phase'
 	 * 	@return {Blob} 				The downloaded content

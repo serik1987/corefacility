@@ -1,9 +1,12 @@
+import {createRef} from 'react';
+
 import {translate as t} from 'corefacility-base/utils';
 import SidebarEditor from 'corefacility-base/view/SidebarEditor';
 import DataUploader from 'corefacility-base/shared-view/components/DataUploader';
 import FunctionalMap from 'corefacility-imaging/model/entity/FunctionalMap';
 
 import DataList from '../DataList';
+import FunctionalMapDrawer from '../FunctionalMapDrawer';
 import style from './style.module.css';
 
 
@@ -49,11 +52,19 @@ export default class DataEditor extends SidebarEditor{
 	constructor(props){
 		super(props);
 		this.handleUploadError = this.handleUploadError.bind(this);
+		this._functionalMapDrawer = createRef();
 
 		this.state = {
 			...this.state,
 			uploadError: null,
 		}
+	}
+
+	/**
+	 * 	Returns the drawing element of the functional map.
+	 */
+	get functionalMapDrawer(){
+		return this._functionalMapDrawer.current;
 	}
 
 	/** Returns class of the entity which list must be downloaded from the external server
@@ -122,6 +133,7 @@ export default class DataEditor extends SidebarEditor{
 	async reload(){
 		this.setState({uploadError: null});
 		await super.reload();
+		this.functionalMapDrawer && (await this.functionalMapDrawer.reload());
 	}
 
 	/**
@@ -142,18 +154,30 @@ export default class DataEditor extends SidebarEditor{
         				additionalIcons={[
         					<div
         						className={style.download_icon}
-        						onClick={event => this.handleItemDownload(event, 'npy')}>
+        						title={t("Download as .npy file")}
+        						onClick={event => this.handleItemDownload(event, 'npy')}
+        					>
         						NPY
         					</div>,
         					<div
         						className={style.download_icon}
-        						onClick={event => this.handleItemDownload(event, 'mat')}>
+        						title={t("Download as .mat file")}
+        						onClick={event => this.handleItemDownload(event, 'mat')}
+        					>
         						MAT
         					</div>,
         				]}
         			/>
         		</div>
-        		<div className={style.map_viewer}>Rendering the map viewer...</div>
+        		<FunctionalMapDrawer
+        			ref={this._functionalMapDrawer}
+        			functionalMap={this.state.item}
+        			onFetchStart={() => this.reportListFetching()}
+        			onFetchSuccess={() => this.reportFetchSuccess(undefined)}
+        			onFetchFailure={error => this.reportFetchFailure(error)}
+        			inactive={this.isLoading}
+        			cssSuffix={style.map_viewer}
+        		/>
         	</div>	
         );
     }

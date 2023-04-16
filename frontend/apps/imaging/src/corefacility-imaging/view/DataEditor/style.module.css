@@ -1,8 +1,13 @@
 .main{
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
 	padding: 14px 30px 14px 6px;
 }
 
 .uploader_row{
+	flex: 0;
 	display: flex;
 	gap: 5px;
 	margin-bottom: 10px;
@@ -23,6 +28,8 @@
 }
 
 .map_viewer{
+	flex: 1;
+	height: 100px;
 }
 
 .download_icon{
