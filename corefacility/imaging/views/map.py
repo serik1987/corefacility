@@ -182,10 +182,10 @@ class MapViewSet(FileUploadMixin, EntityViewSet):
         if functional_map.type == 'ori':
             self._harmonic = 2
         if functional_map.data.url is None:
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response({'detail': "No map file uploaded"}, status=status.HTTP_404_NOT_FOUND)
         filename = os.path.join(self.request.project.project_dir, functional_map.data.url)
         if not os.path.exists(filename):
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response({'detail': "The uploaded file has not been found"}, status=status.HTTP_404_NOT_FOUND)
         output_stream = (processor if processor is not None else self.process_npy)(filename)
         response = HttpResponse(output_stream.getbuffer(), content_type="application/octet-stream")
         response['Content-Disposition'] = 'attachment; filename="%s"' % functional_map.data.url

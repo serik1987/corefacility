@@ -67,7 +67,7 @@ export default class FunctionalMapDrawer extends Loader{
 
 	/* Zooming parameters */
 	MIN_SCALE = 1;
-	SCALE_STEP = 1;
+	SCALE_STEP = 0.5;
 	MAX_SCALE = 10;
 
 	/* Mouse parameters */
@@ -80,7 +80,6 @@ export default class FunctionalMapDrawer extends Loader{
 		this._canvasRect = null;
 		this._amplitudeMapRectangle = null;
 		this._phaseMapRectangle = null;
-		this.handleMapResize = this.handleMapResize.bind(this);
 		this.handleMouseDown = this.handleMouseDown.bind(this);
 		this.handleMouseMove = this.handleMouseMove.bind(this);
 		this.handleMouseUp = this.handleMouseUp.bind(this);
@@ -128,10 +127,16 @@ export default class FunctionalMapDrawer extends Loader{
 		return this.container.getElementsByTagName('canvas')[0]; /* There is only one canvas */
 	}
 
+	/**
+	 * 	Returns abscissa of the very left map pixels to show
+	 */
 	get left(){
 		return this._left;
 	}
 
+	/**
+	 * 	Sets abscissa of the very left map pixels to show
+	 */
 	set left(newValue){
 		if (newValue >= 0 && newValue < this.props.functionalMap.resolution_x){
 			this._left = newValue;
@@ -140,10 +145,16 @@ export default class FunctionalMapDrawer extends Loader{
 		}
 	}
 
+	/**
+	 * 	Returns ordinate of the very top pixels to show
+	 */
 	get top(){
 		return this._top;
 	}
 
+	/**
+	 * 	Sets ordinate of the very top map pixels to show
+	 */
 	set top(newValue){
 		if (newValue >= 0 && newValue < this.props.functionalMap.resolution_y){
 			this._top = newValue;
@@ -269,6 +280,11 @@ export default class FunctionalMapDrawer extends Loader{
 	 * 	Provides a full redraw of the canvas
 	 */
 	repaint(){
+		if (!this.props.functionalMap ||
+				!this.props.functionalMap.resolution_x || !this.props.functionalMap.resolution_y){
+			throw new Error("The FunctionalMapDrawer is not suitable for maps that has not been uploaded yet");
+		}
+
 		let repaintStartDate = new Date();
 		if (!this.canvasElement.getContext){
 			this.reportFetchFailure(new Error("The Web browser doesn't support the canvas"));
@@ -418,9 +434,9 @@ export default class FunctionalMapDrawer extends Loader{
 	}
 
 	/**
-	 * 	Arranges an available space for the map
-	 * 	
-	 * 	@param {Number} 				globalOffset 		Position of the map on the offscreen auxiliary canvas.
+	 * 	Defines the rectangle from the offline map canvas to be used to draw the map
+	 * 	@param {Number} 				globalOffset 		0 for amplitude map, map resolution x for the phase map
+	 * 	@return {Array} 									Rectangle in the source map to
 	 */
 	measureMap(globalOffset){
 		let sWidth = this.props.functionalMap.resolution_x;
@@ -430,12 +446,22 @@ export default class FunctionalMapDrawer extends Loader{
 		return [this.left + globalOffset, this.top, Math.round(sWidth / scale), Math.round(sHeight / scale)];
 	}
 
+	/**
+	 * 	Draws amplitude or phase map
+	 * 	@param {Array}					sourceDimensions	rectangle area on the source offscreen canvas to put the map
+	 * 	@param {Array} 					dimensions 			rectangle area on the target canvas to put the map
+	 */
 	drawMap(sourceDimensions, dimensions){
 		if (this.canvasElement.offscreenCanvas){
 			this._context.drawImage(this.canvasElement.offscreenCanvas, ...sourceDimensions, ...dimensions);
 		}
 	}
 
+	/**
+	 * 	Measures geometrical parameters of the amplitude map color bar
+	 * 	@param {Number} 				colorBarHeight 		Desired colorbar height, units text are not included here
+	 * 	@return {object} 									Various geometrical parameters of the amplitude color bar.
+	 */
 	measureAmplitudeColorBar(colorBarHeight){
 		const MIN_POWER_FIXED = -2;
 		const MAX_POWER_FIXED = 1;
@@ -543,6 +569,13 @@ export default class FunctionalMapDrawer extends Loader{
 		return tickProperties;
 	}
 
+	/**
+	 * 	Plots the color bar on the amplitude map
+	 * 	@param {Array} 			dimensions 				Rectangle where the amplitude map color bar must be plotted
+	 * 													(units message is not included here)
+	 * 	@param {object} 		tickProperties 			Various geometrical parameters calculated by the
+	 * 													measureAmplitudeColorBar method
+	 */
 	drawAmplitudeColorBar(dimensions, tickProperties){
 		let [left, top, width, height] = dimensions;
 		let {ticks, ticksPx, tickLabels, mainLabel} = tickProperties;
@@ -577,6 +610,11 @@ export default class FunctionalMapDrawer extends Loader{
 		this._context.fillText(mainLabel, left, top - this.TEXT_PADDING);
 	}
 
+	/**
+	 * 	Calculates various geometrical parameters of the phase color bar
+	 * 	@param {Array} 			colorBarHeight 			Desired height of the phase map color bar
+	 * 	@return {object} 								Various geometrical parameters of the phase map color bar.
+	 */
 	measurePhaseColorBar(colorBarHeight){
 		let imageDataPosition = this.PHASE_COLOR_BAR_TICK_WIDTH + this.DEFAULT_TEXT_HEIGHT + this.TEXT_PADDING;
 		let colorBarResolution = this.state.colorBarResolution;
@@ -601,6 +639,12 @@ export default class FunctionalMapDrawer extends Loader{
 		};
 	}
 
+	/**
+	 * 	Draws the phase map color bar.
+	 * 	@param {Array} 			dimensions 				A rectangular area of the color bar
+	 * 	@param {object} 		properties 				Various geometrical parameters returned by the
+	 * 													measurePhaseColorBar method.
+	 */
 	drawPhaseColorBar(dimensions, properties){
 		if (!this.state.colorBarResolution){
 			return;
@@ -609,7 +653,6 @@ export default class FunctionalMapDrawer extends Loader{
 		const {imageDataPosition, colorBarCenterX, colorBarCenterY, colorBarRadius,
 			zeroDegreeText, verticalOrientationText} = properties;
 		this._context.fillStyle = this.DEFAULT_FILL_STYLE;
-
 
 		let imageData = this._context.createImageData(this.state.colorBarResolution, this.state.colorBarResolution);
 		imageData.data.set(this.state.colorBarImage, 0);
@@ -644,6 +687,11 @@ export default class FunctionalMapDrawer extends Loader{
 		this._context.restore();
 	}
 
+	/**
+	 * 	Calculates geometrical parameters of the scale bar
+	 * 	@param {Number} 		mapWidth 				Desired width of the scale bar
+	 * 	@return {object} 								Various geometrical parameters of the scale bar
+	 */
 	measureScaleBar(mapWidth){
 		let mapWidthUm = this.props.functionalMap.width;
 		let mapResolution = this.state.scale * mapWidth / mapWidthUm;
@@ -655,6 +703,7 @@ export default class FunctionalMapDrawer extends Loader{
 			oldScaleBarWidth = scaleBarWidth;
 			mapWidthPower -= 1;
 			scaleBarWidth /= 10;
+
 		}
 		if (oldMapWidthPower){
 			mapWidthPower = oldMapWidthPower;
@@ -662,6 +711,10 @@ export default class FunctionalMapDrawer extends Loader{
 		}
 
 		let scaleBarText = Math.pow(10, mapWidthPower);
+		if (scaleBarWidth > mapWidth){
+			scaleBarText /= 2;
+			scaleBarWidth /= 2;
+		}
 		if (scaleBarText > 100){ /* um */
 			scaleBarText = `${scaleBarText / 1000} ${t('mm')}`;
 		} else {
@@ -674,6 +727,12 @@ export default class FunctionalMapDrawer extends Loader{
 		}
 	}
 
+	/**
+	 * 	Draws the scale bar
+	 * 	@param {Array} 			dimensions 				Rectangle where the scale bar must be drawn
+	 * 	@return {object} 								Various geometrical parameters returned by measureScaleBar
+	 * 													method
+	 */
 	drawScaleBar(dimensions, scaleBarProperties){
 		let [left, top, width, height] = dimensions;
 		let {scaleBarWidth, scaleBarText} = scaleBarProperties;
@@ -695,6 +754,12 @@ export default class FunctionalMapDrawer extends Loader{
 		this._context.restore();
 	}
 
+	/**
+	 * 	Returns coordinates of a current mouse position
+	 * 	@param {SyntheticEvent} event 					The event that triggered this method
+	 * 	@return {object} 								Given coordinates on the source functional map ('source') and
+	 * 													on the user-visible scaled map copy ('destination')
+	 */
 	getSelectionArea(event){
 		if (!this.props.functionalMap || !this._canvasRect || !this._amplitudeMapRectangle || !this._phaseMapRectangle){
 			return undefined;
@@ -798,7 +863,7 @@ export default class FunctionalMapDrawer extends Loader{
 
 	componentDidMount(){
 		super.componentDidMount();
-		this.__mapResizeObserver = new ResizeObserver(this.handleMapResize);
+		this.__mapResizeObserver = new ResizeObserver(entries => this.repaint());
 		this.__mapResizeObserver.observe(this.container);
 	}
 
@@ -814,10 +879,10 @@ export default class FunctionalMapDrawer extends Loader{
 		this.__mapResizeObserver.disconnect();
 	}
 
-	handleMapResize(entries){
-		this.repaint();
-	}
-
+	/**
+	 * 	Triggers when the user tries to zoom in or zoom out the map
+	 * 	@param {Number} 		zoomDirection 			Amount that the zoom must be change to
+	 */
 	handleZoom(zoomDirection){
 		let newScale =  this.state.scale + zoomDirection;
 		if (newScale < 1){
@@ -844,14 +909,26 @@ export default class FunctionalMapDrawer extends Loader{
 		});
 	}
 
+	/**
+	 * 	Triggers when the user clicks on a given tool
+	 * 	@param 	{BaseTool} tool 			The tool selected by the user
+	 */
 	handleToolSelection(tool){
 		this.setState({currentTool: tool});
 	}
 
+	/**
+	 * 	Triggers when the user clicks on 'Cancel all tools' button
+	 * 	@param {SyntheticEvent} event
+	 */
 	handleCancelSelection(event){
 		this.setState({currentTool: null});
 	}
 
+	/**
+	 * 	Triggers when the user holds the mouse button on the canvas
+	 * 	@param {SyntheticEvent} event
+	 */
 	handleMouseDown(event){
 		if (event.buttons !== this.NO_BUTTONS_ID && event.buttons !== this.LEFT_BUTTON_ID){
 			return;
@@ -863,6 +940,10 @@ export default class FunctionalMapDrawer extends Loader{
 		}
 	}
 
+	/**
+	 * 	Triggers when the user moves the button over the canvas
+	 * 	@param {SyntheticEvent} event
+	 */
 	handleMouseMove(event){
 		let selectionArea = this.getSelectionArea(event);
 		if (this.state.currentTool && selectionArea === null && this._mouseButtonPressed){
@@ -874,6 +955,10 @@ export default class FunctionalMapDrawer extends Loader{
 		}
 	}
 
+	/**
+	 * 	Triggers when the user releases the mouse button on the canvas
+	 * 	@param {SyntheticEvent} event
+	 */
 	handleMouseUp(event){
 		if (!this._mouseButtonPressed){
 			return;

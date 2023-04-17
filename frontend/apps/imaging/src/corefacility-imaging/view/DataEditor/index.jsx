@@ -169,7 +169,7 @@ export default class DataEditor extends SidebarEditor{
         				]}
         			/>
         		</div>
-        		<FunctionalMapDrawer
+        		{this.state.item.resolution_x && <FunctionalMapDrawer
         			ref={this._functionalMapDrawer}
         			functionalMap={this.state.item}
         			onFetchStart={() => this.reportListFetching()}
@@ -177,7 +177,7 @@ export default class DataEditor extends SidebarEditor{
         			onFetchFailure={error => this.reportFetchFailure(error)}
         			inactive={this.isLoading}
         			cssSuffix={style.map_viewer}
-        		/>
+        		/>}
         	</div>	
         );
     }
