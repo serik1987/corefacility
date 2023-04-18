@@ -1,8 +1,13 @@
 import {createRef} from 'react';
 
 import {translate as t} from 'corefacility-base/utils';
+import client from 'corefacility-base/model/HttpClient';
+import Module from 'corefacility-base/model/entity/Module';
 import SidebarEditor from 'corefacility-base/view/SidebarEditor';
 import DataUploader from 'corefacility-base/shared-view/components/DataUploader';
+import Icon from 'corefacility-base/shared-view/components/Icon';
+import ChildModuleFrame from 'corefacility-base/shared-view/components/ChildModuleFrame';
+import {ReactComponent as RoiIcon} from 'corefacility-base/shared-view/icons/variables.svg';
 import FunctionalMap from 'corefacility-imaging/model/entity/FunctionalMap';
 
 import DataList from '../DataList';
@@ -37,6 +42,7 @@ import style from './style.module.css';
  *  @param {Number} itemId                      ID of the item to open.
  *  @param {Entity} item                        The item currently selected by the user.
  * 	@param {string} uploadError 				An error occured during the file upload.
+ * 	@param {boolean} roiSelectionMode 			true if ROI selection application is opened, false if this is closed.
  * 
  * 	Also, one of the descendant of the ListEditor must be an instance of the ItemList with the following
  * 	props defined:
@@ -52,11 +58,14 @@ export default class DataEditor extends SidebarEditor{
 	constructor(props){
 		super(props);
 		this.handleUploadError = this.handleUploadError.bind(this);
+		this.handleRoiSelection = this.handleRoiSelection.bind(this);
 		this._functionalMapDrawer = createRef();
+		this._roiApp = null;
 
 		this.state = {
 			...this.state,
 			uploadError: null,
+			roiSelectionMode: false,
 		}
 	}
 
@@ -139,7 +148,28 @@ export default class DataEditor extends SidebarEditor{
 	/**
      *  Renders the right pane of the sidebar.
      */
-    renderRightPane(){
+	renderRightPane(){
+		if (this.state.roiSelectionMode){
+			return this.renderRoiSelectionApp();
+		} else {
+			return this.renderMapViewer();
+		}
+	}
+
+	renderRoiSelectionApp(){
+		return (
+			<ChildModuleFrame
+				application={this._roiApp}
+				cssSuffix={style.roi_selection_frame}
+				onApplicationMount={event => this.handleApplicationMount(event)}
+			/>
+		);
+	}
+
+	/**
+	 * 	Renders the map viewing application
+	 */
+    renderMapViewer(){
         return (
         	<div className={style.main}>
         		<div className={style.uploader_row}>
@@ -166,6 +196,13 @@ export default class DataEditor extends SidebarEditor{
         					>
         						MAT
         					</div>,
+        					<Icon
+        						type="mini"
+        						onClick={this.handleRoiSelection}
+        						inactive={this.isLoading}
+        						tooltip={t("Select ROI, pinwheel center etc.")}
+        						src={<RoiIcon/>}
+        					/>
         				]}
         			/>
         		</div>
@@ -220,5 +257,54 @@ export default class DataEditor extends SidebarEditor{
     	} catch (error){
     		this.reportFetchFailure(error);
     	}
+    }
+
+    /**
+     * 	@return ROI application
+     */
+    async getRoiApp(){
+    	if (this._roiApp){
+    		return this._roiApp;
+    	}
+
+    	try{
+    		this.reportListFetching();
+	    	let applicationListUrl = `/api/${window.SETTINGS.client_version}/core/projects/` +
+	    		`${window.application.project.id}/imaging/processors/${this.state.item.id}/`;
+	    	let result = await client.get(applicationListUrl);
+	    	result.map_info.parent = window.application.project;
+	    	let functionalMap = FunctionalMap.deserialize(result.map_info);
+	    	this.setState({item: functionalMap});
+	    	let roiAppList = Module
+	    		.deserialize(result.module_list, true)
+	    		.filter(application => application.alias === 'roi');
+	    	if (roiAppList.length === 0){
+	    		throw new Error(t("The ROI selection application has not been connected to the project"));
+	    	}
+	    	this.reportFetchSuccess(undefined);
+	    	this._roiApp = roiAppList[0];
+	    	return this._roiApp;
+    	} catch (error){
+    		this.reportFetchFailure(error);
+    	}
+    }
+
+    /**
+     * 	Triggers when the user tries to switch to the ROI selection application.
+     * 	@async
+     * 	@param {SyntheticEvent}		event
+     */
+    async handleRoiSelection(event){
+    	if (await this.getRoiApp()){
+    		this.setState({roiSelectionMode: true});
+    	}
+    }
+
+    handleApplicationMount(event){
+    	event.target.receiveParentEntities({
+    		user_info: window.application.user.serialize(),
+    		project_info: window.application.project.serialize(),
+    		functional_map_info: this.state.item.serialize(),
+    	});
     }
 }

@@ -20,5 +20,7 @@
   "A short name of the map that participates in URI. Must contain small and capital latin letters, digits, underscores or hypnens": "Короткое имя карты, которое участвует в формировании её URL. Должно содержать большие и маленькие латинские буквы, цифры, дефисы и знаки подчёркивания",
   "Corrupted functional map data received from the Web server": "Web-сервер передал повреждённые данные",
   "Move the cursor to a point on the map to view its coordinates": "Переместите курсор на точку на карте для того, чтобы увидеть её координаты.",
-  "Cancel tool selection": "Отменить действие инструмента"
+  "Cancel tool selection": "Отменить действие инструмента",
+  "The ROI selection application has not been connected to the project": "Приложение для выбора ROI не было добавлено в проект",
+  "Select ROI, pinwheel center etc.": "Выбрать ROI, центр ориентационной гиперколонки и пр."
 }

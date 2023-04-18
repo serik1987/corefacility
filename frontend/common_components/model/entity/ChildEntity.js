@@ -75,4 +75,35 @@ export default class ChildEntity extends Entity{
         return null;
     }
 
+    /**
+     *  Recovers the entity from its serialized information
+     *  @static
+     *  @param {object|array} info the serialized information about the entity (many = false), or
+     *          array of such objects (many = true).
+     *  @param {boolean} many true to deserialize list of entities, false to deserialize single entity
+     *  @return {Entity|array of Entity} the entity itself (many = false) or array of entities (many = true)
+     */
+    static deserialize(info, many=false){
+        if (!('parent' in info)){
+            throw new Error("When you deserialize the child entity, its first argument must contain the parent field");
+        }
+        let parentEntity = info.parent;
+        delete info.parent;
+        let childEntity = super.deserialize(info, many);
+        childEntity._entityFields.__parent = parentEntity;
+        return childEntity;
+    }
+
+    /**
+     *  Transforms entity to its serialized state. The entity can be recovered from its serialized state using the
+     *  deserialize() method
+     *  @return {object} the serialized state of the entity
+     */
+    serialize(){
+        let serializedData = super.serialize();
+        serializedData.parent = serializedData.__parent;
+        delete serializedData.__parent;
+        return serializedData;
+    }
+
 }

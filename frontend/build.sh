@@ -12,6 +12,10 @@ function build(){
     return 1
   fi
   cd "$1" || exit
+  if [ -f "build.sh" ]
+  then
+    ./build.sh || exit
+  fi
   if ! npm run build
   then
     echo "build.sh: Frontend compilation failed."

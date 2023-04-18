@@ -285,7 +285,6 @@ export default class FunctionalMapDrawer extends Loader{
 			throw new Error("The FunctionalMapDrawer is not suitable for maps that has not been uploaded yet");
 		}
 
-		let repaintStartDate = new Date();
 		if (!this.canvasElement.getContext){
 			this.reportFetchFailure(new Error("The Web browser doesn't support the canvas"));
 			return;
@@ -315,7 +314,6 @@ export default class FunctionalMapDrawer extends Loader{
 		this.drawMap(dimensions.phaseMapSrc, dimensions.phaseMap);
 		this.drawPhaseColorBar(dimensions.phaseColorBar, dimensions.phaseColorBarProperties);
 		this.drawScaleBar(dimensions.phaseScaleBar, dimensions.scaleBarProperties);
-		console.log(`Repaint time: ${new Date() - repaintStartDate}`);
 	}
 
 	/**
@@ -332,7 +330,6 @@ export default class FunctionalMapDrawer extends Loader{
 		let mapResolution = null; /* number of pixels in real map per each pixel in visible map */
 		let mapWidth = null;
 		let mapHeight = null;
-		let scaleBarHeight = null;
 		let subplotWidth = null;
 		let subplotHeight = null;
 		let canvasWidth = null;

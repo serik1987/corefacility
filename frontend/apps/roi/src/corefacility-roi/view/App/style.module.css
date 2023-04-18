@@ -1,0 +1,22 @@
+:global #root{
+	background: #fff;
+}
+
+.panel_wrapper{
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	height: 100%;
+}
+
+.object_list_panel{
+	background: red;
+	flex: 1;
+	height: 100px;
+}
+
+.functional_map_panel{
+	background: green;
+	flex: 4;
+	height: 100px;
+}
