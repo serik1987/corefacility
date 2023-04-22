@@ -79,6 +79,9 @@ export default class DialogBox extends React.Component{
 		if (this.state.__isOpening || this.state.__isOpened || this.state.__isClosing){
 			wrapperClasses += ` ${styles.opened}`;
 		}
+		if (this.props.cssSuffix){
+			wrapperClasses += ` ${this.props.cssSuffix}`;
+		}
 		return wrapperClasses;
 	}
 

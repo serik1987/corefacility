@@ -1,6 +1,9 @@
 import {NotImplementedError} from 'corefacility-base/exceptions/model';
 
 
+/**
+ *  This is the base class for all tools that can be applied on the map
+ */
 export default class BaseTool{
 
 	constructor(){
@@ -30,6 +33,14 @@ export default class BaseTool{
 	 */
 	get tooltip(){
 		throw new NotImplementedError('tooltip');
+	}
+
+	/**
+	 * 	Triggers when the user selects a tool
+	 * 	@return {boolean} true will cancel selection, false will do nothing
+	 */
+	selectTool(){
+		return false;
 	}
 
 	/**

@@ -125,7 +125,7 @@ export default class UpdateForm extends Form{
 			if (!('lookup' in inputData)){
 				throw new Error("UpdateForm.getDefaultValues: bad entity lookup");
 			}
-			this._defaultObject = await this.entityClass.get(inputData.lookup);
+			this._defaultObject = await this.fetchObject(inputData.lookup);
 			for (let field of this.fieldList){
 				defaultValues[field] = this._defaultObject[field];
 			}
@@ -141,6 +141,16 @@ export default class UpdateForm extends Form{
 			});
 		}
 		return defaultValues;
+	}
+
+	/**
+	 *  Requests the object from the server
+	 * 	@async
+	 * 	@param {Any} 	lookup 			The object identity (e,g., ID, alias, ...)
+	 * 	@return the object itself
+	 */
+	async fetchObject(lookup){
+		return await this.entityClass.get(lookup);
 	}
 
 	/** Sets default values to the form. The function calls everywhere when the dialog box opens
@@ -317,7 +327,7 @@ export default class UpdateForm extends Form{
 		}
 
 		if (this.state.reloadError instanceof UnauthorizedError){
-			window.location.reload();
+			window.parent.location.reload();
 		}
 
 		if (this.state.reloadError instanceof NotFoundError && this.props.on404){

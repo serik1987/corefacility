@@ -1,0 +1,16 @@
+.main{
+	position: fixed;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+}
+
+.message{
+	padding: 30px;
+	font-style: italic;
+}
+
+.error_message{
+	color: rgb(197, 57, 41);
+}

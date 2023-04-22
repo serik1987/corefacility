@@ -4,16 +4,19 @@ import {ReactComponent as MoveToolIcon} from 'corefacility-base/shared-view/icon
 import BaseTool from './BaseTool';
 
 
+/**
+ * 	Allows the user to change position of the visible part of the map
+ */
 export default class MoveTool extends BaseTool{
 
-	constructor(props){
-		super(props);
+	constructor(){
+		super();
 		this._originalLeft = undefined;
 		this._originalTop = undefined;
 	}
 
 	get cursorCss(){
-		return 'move';
+		return 'all-scroll';
 	}
 
 

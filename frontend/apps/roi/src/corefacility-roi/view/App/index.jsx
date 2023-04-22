@@ -1,9 +1,13 @@
+import {Routes, Route, Navigate} from 'react-router-dom';
+
 import User from 'corefacility-base/model/entity/User';
 import Project from 'corefacility-base/model/entity/Project';
-import FunctionalMap from 'corefacility-imaging/model/entity/FunctionalMap';
 import BaseApp from 'corefacility-base/view/App';
+import FunctionalMap from 'corefacility-roi/model/FunctionalMap';
 
 import style from './style.module.css';
+import RectangularRoiEditor from '../RectangularRoiEditor';
+import RectangularRoiForm from '../RectangularRoiForm';
 
 
 /** Base class for application root components
@@ -27,6 +31,7 @@ export default class App extends BaseApp{
 
     constructor(props){
         super(props);
+        this.registerModal('edit-rectangular-roi', RectangularRoiForm);
 
         this.state = {
             ...this.state,
@@ -68,6 +73,7 @@ export default class App extends BaseApp{
             project: Project.deserialize(entityInfo.project_info),
             functionalMap: FunctionalMap.deserialize(entityInfo.functional_map_info),
         });
+        this.reload();
     }
 
 	/** Renders all routes.
@@ -75,10 +81,10 @@ export default class App extends BaseApp{
 	 */
 	renderAllRoutes(){
 		return (
-            <div className={style.panel_wrapper}>
-                <div className={style.object_list_panel}>Rendering the object list panel...</div>
-                <div className={style.functional_map_panel}>Rendering the functional map panel...</div>
-            </div>
+            <Routes>
+                <Route path="/rectangular" element={<RectangularRoiEditor reloadTime={this.state.reloadTime}/>}/>
+                <Route path="*" element={<Navigate to="/rectangular"/>}/>
+            </Routes>
         );
 	}
 

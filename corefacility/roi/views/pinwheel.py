@@ -13,7 +13,6 @@ class PinwheelViewSet(FunctionalMapMixin, EntityViewSet):
     """
     Dealing with pinwheels
     """
-
     @staticmethod
     def sqr(x):
         """

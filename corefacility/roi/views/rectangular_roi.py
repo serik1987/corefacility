@@ -28,7 +28,13 @@ class RectangularRoiViewSet(FunctionalMapMixin, EntityViewSet):
     """ The entity set class related to this view """
 
     list_serializer_class = RectangularRoiSerializer
+    """ The view will use its own serializer """
+
     detail_serializer_class = RectangularRoiSerializer
+    """ The view will use its own serializer """
+
+    pagination_class = None
+    """ No pagination since it hardens the development of graphical editor. """
 
     @map_processing(target_alias_suffix="cut", detail=True, url_path="cut_map", url_name="apply")
     def apply_roi(self, source_data, roi):

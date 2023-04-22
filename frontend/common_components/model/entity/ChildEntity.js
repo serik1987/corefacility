@@ -91,6 +91,7 @@ export default class ChildEntity extends Entity{
         delete info.parent;
         let childEntity = super.deserialize(info, many);
         childEntity._entityFields.__parent = parentEntity;
+        childEntity._parentIdList = [...parentEntity._parentIdList, parentEntity.id];
         return childEntity;
     }
 

@@ -34,7 +34,7 @@ import ListLoader from './ListLoader';
  * 
  * 	Also, one of the descendant of the ListEditor must be an instance of the ItemList with the following
  * 	props defined:
- * 	@param {callback} onItemAddOpen 			This method must be triggered the the user adds an entity to
+ * 	@param {callback} onItemAdd 	 			This method must be triggered the the user adds an entity to
  * 												the entity list by means of the entity list facility
  * 	@param {callback} onItemSelect				This method must be triggered when the user changes the entity
  * 												and wants editor to send the changes to the Web server.
@@ -69,6 +69,22 @@ export default class ListEditor extends ListLoader{
 		this.itemListComponent.addItem(entity);
 	}
 
+	/**
+	 * 	Triggers when the user tries to add another user to the user list
+	 * 	@async
+	 * 	@param {Entity} entity 	the entity to be added
+	 */
+	async handleItemAdd(entity){
+		try{
+			this.reportListFetching();
+			await entity.create();
+			this.itemListComponent.addItem(entity);
+			this.reportFetchSuccess(undefined);
+		} catch (error){
+			this.reportFetchFailure(error);
+		}
+	}
+
 	/** Handles clicking on a particular entity.
 	 *  This is a callback widget for the child component responsible
 	 *  for item modification. Don't forget to add this to the ItemList!
@@ -93,6 +109,7 @@ export default class ListEditor extends ListLoader{
 	 *  Triggers when the user is going to remove the item from the list
 	 * 	@async
 	 * 	@param {SyntheticEvent} event  the event triggered by the child component
+	 * 	@return true if the entity delete was successful, false on failure
 	 */
 	async handleItemRemove(event){
 		try{
@@ -104,11 +121,12 @@ export default class ListEditor extends ListLoader{
 			});
 			if (!result){
 				this.reportFetchSuccess(undefined);
-				return;
+				return false;
 			}
 			await entity.delete();
 			this.itemListComponent.removeItem(entity);
 			this.reportFetchSuccess(undefined);
+			return true;
 		} catch (error){
 			this.reportFetchFailure(error);
 		}
@@ -128,23 +146,6 @@ export default class ListEditor extends ListLoader{
 					onItemSelect={this.handleSelectItem}
 					onItemRemove={this.handleItemRemove}
 				/>);
-	}
-
-	/**
-	 * 	Triggers when the user tries to add another user to the user list
-	 * 	@async
-	 * 	@param {Entity} entity 	the entity to be added
-	 */
-	async handleItemAdd(entity){
-		try{
-			this.setState({_isLoading: true, _error: null});
-			await entity.create();
-			this.itemListComponent.addItem(entity);
-		} catch (error){
-			this.setState({_error: error});
-		} finally{
-			this.setState({_isLoading: false});
-		}
 	}
 
 }

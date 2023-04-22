@@ -1,3 +1,13 @@
 {
+  "Add new rectangular ROI": "Добавить новую прямоугольную ROI",
+  "Edit an existent ROI": "Внести изменения в существующую ROI",
+  "Remove the ROI": "Удалить ROI",
+  "Close the application": "Закрыть приложение",
+  "Left": "Лево",
+  "Right": "Право",
+  "Top": "Верх",
+  "Bottom": "Низ",
 
+  "ROI properties": "Свойства ROI",
+  "Apply ROI": "Применить ROI"
 }

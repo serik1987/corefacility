@@ -26,6 +26,15 @@ import style from './style.module.css';
  * 		@param {Error}			error 						A Javascript exception thrown during the map downloading.
  * 	@param {string}			cssSuffix 					Additional CSS clsaases to apply
  * 	@param {boolean} 		inactive 					All buttons and controls of this drawer are inactive
+ * 
+ * 	State:
+ * 	--------------------------------------------------------------------------------------------------------------------
+ * 	@param {BaseTool} 		tool 						Currently selected tool
+ * 	@param {Number} 		minValue 					Minimum amplitude
+ * 	@param {Number} 		maxValue 					Maximum amplitude
+ * 	@param {Number} 		colorBarResolution 			dimensions of the phase axis color bar, px
+ * 	@param {Uint8ClampedArray} 	colorBarImage			bitmap for the phase axis color bar
+ * 	@param {Number} 		scale 						Currently selected scale.
  */
 export default class FunctionalMapDrawer extends Loader{
 
@@ -387,6 +396,7 @@ export default class FunctionalMapDrawer extends Loader{
 		let mapOffsetY = this.MAP_TITLE_HEIGHT + this.AXES_GAP;
 		this._amplitudeMapRectangle = [0, mapOffsetY, mapWidth, mapHeight];
 		this._phaseMapRectangle = [subplotWidth + this.SUBPLOT_GAP, mapOffsetY, mapWidth, mapHeight];
+		this._relativeMapRectangle = [0, 0, mapWidth, mapHeight];
 
 		return {
 			mapResolution: mapResolution,
@@ -803,7 +813,56 @@ export default class FunctionalMapDrawer extends Loader{
 			sourceY: sourceY,
 			destinationX: localX,
 			destinationY: localY,
+			sourceWidth: sourceWidth,
 		}
+	}
+
+	/**
+	 * 	Returns destination coordinates of the functional map draw on the canvas
+	 * 	@param {String} 		mapType 				Type of the map.
+	 * 	@return {Array} 								Abscissa of the left border, ordinate of the top border,
+	 * 													width of the map area, height of the map area
+	 */
+	_getMapRectangle(mapType){
+		let mapRectangle = null;
+		switch (mapType){
+		case 'amplitude':
+			mapRectangle = this._amplitudeMapRectangle;
+			break;
+		case 'phase':
+			mapRectangle = this._phaseMapRectangle;
+			break;
+		case 'relative':
+			mapRectangle = this._relativeMapRectangle;
+			break;
+		default:
+			throw new Error('getCanvasX or getCanvasY requires two arguments: source coordinates and mapType');
+		}
+		return mapRectangle;
+	}
+
+	/**
+	 * 	Returns the X coordinate on the canvas related to a given X coordinate on the source map
+	 * 	@param {Number} 		mapX 					Abscissa of a point on the source map
+	 * 	@param {String} 		mapType 				'amplitude' for amplitude map, 'phase' for phase map
+	 * 	@return {Number} 								Abscissa of related point on the canvas
+	 */
+	getCanvasX(mapX, mapType){
+		let [destinationLeft, destinationTop, destinationWidth, destinationHeight] = this._getMapRectangle(mapType);
+		let sourceWidth = this.props.functionalMap.resolution_x / this.state.scale;
+		return Math.round((mapX - this._left) * destinationWidth / sourceWidth + destinationLeft);
+	}
+
+	/**
+	 * 	Returns the Y coordinate on the canvas related to a given Y coordinate on the source map
+	 * 	@param {Number} 		mapY 					Ordinate of a point on the source map
+	 * 	@param {String} 		mapType 				'amplitude' for an amplitude map, 'phase' for a phase map
+	 * 	@return {Number} 								Ordinate of related point on the canvas
+	 */
+	getCanvasY(mapY, mapType){
+		let [destinationLeft, destinationTop, destinationWidth, destinationHeight] = this._getMapRectangle(mapType);
+		let sourceHeight = this.props.functionalMap.resolution_y / this.state.scale;
+		return Math.round((mapY - this._top) * destinationHeight / sourceHeight + destinationTop);
 	}
 
 	render(){
@@ -911,7 +970,10 @@ export default class FunctionalMapDrawer extends Loader{
 	 * 	@param 	{BaseTool} tool 			The tool selected by the user
 	 */
 	handleToolSelection(tool){
-		this.setState({currentTool: tool});
+		let selectionResult = tool.selectTool();
+		if (selectionResult !== true){
+			this.setState({currentTool: tool});
+		}
 	}
 
 	/**

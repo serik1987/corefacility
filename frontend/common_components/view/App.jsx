@@ -135,12 +135,15 @@ export default class App extends DialogWrapper{
 		this.setState({reloadTime: new Date().valueOf()});
 	}
 
+	/**
+	 * 	Sends to the parent frame information about the path changed
+	 */
 	notifyStateChanged(){
 		if (window.parent !== window){
 			window.postMessage({
 				method: 'pathChanged',
 				info: window.location.pathname
-			});
+			}, window.location.origin);
 		}
 	}
 

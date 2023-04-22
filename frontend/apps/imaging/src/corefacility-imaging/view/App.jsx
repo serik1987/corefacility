@@ -12,6 +12,7 @@ import DataSelector from './DataSelector';
 import DataEditor from './DataEditor';
 import DataCreateBox from './DataCreateBox';
 import DataChangeBox from './DataChangeBox';
+import RoiWrapper from './RoiWrapper';
 
 /** The root component in the imaging application
  *  
@@ -86,6 +87,11 @@ export default class App extends BaseApp{
         if (this.state.user !== null && this.state.project !== null){
             return (
                 <Routes>
+                    <Route path="/data/:lookup/apps/roi/" element={
+                        <DataSelector>
+                            <RoiWrapper reloadTime={this.state.reloadTime}/>
+                        </DataSelector>
+                    }/>
                     <Route path="/data/:lookup/" element={
                         <DataSelector>
                             <DataEditor
