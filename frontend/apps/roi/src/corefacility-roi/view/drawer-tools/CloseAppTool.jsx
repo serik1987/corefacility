@@ -32,9 +32,10 @@ export default class CloseAppTool extends BaseTool{
 
 	/**
 	 * 	Triggers when the user selects a tool
+	 * 	@param {FunctionalMapDrawer} drawer a parent drawer this tool belongs to
 	 * 	@return {boolean} true will cancel selection, false will do nothing
 	 */
-	selectTool(){
+	selectTool(drawer){
 		window.postMessage({method: 'redirect', info: this._redirectUri}, window.location.origin);
 		return true;
 	}

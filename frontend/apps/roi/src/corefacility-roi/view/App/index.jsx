@@ -8,6 +8,8 @@ import FunctionalMap from 'corefacility-roi/model/FunctionalMap';
 import style from './style.module.css';
 import RectangularRoiEditor from '../RectangularRoiEditor';
 import RectangularRoiForm from '../RectangularRoiForm';
+import PinwheelEditor from '../PinwheelEditor';
+import PinwheelForm from '../PinwheelForm';
 
 
 /** Base class for application root components
@@ -32,6 +34,7 @@ export default class App extends BaseApp{
     constructor(props){
         super(props);
         this.registerModal('edit-rectangular-roi', RectangularRoiForm);
+        this.registerModal('edit-pinwheel', PinwheelForm);
 
         this.state = {
             ...this.state,
@@ -82,8 +85,9 @@ export default class App extends BaseApp{
 	renderAllRoutes(){
 		return (
             <Routes>
-                <Route path="/rectangular" element={<RectangularRoiEditor reloadTime={this.state.reloadTime}/>}/>
-                <Route path="*" element={<Navigate to="/rectangular"/>}/>
+                <Route path="/rectangular/" element={<RectangularRoiEditor reloadTime={this.state.reloadTime}/>}/>
+                <Route path="/pinwheels/" element={<PinwheelEditor reloadTime={this.state.reloadTime}/>}/>
+                <Route path="*" element={<Navigate to="/rectangular/"/>}/>
             </Routes>
         );
 	}

@@ -1,0 +1,19 @@
+.root{
+	display: inline-block;
+	margin: 5px 10px;
+	margin-left: 0;
+	border: 1px solid rgb(60, 64, 67);
+	border-radius: 16px;
+	padding: 0 16px;
+	line-height: 32px;
+}
+
+
+.root > :global(.icon){
+	display: inline-block;
+	vertical-align: -5px;
+	margin-left: 5px;
+	width: 20px;
+	height: 20px;
+	cursor: pointer;
+}

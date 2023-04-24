@@ -59,6 +59,12 @@ export default class ChildModuleFrame extends React.Component{
             this.setState({path: window.SETTINGS.iframe_route});
             window.SETTINGS.iframe_route = undefined;
             this._basePath = window.location.pathname;
+        } else if (window.location.pathname.search('/apps/') !== -1) {
+            let [basePath, baseAppPath] = window.location.pathname.split('/apps/', 2);
+            let [appName, appPath] = baseAppPath.split('/', 2);
+            window.history.replaceState(null, null, `${basePath}/apps/${appName}`);
+            this._basePath = window.location.pathname;
+            this.setState({path: appPath});
         }
     }
 

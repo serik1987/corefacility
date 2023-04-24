@@ -37,9 +37,10 @@ export default class BaseTool{
 
 	/**
 	 * 	Triggers when the user selects a tool
+	 * 	@param {FunctionalMapDrawer} drawer that parent class that has invoked the tool
 	 * 	@return {boolean} true will cancel selection, false will do nothing
 	 */
-	selectTool(){
+	selectTool(drawer){
 		return false;
 	}
 

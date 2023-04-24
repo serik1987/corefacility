@@ -68,9 +68,9 @@ export default class RectangularRoiForm extends UpdateForm{
 				<div className={style.controls_block}>
 					<PrimaryButton {...this.getSubmitProps()}>{t("Continue")}</PrimaryButton>
 					<PrimaryButton
-						{...this.getSubmitProps()}
 						type="cancel"
 						onClick={event => this.dialog.closeDialog(false)}
+						inactive={this.state.inactive}
 					>
 						{t("Cancel")}
 					</PrimaryButton>

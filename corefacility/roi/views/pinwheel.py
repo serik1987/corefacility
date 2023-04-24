@@ -27,6 +27,7 @@ class PinwheelViewSet(FunctionalMapMixin, EntityViewSet):
     entity_set_class = PinwheelSet
     list_serializer_class = PinwheelSerializer
     detail_serializer_class = PinwheelSerializer
+    pagination_class = None
 
     @map_processing(target_alias_suffix="distance", detail=False, url_path="distance_map", url_name="distance-map")
     def calculate_distance_map(self, source_data, pinwheel_set):

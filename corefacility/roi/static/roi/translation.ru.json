@@ -1,4 +1,5 @@
 {
+  "Select rectangular ROI": "Выбрать прямоугольную ROI",
   "Add new rectangular ROI": "Добавить новую прямоугольную ROI",
   "Edit an existent ROI": "Внести изменения в существующую ROI",
   "Remove the ROI": "Удалить ROI",
@@ -9,5 +10,12 @@
   "Bottom": "Низ",
 
   "ROI properties": "Свойства ROI",
-  "Apply ROI": "Применить ROI"
+  "Apply ROI": "Применить ROI",
+
+  "Pinwheel center properties": "Свойства центра ориентационной гиперколонки",
+  "Select pinwheel centers": "Выбрать центры ориентационных гиперколонок",
+  "Add new pimwheel center": "Добавить новый центр ориентационной гиперколонки",
+  "Change pinwheel position": "Изменить центр ориентационной гиперколонки",
+  "Remove the pinwheel center": "Удалить центр ориентационной гиперколонки",
+  "Calculate the distance map": "Рассчитать карту расстояний"
 }

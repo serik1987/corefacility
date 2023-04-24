@@ -1,0 +1,14 @@
+.dialog :global .epic-fail{
+	display: none;
+}
+
+.data_section{
+	display: grid;
+	gap: 10px;
+	grid-template-columns: auto 1fr;
+	margin-bottom: 20px;
+}
+
+.controls_section{
+	text-align: center;
+}

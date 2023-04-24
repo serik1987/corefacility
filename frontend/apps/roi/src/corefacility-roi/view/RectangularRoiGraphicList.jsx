@@ -1,3 +1,7 @@
+import {translate as t} from 'corefacility-base/utils';
+import {ReactComponent as Pinwheel} from 'corefacility-base/shared-view/icons/pinwheel.svg';
+import RedirectionTool from 'corefacility-imaging/view/drawer_tools/RedirectionTool';
+
 import GraphicList from './GraphicList';
 import RoiAddTool from './drawer-tools/RoiAddTool';
 import RoiEditTool from './drawer-tools/RoiEditTool';
@@ -33,6 +37,8 @@ import CloseAppTool from './drawer-tools/CloseAppTool';
  * 	@param {Number} 		colorBarResolution 			dimensions of the phase axis color bar, px
  * 	@param {Uint8ClampedArray} 	colorBarImage			bitmap for the phase axis color bar
  * 	@param {Number} 		scale 						Currently selected scale.
+ * 	@param {String} 		redirect 					Route to redirect to or null if no redirection required
+ * 	@param {Array} 			itemList 					List of all items to output
  */
 export default class RectangularRoiGraphicList extends GraphicList{
 
@@ -53,6 +59,7 @@ export default class RectangularRoiGraphicList extends GraphicList{
 			new RoiAddTool(),
 			new RoiEditTool(),
 			new RoiRemoveTool(),
+			new RedirectionTool(t("Select pinwheel centers"), <Pinwheel/>, '/pinwheels/'),
 			new CloseAppTool(`/data/${this.props.functionalMap.id}/`),
 		];
 	}

@@ -64,47 +64,6 @@ export default class FrameEditor extends ListEditor{
 		return result;
 	}
 
-	/** Tells the component that list fetching is in progress.
-	 *  @return {undefined}
-	 */
-	reportListFetching(){
-		super.reportListFetching();
-		if (window !== window.parent){
-			window.postMessage({
-				method: 'fetchList',
-				info: null,
-			}, window.location.origin);
-		}
-	}
-
-	/** Tells the component that list fetching has been successfully completed.
-	 *  @param {EntityPage|array} the item list that has been recently received from the Web server
-	 *  @returns {undefined}
-	 */
-	reportFetchSuccess(itemList){
-		super.reportFetchSuccess(itemList);
-		if (window !== window.parent){
-			window.postMessage({
-				method: 'fetchSuccess',
-			});
-		}
-	}
-
-	/** Tells the component that there was unabled to fetch the list.
-	 *  @param {Error} the Javascript exception that has been thrown during the fetch
-	 *  @returns {undefined}
-	 */
-	reportFetchFailure(error){
-		super.reportFetchFailure(error);
-		if (window !== window.parent){
-			window.postMessage({
-				method: 'fetchFailure',
-				info: error.message,
-			}, window.location.origin);
-			console.error(error);
-		}
-	}
-
 	componentDidMount(){
 		super.componentDidMount();
 		window.application.notifyStateChanged();
@@ -114,6 +73,22 @@ export default class FrameEditor extends ListEditor{
 		super.componentDidUpdate(prevProps, prevState);
 		if (prevProps.reloadTime !== this.props.reloadTime){
 			this.reload();
+		}
+		if (this.isLoading && window !== window.parent){
+			window.postMessage({
+				method: 'fetchList',
+				info: null,
+			}, window.location.origin);
+		} else if (this.isError){
+			window.postMessage({
+				method: 'fetchFailure',
+				info: this.error.message,
+			}, window.location.origin);
+			console.error(this.error);
+		} else {
+			window.postMessage({
+				method: 'fetchSuccess',
+			});
 		}
 	}
 

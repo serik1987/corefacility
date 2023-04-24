@@ -1,4 +1,5 @@
 import {createRef} from 'react';
+import {Navigate} from 'react-router-dom';
 
 import {translate as t} from 'corefacility-base/utils';
 import Loader from 'corefacility-base/view/Loader';
@@ -35,6 +36,7 @@ import style from './style.module.css';
  * 	@param {Number} 		colorBarResolution 			dimensions of the phase axis color bar, px
  * 	@param {Uint8ClampedArray} 	colorBarImage			bitmap for the phase axis color bar
  * 	@param {Number} 		scale 						Currently selected scale.
+ * 	@param {String} 		redirect 					Route to redirect to or null if no redirection required
  */
 export default class FunctionalMapDrawer extends Loader{
 
@@ -108,6 +110,7 @@ export default class FunctionalMapDrawer extends Loader{
 			colorBarResolution: null,
 			colorBarImage: null,
 			scale: 1,
+			redirect: null,
 		}
 
 		this.tools = [
@@ -133,7 +136,11 @@ export default class FunctionalMapDrawer extends Loader{
 	 * 	DOM node of the canvas where we will draw maps and color bars.
 	 */
 	get canvasElement(){
-		return this.container.getElementsByTagName('canvas')[0]; /* There is only one canvas */
+		if (this.container === null){
+			return null;
+		} else {
+			return this.container.getElementsByTagName('canvas')[0]; /* There is only one canvas */
+		}
 	}
 
 	/**
@@ -289,6 +296,10 @@ export default class FunctionalMapDrawer extends Loader{
 	 * 	Provides a full redraw of the canvas
 	 */
 	repaint(){
+		if (this.canvasElement === null){
+			return;
+		}
+
 		if (!this.props.functionalMap ||
 				!this.props.functionalMap.resolution_x || !this.props.functionalMap.resolution_y){
 			throw new Error("The FunctionalMapDrawer is not suitable for maps that has not been uploaded yet");
@@ -866,6 +877,11 @@ export default class FunctionalMapDrawer extends Loader{
 	}
 
 	render(){
+		if (this.state.redirect){
+			return <Navigate to={this.state.redirect}/>
+		}
+
+
 		let containerClasses = style.drawer;
 		if (this.props.cssSuffix){
 			containerClasses += ` ${this.props.cssSuffix}`;
@@ -970,7 +986,7 @@ export default class FunctionalMapDrawer extends Loader{
 	 * 	@param 	{BaseTool} tool 			The tool selected by the user
 	 */
 	handleToolSelection(tool){
-		let selectionResult = tool.selectTool();
+		let selectionResult = tool.selectTool(this);
 		if (selectionResult !== true){
 			this.setState({currentTool: tool});
 		}

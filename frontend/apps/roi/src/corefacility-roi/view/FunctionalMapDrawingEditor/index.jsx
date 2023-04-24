@@ -48,6 +48,12 @@ export default class FunctionalMapDrawingEditor extends FrameEditor{
     constructor(props){
         super(props);
         this._graphicList = createRef();
+
+        this.state = {
+            ...super.state,
+            _functionalMapIsLoading: false,
+            _functionalMapError: null,
+        }
     }
 
     /**
@@ -58,10 +64,72 @@ export default class FunctionalMapDrawingEditor extends FrameEditor{
     }
 
     /**
+     *  Defines props for the child GraphicList component
+     */
+    get graphicItemListComponentProps(){
+        return {
+            ref: this._graphicList,
+            functionalMap: window.application.functionalMap,
+            onFetchStart: () => this.reportFunctionalMapIsLoading(),
+            onFetchSuccess: () => this.reportFunctionalMapLoadSuccess(),
+            onFetchFailure: error => this.reportFunctionalMapLoadFail(error),
+            cssSuffix: style.graphic_list,
+            inactive: this.isLoading,
+            itemList: this.itemList,
+            onItemAdd: this.handleItemAdd,
+            onItemChange: this.handleSelectItem,
+            onItemRemove: this.handleItemRemove,
+        }
+    }
+
+    /**
      *  Returns the graphic list or null if no graphic list was attached.
      */
     get graphicList(){
         return this._graphicList.current;
+    }
+
+    /**
+     *  Whether something in the editor or its child components is loading
+     */
+    get isLoading(){
+        return super.isLoading || this.state._functionalMapIsLoading;
+    }
+
+    /**
+     *  Whether something in the editor or its child component has an error
+     */
+    get isError(){
+        return super.isError || this.state._functionalMapError !== null
+    }
+
+    /**
+     *  Returns the error
+     */
+    get error(){
+        return super.error ?? this._functionalMapError;
+    }
+
+    /**
+     *  Tells the editor that the functional map in the graphic list is still loading
+     */
+    reportFunctionalMapIsLoading(){
+        this.setState({_functionalMapIsLoading: true, _functionalMapError: null});
+    }
+
+    /**
+     *  Tells the editor that the functional map loading was successful
+     */
+    reportFunctionalMapLoadSuccess(){
+        this.setState({_functionalMapIsLoading: false, _functionalMapError: null});
+    }
+
+    /**
+     *  Tells the editor that the functional map loading was failed
+     *  @param {Error} error        An error occured
+     */
+    reportFunctionalMapLoadFail(error){
+        this.setState({_functionalMapIsLoading: false, _functionalMapError: error});
     }
 
     render(){
@@ -116,19 +184,7 @@ export default class FunctionalMapDrawingEditor extends FrameEditor{
     renderGraphicItemList(){
         let GraphicList = this.graphicItemListComponent;
         return (
-            <GraphicList
-                ref={this._graphicList}
-                functionalMap={window.application.functionalMap}
-                onFetchStart={() => this.reportListFetching()}
-                onFetchSuccess={() => this.reportFetchSuccess(undefined)}
-                onFetchFailure={error => this.reportFetchFailure(error)}
-                cssSuffix={style.graphic_list}
-                inactive={this.isLoading}
-                itemList={this.itemList}
-                onItemAdd={this.handleItemAdd}
-                onItemChange={this.handleSelectItem}
-                onItemRemove={this.handleItemRemove}
-            />
+            <GraphicList {...this.graphicItemListComponentProps} />
         );
     }
 

@@ -244,7 +244,7 @@ export default class App extends DialogWrapper{
 	}
 
 	componentWillUnmount(){
-		window.removeEventListener(this.__dropDownCloser);
+		window.removeEventListener('click', this.__dropDownCloser);
 	}
 
 }

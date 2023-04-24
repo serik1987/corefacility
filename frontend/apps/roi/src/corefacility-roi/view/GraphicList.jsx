@@ -31,7 +31,9 @@ import FunctionalMapDrawer from 'corefacility-imaging/view/FunctionalMapDrawer';
  * 	@param {Number} 		colorBarResolution 			dimensions of the phase axis color bar, px
  * 	@param {Uint8ClampedArray} 	colorBarImage			bitmap for the phase axis color bar
  * 	@param {Number} 		scale 						Currently selected scale.
+ * 	@param {String} 		redirect 					Route to redirect to or null if no redirection required
  * 	@param {Array} 			itemList 					List of all items to output
+ * 
  */
 export default class GraphicList extends FunctionalMapDrawer{
 
@@ -81,6 +83,9 @@ export default class GraphicList extends FunctionalMapDrawer{
 		this.repaintItems();
 	}
 
+	/**
+	 * 	Repaints all items in the list
+	 */
 	repaintItems(){
 		let currentItem = null;
 		if (this.state.currentTool && this.state.currentTool.current){
