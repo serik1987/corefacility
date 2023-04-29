@@ -13,7 +13,7 @@ class PageObject:
     _web_page = None
     _client_settings = None
 
-    SETTINGS_TEMPLATE = re.compile(r'^const\s+SETTINGS\s*=\s*(.+)\s*;\s*$')
+    SETTINGS_TEMPLATE = re.compile(r'^window\.SETTINGS\s*=\s*(.+)\s*;\s*$')
 
     def __init__(self, test, response):
         """

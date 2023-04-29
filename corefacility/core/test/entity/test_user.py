@@ -4,7 +4,8 @@ from parameterized import parameterized
 from core.entity.user import User
 from core.entity.entity_sets.user_set import UserSet
 from core.entity.entity_fields.field_managers.entity_password_manager import EntityPasswordManager
-from core.entity.entity_exceptions import EntityDuplicatedException, EntityFieldInvalid, EntityOperationNotPermitted
+from core.entity.entity_exceptions import EntityDuplicatedException, EntityFieldInvalid, EntityOperationNotPermitted, \
+    SupportUserModificationNotAllowed
 
 from .base_test_class import BaseTestClass
 from .entity_field_mixins.expiry_date_mixin import ExpiryDateMixin
@@ -193,7 +194,7 @@ class TestUser(PasswordMixin, FileFieldMixin, ExpiryDateMixin, BaseTestClass):
     def test_support_update(self):
         support = UserSet().get("support")
         support.password_hash.generate(EntityPasswordManager.SMALL_LATIN_LETTERS, 3)
-        with self.assertRaises(EntityFieldInvalid, msg="the password for support user can be set"):
+        with self.assertRaises(SupportUserModificationNotAllowed, msg="the password for support user can be set"):
             support.update()
 
     def test_support_user_delete(self):

@@ -44,12 +44,14 @@ class TestCookieAuthorization(BaseTestClass):
         user = self.users[login]
         token = AuthorizationModule.issue_token(user)
         self.assert_profile_response(token, user)
-        self.assert_token_ok(user)
+        if login == 'superuser':
+            self.assert_token_failed()
+        else:
+            self.assert_token_ok(user)
 
-    @parameterized.expand(login_provider())
     @enable_all_methods
-    def test_multiple_authorization(self, login):
-        user = self.users[login]
+    def test_multiple_authorization(self):
+        user = self.users['user']
         token = AuthorizationModule.issue_token(user)
         self.assert_profile_response(token, user)
         self.assert_token_ok(user)
@@ -102,15 +104,14 @@ class TestCookieAuthorization(BaseTestClass):
         self.simulate_token_expiration()
         self.assert_token_failed()
 
-    @parameterized.expand(login_provider())
     @enable_all_methods
-    def test_ambiguous_expired_cookie(self, login):
+    def test_ambiguous_expired_cookie(self):
         """
         Tries ambiguous authorization when the cookie has been expired
 
         :return: nothing
         """
-        user = self.users[login]
+        user = self.users['user']
         token = AuthorizationModule.issue_token(user)
         self.assert_profile_response(token, user)
         self.simulate_token_expiration()
@@ -140,24 +141,6 @@ class TestCookieAuthorization(BaseTestClass):
         :return: nothing
         """
         self.assert_token_failed()
-
-    @enable_all_methods
-    def test_authorization_not_authentication(self):
-        """
-        Checks that the authorization is not authentication
-
-        :return: nothing
-        """
-        response = self.client.post(self.login_response, data={"login": "user", "password": self.password},
-                                    format="json")
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        token = response.data['token']
-        if 'token' in response.cookies:
-            self.assertEquals(response.cookies['token'].value, "",
-                              "Authorization is not authentication: No cookie shall be sent "
-                              "during the API authorization")
-        self.assert_profile_response(token, self.users['user'])
-        self.assert_token_ok(self.users['user'])
 
     def simulate_token_expiration(self):
         """

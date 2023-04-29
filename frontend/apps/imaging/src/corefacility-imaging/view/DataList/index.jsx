@@ -42,6 +42,16 @@ export default class DataList extends PaginatedList{
      *              - its onClick prop must be equal to this.props.onItemSelect
      */
     renderItemContent(functionalMap){
+        let permissions = window.application.project.user_access_level;
+        let allowedToEdit = false;
+        let allowedToRemove = false;
+        if (permissions === 'full' || permissions === 'data_full'){
+            allowedToEdit = true;
+            allowedToRemove = true;
+        } else if (permissions === 'data_add'){
+            allowedToEdit = true;
+        }
+
         return (
             <li key={functionalMap.id} className={style.item}>
                 <SidebarItem
@@ -49,13 +59,13 @@ export default class DataList extends PaginatedList{
                     onClick={event => this.handleSelect(event, functionalMap)}
                     text={[
                         <p>{functionalMap.alias}</p>,
-                        <Icon
+                        allowedToEdit && <Icon
                             onClick={event => this.handleEdit(event, functionalMap)}
                             inactive={this.props.isLoading}
                             tooltip={t("Edit")}
                             src={<EditIcon/>}
                         />,
-                        <Icon
+                        allowedToRemove && <Icon
                             onClick={event => this.handleRemove(event, functionalMap)}
                             inactive={this.props.isLoading}
                             tooltip={t("Remove")}

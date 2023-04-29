@@ -79,7 +79,7 @@ class BaseListTest(MapListMixin, BaseTestClass):
         response = self.client.get(entity_search_path, **headers)
         self.assertEquals(response.status_code, expected_status_code, "Unexpected response status")
         if expected_status_code < status.HTTP_300_MULTIPLE_CHOICES:
-            actual_data = response.data['results']
+            actual_data = response.data
             if map_alias not in self.entity_list[project_alias]:
                 self.assertEquals(len(actual_data), 0, "The pinwheel list must be empty")
             else:

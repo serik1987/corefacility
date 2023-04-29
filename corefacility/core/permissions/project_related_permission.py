@@ -2,7 +2,6 @@ from django.core.exceptions import ImproperlyConfigured
 from rest_framework.permissions import IsAuthenticated
 
 from core.entity.project import ProjectSet
-from core.generic_views.entity_view_mixin import EntityViewMixin
 
 
 class ProjectRelatedPermission(IsAuthenticated):
@@ -30,6 +29,7 @@ class ProjectRelatedPermission(IsAuthenticated):
         :param view: the view corresponding to the request
         :return: True if the access shall be granted, False if the access shall be denied
         """
+        from core.generic_views.entity_view_mixin import EntityViewMixin
         if not super().has_permission(request, view):
             return False
         if 'project_lookup' not in view.kwargs:

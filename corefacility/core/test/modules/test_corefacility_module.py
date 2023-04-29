@@ -128,20 +128,40 @@ class TestCorefacilityModule(BaseAppsTest):
 
         (BaseAppsTest.TEST_FIND_BY_INDEX, -1, BaseAppsTest.NEGATIVE_TEST_CASE),
         (BaseAppsTest.TEST_FIND_BY_INDEX, 0, BaseAppsTest.POSITIVE_TEST_CASE),
-        (BaseAppsTest.TEST_FIND_BY_INDEX, 10, BaseAppsTest.POSITIVE_TEST_CASE),
-        (BaseAppsTest.TEST_FIND_BY_INDEX, 11, BaseAppsTest.NEGATIVE_TEST_CASE),
+        (BaseAppsTest.TEST_FIND_BY_INDEX, 9, BaseAppsTest.POSITIVE_TEST_CASE),
+        (BaseAppsTest.TEST_FIND_BY_INDEX, 10, BaseAppsTest.NEGATIVE_TEST_CASE),
 
         (BaseAppsTest.TEST_SLICING, (3, 7, 1), BaseAppsTest.POSITIVE_TEST_CASE),
         (BaseAppsTest.TEST_SLICING, (10, 20, 1), BaseAppsTest.POSITIVE_TEST_CASE),
         (BaseAppsTest.TEST_SLICING, (8, 7, 1), BaseAppsTest.POSITIVE_TEST_CASE),
     ])
-    def test_module_set(self, *args):
+    def test_module_set(self, feature_index, arg, test_type):
+        """
+        Tests all entity reading features
+
+        :param feature_index: entity reading feature to test:
+            0 - search by ID
+            1 - search by alias
+            2 - search by item index in the entity set
+            3 - slicing
+            4 - iterating
+            5 - counting entity number
+        :param arg: depends on testing feature:
+            for searching by ID: entity index within the entity set object
+            for searching by alias: entity alias
+            for searching by item index: item index
+            for slicing: a tuple containing start and stop indices and slice step
+            for iteration: useless
+            for entity counting: useless
+        :param test_type: 0 for positive test, 1 for negative test, useless for iteration and counting
+        :return: nothing
+        """
         with self.assertLessQueries(1):
-            self._test_all_access_features(*args)
+            self._test_all_access_features(feature_index, arg, test_type)
 
     @parameterized.expand([
         (True, 1),  # We have just one root module
-        (False, 10)  # We have 10 non-root modules
+        (False, 9)  # We have 10 non-root modules
     ])
     def test_filter_is_root_module_count(self, filter_value, module_count):
         module_set = CorefacilityModuleSet()

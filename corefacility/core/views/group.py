@@ -1,13 +1,13 @@
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import PermissionDenied, ValidationError, NotFound
 
 from ..pagination import CorePagination
 from ..generic_views import EntityViewSet
 from ..entity.group import GroupSet
 from ..entity.user import UserSet
-from ..entity.entity_exceptions import EntityOperationNotPermitted
+from ..entity.entity_exceptions import EntityOperationNotPermitted, EntityNotFoundException
 from ..serializers import GroupSerializer, UserListSerializer
 from ..permissions import GroupPermission
 
@@ -114,7 +114,10 @@ class GroupViewSet(EntityViewSet):
         group_set = GroupSet()
         if not request.user.is_superuser and "all" not in request.query_params:
             group_set.user = request.user
-        group = group_set.get(int(kwargs['lookup']))
+        try:
+            group = group_set.get(int(kwargs['lookup']))
+        except EntityNotFoundException:
+            raise NotFound()
         self.check_object_permissions(request, group)
         group_users = {user.id for user in group.users}
         user_set = UserSet()

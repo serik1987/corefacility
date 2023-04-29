@@ -159,6 +159,11 @@ export default class DataEditor extends SidebarEditor{
 	 * 	Renders the map viewing application
 	 */
     renderRightPane(){
+    	let permissionLevel = window.application.project.user_access_level;
+    	let mapUploadPermissions = permissionLevel === 'full' || permissionLevel === 'data_full' ||
+    		permissionLevel === 'data_add';
+    	let mapProcessingPermissions =  mapUploadPermissions || permissionLevel === 'data_process';
+
         return (
         	<div className={style.main}>
         		<div className={style.uploader_row}>
@@ -170,6 +175,7 @@ export default class DataEditor extends SidebarEditor{
         				error={this.state.uploadError}
         				onError={this.handleUploadError}
         				cssSuffix={style.uploader}
+        				readonly={!mapUploadPermissions}
         				additionalIcons={[
         					<div
         						className={style.download_icon}
@@ -185,7 +191,7 @@ export default class DataEditor extends SidebarEditor{
         					>
         						MAT
         					</div>,
-        					<Icon
+        					mapProcessingPermissions && <Icon
         						type="mini"
         						onClick={this.handleRoiSelection}
         						inactive={this.isLoading}
@@ -195,7 +201,7 @@ export default class DataEditor extends SidebarEditor{
         				]}
         			/>
         		</div>
-        		{this.state.item.resolution_x && <FunctionalMapDrawer
+        		{this.state.item.data.value !== null && <FunctionalMapDrawer
         			ref={this._functionalMapDrawer}
         			functionalMap={this.state.item}
         			onFetchStart={() => this.reportListFetching()}

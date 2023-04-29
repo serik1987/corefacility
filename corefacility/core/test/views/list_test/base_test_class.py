@@ -36,8 +36,7 @@ class BaseTestClass(BaseViewTest):
 
     def _test_search(self, query_params, token_id: str, expected_status_code: int = status.HTTP_200_OK):
         """
-        Tries the general field search
-
+        Tries the general field search for the paginated list
         :param query_params: the query parameters that shall be used for searching
         :param token_id: a token ID.
         :param expected_status_code: a status code to expect
@@ -67,6 +66,15 @@ class BaseTestClass(BaseViewTest):
 
     def _test_single_page(self, request_path, query_params, headers, page_number,
                           expected_status_code=status.HTTP_200_OK):
+        """
+        When the response is paginated, the method provides test for the single list page.
+        :param request_path: full path to the request
+        :param query_params: query parameters
+        :param headers: Request headers
+        :param page_number: number of the page to request and test
+        :param expected_status_code: status code to be expected
+        :return: two-element tuple: URI for the previous page, URI for the next page
+        """
         response = self.client.get(request_path, data=query_params, **headers)
         self.assertEquals(response.status_code, expected_status_code, "The entity list response must be successful")
         if response.status_code >= status.HTTP_300_MULTIPLE_CHOICES:
@@ -77,12 +85,37 @@ class BaseTestClass(BaseViewTest):
         page_size = self.pagination_class.PAGE_SIZES[profile]
         page_offset = (page_number-1) * page_size
         desired_results = self.container[page_offset:page_offset+page_size]
+        self._compare_search_result(actual_results, desired_results)
+        return response.data['previous'], response.data['next']
+
+    def _test_unpaginated_list(self, query_params, token_id: str, expected_status_code: int = status.HTTP_200_OK):
+        """
+        Tries general field search for an unpaginated list
+        :param query_params: query parameters
+        :param token_id: ID for the authorization token
+        :param expected_status_code: status code to be expected
+        """
+        headers = self.get_authorization_headers(token_id)
+        response = self.client.get(self.request_path, data=query_params, **headers)
+        self.assertEquals(response.status_code, expected_status_code, "The entity list response must be successful")
+        if response.status_code >= status.HTTP_300_MULTIPLE_CHOICES:
+            return
+        actual_results = response.data
+        desired_results = self.container[:]
+        self.assertEquals(len(actual_results), len(desired_results), "Wrong number of the page size")
+        self._compare_search_result(actual_results, desired_results)
+
+    def _compare_search_result(self, actual_results, desired_results):
+        """
+        Compared the list retrieved by the response with the expected list saved in the object container
+        :param actual_results: the list revealed by the response
+        :param desired_results: expected list saved in the object container
+        """
         self.assertEquals(len(actual_results), len(desired_results), "Wrong number of the page size")
         for result_index in range(len(actual_results)):
             actual_item = actual_results[result_index]
             desired_item = desired_results[result_index]
             self.assert_items_equal(actual_item, desired_item)
-        return response.data['previous'], response.data['next']
 
     @property
     def container(self):

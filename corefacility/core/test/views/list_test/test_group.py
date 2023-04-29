@@ -154,7 +154,7 @@ def security_delete_provider():
         *delete_user_provider("superuser", 0, 8),
         *delete_user_provider("superuser", 1, 8),
 
-        ("user1", 3, "user1", status.HTTP_403_FORBIDDEN),
+        ("user1", 3, "user1", status.HTTP_204_NO_CONTENT),
         ("user1", 2, "user3", status.HTTP_403_FORBIDDEN),
         ("user1", 4, "user4", status.HTTP_404_NOT_FOUND),
         ("user1", 0, "user6", status.HTTP_404_NOT_FOUND),
@@ -167,14 +167,14 @@ def security_delete_provider():
         ("user2", 1, "user10", status.HTTP_404_NOT_FOUND),
 
         ("user3", 3, "user1", status.HTTP_403_FORBIDDEN),
-        ("user3", 2, "user3", status.HTTP_403_FORBIDDEN),
+        ("user3", 2, "user3", status.HTTP_204_NO_CONTENT),
         ("user3", 4, "user4", status.HTTP_404_NOT_FOUND),
         ("user3", 0, "user6", status.HTTP_404_NOT_FOUND),
         ("user3", 1, "user10", status.HTTP_404_NOT_FOUND),
 
         ("user4", 3, "user1", status.HTTP_404_NOT_FOUND),
         ("user4", 2, "user3", status.HTTP_204_NO_CONTENT),
-        ("user4", 4, "user4", status.HTTP_403_FORBIDDEN),
+        ("user4", 4, "user4", status.HTTP_204_NO_CONTENT),
         ("user4", 0, "user6", status.HTTP_404_NOT_FOUND),
         ("user4", 1, "user10", status.HTTP_404_NOT_FOUND),
 
@@ -187,7 +187,7 @@ def security_delete_provider():
         ("user6", 3, "user1", status.HTTP_403_FORBIDDEN),
         ("user6", 2, "user3", status.HTTP_404_NOT_FOUND),
         ("user6", 4, "user4", status.HTTP_403_FORBIDDEN),
-        ("user6", 0, "user6", status.HTTP_403_FORBIDDEN),
+        ("user6", 0, "user6", status.HTTP_204_NO_CONTENT),
         ("user6", 1, "user10", status.HTTP_404_NOT_FOUND),
 
         ("user7", 3, "user1", status.HTTP_404_NOT_FOUND),
@@ -212,7 +212,7 @@ def security_delete_provider():
         ("user10", 2, "user3", status.HTTP_404_NOT_FOUND),
         ("user10", 4, "user4", status.HTTP_404_NOT_FOUND),
         ("user10", 0, "user6", status.HTTP_404_NOT_FOUND),
-        ("user10", 1, "user10", status.HTTP_403_FORBIDDEN),
+        ("user10", 1, "user10", status.HTTP_204_NO_CONTENT),
     ]
 
 
@@ -347,6 +347,13 @@ class TestGroup(BaseTestClass):
 
     @parameterized.expand(security_delete_provider())
     def test_user_list_delete(self, token_id, group_index, delete_user_login, expected_status_code):
+        """
+        Tests whether the user can be successfully deleted from the group
+        :param token_id: index of the authorized user
+        :param group_index: index of a group to test
+        :param delete_user_login: login of the user to delete
+        :param expected_status_code: expected result of such operation
+        """
         headers = self.get_authorization_headers(token_id)
         group = self.container[group_index]
         request_path = self._detail_path % group.id + "users/%s/" % delete_user_login
@@ -360,6 +367,12 @@ class TestGroup(BaseTestClass):
 
     @parameterized.expand(security_read_provider())
     def test_user_suggest(self, token_id, group_index, expected_status_code):
+        """
+        Tests for user suggestions for the group
+        :param token_id: ID of the authorization token
+        :param group_index: index of the group within the container
+        :param expected_status_code: response status code to be expected
+        """
         group = self.container[group_index]
         path = self._detail_path % group.id + "user-suggest/"
         headers = self.get_authorization_headers(token_id)

@@ -38,7 +38,7 @@ class TestCorefacilityModule(BaseTestClass):
         """
         Basic search test
         """
-        self._test_search({"profile": profile}, login, response_status)
+        self._test_unpaginated_list({"profile": profile}, login, response_status)
 
     @parameterized.expand([
         (AuthorizationsEntryPoint, "superuser", status.HTTP_200_OK),
@@ -64,7 +64,7 @@ class TestCorefacilityModule(BaseTestClass):
         else:
             self._container.is_root_module = True
             entry_point_id = ""
-        self._test_search({"profile": "basic", "entry_point": entry_point_id}, login, response_status)
+        self._test_unpaginated_list({"profile": "basic", "entry_point": entry_point_id}, login, response_status)
 
     @parameterized.expand([
         (True, True, "superuser", status.HTTP_200_OK),
@@ -88,7 +88,7 @@ class TestCorefacilityModule(BaseTestClass):
             roi_app.update()
         self._container.is_application = True
         self._container.is_enabled = True
-        self._test_search({"profile": "basic", "enabled_apps_only": ""}, login, status_code)
+        self._test_unpaginated_list({"profile": "basic", "enabled_apps_only": ""}, login, status_code)
 
     @parameterized.expand([
         (CoreApp, "superuser", status.HTTP_200_OK),
@@ -107,7 +107,7 @@ class TestCorefacilityModule(BaseTestClass):
         response = self.client.get(path, **headers)
         self.assertEquals(response.status_code, expected_status_code, "Unexpected response status")
         if expected_status_code == status.HTTP_200_OK:
-            results = response.data['results']
+            results = response.data
             self.assertEquals(len(results), len(module.get_entry_points()), "Unexpected number of entry points")
             for entry_point_info in results:
                 self.assertIn(entry_point_info['alias'], module.get_entry_points(),

@@ -17,7 +17,6 @@ from core.entity.entry_points.entry_point_set import EntryPointSet
 from core.authorizations import AutomaticAuthorization, PasswordRecoveryAuthorization, StandardAuthorization
 
 from authorizations.cookie import App as CookieAuthorization
-from authorizations.ihna import App as IhnaAuthorization
 from authorizations.mailru import App as MailruAuthorization
 from authorizations.google import App as GoogleAuthorization
 from core.synchronizations import IhnaSynchronization
@@ -32,7 +31,6 @@ def module_delete_provider():
         (PasswordRecoveryAuthorization, None),
         (StandardAuthorization, None),
         (CookieAuthorization, None),
-        (IhnaAuthorization, None),
         (MailruAuthorization, None),
         (GoogleAuthorization, None),
         (IhnaSynchronization, None),
@@ -61,7 +59,6 @@ class TestCorefacilityModuleDelete(TestCase):
         PasswordRecoveryAuthorization.reset()
         StandardAuthorization.reset()
         CookieAuthorization.reset()
-        IhnaAuthorization.reset()
         MailruAuthorization.reset()
         GoogleAuthorization.reset()
         IhnaSynchronization.reset()

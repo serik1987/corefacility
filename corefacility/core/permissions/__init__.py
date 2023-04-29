@@ -92,10 +92,15 @@ class GroupPermission(IsAuthenticated):
         :param group: some group the user is trying to perform operations
         :return: True if particular operation is granted, False if the operation is denied
         """
+        requested_user_id = None
+        try:
+            requested_user_id = int(view.kwargs['user_lookup'])
+        except (KeyError, ValueError):
+            pass
         user_wants_to_exclude_himself = (
                 view.action == 'delete_user' and
-                request.method == 'DELETE' and
-                request.user.id == int(view.kwargs['user_lookup'])
+                request.method.upper() == 'DELETE' and
+                (request.user.login == view.kwargs['user_lookup'] or request.user.id == requested_user_id)
         )
         return request.method in self.SAFE_METHODS or group.governor.id == request.user.id \
             or request.user.is_superuser or user_wants_to_exclude_himself

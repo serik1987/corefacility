@@ -50,6 +50,10 @@ class AvatarUploadTest(ImageUploadTest):
         """
         avatar_url = self.get_uploaded_file_url(response)
         self.assertTrue(avatar_url.startswith(settings.MEDIA_URL), "The file doesn't seem to be uploaded")
+        avatar_url, hash_code = avatar_url.split('?')
+        if hash_code == '?' or hash_code is None:
+            self.fail(msg="The avatar URL must be appended by the file checksum in order to prevent unexpected caching "
+                          "or this file by the Web browser")
         filename = avatar_url.split(settings.MEDIA_URL)[1]
         fullname = os.path.join(settings.MEDIA_ROOT, filename)
         self.assertTrue(os.path.isfile(fullname), "The uploaded file doesn't seem to be saved")

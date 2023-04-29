@@ -123,17 +123,25 @@ export default class SidebarEditor extends FrameEditor{
     }
 
 	render(){
+        let addDataPermissions = true;
+        if (window.application.project){
+            let accessLevel = window.application.project.user_access_level;
+            if (accessLevel !== 'full' && accessLevel !== 'data_full' && accessLevel !== 'data_add'){
+                addDataPermissions = false;
+            }
+        }
+
 		return (
 			<Sidebar
                 cssSuffix={style.sidebar}
 				items={
 					<div className={style.main}>
-                        <SidebarItem
+                        {addDataPermissions && <SidebarItem
                             onClick={this.handleAddButton}
                             icon={<AddIcon/>}
                             text={t("Add new data")}
                             inactive={this.isLoading}
-                        />
+                        />}
 						{this.renderItemList()}
 					</div>
 				}

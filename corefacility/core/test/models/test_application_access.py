@@ -8,16 +8,15 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.test import TestCase
 from parameterized import parameterized
 
-from core.models import Module, EntryPoint, ExternalAuthorizationSession, User
+from core.models import Module, EntryPoint, User
 
-AUTHORIZATION_MODULE_LIST = ["ihna", "google", "mailru"]
+AUTHORIZATION_MODULE_LIST = ["google", "mailru"]
 
 
 def widget_list_provider():
     return [
         (["core", "authorizations"],  [
             ("standard", None),
-            ("ihna", "<div class='auth ihna'></div>"),
             ("google", "<div class='auth google'></div>"),
             ("mailru", "<div class='auth mailru'></div>"),
             ("cookie", None),
@@ -39,7 +38,6 @@ def widget_list_provider():
 def module_list_provider():
     return [
         ("standard", "core.authorizations.StandardAuthorization"),
-        ("ihna", "authorizations.ihna.App"),
         ("google", "authorizations.google.App"),
         ("mailru", "authorizations.mailru.App"),
         ("cookie", "authorizations.cookie.App"),
@@ -62,18 +60,6 @@ class TestApplicationProcess(TestCase):
         user = User(login="sergei.kozhukhov")
         user.save()
         for module in AUTHORIZATION_MODULE_LIST:
-            password = cls.generate_random_password()
-            password_hash = make_password(password)
-            module_app = Module.objects.get(parent_entry_point__alias="authorizations", alias=module)
-            session = ExternalAuthorizationSession(
-                authorization_module=module_app,
-                session_key=password_hash,
-                session_key_expiry_date=timezone.now()
-            )
-            session.save()
-            session_key = base64.encodebytes((str(session.id) + ":" + password).encode("utf-8")).decode("utf-8")
-            cls.auth_sessions[module] = session_key
-
             Account = cls.get_account_class(module)
             Account(user=user, email="no-reply@ihna.ru").save()
 
@@ -122,17 +108,6 @@ class TestApplicationProcess(TestCase):
         authorization_app = Module.objects.get(parent_entry_point__alias="authorizations", alias=alias)
         authorization_module = authorization_app.app_class
         self.assertEquals(authorization_module, expected_authorization_module)
-
-    def test_authorization_sessions(self):
-        for module, session_key in self.auth_sessions.items():
-            session_info = base64.decodebytes(session_key.encode("utf-8")).decode("utf-8")
-            session_id, session_password = session_info.split(":", 1)
-            session = ExternalAuthorizationSession.objects.get(authorization_module__alias=module, id=session_id)
-            stored_password_hash = session.session_key
-            self.assertTrue(check_password(session_password, stored_password_hash))
-            module_class = session.authorization_module.app_class
-            session.delete()
-            self.assertTrue(module_class.split('.')[1], module)
 
     def test_find_user(self):
         for module in AUTHORIZATION_MODULE_LIST:
