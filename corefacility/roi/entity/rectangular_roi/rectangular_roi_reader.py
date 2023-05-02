@@ -36,7 +36,8 @@ class RectangularRoiReader(RawSqlQueryReader):
             .add_select_expression("imaging_map.resolution_y") \
             .add_select_expression("imaging_map.width") \
             .add_select_expression("imaging_map.height") \
-            .add_select_expression("imaging_map.project_id")
+            .add_select_expression("imaging_map.project_id") \
+            .add_order_term("roi_rectangularroi.id")
 
     def apply_map_filter(self, imaging_map):
         for builder in (self.count_builder, self.items_builder):

@@ -41,8 +41,8 @@ class PinwheelViewSet(FunctionalMapMixin, EntityViewSet):
         if map_width is None or map_height is None:
             raise BadDimensionsException()
         res_y, res_x = source_data.shape
-        x_1d = numpy.arange(res_x, dtype=numpy.float)
-        y_1d = numpy.arange(res_y, dtype=numpy.float)
+        x_1d = numpy.arange(res_x, dtype=float)
+        y_1d = numpy.arange(res_y, dtype=float)
         x, y = numpy.meshgrid(x_1d, y_1d)
         target_map = None
         for pinwheel in pinwheel_set:

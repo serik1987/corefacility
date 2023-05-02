@@ -43,6 +43,9 @@ class TestRectangularRoiSet(BaseTestClass):
 
     @parameterized.expand(general_search_provider())
     def test_general_search(self, *args):
+        """
+        @param args
+        """
         with self.assertLessQueries(1):
             self._test_all_access_features(*args)
 

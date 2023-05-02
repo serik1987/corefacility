@@ -1,4 +1,4 @@
-from nose_parameterized import parameterized
+from parameterized import parameterized
 
 from core import models
 from core.models.enums import LevelType

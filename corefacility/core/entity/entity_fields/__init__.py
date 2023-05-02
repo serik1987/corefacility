@@ -4,6 +4,7 @@ from .read_only_field import ReadOnlyField
 from .managed_entity_field import ManagedEntityField
 from .related_entity_field import RelatedEntityField
 from .ip_address_field import IpAddressField
+from .boolean_field import BooleanField, BooleanReadOnlyField
 
 from .field_managers.entity_value_manager import EntityValueManager
 from .field_managers.public_file_manager import PublicFileManager

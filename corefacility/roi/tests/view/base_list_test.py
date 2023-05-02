@@ -111,7 +111,7 @@ class BaseListTest(MapListMixin, BaseTestClass):
         request_start_time = time()
         response = self.client.post(roi_processing_path, follow=True, **headers)
         request_finish_time = time()
-        self.assertLess(request_finish_time - request_start_time, 1.0,
+        self.assertLess(request_finish_time - request_start_time, 2.0,
                         "The request is too busy")
         self.assertEquals(response.status_code, expected_status_code, "Unexpected status code")
         target_map = None

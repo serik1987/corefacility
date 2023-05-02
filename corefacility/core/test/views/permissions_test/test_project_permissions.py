@@ -227,7 +227,7 @@ class TestProjectPermissions(BasePermissionTest):
             self.assert_permission_updated(project.permissions, permission_list)
 
     @parameterized.expand(file_data_provider(PERMISSION_DELETE_FILE))
-    def test_permision_delete(self, token_id: str, project_alias: str, delete_mode: str, expected_status_code: int):
+    def test_permission_delete(self, token_id, project_alias, delete_mode, expected_status_code):
         """
         Tests whether project permission delete routine works OK
 

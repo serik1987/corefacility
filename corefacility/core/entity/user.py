@@ -7,7 +7,7 @@ from core.transaction import CorefacilityTransaction
 from .entity import Entity
 from .entity_sets.user_set import UserSet
 from .entity_fields import EntityField, EntityAliasField, ManagedEntityField, ReadOnlyField, \
-    EntityPasswordManager, PublicFileManager, ExpiryDateManager
+    EntityPasswordManager, PublicFileManager, ExpiryDateManager, BooleanField, BooleanReadOnlyField
 from core.entity.entity_fields.field_managers.group_manager import GroupManager
 from .entity_exceptions import EntityFieldInvalid, SupportUserModificationNotAllowed
 from .entity_providers.model_providers.user_provider import UserProvider as ModelProvider
@@ -36,9 +36,9 @@ class User(Entity):
         "surname": EntityField(str, max_length=100, description="Surname"),
         "email": EntityField(str, max_length=254, description="E-mail"),
         "phone": EntityField(str, max_length=20, description="Phone number"),
-        "is_locked": EntityField(bool, description="User is locked", default=False),
-        "is_superuser": EntityField(bool, description="Is superuser", default=False),
-        "is_support": ReadOnlyField(description="Is support", default=False),
+        "is_locked": BooleanField(description="User is locked", default=False),
+        "is_superuser": BooleanField(description="Is superuser", default=False),
+        "is_support": BooleanReadOnlyField(description="Is support", default=False),
         "avatar": ManagedEntityField(PublicFileManager, description="User avatar", default=static("core/user.svg")),
         "unix_group": ReadOnlyField(description="UNIX group"),
         "home_dir": ReadOnlyField(description="Home directory"),

@@ -7,7 +7,7 @@ from .arbitrary_access_level_entity import ArbitraryAccessLevelEntity
 from .entity_fields.field_managers.project_permission_manager import ProjectPermissionManager
 from .entity_sets.project_set import ProjectSet
 from .entity_fields import EntityField, EntityAliasField, PublicFileManager, ManagedEntityField, ReadOnlyField, \
-    RelatedEntityField, ProjectApplicationManager
+    RelatedEntityField, ProjectApplicationManager, BooleanField
 from .entity_providers.model_providers.project_provider import ProjectProvider as ModelProvider
 from .entity_providers.posix_providers.project_provider import ProjectProvider as PosixProvider
 from .entity_providers.file_providers.project_files_provider import ProjectFilesProvider
@@ -42,7 +42,7 @@ class Project(ArbitraryAccessLevelEntity):
         "unix_group": ReadOnlyField(description="UNIX group to remote access to project files"),
 
         "user_access_level": ReadOnlyField(description="The user access level list (if applicable)"),
-        "is_user_governor": ReadOnlyField(
+        "is_user_governor": BooleanField(
             description="Whether the user is governor for group with 'full' access (if applicable)")
     }
 
