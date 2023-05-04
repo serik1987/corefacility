@@ -70,11 +70,7 @@ export default class App extends BaseApp{
 			let noSupportPermission = !window.application.user.is_support;
 			let defaultUrl = null;
 
-			if (noSupportPermission){
-				defaultUrl = '/projects/';
-			} else {
-				defaultUrl = '/users/';
-			}
+			defaultUrl = "/projects/";
 
 			return (
 				<Routes>

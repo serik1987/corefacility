@@ -53,7 +53,7 @@ export default class ProjectList extends PaginatedList{
      *              - its onClick prop must be equal to this.props.onItemSelect
      */
     renderItemContent(project){
-        let governor = `${project.governor.surname} ${project.governor.name}`.trim();
+        let governor = `${project.governor.surname ?? ''} ${project.governor.name ?? ''}`.trim();
         if (!governor){
             governor = project.governor.login;
         }
