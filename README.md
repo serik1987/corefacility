@@ -1,377 +1,574 @@
-# corefacility
+# Installation and usage instruction
 
-Documentation for Russian speakers:
-https://github.com/serik1987/corefacility/wiki
+## Developers
 
-Non-Russian speakers are unable to receive
-any kind of documentation. Please, contact
-the following person if you still require
-this documentation:
+(c) Sergei Kozhukhov, scientist in the Institute of Higher Nervous Activity, RAS
 
-> Prof. Igor V. Bondar, D.Sc., Chief of the Department  
-> Laboratory of Physiology of Sensory Systems  
-> the Institute of Higher Nervous Activity and Neurophysiology,  
-> Russian Academy of Sciences  
-> E-mail: bondar@ihna.ru
+E-mail: sergei.kozhukhov@ihna.ru
 
-Here we will mention core aspects of how to install and deploy the application
+URL: https://www.ihna.ru/ru/employees/sergei.kozhukhov
 
-## Requirements
+(c) the Institute of Higher Nervous Activity and Neurophysiology, Russian Academy of Sciences, Moscow,
+Russia
 
-The application is written on Python 3.8 and hence will not work without this interpreter. The following Python
-packages shall be installed in advance using PIP utility:
+Address: 5A Butlerova str., Moscow, Russia
 
-* psutil
-* django
-* django-configurations
-* django-restframework
-* python-dotenv
-* pillow
+E-mail: admin@ihna.ru
 
-## Stage 1. Download and install your application
+Phone number: +7 (495) 334-70-00
 
-We suppose that you have already installed python 3.8 or higher, PIP and all python
-dependencies required by the application (see github wiki for details) as well as git client.
+## Замечание для русскоязычных пользователей
 
-To download the application use the following command:
+Работая с данным продуктом, Вы принимаете условия лицензионного соглашения, изложенные в файле LICENSE.txt
 
-    git clone https://github.com/serik1987/corefacility.git
+К сожалению, данная инструкция доступна на английском языке. В случае возникновения каких-либо затруднений
+в установке пожалуйста, обратитесь к разработчикам за консультацией.
 
-The last step in this stage is to define the configuration defaults. Use the following command to do this
-(it doesn't matter what operating system to use):
+## Installation instructions
 
-    python corefacility/corefacility/manage.py configure
+The program works in stand-alone and Web server configuration. The stand-alone configuration must be
+installed on your personal computer and is suitable for your personal use only. The Web Server
+configuration usually installs on special Web Servers and provides cloud data storage and cloud data
+processing. However, web server configuration is highly difficult and requires a person with special
+skills.
 
-If you complete this stage correctly you will see 'corefacility' folder that contains the following files:
+The following reading will help you to gain such skills:
+Nemett, E., Snyder G. Unix and Linux System Administration Handbook. Fifth Edition. 
 
-* corefacility - the application files itself
-* lang - contains application translations to appropriate language
-* settings - the application settings. You will see several .env files. You need to edit these files to make your
-application working properly
-* venv - if you want to run this application from a virtual environment you will also see these files
-* db.sqlite3 - if you use SQLite all information located in the database will be saved here
-* .gitignore - This file makes github working properly
-* .git - this folder makes github working properly
-* LICENSE, README.md - these files doesn't influence on the program functionality
+### Requirements
 
-## Stage 2. Select an appropriate configuration profile
+_Operating system_: Any operating system where you can install Python 3 and GitHub is good.
+However, if you have non-POSIX operating systems (including Microsoft Windows) you can run this application
+only in stand-alone configuration.
 
-During this stage you need to find a compromise between security, installation simplicity
-and functionality of the application by choosing an appropriate installation profile.
-Each profile correspond to a certain function.
+This program works under Python 3.10 or higher. Also, you are required to install python3-pip v. 22.2.2
+or higher and use this to install the Python packages mentioned below:
 
-| Profile name        | Profile ID                  | Ports that shall be listened | Required  operating system | Access to /etc/shadow | Base project dir | SSH access to all users | Remote access to the application | Hardware health check | Overall security | Difficulty to install |
-| ------------------- | --------------------------- | ---------------------------- | -------------------------- | --------------------- | ---------------- | ----------------------- | -------------------------------- | --------------------- | ---------------- | --------------------- |
-| Full server         | FullServerConfiguration     | 1-1024                       | UNIX-like                  | Required              | /home            | provided                | Allowed                          | provided              | Medium           | High                  |
-| Part server         | PartServerConfiguration     | 1-1024                       | UNIX-like                  | Not required          | /home            | instructed **           | Allowed                          | instructed**          | High             | High                  |
-| Virtual server      | VirtualServerConfiguration  | 1-1024                       | Recommended UNIX-like *    | Not required          | ~/research       | not available           | Allowed                          | not allowed           | High             | High                  |
-| Extended standalone | ExtendedLaunchConfiguration | any port                     | UNIX-like                  | Required              | ~/My Research    | not available           | Not allowed                      | provided              | Absolute         | Medium                |
-| Simple standalone   | SimpleLaunchConfiguration   | any port                     | any                        | Not required          | ~/My Research    | not available           | Not allowed                      | not allowed           | Absolute         | Low                   |
+* psutil >= 5.8.0
+* python-dotenv >= 0.19.2
+* django >= 4.1.1
+* django-configurations >= 2.4
+* djangorestframework >= 3.13.1
+* pillow >= 9.2.0
+* parameterized >= 0.8.1
+* pytz >= 2022.2.1
+* colorama >= 0.4.4
+* urllib3 >= 1.26.9
+* bs4
+* dateutils
+* numpy >= 1.23.2
+* matplotlib >= 3.5.3
+* scipy >= 1.9.1
 
-\* 'Recommended UNIX-like' means that theoretically such a configuration can be run under
-non-UNIX operating system but in practise we don't test this thing. So, you can apply
-it but just on your risk.
+Also, GitHub client is required for the installation and update process. You need to install it as well.
+If you doesn't intend to use this application in stand-alone configuration you need cron to be installed.
 
-** 'instructed' means that the application will not perform any UNIX administration tasks by itself. Instead it will write
-a user some BASH commands and require him to login to the server via SSH and run these commands
+### Download the application
 
-Select an appropriate configuration profile from the table above by double-clicking on corresponding
-profile ID and pressing Ctrl-C. Now open the settings/preliminary.env
-configuration file and paste (Ctrl-V) the configuration profile ID after `DJANGO_CONFIGURATION=` line. For example
-if you prefer the VirtualServerConfiguration your preliminary.env file must look like here:
-
-    DJANGO_CONFIGURATION=VirtualServerConfiguration
-
-Alternatively you can set an appropriate environment variable before starting the server like here:
-
-    set DJANGO_CONFIGURATION=PartServerConfiguration
-    python corefacility/manage.py runserver
-
-(Written above is some kind of Bash script)
-
-## Stage 3. Setup minor settings
-
-Since you selected the basic configuration profile you need to adjust the minor settings like
-the address of the mail server, destination of the static root directory or database access credentials.
-
-To do this please, edit the rest of .env files located in the settings directory.
-
-Each file correspond to a particular purpose of configuration properties located here:
-
-| Config file     | Purpose of config parameters                                                             |
-|-----------------|------------------------------------------------------------------------------------------|
-| basics.env      | Basic configuration setup (allowed hosts and IP addresses, language and time zone etc.)  |
-| sql.env         | Access credentials to the database                                                       |
-| email.env       | These settings are important for sending e-mail notifications                            |
-| staticfiles.env | Defines how the application will collect and process static files                        |
-| secret.env      | Defines the secret key                                                                   |
-| security.env    | Defines how the application will deal with HTTP and HTTPS connections                    |
-
-Each line in the configuration file correspond to a particular configuration parameter and looks like:
-
-    PARAMETER_NAME=PARAMETER_VALUE
-
-The line must contain an equal ('=') sign. The parameter name is given before the equal sign while its value
-is located after it. The parameter name and parameter value must be separated from each other by a single equal
-sign, NO EXTRA SPACES ARE PERMITTED.
-
-Depending on a certain parameter and its purpose the parameter value can be:
-
-* either `yes` or `no`
-* some positive integer
-* some arbitrary string
-* Comma-separated list of strings like: `ihna.ru,www.ihna.ru` In this case string separator is comma only,
-no extra spaces permitted
-
-Another way to set the application configuration is to define the same parameters using the operating
-system environment variables. The following Bash script will also be OK:
-
-    export PARAMETER1=VALUE1
-    export PARAMETER2=VALUE2
-    .......
-    python corefacility/manage.py runserver
-
-Configuration options read from environment will also override the configuration options read from .env files.
-
-Please, don't touch `secret.env` file. This file was created during the system configuration and contains a secret key
-related to security. The file will be created or modified automatically
-
-### Stage 3.1. Defining basic settings (basics.env)
-
-This is how basics.env file looks like:
-
-    DJANGO_ADMIN_NAME=Bill Gates
-    DJANGO_ADMIN_EMAIL=bill.gates@microsoft.com
-
-    DJANGO_ALLOWED_HOSTS=192.168.0.10,127.0.0.1,localhost
-    DJANGO_ALLOWED_IPS=192.168.0.0/24,192.168.88.0/24
-    DJANGO_DEBUG=yes
-
-    DJANGO_LANGUAGE_CODE=ru-ru
-    DJANGO_TIME_ZONE=Europe/Moscow
-
-The file contains three sections.
-
-The first section defines name of the web server administrators.
-When critical errors occured during the application job a corresponding message will be sent to
-the application author and its copy will be sent to the system administrator which name is defined
-by the `DJANGO_ADMIN_NAME` property and its E-mail is defined by the `DJANGO_ADMIN_EMAIL` property.
-These two parameters don't work for virtual server, extended desktop and simple desktop
-configurations. No e-mails will be sent when `DJANGO_DEBUG` property is `yes`
-
-The second section is connected with the web server security and contains the following properties:
-* `DJANGO_ALLOWED_HOSTS` the list of IP addresses or domain names assigned to your server. More formally,
-the application will accept only such requests where value of the 'Host' header is within this list.
-When you access the application from your web browser and use the following URL http://hostname:port/location
-you will get an error 500 if hostname is not within this list.
-
-A value beginning with a period can be used as a subdomain wildcard: '.example.com' will match example.com,
-www.example.com, and any other subdomain of example.com.
-
-* `DJANGO_ALLOWED_IPS` When the application is configured as 'Full Server Configuration' you can
-add Linux users and group or perform another Linux administrative routines only when you try to access
-the server from the remote host which IP is within this range. When you used any other configuration profile
-execution of direct administrative routines is prohibited from any host.
-
-The value is a list of IP addresses of single hosts or pairs of addresses of masks of subnetworks.
-Example: `192.168.88.1,192.168.24.0/24,192.168.0.0/24`
-
-* `DJANGO_DEBUG` Allows you to debug the application itself, not the server. If you are not program developer
-turn this option to False
-
-The third section defines the program localization. It contains two parameters: `DJANGO_LANGUAGE_CODE` and
-`DJANGO_TIME_ZONE`. `DJANGO_LANGUAGE_CODE` defines language and regional settings that will be used for
-writing messages. Examples: `ru-ru`, `en-gb`, `en-us` etc. The list of all available values are given here:
-http://www.i18nguy.com/unicode/language-identifiers.html
-
-`DJANGO_TIME_ZONE` must be set to a local time zone where the web server is located. List of available time
-zones is here:
-https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-
-### Stage 3.2. SQL configuration
-
-The application saves small information in databases while large information is saved to regular files. At this
-stage you need to tell the application in what way it shall interact with database management system. Of course,
-such management system shall be installed before execution of this step. An SQLite is an exception: since such
-system has already embedded to this application you are not required to install it.
-
-Use the following table to choose an appropriate database management system
-
-| Database management system | Installation website        | Additional Python package to install | management system ID          | Installation difficulty | Stability, functionality and thread safety        |
-|----------------------------|-----------------------------|--------------------------------------|-------------------------------|-------------------------|---------------------------------------------------|
-| SQLite                     | no installation required    | Not required                         | django.db.backends.sqlite3    |                         | not stable, little functionality, not thread-safe |
-| MySQL                      | https://www.mysql.com/      | mysqlclient                          | django.db.backends.mysql      | * * *                   | stable, moderate functionality, thread-safe       |
-| PostgreSQL                 | https://www.postgresql.org/ | psycopg2                             | django.db.backends.postgresql | * * *                   | stable, high functionality, thread-safe           |
-
-Please, provide an installation of appropriate database management system together with installing additional python
-package which you need to add using pip utility. If you use MySQL of PostgreSQL prepare credentials that this
-application will be used to gain access to the database. Also, don't forget to create the database where the application
-will write its data.
-
-Next, look at the "management system ID" column at this table. Find the management system ID corresponding to the
-selected management system, copy it to your clipboard, then open `sql.env` file in text editor and use this ID to
-set the `DJANGO_SQL_BACKEND` parameter.
-
-Finally, define another properties in the `sql.env`:
-
-| property name           | property value (for SQLite)                            | property value (for MySQL, PostgreSQL)                                 |
-|-------------------------|--------------------------------------------------------|------------------------------------------------------------------------|
-| DJANGO_SQL_NAME         | name of a file where all database data will be written | Name of a database where this application write all its tables         |
-| DJANGO_SQL_SERVER       | this option has no effect: don't touch this            | Name of a server where the management system is installed              |
-| DJANGO_SQL_PORT         | this option has no effect: don't touch this            | Port listening by your SQL server                                      |
-| DJANGO_SQL_USER         | this option has no effect: don't touch this            | The application will use these credentials gain access to the database |
-| DJANGO_SQL_PASSWORD     | this option has no effect: don't touch this            | The application will use these credentials gain access to the database |
-| DJANGO_SQL_INIT_COMMAND | execute some SQL command after connection              | execute some SQL command after connection                              | 
-
-### Stage 3.3. E-mail configuration
-
-The application will notify the system administrator about errors in hardware or software as well as notify
-you and all your users about all important steps (e.g., including to the project etc.). E-mails are crucial during
-another stages like password reminding.
-
-If you use Simple Desktop configuration or Extended Desktop configuration just skip reading this section because
-no e-mails can be sent in this case. However, for Virtual servers, Part servers and Full servers e-mail delivery
-is possible.
-
-Use the following configuration parameters to define your E-mail settings
-
-* `DJANGO_DEFAULT_FROM_EMAIL` the application implies that all e-mails will be sent from this address. This will be
-used to define the value of the 'From' header and to tell the SMTP server a particular mailbox that will be used for
-sending mails
-* `DJANGO_EMAIL_BACKEND` you need to select an appropriate way to deliver E-mails copy the ID of this way and
-paste this ID at the right of this option
-
-| Way to deliver E-mails                                           | Way ID                                           |
-|------------------------------------------------------------------|--------------------------------------------------|
-| The application will use external SMTP server to deliver e-mails | django.core.mail.backends.smtp.EmailBackend      |
-| The message to deliver will be printer on console                | django.core.mail.backends.console.EmailBackend   |
-| The message will be saved to some local file on the hard disk    | django.core.mail.backends.filebased.EmailBackend |
-| Delete the message and do nothing with it                        | django.core.mail.backends.dummy.EmailBackend     |
-
-As you see, using SMTP server is the only way to deliver e-mails. However, it requires SMTP server to be installed
-and properly configured. If you don't want to do this, you can use an external SMTP server for mass mail delivery
-like gmail or mail.ru
-
-* `DJANGO_EMAIL_FILE_PATH` if you decided to save e-mails on the hard disk drive tell the folder where the file must be
-located
-* `DJANGO_EMAIL_HOST` if you use SMTP server to deliver e-mail, write down the server address. Otherwise don't touch
-this option
-* `DJANGO_EMAIL_PORT` if you use SMTP server to deliver e-mail, tell what port it listens to. Otherwise don't touch
-this option
-* `DJANGO_EMAIL_HOST_USER`, `DJANGO_EMAIL_HOST_PASSWORD` if you use SMTP server and you are required to login provide
-your credentials here. Otherwise, don't touch this option
-* `DJANGO_EMAIL_USE_TLS` Whether to use a TLS (secure) connection when talking to the SMTP server. This is used for
-explicit TLS connections, generally on port 587.
-* `DJANGO_EMAIL_USE_SSL` Whether to use an implicit TLS (secure) connection when talking to the SMTP server. In most
-email documentation this type of TLS connection is referred to as SSL. It is generally used on port 465. If you are
-experiencing problems, see the explicit TLS setting EMAIL_USE_TLS.
-
-Note that EMAIL_USE_TLS/EMAIL_USE_SSL are mutually exclusive, so only set one of those settings to True.
-
-### Stage 3.4. Configuring static files collection
-
-If you access this application directly (especially, when you use Simple Desktop and Extended Desktop configurations)
-you shall omit this step. However, if the user access it indirectly through NGINX or any other web server you need
-to read this stage carefully
-
-All information delivered to the remote user can be divided into three categories:
-* Dynamic information: the information is generated during the request and can't be retrieved outside the application;
-* Static files: the files have already located on your hard disk and shall be delivered to the final user without any
-changes. Static files can be retrieved without using this application;
-* Media files: the media files are delivered to the application like static files. However such files are uploaded by
-by the user rather than supplied by the application manufacturers.
-
-To improve the web server performance static and media files will be delivered by the web proxy server directly, no
-need is required. However, you need to define a folder where static files are located. Since such folder is defined,
-edit `staticfiles.env` configuration settings to tell the corefacility:
-
-* `DJANGO_STATIC_ROOT` directory where static files were located
-* `DJANGO_MEDIA_ROOT` directory where media files were located
-
-These parameters will be ignored if you will not try to collect all static files for the NGINX web server and
-don't want to use the Web proxy server.
-
-### Stage 3.5. Security settings
-
-Please, skip reading this file and don't touch security.env file if you don't receive SSL certificate and did not try
-working with this application using HTTPS protocol. In this case passwords and any personal data will be compromised.
-
-By default, application allows interaction with the user by means of HTTP protocol. All passwords and another personal
-data are transmitted to the web server in non-encrypted manner and can be listened by the third side (so called 'attack
-at the middle').
-
-To adjust security settings you have to check whether nginx interacts with this application though HTTP or HTTPS.
-You can check this by looking for `proxy_pass` parameter inside your NGINX settings file. If you see `http://`
-inside the value of this parameter you can adjust your security settings in the following way: the user connects
-to NGINX through HTTPS. Next, nginx decrypts the request and send it to this application using HTTP, not HTTPS.
-This is OK for security but you need to refer to your NGINX documentation to adjust the security settings not this
-manual.
-
-If you don't want this to happen, first, you need to implement HTTPS connection to your application. After the
-application main page is loaded through HTTPS perfectly, mind about changing the following properties:
-
-* `DJANGO_SECURE_SSL_REDIRECT` If this option equals to `yes` all request received using HTTP protocol will be
-redirected to HTTPS. The default option value is `no` which means that HTTP request will be processed in the same
-way as HTTPS requests
-* `DJANGO_SECURE_SSL_HOSTNAME` If `DJANGO_SECURE_SSL_REDIRECT` is `no` this option takes no effect. Otherwise it
-defines name of a server responsible for processing HTTPS requests. Leave this option empty if HTTP and HTTPS requests
-are processed by the same server.
-* `DJANGO_SECURE_HSTS_SECONDS`, `DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS`, `DJANGO_SECURE_HSTS_PRELOAD` When the response
-is sent to the client using HTTP this option takes no effect. However, when the response is sent using HTTPS protocol
-`Strict-Transport-Security` response header will be added at the end of request processing. This header tells
-the web browser to prohibit any attempt to access this application using HTTP protocol. These three parameters are
-used to adjust details of this header value: use `DJANGO_SECURE_HSTS_SECONDS` to define `max-age` option. Setting
-`DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS` will include `includeSubDomains` to the header value and
-`DJANGO_SECURE_HSTS_PRELOAD` will include `preload` to the header. The additional information about strict transport
-security is provided here:
-https://developer.mozilla.org/ru/docs/Web/HTTP/Headers/Strict-Transport-Security
-
-# Stage 4. Translating the application into your native language
-
-By default Russian and Engish are available. However, if you want to translate your application into another languages
-you need to do the following things:
-
-1. Change the directory to `corefacility`
+Create the folder where your application will be located. Open the command line interpreter and go to
+this folder using the `cd` command. Next, type the following:
 
 ```commandline
+git clone https://github.com/serik1987/corefacility.git
 cd corefacility
 ```
 
-2. Make translation messages to your own language
+### Preliminary setup
+
+Scan the corefacility application for list of all available extensions. This could be done by the following
+command
 
 ```commandline
-python3 manage.py makemessages -l your_language_code
+python3 corefacility/build.py
 ```
 
-Here the language code shall be separated from the country code by underscore (_). Example:
+After this command will run correctly, you will see the `settings` folder. The next step is to configure
+the application by changing special .env files. Each such file contain line in the following form:
+
+```dotenv
+key=value
+```
+
+The value to change in on the right of the equal (`=`) sign. Do it without changing the key.
+
+### Selection of application configuration mode.
+The only option `DJANGO_CONFIGURATION` is responsible for the application running mode. Value of this
+option is given configuration mode. All such modes are mentioned below.
+
+The very easy configuration mode is `SimpleLaunchConfiguration`. This is the only configuration that works
+in non-POSIX operating system (including Microsoft Windows), so use it if this is your case.
+The `SimpleLaunchConfiguration` allows a stand-alone usage of this application, gathering and processing
+the data. However, it doesn't allow you cloud storage and cloud processing, the performance options
+are highly non-optimal (I mean, only one CPU kernel will be engaged during the processing), doesn't provide
+hardware health-check and adjustment.
+
+The next mode is `ExtendedLaunchConfiguration`. This mode is as easy to install as
+`SimpleLaunchConfiguration` but requires POSIX-compliant operating system (Mac OS X, Linux, another
+Unix-like operating system is good). Such configuration also requires a stand-alone usage as well as
+setting up performance options, hardware health-check and adjustment. However, cloud storage is not
+possible. Use this option if you are the only person responsible for the data processing and don't need
+any cloud storage.
+
+`VirtualServerConfiguration` allows to organize cloud storage and cloud data processing given that
+computational difficulty of the task is low (i.e., the task can be accomplished for less than a second).
+Only one CPU kernel is used for any computations. Any performance optimization, hardware health-check and
+adjustment is not possible. You this option if you rent cheap virtual hosting service for the data cloud
+storage.
+
+Any other configuration options require either VPS/VDS service or dedicated Web Server or buying your
+own Web server.
+
+`FullServerConfiguration` has absolutely no restrictions: you can organize cloud data storage and
+processing, provide administration of the operating system accounts and groups (this is needed for SSH
+access to all users), adjust CPU optimization, hardware health-check and adjustment. If you select this
+option, the program installation will be the hardest. Also, the Shell crawler process requires
+administrative privileges. (_However this is not the case for worker processes of your Web server._)
+
+`PartServerConfiguration` We always try to provide all necessary security tests and find and fix all
+found security holes. However, this is OK that you don't trust our application, treat it as insecure and
+don't  want it to give an administrative privileges to it. Under this configuration the application will not
+require administrative privileges. However, it requires your attention when somebody wants to create
+users and projects and during the hardware health-check and adjust routines, performance optimization etc.
+(i.e., such features will be accomplished by corefacility + SSH + yourself logged in using your sudo account
+and are impossible solely by corefacility).
+
+| Configuration options         | Cloud storage | POSIX account administration                       | Hardware health-check and adjustments                                                                     | Number of CPU cores for data processing and simulation  | Operating system required |
+|-------------------------------|---------------|----------------------------------------------------|-----------------------------------------------------------------------------------------------------------|---------------------------------------------------------|---------------------------|
+| `SimpleLaunchConfiguration`   | Not allowed   | Not provided                                       | Not provided                                                                                              | 1                                                       | Any                       |
+| `ExtendedLaunchConfiguration` | Not allowed   | Not provided                                       | Provided                                                                                                  | As many as you have                                     | POSIX-compliant           |
+| `VirtualServerConfiguration`  | Allowed       | Not provided                                       | Not provided                                                                                              | 1, algorithm execution time is not less that 2 seconds. | POSIX-compliant           |
+| `FullServerConfiguration`     | Allowed       | Provided                                           | Provided                                                                                                  | As many as you have                                     | POSIX-compliant           |
+| `PartServerConfiguration`     | Allowed       | Requires attention of the Web server administrator | Hardware health-check is provided. Any other operations require attention of the web server administrator | As many as you have                                     | POSIX-compliant           |
+
+### Basic settings
+
+Open the `basics.env` file to adjust the application Basic settings.
+
+The first setting is E-mail address. The corefacility application will send an E-mail to administrators
+in case of troubles. `DJANGO_ADMIN_NAME` and `DJANGO_ADMIN_EMAIL` options are responsible for this.
+Value of the `DJANGO_ADMIN_NAME` will be written to the To: field of an emergency e-mail. The e-mail itself
+will be sent to the address defined by the value of the `DJANGO_ADMIN_EMAIL` option
+
+`DJANGO_ALLOWED_HOST` Left this field intact in `SimpleLaunchConfiguration` and
+`ExtendedLaunchConfiguration` profile. If your application is needed to have cloud hosting it implies that
+some URL corresponds to such application. An example of such URL:
+```
+http://192.168.0.20
+http://hendrikje.uni-tuebingen.de:1500
+```
+and so on...
+Such a URL consists of protocol name (HTTP or HTTP secured), host name and port number preceded by the
+colon (`:`). Put here names of all hosts in such URL separated by commas. The application will not respond
+request designated for another hosts. If you follow the application URL and get `Bad Request (400)` you
+probably incorrectly setup this option.
+
+`DJANGO_ALLOWED_IPS` When you use `FullServerConfiguration` mention here all IPs from which you can
+provide administration tasks (manage users, groups and projects, adjust performance and hardware options).
+Please, note that they must be internal IPs from your laboratory or University network and IP spoofing
+protecting must be turned on for your Internet gateway (e.g., laboratory router). Otherwise, this option
+will not work. This option is ignored in any other types of configurations: `VirtualServerConfiguration`
+and `PartServerConfiguration` allows administration and network adjust tasks from any IP,
+`ExtendedLaunchConfiguration` and `SimpleLaunchConfiguration` don't support data transmission over the
+network.
+
+`DJANGO_DEBUG` At first start turn this option to `yes`. When you finish your application and the
+application will work correctly turn this option to `no`. Also, turn this option to `yes` when you develop
+an extension to this application. Another point is `SimpleLaunchConfiguration` and
+`ExtendedLaunchConfiguration` will not work when `DJANGO_DEBUG` is `no`. So, set it to `yes` for such modes.
+
+`DJANGO_LANGUAGE_CODE` Defines language and locale of all messages generated by the corefacility. Two
+languages only are supported here:
+`ru-RU` Russian
+`en-GB` English (Great Britain)
+Another languages will be available if you create special language files. See reference here on how to do
+it:
+
+(a) Language files for Backend:
+
+https://docs.djangoproject.com/en/4.2/topics/i18n/translation/#localization-how-to-create-language-files
+
+(b) Language files for Frontend:
+
+https://react.i18next.com/
+
+`DJANGO_TIME_ZONE` Defines a timezone where you are (for stand-alone configuration) or where your Web
+Server are (for web server configuration).
+
+### Database settings
+
+Database is a special kind of storage where metadata, user list, logs, groups and project etc. are saved.
+
+Database is some kind of information on your disk which access is managed by a special system, called
+Database Management System. Corefacility supports the following Database Management Systems:
+
+`PostgreSQL` (https://www.postgresql.org/) has higher performance and more features. However, this is
+difficult to install this one. Use PostgreSQL for `FullServerConfiguration` and `PartServerConfiguration`.
+You can use this management system in `VirtualServerConfiguration` if your hosting provider support this.
+
+`MySQL` (https://mysql.com/) has less performance and less features. Use this database management system
+when your hosting provider doesn't support PostgreSQL.
+
+`SQLite` this is the only database system embedded to Corefacility (i.e., no difficult preliminary
+installation is required). However, the management system is very slow. Also, this management system
+doesn't support multiple request made at the same time. Such a feature doesn't allow it to use for the
+cloud storage. You this management system for configuration where cloud storage is not allowed.
+
+The table below mention advantages and disadvantages of all three systems.
+
+| Database Management System | Performance | Deals with simultaneous queries | Installation process | Backend name                    | Additional python package to install |
+|----------------------------|-------------|---------------------------------|----------------------|---------------------------------|--------------------------------------|
+| PostgreSQL                 | high        | Yes                             | Hard                 | `django.db.backends.postgresql` | `psycopg2`                           |
+| MySQL                      | low         | Yes                             | Hard                 | `django.db.backends.mysql`      | `mysqlclient`                        |
+| SQLite                     | low         | No                              | Not required         | `django.db.backends.sqlite3`    | Not required                         |
+
+When you choose proper Database management system, you have to install this. After installation has been
+completed provide some administration tasks:
+* issue credentials that corefacility will use to log in on the database server (username and password);
+* create database for the corefacility application;
+* grant permissions to the user you currently created.
+In the long run you must have the following access details for PostgreSQL and MySQL:
+* Address of the SQL server (its domain name, host name or IP address). Use `localhost` if Database management system has been installed on the same server as corefacility;
+* A port listening by the SQL server. By default, PostgreSQL listens to the port number 5432 and MySQL listens to the port 3306
+* username
+* password
+* database name
+Write down such access details somewhere on your paper.
+
+Next, you have to install python package that is required to link Corefacility with your Database management
+system. Refer to the last column of the table above to find out which package is required. This step is not
+necessary for the SQLite.
+
+Open `sql.env` file inside the `settings` folder to tell corefacility how it should connect to the Database
+Management system.
+
+#### Database properties when you use SQLite
+
+`DJANGO_SQL_BACKEND` Set to `django.db.backends.sqlite3`
+
+`DJANGO_SQL_NAME` Name of a file where the database will be stored. The file is not required to exist
+because it will be created during the following installation steps. However, be sure that the directory where
+this file will be located exists and is available for writing. Come up with any arbitrary name of this file.
+The preferrable file extension is `.sqlite3` or `.db`. Put full name of the file to this option.
+
+Any other options will be ignored.
+
+#### Database properties when you use PostgreSQL or MySQL
+
+`DJANGO_SQL_BACKEND` Corresponding backend name. Refer to the table above to find out value of this feature.
+
+`DJANGO_SQL_NAME` Name of the database that you have been created
+
+`DJANGO_SQL_SERVER` Put address of the SQL server here
+
+`DJANGO_SQL_PORT` Put here a port listening by the SQL server.
+
+`DJANGO_SQL_USER` Name of the user to log in
+
+`DJANGO_SQL_PASSWORD` Password for the user to log in
+
+`DJANGO_SQL_INIT_COMMAND` If some initial query is required for correct job of the database, use this option
+to write down such a query.
+
+#### Migration of the data
+
+**Migration** is a process of creation of all necessary tables in a database you have been created. If you
+choose SQLite, migration is also a process of creation of database file and putting all tables here.
+
+To provide migration, run the following command:
 
 ```commandline
-python3 manage.py makemessages -l ru_RU
+python3 corefacility/manage.py migrate
 ```
 
-3. Find django.po file corresponding to your language in the lang folder
+### Construction the Web server stack
+
+If you use `SimpleLaunchConfiguration` or `ExtendedLaunchConfiguration` this step must be definitely
+omitted because everything is ready for the application launch.
+
+#### Static and py files
+
+The corefacility contains two major file types: static files and py files. The corefacility also have
+another types of the files, however they are beyond the scope of this section. You Web server must cope
+with static files and py files in different way. The static files must be delivered to the connected user
+as they are: they will be downloaded, opened and used by the Web browser of your colleague, not your Web
+server. These files contain _Application frontend_.
+
+The py files must be run by your Web server with the aid of the Python interpreter. These files will be
+launched in response to the user's request. The result of their execution will be delivered to the client.
+These files are called _Application backend_.
+
+When the user interacts with corefacility he uses a mouse and a keyboard. All signals from these input
+devices are processed by the _Application frontend_. Application frontend constructs and sends _HTTP request_
+to the Web server. HTTP request is some piece of information that delivers from the user's PC to your
+Web server that tells Web Server what to do and what the user wants from it. When the Web Server receives
+the HTTP request it runs _Application backend_ (or py files) that process such request. The application
+backend generates another piece of information called _HTTP response_ that tells the user's PC about the
+result of the operating and supply it with all necessary data. The HTTP response is delivered to the 
+user's PC and process by the Application backend that shows operation results on the screen.
+
+#### How your Web Server works
+
+Three program must be worked together on your Web server: nginx, gunicorn and corefacility.
+
+**nginx** accepts requests from the user and determines whether the user's Web browser requires static files
+to be delivered here or accomplish some task on the Web server by means of execution of py files here.
+If this is request for static files delivering such files will be delivered as they are, without any change.
+In case when the user need to perform some job on the Web server, nginx does nothing with request and
+send it to the next application called gunicorn.
+
+**gunicorn** is responsible for the data transmission between nginx and corefacility and management of
+the corefacility itself. gunicorn is connected with nginx by means of the Web socket.
+
+**corefacility** is run by the gunicorn accept the request data from them, does the job required by the user
+and gives output data to the gunicorn.
+
+At this stage of installation process you need to construct a chain containing three applications:
+nginx <-> gunicorn <-> corefacility
+
+#### How to do it in VPS/VDS, Dedicated Server, your personal Web Server
+
+* Install and configure nginx
+* Install and configure gunicorn.
+* Connect nginx and gunicorn by the UNIX socket.
+
+In order to connect gunicorn and corefacility tell gunicorn to find out `application` object in
+`corefacility.wsgi` module and use it for the HTTP request handling. The working directory for the gunicorn
+application is `corefacility`.
+
+#### How to do it in the Virtual Hosting
+
+Some of the actions mentioned above has already been done by your hosting provider. Follow instructions
+suggested to your hosting provider.
+
+#### Copy static files to your document root
+
+The **nginx** Web server can either deliver file located to the special directory named _Document root_ or
+deliver the request to **gunicorn** by means of the UNIX socket. If you know your document root create
+directory for static and media files here (_Media files_ are files uploaded by the user for the public
+access, e.g., user's avatar, project icon etc.). Open the `staticfiles.env` file and write down full paths
+to directory where you wish to store static and media files. Static files directory is value of the 
+`DJANGO_STATIC_ROOT` option and media files directory is value of the `DJANGO_MEDIA_ROOT` option.
+
+After you finish setting up the `staticfiles.env` files run the following command that copy all static files:
+```commandline
+python3 corefacility/manage.py collectstatic
+```
+
+### Trial launch
+
+If everything is OK you need to run your Web server. To run the Web server in `SimpleLaunchConfiguration`
+and `ExtendedLaunchConfiguration` use the following command:
 
 ```commandline
-vi ../lang/your_language_code/LC_MESSAGES/django.po
+python3 corefacility/manage.py runserver
 ```
 
-Edit this file by writing down appropriate translations
+and follow the address printed on the console.
 
-4. Compile the language messages:
+If you use another configuration profiles you are required to start nginx and gunicorn services or
+restart them if they have already been started.
+
+Be sure that the corefacility main window was loaded correctly.
+
+### Adjustment of E-mail delivery
+
+Omit this section for `SimpleLaunchConfiguration` and `ExtendedLaunchConfiguration` since they don't
+support E-mail delivery.
+
+E-mail delivery allows the users to recover their passwords and warn administrator about troubles occured
+with their Web server. To deliver e-mail you need to install and configure the SMTP server or to use
+external SMTP server provided by such famous mail systems as Google or Mail.ru etc. In first case be sure
+that your Web server is not treated as mail spam engine by the Gmail, Mail.ru etc. (This is impossible to
+done if your Web server doesn't have public or 'white' IP address.) In the second case ensure that
+connection to the SMTP is not treated by the SMTP server as suspicious attempt to hack the account.
+
+Whenever which method you use you will give mail connection details. Put such details to the `email.env`
+file located in the `settings` directory.
+
+### SSL encryption properties
+
+SSL encryption allow you to encrypt your corefacility account credentials when transmitting from the user's
+PC to the Web server. This is required when the credentials are sent by the global network and hence can
+be read by unrestricted number of anonymous users (i.e., from the home of your colleague to the Web server
+located on your job or from Moscow to St.Petersburg etc.). The encryption process is the following: the
+Web browser encrypts the data and delivers the encrypted ones. The encrtypted data can't be read and analyze
+without the decryption process. And the decryption must be done only by your Web server.
+
+Omit this section if encryption is not required (i.e., when you transmit the data
+using the wired connections within your laboratory etc.) Don't do anything in this section when your
+Web server is under `SimpleLaunchConfiguration` or `ExtendedLaunchConfiguration`.
+
+In any other cases issue the SSL certificate from the authorization center and configure your **nginx** to
+deal with such certificate.  Ensure that SSL encryption works OK. To do this, open the following address:
+
+```
+https://<your-web-server-address>/
+```
+
+Yes, your protocol is HTTPS. If the page was loaded the SSL encryption works OK and hence you can start
+adjustment of the corefacility security settings.
+
+`DJANGO_SECURE_SSL_REDIRECT` When the user uses insecure channel (i.e., he accesses the Website by means
+of `http://`, not `https://`) his request will not be considered and his Web browser will be redirected
+to the similar page but uses `https://` for communication. Available values: `yes`, `no`.
+
+`DJANGO_SECURE_SSL_HOSTNAME` If the previous option was set to `yes` this option must refer to the web
+server to redirect when the user uses `http://`. Omit this option is you want the user to redirect to the
+same Web server.
+
+`DJANGO_SECURE_HSTS_SECONDS` tells the browser that your Web server works with HTTPS only. The Web browser
+will not use HTTP protocol any more to connect to your Web server. Number defines amount of seconds that
+the browser will remember this option.
+
+`DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS` If previous option was set, the Web browser will apply this rule
+to all subdomains. Available values: `yes`, `no.`
+
+`DJANGO_SECURE_HSTS_PRELOAD` the Web server tells all Google Chrome Web browsers to use HTTPS only when
+connecting to your Web Server. Doesn't work for another Web browsers.
+
+### Final launch
+
+The last thing you should do is to open the `basics.env` file and set `DJANGO_DEBUG` to `no`. This is not
+required for the `SimpleLaunchConfiguration` and `ExtendedLaunchConfiguration`.
+
+Next, follow the corefacility Web address and open the main page.
+
+### SECURITY ALERT!
+
+As you can see there is no accounts, user names and passwords on your Web Server! This is fine when you
+work with `SimpleLaunchConfiguration` and `ExtendedLaunchConfiguration` but absolutely disgusting when your
+Web server is accessible via the Internel. In the last case do the following:
+
+* Open Settings -> Users.
+* Create your own personal account.
+* Issue a password for you.
+* Open Settings -> Application settings.
+* Go to Authorization branch on the left tree.
+* Click on standard authorization and put the checkbox at the left of "Enabled" on the right panel. Save the settings.
+* Click on the automatic authorization on that tree on the left panel and clear checkbox at the left of the "Enabled" on the right panel. Save the settings.
+* Reload the Web browser window.
+* Enter your login and password.
+* Now your corefacility application is safe.
+
+### Corefacility update
+
+Always update your corefacility application because new updated version contain bug fixes and security
+improvements. The corefacility application can be updated by the following command:
 
 ```commandline
-python3 manage.py compilemessages
+git pull
 ```
 
-If this command is succeeded `django.mo` file will emerge together with `django.po` file
+Use your operating system to schedule the corefacility update!
 
-5. Open settings file
+## Add new application to the corefacility
+
+### Tell corefacility that you have added your application
+
+To do this open the `applications.list` file and write here full name of the application root module
+on the new last line.
+
+### Apply all changes
+
+To apply all changes reconfigure your application by the following way:
 
 ```commandline
-vi ../settings/base.env
+python3 corefacility/manage.py configure
 ```
 
-Make sure that the DJANGO_LANGUAGE_CODE property is valid (this is case sensitive and differed from the
-lang subfolder only by replacement of '_' symbol by '-')
+Corefacility will tell Django where your application is located.
 
-6. Enjoy! Nothing else is required!
+### Create tables in the database
+
+In order to do this, repeat the migration process:
+
+```commandline
+python3 corefacility/manage.py migrate
+```
+
+### Static files collection
+
+Collect all static files from your new application. In order to do this provide the following thing:
+
+```commandline
+python3 corefacility/manage.py collectstatic
+```
+
+### Restart
+
+Restart corefacility application. If you use `VirtualServerConfiguration`, `PartServerConfiguration` or
+`FullServerConfiguration` restart **gunicorn**.
+
+## Add new application
+
+If all corefacility features are not sufficient for you and you are good in Python and Javascript
+programming (Web browsers understand Javascript, not Python) you can extend the features of corefacility
+by creating your own corefacility extension, or _corefacility module_.
+
+### Corefacility module is usual Django application
+
+Start this application by the following command:
+
+```commandline
+python3 corefacility/manage.py startapp <name-of-your-application>
+```
+
+### Write your Backend side of the application
+
+The application is created as additional package inside the corefacility application directory. Put your
+own code there.
+
+_Don't forget to develop the App class_: this class must contain exactly in the package root module and must
+be a subclass of the `core.entity.corefacility_module.CorefacilityModule` class.
+
+### Tell corefacility that you have been created application
+
+Put your application root module to the `applications.list` file and reconfigure the corefacility:
+
+```commandline
+python3 corefacility/manage.py configure
+```
+
+### Create application tables
+
+There are two types of migration files you need to create - initialization migration files and installation
+migration files. The initialization migration files create all tables connected with your application. The
+installation migration files link your application to the corefacility. To create initialization migration
+scripts use the following command:
+
+```commandline
+python3 corefacility/manage.py makemigrations
+```
+
+To create installation migration files use the following command:
+
+```commandline
+python3 corefacility/manage.py makeinstall
+```
+
+When you create all migration files run them:
+
+```commandline
+python3 corefacility/manage.py migrate
+```
+
+### Create frontend
+
+In order to create frontend use the following commands:
+
+```commandline
+cd frontend/apps
+npx create-react-app
+npm run build
+cd ..
+./build.sh
+```
+
+Next, write your frontend code using the classes containing in the `corefacility-base` module. The frontend
+code must be compiled and put into Django static files list using the following command:
+
+```commandline
+./build.sh
+```
+
+Now your own application works.
