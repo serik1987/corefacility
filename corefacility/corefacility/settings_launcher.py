@@ -22,6 +22,6 @@ def select_config_profile():
     except OSError:
         print("Configuration profile is not found here: %s\n"
               "Hence, we will use the default configuration profile: SimpleLaunchConfiguration\n"
-              "This is a critical error by using the following command will fix it:\n"
-              "python corefacility/manage.py configure" % PRELIMINARY_SETTINGS_FILENAME)
+              "This is a critical error. To fix this please, follow the installation instructions\n"
+              % PRELIMINARY_SETTINGS_FILENAME)
         os.environ.setdefault("DJANGO_CONFIGURATION", "SimpleLaunchConfiguration")

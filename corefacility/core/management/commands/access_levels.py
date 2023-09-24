@@ -9,6 +9,7 @@ class Command(BaseCommand):
     Prints all access levels in one column (this will facilitate the view development).
     """
 
+    help = "Prints project and application access levels"
     requires_migrations_checks = True
 
     LEVEL_TYPES = {
@@ -25,10 +26,10 @@ class Command(BaseCommand):
         :return: nothing
         """
         for level_type in [LevelType.project_level, LevelType.app_level]:
-            print(self.LEVEL_TYPES[level_type])
+            self.stdout.write(self.LEVEL_TYPES[level_type])
             print("==================================================")
             level_set = AccessLevelSet()
             level_set.type = level_type
             for level in level_set:
-                print("%d\t%s\t%s" % (level.id, level.alias, level.name))
-            print()
+                self.stdout.write("%d\t%s\t%s" % (level.id, level.alias, level.name))
+            self.stdout.write()

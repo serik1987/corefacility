@@ -12,6 +12,12 @@ class Command(BaseCommand):
     Defines a command that loads all configuration defaults
     """
 
+    help = """
+Provides preliminary configuration setup including:
+    (1) creating settings folder with default settings
+    (2) looking for all found applications and putting them to the 'applications.list' file
+    """
+
     requires_system_checks = []
 
     DEFAULT_APPLICATION_LIST = [
@@ -42,6 +48,8 @@ class Command(BaseCommand):
         application_list = self._load_application_list()
         django_apps, django_middleware = self._find_django_apps(application_list)
         self._make_application_settings(django_apps, django_middleware)
+        if not os.path.isdir(SETTINGS_DIR):
+            os.mkdir(SETTINGS_DIR)
         if reset:
             self._remove_old_files()
         self._copy_configuration_defaults()
