@@ -46,7 +46,7 @@ or higher and use this to install the Python packages mentioned below:
 
 * psutil >= 5.8.0
 * python-dotenv >= 0.19.2
-* django >= 4.1.1
+* Django >= 4.1.1
 * django-configurations >= 2.4
 * djangorestframework >= 3.13.1
 * pillow >= 9.2.0
@@ -73,13 +73,20 @@ git clone https://github.com/serik1987/corefacility.git
 cd corefacility
 ```
 
+### Necessary environment
+
+The corefacility understands POSIX-compliant operating system and Windows operating system. Such operating systems
+don't require any settins mentioned in this section. However, corefacility will fail to run under another operating
+systems until you specify the `COREFACILITY_SETTINGS_DIR` environmental variable that equals to the folder where you
+should put the settings
+
 ### Preliminary setup
 
 Scan the corefacility application for list of all available extensions. This could be done by the following
 command
 
 ```commandline
-python3 corefacility/build.py
+corefacility configure
 ```
 
 After this command will run correctly, you will see the `settings` folder. The next step is to configure
@@ -277,7 +284,7 @@ choose SQLite, migration is also a process of creation of database file and putt
 To provide migration, run the following command:
 
 ```commandline
-python3 corefacility/manage.py migrate
+corefacility migrate
 ```
 
 ### Construction the Web server stack
@@ -351,7 +358,7 @@ to directory where you wish to store static and media files. Static files direct
 
 After you finish setting up the `staticfiles.env` files run the following command that copy all static files:
 ```commandline
-python3 corefacility/manage.py collectstatic
+corefacility collectstatic
 ```
 
 ### Trial launch
@@ -360,7 +367,7 @@ If everything is OK you need to run your Web server. To run the Web server in `S
 and `ExtendedLaunchConfiguration` use the following command:
 
 ```commandline
-python3 corefacility/manage.py runserver
+corefacility runserver
 ```
 
 and follow the address printed on the console.
@@ -448,7 +455,7 @@ Web server is accessible via the Internel. In the last case do the following:
 * Click on the automatic authorization on that tree on the left panel and clear checkbox at the left of the "Enabled" on the right panel. Save the settings.
 * Reload the Web browser window.
 * Enter your login and password.
-* Now your corefacility application is safe.
+* Now the corefacility is safe
 
 ### Corefacility update
 
@@ -461,7 +468,7 @@ git pull
 
 Use your operating system to schedule the corefacility update!
 
-## Add new application to the corefacility
+## How to add new application to corefacility
 
 ### Tell corefacility that you have added your application
 
@@ -473,7 +480,7 @@ on the new last line.
 To apply all changes reconfigure your application by the following way:
 
 ```commandline
-python3 corefacility/manage.py configure
+corefacility configure
 ```
 
 Corefacility will tell Django where your application is located.
@@ -483,7 +490,7 @@ Corefacility will tell Django where your application is located.
 In order to do this, repeat the migration process:
 
 ```commandline
-python3 corefacility/manage.py migrate
+corefacility migrate
 ```
 
 ### Static files collection
@@ -491,7 +498,7 @@ python3 corefacility/manage.py migrate
 Collect all static files from your new application. In order to do this provide the following thing:
 
 ```commandline
-python3 corefacility/manage.py collectstatic
+corefacility collectstatic
 ```
 
 ### Restart
@@ -510,7 +517,7 @@ by creating your own corefacility extension, or _corefacility module_.
 Start this application by the following command:
 
 ```commandline
-python3 corefacility/manage.py startapp <name-of-your-application>
+corefacility startapp <name-of-your-application>
 ```
 
 ### Write your Backend side of the application
@@ -526,7 +533,7 @@ be a subclass of the `core.entity.corefacility_module.CorefacilityModule` class.
 Put your application root module to the `applications.list` file and reconfigure the corefacility:
 
 ```commandline
-python3 corefacility/manage.py configure
+corefacility configure
 ```
 
 ### Create application tables
@@ -537,19 +544,19 @@ installation migration files link your application to the corefacility. To creat
 scripts use the following command:
 
 ```commandline
-python3 corefacility/manage.py makemigrations
+corefacility makemigrations
 ```
 
 To create installation migration files use the following command:
 
 ```commandline
-python3 corefacility/manage.py makeinstall
+corefacility makeinstall
 ```
 
 When you create all migration files run them:
 
 ```commandline
-python3 corefacility/manage.py migrate
+corefacility migrate
 ```
 
 ### Create frontend

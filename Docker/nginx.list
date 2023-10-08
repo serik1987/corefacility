@@ -1,0 +1,3 @@
+## Replace $release with your corresponding Ubuntu release.
+deb https://nginx.org/packages/ubuntu/ $release nginx
+deb-src https://nginx.org/packages/ubuntu/ $release nginx

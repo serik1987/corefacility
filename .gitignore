@@ -104,7 +104,7 @@ celerybeat.pid
 
 # Environments
 .idea/
-settings/*.env
+settings/*
 .env
 .venv
 env/
@@ -139,7 +139,5 @@ dmypy.json
 
 # Other settings
 applications.list
-corefacility/corefacility/settings/application_settings.py
-core/entity/ep_urls/projects.py
-core/entity/ep_urls/settings.py
-imaging/entity/ep_urls/processors.py
+src/ru/ihna/kozhukhov/corefacility/settings/application_settings.py
+src/ru/ihna/kozhukhov/core_application/ep_urls/projects.py

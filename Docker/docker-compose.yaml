@@ -1,0 +1,70 @@
+services:
+  base:
+    build:
+      context: ..
+      dockerfile: Docker/base.Dockerfile
+    image: base
+  standalone:
+    build:
+      context: ..
+      dockerfile: Docker/standalone.Dockerfile
+    image: standalone
+    container_name: standalone
+    ports:
+      - "8280:80"
+    volumes:
+      - ../src/ru:/usr/local/lib/python3.11/dist-packages/ru
+      - ../corefacility:/usr/local/bin/corefacility
+      - ./standalone.settings:/etc/corefacility/django-settings
+      - ../settings/applications.list:/etc/corefacility/applications.list
+      - "./My Research:/home/serik1987/My Research"
+  abstract-server:
+    build:
+      context: ..
+      dockerfile: Docker/abstract-server.Dockerfile
+    image: abstract-server
+  virtual-server:
+    build:
+      context: ..
+      dockerfile: Docker/virtual-server.Dockerfile
+    image: virtual-server
+    container_name: virtual-server
+    ports:
+      - "2122:22"
+      - "8180:80"
+    volumes:
+      - ../src/ru:/usr/local/lib/python3.11/dist-packages/ru
+      - ../corefacility:/usr/local/bin/corefacility
+      - ./virtual-server.settings:/etc/corefacility/django-settings
+      - ../settings/applications.list:/etc/corefacility/applications.list
+      - mysql:/var/lib/mysql
+      - virtual-server-www:/var/www/media
+      - ../src/ru/ihna/kozhukhov/corefacility/static/favicon.ico:/var/www/static/favicon.ico
+      - ../src/ru/ihna/kozhukhov/core_application/static/common.min.css:/var/www/static/common.min.css
+      - ../src/ru/ihna/kozhukhov/core_application/static/ru.ihna.kozhukhov.core_application:/var/www/static/ru.ihna.kozhukhov.core_application
+      - ../venv/lib/python3.11/site-packages/rest_framework/static/rest_framework:/var/www/static/rest_framework
+  lpss-server:
+    build:
+      context: ..
+      dockerfile: Docker/lpss-server.Dockerfile
+    image: lpss-server
+    container_name: lpss-server
+    ports:
+      - "2022:22"
+      - "8080:80"
+    volumes:
+      - ../src/ru:/usr/local/lib/python3.11/dist-packages/ru
+      - ../corefacility:/usr/local/bin/corefacility
+      - ./lpss-server.settings:/etc/corefacility/django-settings
+      - ../settings/applications.list:/etc/corefacility/applications.list
+      - postgre:/var/lib/postgresql/14/main
+      - virtual-server-www:/var/www/media
+      - ../src/ru/ihna/kozhukhov/corefacility/static/favicon.ico:/var/www/static/favicon.ico
+      - ../src/ru/ihna/kozhukhov/core_application/static/common.min.css:/var/www/static/common.min.css
+      - ../src/ru/ihna/kozhukhov/core_application/static/ru.ihna.kozhukhov.core_application:/var/www/static/ru.ihna.kozhukhov.core_application
+      - ../venv/lib/python3.11/site-packages/rest_framework/static/rest_framework:/var/www/static/rest_framework
+volumes:
+  mysql:
+  virtual-server-www:
+  postgre:
+  lpss-server-www:
