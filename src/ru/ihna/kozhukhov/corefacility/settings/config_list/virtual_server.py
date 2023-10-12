@@ -1,6 +1,8 @@
 import os
 from pathlib import Path
 
+from configurations import values
+
 from ru.ihna.kozhukhov.corefacility.settings.config_list.base import CorefacilityConfiguration
 
 
@@ -11,7 +13,7 @@ class VirtualServerConfiguration(CorefacilityConfiguration):
     """
 
     # The base directory where all project and user files were located
-    CORE_PROJECT_BASEDIR = os.path.join(Path.home(), ".research")
+    CORE_PROJECT_BASEDIR = values.Value(os.path.join(Path.home(), ".research"))
 
     # E-mail support
     EMAIL_SUPPORT = True

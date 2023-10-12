@@ -12,6 +12,7 @@ from ru.ihna.kozhukhov.core_application.entity.readers.query_builders.sqlite imp
 from ..launcher import ConfigLauncher
 
 
+# noinspection PyTypeChecker
 class CorefacilityConfiguration(Configuration):
     """
     Defines base application settings valid for any configuration profile
@@ -272,6 +273,15 @@ class CorefacilityConfiguration(Configuration):
         }
     }
 
+    # The base directory where all project and user files were located
+    CORE_PROJECT_BASEDIR = None
+
+    # Whether the application can manage UNIX groups
+    CORE_MANAGE_UNIX_GROUPS = False
+
+    # Whether the application can manage UNIX users
+    CORE_MANAGE_UNIX_USERS = False
+
     if sys.platform.startswith("win32"):
         del LOGGING["handlers"]["syslog_handler"]
         LOGGING["loggers"]["django.corefacility"]["handlers"].remove("syslog_handler")
@@ -304,6 +314,7 @@ class CorefacilityConfiguration(Configuration):
         super().setup()
         cls.check_config_possibility()
         cls.load_application_settings()
+        cls.check_write_access()
 
     @classmethod
     def check_config_possibility(cls):
@@ -336,6 +347,22 @@ class CorefacilityConfiguration(Configuration):
             print("The worker process EUID doesn't correspond to root. Select another "
                   "configuration profile run the app in docker or run it under sudo to overcome this problem.")
             raise ImproperlyConfigured()
+
+    @classmethod
+    def check_write_access(cls):
+        """
+        Checks the write access to the project base directory and to the project media files
+        """
+        if cls.CORE_PROJECT_BASEDIR is None:
+            raise ImproperlyConfigured("Error in developing the new configuration profile: the CORE_PROJECT_BASEDIR "
+                                       "property must be redefined")
+        if not os.access(cls.CORE_PROJECT_BASEDIR, os.R_OK | os.W_OK | os.X_OK, follow_symlinks=True) and \
+                not (cls.CORE_MANAGE_UNIX_USERS and cls.CORE_MANAGE_UNIX_GROUPS):
+            raise ImproperlyConfigured("The project base directory '{0}' doesn't exist or its read and write access "
+                                       "is denied".format(cls.CORE_PROJECT_BASEDIR))
+        if not os.access(cls.MEDIA_ROOT, os.R_OK | os.W_OK | os.X_OK, follow_symlinks=True):
+            raise ImproperlyConfigured("The public media files directory '{0}' doesn't exist or its read and write "
+                                       "access is denied".format(cls.MEDIA_ROOT))
 
     @classmethod
     def load_application_settings(cls):

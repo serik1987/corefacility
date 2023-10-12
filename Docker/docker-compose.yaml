@@ -39,6 +39,7 @@ services:
       - ../settings/applications.list:/etc/corefacility/applications.list
       - mysql:/var/lib/mysql
       - virtual-server-www:/var/www/media
+      - virtual-server-files:/var/www/.research
       - ../src/ru/ihna/kozhukhov/corefacility/static/favicon.ico:/var/www/static/favicon.ico
       - ../src/ru/ihna/kozhukhov/core_application/static/common.min.css:/var/www/static/common.min.css
       - ../src/ru/ihna/kozhukhov/core_application/static/ru.ihna.kozhukhov.core_application:/var/www/static/ru.ihna.kozhukhov.core_application
@@ -58,7 +59,7 @@ services:
       - ./lpss-server.settings:/etc/corefacility/django-settings
       - ../settings/applications.list:/etc/corefacility/applications.list
       - postgre:/var/lib/postgresql/14/main
-      - virtual-server-www:/var/www/media
+      - lpss-server-www:/var/www/media
       - ../src/ru/ihna/kozhukhov/corefacility/static/favicon.ico:/var/www/static/favicon.ico
       - ../src/ru/ihna/kozhukhov/core_application/static/common.min.css:/var/www/static/common.min.css
       - ../src/ru/ihna/kozhukhov/core_application/static/ru.ihna.kozhukhov.core_application:/var/www/static/ru.ihna.kozhukhov.core_application
@@ -66,5 +67,6 @@ services:
 volumes:
   mysql:
   virtual-server-www:
+  virtual-server-files:
   postgre:
   lpss-server-www:

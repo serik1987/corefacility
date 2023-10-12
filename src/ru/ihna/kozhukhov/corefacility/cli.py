@@ -1,4 +1,6 @@
 import sys
+import traceback
+
 from django.core.management import ManagementUtility
 from django.core.exceptions import ImproperlyConfigured
 from colorama import init
@@ -42,8 +44,14 @@ def main():
                   "with 'COREFACILITY_SETTINGS_DIR' environment variable properly installed.", file=sys.stderr)
         try:
             from configurations.management import execute_from_command_line
+            from django.conf import settings
+            # noinspection PyStatementEffect
+            settings.CONFIGURATION
             execute_from_command_line(sys.argv)
-        except ImproperlyConfigured:
+        except ImproperlyConfigured as err:
+            print("The corefacility was not configured due to the following error:\n", err)
+            if "--traceback" in sys.argv:
+                traceback.print_exception(err)
             if config_profile_selected:
                 utility = ConfigurationUtility(sys.argv)
                 utility.execute()

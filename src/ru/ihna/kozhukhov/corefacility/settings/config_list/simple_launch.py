@@ -1,5 +1,8 @@
 import os
 from pathlib import Path
+
+from configurations import values
+
 from ru.ihna.kozhukhov.corefacility.settings.config_list.base import CorefacilityConfiguration
 
 
@@ -16,7 +19,7 @@ class SimpleLaunchConfiguration(CorefacilityConfiguration):
     EMAIL_SUPPORT = False
 
     # The base directory where all project and user files were located
-    CORE_PROJECT_BASEDIR = os.path.join(Path.home(), "My Research")
+    CORE_PROJECT_BASEDIR = values.Value(os.path.join(Path.home(), "My Research"))
 
     # Whether the application can manage UNIX groups
     CORE_MANAGE_UNIX_GROUPS = False

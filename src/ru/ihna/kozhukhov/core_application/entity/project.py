@@ -26,8 +26,10 @@ class Project(ArbitraryAccessLevelEntity):
 
     _public_field_description = {
         "alias": EntityAliasField(max_length=64),
-        "avatar": ManagedEntityField(PublicFileManager, default=static("core/science.svg"),
-                                     description="The project avatar"),
+        "avatar": ManagedEntityField(PublicFileManager,
+                                     default=static("ru.ihna.kozhukhov.core_application/science.svg"),
+                                     description="The project avatar"
+                                     ),
         "name": EntityField(str, min_length=1, max_length=64, description="Project name"),
         "description": EntityField(str, min_length=0, max_length=1024, description="Project description"),
         "governor": ReadOnlyField(description="Project leader"),
