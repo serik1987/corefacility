@@ -1,7 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8
+import sys
 
-from ru.ihna.kozhukhov.corefacility.cli import main
+try:
+    from ru.ihna.kozhukhov.corefacility.cli import main
+except ImportError:
+    print("FATAL ERROR: The corefacility library has not been installed or the path to its library was not properly "
+          "set by PYTHONPATH environment", file=sys.stderr)
+    sys.exit(-1)
 
 if __name__ == "__main__":
     main()

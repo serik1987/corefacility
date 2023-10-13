@@ -25,6 +25,9 @@ class ConfigLauncher:
     _preliminary_settings_filename = "preliminary.env"
     """ Short name of the preliminary settings file """
 
+    config_profile_selected = False
+    """ True if the config profile has been selected, False otherwise """
+
     @classmethod
     def find_settings_dir(cls):
         """
@@ -68,3 +71,4 @@ class ConfigLauncher:
         preliminary_settings_file = cls.get_preliminary_settings_filename()
         if os.path.isfile(preliminary_settings_file):
             load_dotenv(preliminary_settings_file)
+            cls.config_profile_selected = True
