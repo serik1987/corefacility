@@ -282,6 +282,10 @@ class CorefacilityConfiguration(Configuration):
     # Whether the application can manage UNIX users
     CORE_MANAGE_UNIX_USERS = False
 
+    # Root only is allowed to run CLI (this is protection against HTTP + SSH hacking => when the hacker registers
+    # as simple user, gain the SSH access and next use CLI in order to avoid the model layer).
+    CORE_ROOT_ONLY = False
+
     if sys.platform.startswith("win32"):
         del LOGGING["handlers"]["syslog_handler"]
         LOGGING["loggers"]["django.corefacility"]["handlers"].remove("syslog_handler")

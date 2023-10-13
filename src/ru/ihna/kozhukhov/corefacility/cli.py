@@ -1,3 +1,4 @@
+import os
 import sys
 import traceback
 
@@ -24,8 +25,9 @@ def main():
                 traceback.print_exception(error)
         if len(sys.argv) > 1 and sys.argv[1] not in ('configure', 'help'):
             # 'configure' is the only command that wants bad configuration
-            # noinspection PyStatementEffect
-            settings.INSTALLED_APPS
+            if settings.CORE_ROOT_ONLY and os.getuid() != 0:
+                raise PermissionError("Only root is allowed to use corefacility CLI commands "
+                                      "(except for 'configure' and 'help')")
         utility = ManagementUtility(sys.argv)
         utility.execute()
     except Exception as err:
