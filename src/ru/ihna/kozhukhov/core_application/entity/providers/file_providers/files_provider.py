@@ -23,13 +23,6 @@ class FilesProvider(EntityProvider):
         """
         raise NotImplementedError("is_provider_on property")
 
-    @property
-    def is_permission_on(self):
-        """
-        True if permissions set are switched on, False otherwise
-        """
-        raise NotImplementedError("is_permission_on property")
-
     def load_entity(self, entity: Entity):
         """
         The method checks that the entity has already been loaded from the database.
@@ -57,13 +50,10 @@ class FilesProvider(EntityProvider):
         """
         if self.is_provider_on:
             dir_name = self.unwrap_entity(entity)
-            if self.is_permission_on:
-                raise NotImplementedError("Directory create for the real server was still not defined yet.")
-            else:
-                try:
-                    os.mkdir(dir_name)
-                except OSError:
-                    raise BaseDirIoException()
+            try:
+                os.mkdir(dir_name)
+            except OSError:
+                raise BaseDirIoException()
             self.update_dir_info(entity, dir_name)
 
     def resolve_conflict(self, given_entity: Entity, contained_entity: Entity):
@@ -78,12 +68,7 @@ class FilesProvider(EntityProvider):
         :return: nothing but must throw an exception when such entity can't be created
         """
         if self.is_provider_on:
-            if self.is_permission_on:
-                raise NotImplementedError("TO-DO: change proper directory permissions")
             self.update_dir_info(given_entity, contained_entity)
-
-    def change_dir_permissions(self, maker, entity, dir_name):
-        raise NotImplementedError("FilesProvider.change_dir_permission is not implemented")
 
     def update_entity(self, entity: Entity):
         """
@@ -102,15 +87,11 @@ class FilesProvider(EntityProvider):
         """
         if self.is_provider_on:
             dir_name = self.unwrap_entity(entity)
-            if self.is_permission_on:
-                if os.path.isdir(dir_name):
-                    raise NotImplementedError("TO-DO: remove the directory for the files provider")
-            else:
-                if os.path.isdir(dir_name):
-                    try:
-                        shutil.rmtree(dir_name)
-                    except OSError:
-                        raise BaseDirIoException()
+            if os.path.isdir(dir_name):
+                try:
+                    shutil.rmtree(dir_name)
+                except OSError:
+                    raise BaseDirIoException()
 
     def wrap_entity(self, external_object):
         """

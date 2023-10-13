@@ -36,6 +36,9 @@ class Entity:
     5. The request atomicity is provided on the Entity level
     """
 
+    log = None
+    """ Log associated with the entity, if applicable  """
+
     _id = None
     """ The entity ID or None if the entity is not stored in the database"""
 

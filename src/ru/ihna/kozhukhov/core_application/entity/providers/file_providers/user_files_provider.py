@@ -1,5 +1,4 @@
 import os
-import stat
 
 from django.conf import settings
 
@@ -18,17 +17,7 @@ class UserFilesProvider(FilesProvider):
         """
         True if provider is switched on, False otherwise
         """
-        return not self.force_disable
-
-    @property
-    def is_permission_on(self):
-        """
-        True if permissions set are switched on, False otherwise
-        """
-        return not self.force_disable and settings.CORE_MANAGE_UNIX_USERS
-
-    def change_dir_permissions(self, maker, user, dir_name):
-        raise NotImplementedError('change_dir_permissions')
+        return not self.force_disable and not settings.CORE_MANAGE_UNIX_USERS
 
     def update_entity(self, user):
         """
@@ -36,9 +25,8 @@ class UserFilesProvider(FilesProvider):
         :param user: the user to be updated
         :return: nothing
         """
-        if self.is_provider_on \
-                and "login" in user._edited_fields and \
-                not settings.CORE_MANAGE_UNIX_USERS and \
+        if self.is_provider_on and \
+                "login" in user._edited_fields and \
                 os.path.isdir(user.home_dir):
             new_home_dir = os.path.join(settings.CORE_PROJECT_BASEDIR, user.login)
             os.rename(user.home_dir, new_home_dir)

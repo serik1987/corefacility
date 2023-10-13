@@ -14,7 +14,7 @@ class PosixRequest(models.Model):
     the requested command.
     """
 
-    initialization_date = models.DateTimeField(editable=False, db_index=True)
+    initialization_date = models.DateTimeField(editable=False, db_index=True, auto_now_add=True)
     action_class = models.CharField(editable=False, max_length=1024)
     action_arguments = models.JSONField(editable=False)
     method_name = models.CharField(editable=False, max_length=1024)

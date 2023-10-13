@@ -29,6 +29,8 @@ class EntitySerializer(serializers.Serializer):
         """
         entity_class = self.get_entity_class()
         entity = entity_class(**data)
+        if 'request' in self.context and hasattr(self.context['request'], 'corefacility_log'):
+            entity.log = self.context['request'].corefacility_log
         entity.create()
         return entity
 

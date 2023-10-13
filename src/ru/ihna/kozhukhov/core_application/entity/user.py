@@ -4,7 +4,7 @@ from django.db import transaction
 from .. import App
 
 from .entity import Entity
-from ru.ihna.kozhukhov.core_application.entity.entity_sets.user_set import UserSet
+from .entity_sets.user_set import UserSet
 from .fields import EntityField, EntityAliasField, ManagedEntityField, ReadOnlyField, \
     BooleanField, BooleanReadOnlyField
 from .field_managers.entity_password_manager import EntityPasswordManager
@@ -28,7 +28,7 @@ class User(Entity):
 
     _entity_set_class = UserSet
 
-    _entity_provider_list = [PosixProvider(), UserFilesProvider(), ModelProvider()]
+    _entity_provider_list = [UserFilesProvider(), ModelProvider(), PosixProvider()]
 
     _public_field_description = {
         "login": EntityAliasField(max_length=100),

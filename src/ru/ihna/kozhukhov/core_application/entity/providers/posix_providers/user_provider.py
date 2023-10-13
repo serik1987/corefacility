@@ -2,6 +2,8 @@ import os
 import hashlib
 from django.conf import settings
 
+from ....management.commands.autoadmin.posix_user import PosixUser
+from ....management.commands.autoadmin.auto_admin_wrapper_object import AutoAdminWrapperObject
 from .posix_provider import PosixProvider
 
 
@@ -34,8 +36,7 @@ class UserProvider(PosixProvider):
         :param user: The user that shall be found in the operating system
         :return: the PosixUser instance if the user exists or None otherwise
         """
-        if self.is_provider_on():
-            raise NotImplementedError('load_entity')
+        pass
 
     def create_entity(self, user):
         """
@@ -44,7 +45,7 @@ class UserProvider(PosixProvider):
         :return: nothing
         """
         if self.is_provider_on():
-            self._create_posix_user(user)
+            self.unwrap_entity(user).create()
 
     def resolve_conflict(self, given_user, posix_user):
         """
@@ -58,12 +59,7 @@ class UserProvider(PosixProvider):
         :param posix_user: the entity duplicate that has already been present on given entity source
         :return: nothing but must throw an exception when such entity can't be created
         """
-        if self.is_provider_on():
-            self._update_gecos_information(given_user, posix_user)
-            given_user._home_dir = posix_user.home_dir
-            given_user.notify_field_changed("home_dir")
-            given_user._unix_group = posix_user.login
-            given_user.notify_field_changed("unix_group")
+        pass
 
     def update_entity(self, user):
         """
@@ -71,7 +67,8 @@ class UserProvider(PosixProvider):
         :param user: the user to which the information shall be set
         :return: nothing
         """
-        raise NotImplementedError('update_entity')
+        if self.is_provider_on():
+            self.unwrap_entity(user).update()
 
     def delete_entity(self, user):
         """
@@ -79,7 +76,8 @@ class UserProvider(PosixProvider):
         :param user: the entity to be deleted
         :return: nothing
         """
-        raise NotImplementedError('delete_entity')
+        if self.is_provider_on():
+            self.unwrap_entity(user).delete()
 
     def wrap_entity(self, external_object):
         """
@@ -88,8 +86,7 @@ class UserProvider(PosixProvider):
         :param external_object:
         :return:
         """
-        if self.is_provider_on():
-            raise NotImplementedError("wrap_entity")
+        pass
 
     def unwrap_entity(self, user):
         """
@@ -98,8 +95,7 @@ class UserProvider(PosixProvider):
         :param user: the entity that must be sent to the external data source
         :return: the entity data suitable for that external source
         """
-        if self.is_provider_on():
-            raise NotImplementedError("unwrap_entity")
+        return AutoAdminWrapperObject(PosixUser, user)
 
     def is_provider_on(self):
         """
@@ -109,33 +105,3 @@ class UserProvider(PosixProvider):
         :return: True if the provider is enabled, False otherwise.
         """
         return not self.force_disable and settings.CORE_MANAGE_UNIX_USERS
-
-    def _create_posix_user(self, user):
-        """
-        Immediately creates the POSIX user and stores it as operating system account
-        :param user: the user to be created
-        :return: nothing
-        """
-        raise NotImplementedError('_create_posix_user')
-
-    def _update_user_login(self, user, posix_user):
-        raise NotImplementedError('_update_user_login')
-
-    def _update_gecos_information(self, given_user, posix_user):
-        """
-        Updates the GECOS information. Does nothing if such information has already been updated
-        :param given_user: User entity that shall be used to update GECOS information
-        :param posix_user: the user's record within the operating system which GECOS information has to be updated
-        :return: nothing
-        """
-        raise NotImplementedError('_update_gecos_information')
-
-    def _update_lock_status(self, given_user, posix_user):
-        """
-        Updates the user's lock status. This means that the method locks the POSIX user if the User entity is locked
-        and unlocks the POSIX user if the User entity is unlocked
-        :param given_user: the User entity
-        :param posix_user: the POSIX user that shall be locked or unlocked
-        :return: nothing
-        """
-        raise NotImplementedError('_update_lock_status')

@@ -371,7 +371,7 @@ class EntryPoint(Entity):
             .add_select_expression("alias")\
             .add_select_expression("name")\
             .add_select_expression("html_code")\
-            .add_data_source("core_module")\
+            .add_data_source("core_application_module")\
             .set_main_filter(AndQueryFilter())
         query_builder.main_filter &= StringQueryFilter("parent_entry_point_id=%s", self.id)
         query_builder.main_filter &= ~StringQueryFilter("is_application")
