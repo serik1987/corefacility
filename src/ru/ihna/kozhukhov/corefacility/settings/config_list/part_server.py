@@ -27,6 +27,10 @@ class PartServerConfiguration(CorefacilityConfiguration):
     # Whether the application can suggest user to provide a certain administration
     CORE_SUGGEST_ADMINISTRATION = True
 
+    # Root only is allowed to run CLI (this is protection against HTTP + SSH hacking => when the hacker registers
+    # as simple user, gain the SSH access and next use CLI in order to avoid the model layer).
+    CORE_ROOT_ONLY = True
+
     @classmethod
     def check_config_possibility(cls):
         """

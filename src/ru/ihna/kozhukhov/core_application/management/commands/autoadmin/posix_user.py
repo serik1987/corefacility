@@ -102,7 +102,7 @@ class PosixUser(AutoAdminObject):
         if self.login is None or self.home_dir is None:
             self.login = self._shorten_user_login(self.entity.login)
             self.home_dir = os.path.join(settings.CORE_PROJECT_BASEDIR, "u-" + self.login)
-        result = self.run(
+        self.run(
             (
                 "useradd",
                 "-d", self.home_dir,
@@ -112,7 +112,6 @@ class PosixUser(AutoAdminObject):
                 self.login
             )
         )
-        print(result)
 
     def update(self):
         """

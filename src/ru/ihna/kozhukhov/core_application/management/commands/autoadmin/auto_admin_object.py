@@ -1,3 +1,4 @@
+import re
 import subprocess
 
 from django.conf import settings
@@ -17,6 +18,13 @@ class AutoAdminObject:
 
     log = None
     """ Log to be attached to the AutoAdminObject (allows to use the AutoAdminWrapperObject as wrapper on it). """
+
+    command_emulation = True
+    """ Prints commands to the command buffer, instead of execution of them """
+
+    _command_buffer = None
+
+    _quote_needed_pattern = re.compile(r"\s")
 
     @classmethod
     def update_static_objects(cls):
@@ -48,6 +56,35 @@ class AutoAdminObject:
         """
         if not settings.CORE_UNIX_ADMINISTRATION and not settings.CORE_SUGGEST_ADMINISTRATION:
             raise ConfigurationProfileException(settings.CONFIGURATION)
+        self._command_buffer = list()
+
+    def flush_command_buffer(self):
+        """
+        Returns all strings from the command buffer and clears it.
+        """
+        command_list = []
+        for command in self._command_buffer:
+            quoted_command = [
+                '"%s"' % cmd_part
+                if self._quote_needed_pattern.search(cmd_part) is not None else cmd_part
+                for cmd_part in command
+            ]
+            command_string = " ".join(quoted_command)
+            command_list.append(command_string)
+        self._command_buffer = list()
+        return "\r\n".join(command_list)
+
+    def call(self, posix_request):
+        """
+        Calls a method stored into the database
+
+        :param posix_request: a model that reflects a given row in the database related to the POSIX request
+        :return: the same value as returned by the called method
+        """
+        from .utils import deserialize_all_args
+        request_method = getattr(self, posix_request.method_name)
+        args, kwargs = deserialize_all_args(posix_request.method_arguments)
+        return request_method(*args, **kwargs)
 
     def run(self, cmd, *args, **kwargs):
         """
@@ -58,10 +95,15 @@ class AutoAdminObject:
         :param kwargs: keyword arguments to the subprocess.call
         :return: combined stdout + stderr output
         """
-        kwargs.update({
-            "stdout": subprocess.PIPE,
-            "stderr": subprocess.STDOUT,
-            "check": True,
-        })
-        result = subprocess.run(cmd, *args, **kwargs)
-        return result.stdout.decode("utf-8")
+        if self.command_emulation:
+            command = " ".join(cmd)
+            self._command_buffer.append(cmd)
+            return command
+        else:
+            kwargs.update({
+                "stdout": subprocess.PIPE,
+                "stderr": subprocess.STDOUT,
+                "check": True,
+            })
+            result = subprocess.run(cmd, *args, **kwargs)
+            return result.stdout.decode("utf-8")

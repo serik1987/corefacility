@@ -205,7 +205,7 @@ class EntityViewMixin(SetCookieMixin):
         Returns the object the view is displaying.
 
         You may want to override this if you need to provide non-standard
-        queryset lookups.  Eg if objects are referenced using multiple
+        queryset lookups. E.g., if objects are referenced using multiple
         keyword arguments in the url conf.
         """
         entity_set = self.filter_queryset(self.get_queryset())
@@ -217,6 +217,8 @@ class EntityViewMixin(SetCookieMixin):
             pass
         entity = self.get_entity_or_404(entity_set, lookup_value)
         self.check_object_permissions(self.request, entity)
+        if hasattr(self.request, 'corefacility_log'):
+            entity.log = self.request.corefacility_log
         return entity
 
     def filter_queryset(self, queryset):

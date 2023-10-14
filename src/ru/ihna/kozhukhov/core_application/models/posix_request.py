@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.timezone import make_naive
 
 from .log import Log
 from .enums import PosixRequestStatus
@@ -21,3 +22,11 @@ class PosixRequest(models.Model):
     method_arguments = models.JSONField(editable=False)
     log = models.ForeignKey(Log, on_delete=models.CASCADE)
     status = models.CharField(max_length=1, choices=PosixRequestStatus.choices, default=PosixRequestStatus.INITIALIZED)
+
+    def print_initialization_date(self):
+        """
+        Returns an initialization date as well-printed string
+
+        :return: string containing the initialization date
+        """
+        return make_naive(self.initialization_date).strftime("%d.%m.%Y %H:%M:%S.%f")

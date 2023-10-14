@@ -41,7 +41,7 @@ class LogReader(RawSqlQueryReader):
             .add_order_term("core_application_log.request_date", direction=self.items_builder.DESC)
         self.items_builder.data_source\
             .add_join(self.items_builder.JoinType.LEFT, "core_application_user",
-                      "ON (core_application_user.id=core_log.user_id)")
+                      "ON (core_application_user.id=core_application_log.user_id)")
 
         self.count_builder\
             .add_select_expression(self.count_builder.select_total_count())\
