@@ -305,3 +305,10 @@ class DeserializationException(PosixException):
                 origin=str(origin),
             )
         )
+
+
+class SecurityCheckFailedException(PosixException):
+    """
+    An exception throws when autoadmin can't execute the request due to security reasons.
+    """
+    pass

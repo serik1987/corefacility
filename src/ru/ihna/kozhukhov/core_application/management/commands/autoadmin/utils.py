@@ -1,4 +1,7 @@
 from importlib import import_module
+from ipaddress import ip_network
+
+from django.conf import settings
 
 from ru.ihna.kozhukhov.core_application.entity.entity import Entity
 
@@ -68,3 +71,17 @@ def deserialize_args(obj):
         return [deserialize_args(item) for item in obj]
     else:
         return obj
+
+
+def check_allowed_ip(ip):
+    """
+    Checks whether the IP address is within the set of allowed IP addresses
+
+    :param ip: the IP address to check
+    :return: True if the IP address is within the set, False otherwise
+    """
+    ip_is_allowed = False
+    for allowed_ip in settings.ALLOWED_IPS:
+        if ip in ip_network(allowed_ip, False):
+            ip_is_allowed = True
+    return ip_is_allowed

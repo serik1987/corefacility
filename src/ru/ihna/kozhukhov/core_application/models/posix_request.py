@@ -30,3 +30,11 @@ class PosixRequest(models.Model):
         :return: string containing the initialization date
         """
         return make_naive(self.initialization_date).strftime("%d.%m.%Y %H:%M:%S.%f")
+
+    def __str__(self):
+        """
+        String representation of the POSIX request model, just for debugging purpose
+
+        :return: a short string containing information about the POSIX request
+        """
+        return "models.PosixRequest(ID=%d, Log=%d, Status=%s)" % (self.id, self.log_id, self.status)

@@ -144,7 +144,8 @@ class CorefacilityConfiguration(Configuration):
     USE_I18N = True
     USE_L10N = True
     USE_TZ = True
-    LOCALE_PATHS = [os.path.join(BASE_DIR.parent, "lang")]
+    # LOCALE_PATHS = [os.path.join(BASE_DIR.parent, "lang")]
+    LOCALE_PATHS = []
 
     # Secret key
     SECRET_KEY = values.Value()
@@ -266,9 +267,9 @@ class CorefacilityConfiguration(Configuration):
                 "handlers": ["stream_handler", "syslog_handler", "mail_admins", "database_log_handler"],
             },
             "django.corefacility.log": {
-                "level": "CRITICAL",
+                "level": "DEBUG",
                 "propagate": False,
-                "handlers": ["stream_handler", "syslog_handler", "mail_admins"],
+                "handlers": ["stream_handler", "mail_admins"],  # TO-DO: add syslog handler again!
             }
         }
     }

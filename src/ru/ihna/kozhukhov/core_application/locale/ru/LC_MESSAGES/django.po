@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-31 00:20+0300\n"
+"POT-Creation-Date: 2023-10-15 01:22+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,11 +17,222 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: authorizations/cookie/migrations/0002_install.py:13
-msgid "Authorization through Cookie"
-msgstr "Авторизация через Cookie"
+#: src/ru/ihna/kozhukhov/core_application/__init__.py:172
+msgid "Full access"
+msgstr "Полный доступ"
 
-#: authorizations/google/__init__.py:90
+#: src/ru/ihna/kozhukhov/core_application/__init__.py:173
+msgid "Dealing with data"
+msgstr "Работа с данными"
+
+#: src/ru/ihna/kozhukhov/core_application/__init__.py:174
+msgid "Data adding and processing only"
+msgstr "Только добавление и обработка данных"
+
+#: src/ru/ihna/kozhukhov/core_application/__init__.py:175
+msgid "Data processing only"
+msgstr "Только обработка данных"
+
+#: src/ru/ihna/kozhukhov/core_application/__init__.py:176
+msgid "Viewing the data"
+msgstr "Только просмотр данных"
+
+#: src/ru/ihna/kozhukhov/core_application/__init__.py:177
+msgid "No access"
+msgstr "Доступ закрыт"
+
+#: src/ru/ihna/kozhukhov/core_application/entity/entity_sets/corefacility_module_set.py:14
+msgid "Corefacility module"
+msgstr "Модуль"
+
+#: src/ru/ihna/kozhukhov/core_application/entity/entity_sets/group_set.py:11
+msgid "Scientific Group"
+msgstr "Научный коллектив"
+
+#: src/ru/ihna/kozhukhov/core_application/entity/entity_sets/project_set.py:11
+msgid "Project"
+msgstr "Проект"
+
+#: src/ru/ihna/kozhukhov/core_application/entity/entity_sets/user_set.py:11
+msgid "User"
+msgstr "Пользователь"
+
+#: src/ru/ihna/kozhukhov/core_application/entry_points/authorizations.py:36
+msgid "Authorization methods"
+msgstr "Способы авторизации"
+
+#: src/ru/ihna/kozhukhov/core_application/entry_points/authorizations.py:143
+msgid "At least one authorization module must be enabled"
+msgstr "Хотя бы один из способов авторизации должен быть активен"
+
+#: src/ru/ihna/kozhukhov/core_application/entry_points/authorizations.py:251
+msgid "Bad session ID"
+msgstr "Идентификатор сессии неверен или устарел"
+
+#: src/ru/ihna/kozhukhov/core_application/entry_points/projects.py:33
+msgid "Project applications"
+msgstr "Работа с научными проектами"
+
+#: src/ru/ihna/kozhukhov/core_application/entry_points/synchronizations.py:50
+msgid "Account synchronization"
+msgstr "Синхронизация учётных записей"
+
+#: src/ru/ihna/kozhukhov/core_application/exceptions/api_exceptions.py:54
+#: src/ru/ihna/kozhukhov/core_application/generic_views/file_upload_mixin.py:110
+msgid "This file type is not uploadable"
+msgstr "Невозможно загрузить данный тип файла"
+
+#: src/ru/ihna/kozhukhov/core_application/exceptions/api_exceptions.py:65
+msgid "The image resolution is too small"
+msgstr "Разрешение изображения слишком мало"
+
+#: src/ru/ihna/kozhukhov/core_application/exceptions/api_exceptions.py:77
+msgid "Can't send e-mail to this user because it's e-mail field was not filled"
+msgstr ""
+"Невозможно отправить e-mail этому пользователю, поскольку поле E-mail в его "
+"профиле не заполнено"
+
+#: src/ru/ihna/kozhukhov/core_application/exceptions/api_exceptions.py:93
+msgid "The following problem occured during the mail delivery: "
+msgstr "При отправке сообщения пользователю возникла следующая проблема: "
+
+#: src/ru/ihna/kozhukhov/core_application/exceptions/entity_exceptions.py:11
+msgid "The requested resource was not found here"
+msgstr "Запрашиваемый ресурс не обнаружен"
+
+#: src/ru/ihna/kozhukhov/core_application/exceptions/entity_exceptions.py:16
+msgid ""
+"Unable to create the requested resource because it has already been created"
+msgstr "Невозможно создать требуемый ресурс, так как он уже был создан"
+
+#: src/ru/ihna/kozhukhov/core_application/exceptions/entity_exceptions.py:22
+#, python-format
+msgid "%s with such values can't exist"
+msgstr "Поле %s с подобными значениями не существует"
+
+#: src/ru/ihna/kozhukhov/core_application/exceptions/entity_exceptions.py:35
+msgid "The entity operation is not permitted"
+msgstr "Указанная операция над сущностью невозможна"
+
+#: src/ru/ihna/kozhukhov/core_application/exceptions/entity_exceptions.py:47
+msgid ""
+"This feature is not supported for current database engine. Use another one"
+msgstr ""
+"Данное свойство не поддерживается на установленной Вами СУБД. Установка "
+"PostgreSQL решит эту проблему"
+
+#: src/ru/ihna/kozhukhov/core_application/exceptions/entity_exceptions.py:52
+msgid ""
+"The user is a governor of at least one group. Its delete will automatically "
+"remove these groups and reflect another user rights. Are you sure?"
+msgstr ""
+"Данный пользователь руководит одной или несколькими научными группами. Его "
+"удаление приведёт к автоматическому расформированию этих групп, а также к "
+"изменению прав доступа других пользователей к тому или иному функционалу. Вы "
+"желаете продолжить?"
+
+#: src/ru/ihna/kozhukhov/core_application/exceptions/entity_exceptions.py:59
+msgid ""
+"The group is a root group for at least one project. Its delete will "
+"automatically remove these projects and reflect another user rights. Are you "
+"sure?"
+msgstr ""
+"Эта группа является корневой группой как минимум для одного из проектов. Её "
+"удаление приведёт к автоматическому уничтожению этих проектов, а также "
+"изменит права доступа других пользователей к функционалу. Продолжить?"
+
+#: src/ru/ihna/kozhukhov/core_application/exceptions/entity_exceptions.py:66
+#, python-format
+msgid "Unable to write to %s directory."
+msgstr "Невозможно произвести запись в директорию %s"
+
+#: src/ru/ihna/kozhukhov/core_application/exceptions/entity_exceptions.py:150
+msgid "Error during installation of the module"
+msgstr "Ошибка в процессе установки модуля"
+
+#: src/ru/ihna/kozhukhov/core_application/exceptions/entity_exceptions.py:162
+msgid ""
+"This module has a parent module that have not been completely installed yet"
+msgstr ""
+"Данный модуль имеет родительский модуль, который не был полностью установлен"
+
+#: src/ru/ihna/kozhukhov/core_application/exceptions/synchronization_exceptions.py:21
+msgid ""
+"Unable to perform synchronization because all synchronizers were switched off"
+msgstr ""
+"Невозможно осуществить синхронизацию, так как все модули синхронизации "
+"выключены"
+
+#: src/ru/ihna/kozhukhov/core_application/exceptions/synchronization_exceptions.py:32
+msgid ""
+"Unable to perform synchronization due to the temporary problems on remote "
+"server"
+msgstr ""
+"Невозможно провести синхронизацию вследствие проблем на внешнем сервере"
+
+#: src/ru/ihna/kozhukhov/core_application/exceptions/synchronization_exceptions.py:41
+msgid "Failed to remove a user: the user has been currently logged in"
+msgstr ""
+"Невозможно удалить пользователя: этот пользователь только что залогинился"
+
+#: src/ru/ihna/kozhukhov/core_application/generic_views/file_upload_mixin.py:60
+msgid "The uploaded file is too large"
+msgstr "Загружаемый Вами файл имеет слишком большой размер"
+
+#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:397
+msgid ""
+"This is a crucial security error. We decided to permanently interrupt the "
+"executed action."
+msgstr "Это - критическая ошибка безопасности. Мы приняли решение полностью прервать выполняемое действие."
+
+#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:430
+#, python-format
+msgid "The request was made from inappropriate IP address %s"
+msgstr "Запрос с IP-адреса %s запрещён."
+
+#: src/ru/ihna/kozhukhov/core_application/migrations/0002_install.py:13
+msgid "Core functionality"
+msgstr "Базовый функционал"
+
+#: src/ru/ihna/kozhukhov/core_application/models/enums/entry_point_type.py:9
+msgid ""
+"As list (the user can enable arbitrary amount of modules in this entry point)"
+msgstr ""
+"Список (пользователь может включить произвольное количество модулей для "
+"данной точки доступа)"
+
+#: src/ru/ihna/kozhukhov/core_application/models/enums/entry_point_type.py:10
+msgid ""
+"As select (the user must choice which module in this entry point to enable)"
+msgstr ""
+"Выбор (пользователь может включить только один модуль для данной точки "
+"доступа)"
+
+#: src/ru/ihna/kozhukhov/core_application/models/enums/log_level.py:9
+msgid "Debugging message"
+msgstr "Сообщение для разработчика"
+
+#: src/ru/ihna/kozhukhov/core_application/models/enums/log_level.py:10
+msgid "Information message"
+msgstr "Информация"
+
+#: src/ru/ihna/kozhukhov/core_application/models/enums/log_level.py:11
+msgid "The system warning"
+msgstr "Предупреждение"
+
+#: src/ru/ihna/kozhukhov/core_application/models/enums/log_level.py:12
+msgid "The system error"
+msgstr "Ошибка"
+
+#: src/ru/ihna/kozhukhov/core_application/models/enums/log_level.py:13
+msgid "The system was down"
+msgstr "Сервер экстренно прекратил работу"
+
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_auto.py:42
+msgid "Automatic authorization"
+msgstr "Автоматическая авторизация"
+
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_google/__init__.py:90
 msgid ""
 "To authorize through Google you need to provide access of this application "
 "to some personal details stored in Google"
@@ -30,20 +241,21 @@ msgstr ""
 "доступ нашему приложению к некоторым персональным данным, которые у Вас "
 "храняться в Google"
 
-#: authorizations/google/__init__.py:138
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_google/__init__.py:138
 msgid "Google account name (an e-mail)"
 msgstr "Название учётной записи Google (e-mail)"
 
-#: authorizations/google/__init__.py:181 authorizations/google/__init__.py:185
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_google/__init__.py:181
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_google/__init__.py:185
 msgid "To enable this module ensure that this field is not empty"
 msgstr "Для того, чтобы включить модуль, убедитесь, что это поле не пустое"
 
-#: authorizations/google/entity/authorization_token/google_provider.py:58
-#: authorizations/google/entity/authorization_token/google_provider.py:78
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_google/entity/authorization_token/google_provider.py:57
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_google/entity/authorization_token/google_provider.py:77
 msgid "Invalid client ID or client secret"
 msgstr "Неверный Client ID или Client Secret"
 
-#: authorizations/google/entity/authorization_token/google_provider.py:90
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_google/entity/authorization_token/google_provider.py:89
 msgid ""
 "Your Google account was not attached to the corefacility account. Please, "
 "login using another authorization method and attach your Google account to "
@@ -54,19 +266,15 @@ msgstr ""
 "привяжите Вашу учётную запись Google к учётной записи corefacility, "
 "используя для этого настройки Вашего профиля."
 
-#: authorizations/google/migrations/0002_install.py:13
-msgid "Authorization through Google"
-msgstr "Авторизация через Google"
-
-#: authorizations/google/serializers/user_settings_serializer.py:22
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_google/serializers/user_settings_serializer.py:22
 msgid "The e-mail must be ended to @gmail.com"
 msgstr "E-mail должен заканчиваться на @gmail.com"
 
-#: authorizations/mailru/__init__.py:95
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_mailru/__init__.py:94
 msgid "User's email in the Mail.Ru mailbox"
 msgstr "E-mail пользователя в почтовом ящике Mail.Ru"
 
-#: authorizations/mailru/__init__.py:157
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_mailru/__init__.py:156
 msgid ""
 "To authorize through the Mail.Ru you need to grant a read-only access to "
 "your personal details"
@@ -75,11 +283,11 @@ msgstr ""
 "на чтение Ваших персональных данных из аккаунта Mail.Ru. Это не предполагает "
 "наличие доступа на их изменение"
 
-#: authorizations/mailru/__init__.py:160
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_mailru/__init__.py:159
 msgid "Authorization code did not received from the Mail.Ru server"
 msgstr "Код авторизации не был получен через сервер Mail.Ru"
 
-#: authorizations/mailru/__init__.py:187
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_mailru/__init__.py:188
 msgid ""
 "Your mail.ru account has not been attached to your corefacility account. "
 "Please, login using another authorization method and attach your mail.ru "
@@ -90,313 +298,68 @@ msgstr ""
 "авторизации, после чего привяжите Вашу учётную запись mail.ru к учётной "
 "записи corefacility, используя для этого настройки Вашего профиля."
 
-#: authorizations/mailru/__init__.py:257 authorizations/mailru/__init__.py:259
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_mailru/__init__.py:259
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_mailru/__init__.py:261
 msgid "To turn this field on please, ensure that this is not empty"
 msgstr "Для того, чтобы включить модуль, убедитесь, что это поле не пустое"
 
-#: authorizations/mailru/__init__.py:261
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_mailru/__init__.py:263
 msgid "The authorization process will not work when this value equals to zero"
 msgstr ""
 "Процесс авторизации не будет работать, если значение этого поля равно нулю"
 
-#: authorizations/mailru/migrations/0002_install.py:13
-msgid "Authorization through Mail.ru"
-msgstr "Авторизация через Mail.ru"
-
-#: core/__init__.py:165
-msgid "Add application"
-msgstr "Добавление приложения в проект"
-
-#: core/__init__.py:167
-msgid "Add application (superuser permission required)"
-msgstr "Добавление приложения в проект (с согласия суперпользователя)"
-
-#: core/__init__.py:168
-msgid "Full access"
-msgstr "Полный доступ"
-
-#: core/__init__.py:169
-msgid "Dealing with data"
-msgstr "Работа с данными"
-
-#: core/__init__.py:170
-msgid "Data adding and processing only"
-msgstr "Только добавление и обработка данных"
-
-#: core/__init__.py:171
-msgid "Data processing only"
-msgstr "Только обработка данных"
-
-#: core/__init__.py:172
-msgid "Viewing the data"
-msgstr "Только просмотр данных"
-
-#: core/__init__.py:173
-msgid "No access"
-msgstr "Доступ закрыт"
-
-#: core/api_exceptions.py:54 core/generic_views/file_upload_mixin.py:113
-msgid "This file type is not uploadable"
-msgstr "Невозможно загрузить данный тип файла"
-
-#: core/api_exceptions.py:65
-msgid "The image resolution is too small"
-msgstr "Разрешение изображения слишком мало"
-
-#: core/api_exceptions.py:76
-msgid "Can't send e-mail to this user because it's e-mail field was not filled"
-msgstr ""
-"Невозможно отправить e-mail этому пользователю, поскольку поле E-mail в его "
-"профиле не заполнено"
-
-#: core/api_exceptions.py:91
-msgid "The following problem occured during the mail delivery: "
-msgstr "При отправке сообщения пользователю возникла следующая проблема: "
-
-#: core/authorizations/auto.py:42
-msgid "Automatic authorization"
-msgstr "Автоматическая авторизация"
-
-#: core/authorizations/password_recovery.py:47
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_password_recovery/__init__.py:47
 msgid "Password recovery function"
 msgstr "Функция восстановления пароля"
 
-#: core/authorizations/password_recovery.py:135
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_password_recovery/__init__.py:135
 msgid "The module can't be enabled in partial server configuration"
 msgstr "Этот модуль нельзя включить в конфигурации частичного сервера"
 
-#: core/authorizations/password_recovery.py:137
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_password_recovery/__init__.py:137
 msgid "The module can't be enabled without email support"
 msgstr ""
 "Этот модуль нельзя включить, так как Ваш сервер не поддерживает отправку E-"
 "mail"
 
-#: core/authorizations/standard.py:40
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_standard/__init__.py:40
 msgid "Standard authorization"
 msgstr "Стандартная авторизация"
 
-#: core/entity/entity_exceptions/__init__.py:11
-msgid "The requested resource was not found here"
-msgstr "Запрашиваемый ресурс не обнаружен"
+#: src/ru/ihna/kozhukhov/core_application/modules/sync_ihna_employee/__init__.py:93
+msgid "IHNA RAS account synchronization"
+msgstr "Синхронизация с сайтом ИВНД и НФ РАН"
 
-#: core/entity/entity_exceptions/__init__.py:16
-msgid ""
-"Unable to create the requested resource because it has already been created"
-msgstr "Невозможно создать требуемый ресурс, так как он уже был создан"
-
-#: core/entity/entity_exceptions/__init__.py:22
-#, python-format
-msgid "%s with such values can't exist"
-msgstr "Поле %s с подобными значениями не существует"
-
-#: core/entity/entity_exceptions/__init__.py:35
-msgid "The entity operation is not permitted"
-msgstr "Указанная операция над сущностью невозможна"
-
-#: core/entity/entity_exceptions/__init__.py:47
-msgid ""
-"This feature is not supported for current database engine. Use another one"
-msgstr ""
-"Данное свойство не поддерживается на установленной Вами СУБД. Установка "
-"PostgreSQL решит эту проблему"
-
-#: core/entity/entity_exceptions/__init__.py:52
-msgid ""
-"The user is a governor of at least one group. Its delete will automatically "
-"remove these groups and reflect another user rights. Are you sure?"
-msgstr ""
-"Данный пользователь руководит одной или несколькими научными группами. Его "
-"удаление приведёт к автоматическому расформированию этих групп, а также к "
-"изменению прав доступа других пользователей к тому или иному функционалу. Вы "
-"желаете продолжить?"
-
-#: core/entity/entity_exceptions/__init__.py:59
-msgid ""
-"The group is a root group for at least one project. Its delete will "
-"automatically remove these projects and reflect another user rights. Are you "
-"sure?"
-msgstr ""
-"Эта группа является корневой группой как минимум для одного из проектов. Её "
-"удаление приведёт к автоматическому уничтожению этих проектов, а также "
-"изменит права доступа других пользователей к функционалу. Продолжить?"
-
-#: core/entity/entity_exceptions/__init__.py:65
-#, python-format
-msgid "Unable to write to %s directory."
-msgstr "Невозможно произвести запись в директорию %s"
-
-#: core/entity/entity_exceptions/__init__.py:149
-msgid "Error during installation of the module"
-msgstr "Ошибка в процессе установки модуля"
-
-#: core/entity/entity_exceptions/__init__.py:161
-msgid ""
-"This module has a parent module that have not been completely installed yet"
-msgstr ""
-"Данный модуль имеет родительский модуль, который не был полностью установлен"
-
-#: core/entity/entity_sets/corefacility_module_set.py:14
-msgid "Corefacility module"
-msgstr "Модуль"
-
-#: core/entity/entity_sets/group_set.py:11
-msgid "Scientific Group"
-msgstr "Научный коллектив"
-
-#: core/entity/entity_sets/project_application_set.py:14
-msgid "Project application"
-msgstr "Приложение в проекте"
-
-#: core/entity/entity_sets/project_set.py:11
-msgid "Project"
-msgstr "Проект"
-
-#: core/entity/entity_sets/user_set.py:11
-msgid "User"
-msgstr "Пользователь"
-
-#: core/entity/entry_points/authorizations.py:36
-msgid "Authorization methods"
-msgstr "Способы авторизации"
-
-#: core/entity/entry_points/authorizations.py:143
-msgid "At least one authorization module must be enabled"
-msgstr "Хотя бы один из способов авторизации должен быть активен"
-
-#: core/entity/entry_points/authorizations.py:251
-msgid "Bad session ID"
-msgstr "Идентификатор сессии неверен или устарел"
-
-#: core/entity/entry_points/projects.py:33
-msgid "Project applications"
-msgstr "Работа с научными проектами"
-
-#: core/entity/entry_points/settings.py:31
-msgid "Other settings"
-msgstr "Прочие настройки"
-
-#: core/entity/entry_points/synchronizations.py:50
-msgid "Account synchronization"
-msgstr "Синхронизация учётных записей"
-
-#: core/generic_views/file_upload_mixin.py:63
-msgid "The uploaded file is too large"
-msgstr "Загружаемый Вами файл имеет слишком большой размер"
-
-#: core/migrations/0002_install.py:24
-msgid "Core functionality"
-msgstr "Базовый функционал"
-
-#: core/models/enums/entry_point_type.py:9
-msgid ""
-"As list (the user can enable arbitrary amount of modules in this entry point)"
-msgstr ""
-"Список (пользователь может включить произвольное количество модулей для "
-"данной точки доступа)"
-
-#: core/models/enums/entry_point_type.py:10
-msgid ""
-"As select (the user must choice which module in this entry point to enable)"
-msgstr ""
-"Выбор (пользователь может включить только один модуль для данной точки "
-"доступа)"
-
-#: core/models/enums/level_type.py:13
-msgid "Project access level"
-msgstr "Уровень доступа к проекту"
-
-#: core/models/enums/level_type.py:14
-msgid "Application access level"
-msgstr "Уровень доступа к приложению"
-
-#: core/models/enums/log_level.py:9
-msgid "Debugging message"
-msgstr "Сообщение для разработчика"
-
-#: core/models/enums/log_level.py:10
-msgid "Information message"
-msgstr "Информация"
-
-#: core/models/enums/log_level.py:11
-msgid "The system warning"
-msgstr "Предупреждение"
-
-#: core/models/enums/log_level.py:12
-msgid "The system error"
-msgstr "Ошибка"
-
-#: core/models/enums/log_level.py:13
-msgid "The system was down"
-msgstr "Сервер экстренно прекратил работу"
-
-#: core/os/exceptions.py:27
-msgid ""
-"Please, login to the server using SSH, execute the commands listed below \n"
-"and press Continue to finish this action\n"
-"\n"
-msgstr ""
-"Пожалуйста, авторизуйтесь на сервере с использованием протокола SSH, "
-"выполните команды, перечисленные ниже,\n"
-" после чего нажмите Продолжить для завершения этого действия\n"
-"\n"
-
-#: core/serializers/project_application_serializer.py:89
-msgid "You have already added this application to the application list."
-msgstr "Вы уже добавили это приложение в проект."
-
-#: core/serializers/project_detail_serializer.py:44
-#: core/serializers/project_detail_serializer.py:65
+#: src/ru/ihna/kozhukhov/core_application/serializers/project_detail_serializer.py:44
+#: src/ru/ihna/kozhukhov/core_application/serializers/project_detail_serializer.py:65
 msgid ""
 "You don't have permission to assign this group as the project root group"
 msgstr ""
 "У Вас нет достаточных полномочий, чтобы назначить этот коллектив в качестве "
 "управляющего коллектива проекта."
 
-#: core/serializers/user_detail_serializer.py:15
+#: src/ru/ihna/kozhukhov/core_application/serializers/user_detail_serializer.py:15
 msgid "Enter a valid phone number."
 msgstr "Введите корректный номер телефона."
 
-#: core/serializers/user_list_serializer.py:21
+#: src/ru/ihna/kozhukhov/core_application/serializers/user_list_serializer.py:20
 msgid ""
 "Enter a valid login consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "Введите корректное имя пользователя, состоящее из латинских букв, цифр, "
 "дефисов и знаков подчёркивания."
 
-#: core/synchronizations/exceptions.py:21
-msgid ""
-"Unable to perform synchronization because all synchronizers were switched off"
-msgstr ""
-"Невозможно осуществить синхронизацию, так как все модули синхронизации "
-"выключены"
-
-#: core/synchronizations/exceptions.py:32
-msgid ""
-"Unable to perform synchronization due to the temporary problems on remote "
-"server"
-msgstr ""
-"Невозможно провести синхронизацию вследствие проблем на внешнем сервере"
-
-#: core/synchronizations/exceptions.py:41
-msgid "Failed to remove a user: the user has been currently logged in"
-msgstr ""
-"Невозможно удалить пользователя: этот пользователь только что залогинился"
-
-#: core/synchronizations/ihna_employees.py:93
-msgid "IHNA RAS account synchronization"
-msgstr "Синхронизация с сайтом ИВНД и НФ РАН"
-
-#: core/templates/core/base.html:3
+#: src/ru/ihna/kozhukhov/core_application/templates/core/base.html:3
 msgid "Loading..."
 msgstr "Загрузка..."
 
-#: core/templates/core/index.html:6
+#: src/ru/ihna/kozhukhov/core_application/templates/core/index.html:6
 msgid "You need to enable Javascript to run this application"
 msgstr ""
 "Вам необходимо включить поддержку Javascript в браузере для того, чтобы "
 "запустить это приложение"
 
-#: core/templates/core/index.html:17
+#: src/ru/ihna/kozhukhov/core_application/templates/core/index.html:17
 msgid ""
 "The device screen resolution is too small. Please, use this application on "
 "another device"
@@ -404,107 +367,124 @@ msgstr ""
 "Ваше устройство имеет монитор со слишком малым разрешением. Пожалуйста, "
 "запустите это приложение на устройстве с большим разрешением"
 
-#: core/views/login.py:37
+#: src/ru/ihna/kozhukhov/core_application/views/login.py:37
 msgid "Incorrect credentials."
 msgstr "Неверные учётные данные."
 
-#: core/views/user.py:42
+#: src/ru/ihna/kozhukhov/core_application/views/user.py:42
 msgid "You can't delete yourself."
 msgstr "Вы не можете удалить самого себя"
 
-#: core/views/user.py:84
+#: src/ru/ihna/kozhukhov/core_application/views/user.py:84
 msgid "Account activation"
 msgstr "Активация аккаунта"
 
-#: imaging/api_exceptions.py:19
-msgid ""
-"Project's home directory was not defined for the project. Please, ask system "
-"administrator to cope with troubles"
-msgstr ""
-"Домащняя директория проекта не определена для данного проекта. Пожалуйста, "
-"обратитесь к системному администратору для решения данной проблемы"
+#~ msgid "Authorization through Cookie"
+#~ msgstr "Авторизация через Cookie"
 
-#: imaging/api_exceptions.py:26
-msgid "Number of variables in the NPZ file is not correct"
-msgstr "Данный NPZ-файл должен содержать ровно одно поле"
+#~ msgid "Authorization through Google"
+#~ msgstr "Авторизация через Google"
 
-#: imaging/api_exceptions.py:32
-msgid "The file doesn't contain 2D map consisting from complex numbers"
-msgstr ""
-"данный файл не содержит двумерную матрицу, состоящую из комплексных чисел"
+#~ msgid "Authorization through Mail.ru"
+#~ msgstr "Авторизация через Mail.ru"
 
-#: imaging/api_exceptions.py:39
-msgid "Please, upload the functional map to apply this map processor"
-msgstr ""
-"Пожалуйста, загрузите функциональную карту на сервер для выполнения этого "
-"действия"
+#~ msgid "Add application"
+#~ msgstr "Добавление приложения в проект"
 
-#: imaging/api_exceptions.py:46
-msgid ""
-"The functional map has been permanently removed from the server or "
-"corrupted. Please, upload it again"
-msgstr ""
-"Функциональная карта безвозвратно удалена с сервера, либо повреждена. "
-"Пожалуйста, загрузите её снова"
+#~ msgid "Add application (superuser permission required)"
+#~ msgstr "Добавление приложения в проект (с согласия суперпользователя)"
 
-#: imaging/api_exceptions.py:54
+#~ msgid "Project application"
+#~ msgstr "Приложение в проекте"
+
+#~ msgid "Other settings"
+#~ msgstr "Прочие настройки"
+
+#~ msgid "Project access level"
+#~ msgstr "Уровень доступа к проекту"
+
+#~ msgid "Application access level"
+#~ msgstr "Уровень доступа к приложению"
+
+#~ msgid ""
+#~ "Please, login to the server using SSH, execute the commands listed "
+#~ "below \n"
+#~ "and press Continue to finish this action\n"
+#~ "\n"
+#~ msgstr ""
+#~ "Пожалуйста, авторизуйтесь на сервере с использованием протокола SSH, "
+#~ "выполните команды, перечисленные ниже,\n"
+#~ " после чего нажмите Продолжить для завершения этого действия\n"
+#~ "\n"
+
+#~ msgid "You have already added this application to the application list."
+#~ msgstr "Вы уже добавили это приложение в проект."
+
+#~ msgid ""
+#~ "Project's home directory was not defined for the project. Please, ask "
+#~ "system administrator to cope with troubles"
+#~ msgstr ""
+#~ "Домащняя директория проекта не определена для данного проекта. "
+#~ "Пожалуйста, обратитесь к системному администратору для решения данной "
+#~ "проблемы"
+
+#~ msgid "Number of variables in the NPZ file is not correct"
+#~ msgstr "Данный NPZ-файл должен содержать ровно одно поле"
+
+#~ msgid "The file doesn't contain 2D map consisting from complex numbers"
+#~ msgstr ""
+#~ "данный файл не содержит двумерную матрицу, состоящую из комплексных чисел"
+
+#~ msgid "Please, upload the functional map to apply this map processor"
+#~ msgstr ""
+#~ "Пожалуйста, загрузите функциональную карту на сервер для выполнения этого "
+#~ "действия"
+
+#~ msgid ""
+#~ "The functional map has been permanently removed from the server or "
+#~ "corrupted. Please, upload it again"
+#~ msgstr ""
+#~ "Функциональная карта безвозвратно удалена с сервера, либо повреждена. "
+#~ "Пожалуйста, загрузите её снова"
+
 #, python-format
-msgid "Can't process this map because another map with alias '%s' exists"
-msgstr ""
-"Невозможно обработать функциональную карту, поскольку другая карта с "
-"псевдонимом '%s' уже создана"
+#~ msgid "Can't process this map because another map with alias '%s' exists"
+#~ msgstr ""
+#~ "Невозможно обработать функциональную карту, поскольку другая карта с "
+#~ "псевдонимом '%s' уже создана"
 
-#: imaging/api_exceptions.py:61
-msgid "The target map contains no data"
-msgstr "В ходе обработки была получена карта без данных"
+#~ msgid "The target map contains no data"
+#~ msgstr "В ходе обработки была получена карта без данных"
 
-#: imaging/entity/entry_points/processors.py:25
-msgid "Imaging processors"
-msgstr "Обработка функциональных карт"
+#~ msgid "Imaging processors"
+#~ msgstr "Обработка функциональных карт"
 
-#: imaging/entity/map/map_set.py:15
-msgid "Functional map"
-msgstr "Функциональная карта"
+#~ msgid "Functional map"
+#~ msgstr "Функциональная карта"
 
-#: imaging/migrations/0002_install.py:13
-msgid "Basic functional maps processing"
-msgstr "Базовая обработка функциональных карт"
+#~ msgid "Basic functional maps processing"
+#~ msgstr "Базовая обработка функциональных карт"
 
-#: imaging/models/enums/map_type.py:9
-msgid "Orientation map"
-msgstr "Карта ориентационной настройки"
+#~ msgid "Orientation map"
+#~ msgstr "Карта ориентационной настройки"
 
-#: imaging/models/enums/map_type.py:10
-msgid "Direction map"
-msgstr "Карта дирекциональной настройки"
+#~ msgid "Direction map"
+#~ msgstr "Карта дирекциональной настройки"
 
-#: imaging/serializers/map_serializer.py:10
-msgid "This value shall not be zero"
-msgstr "Данное значение не должно быть равно нулю"
+#~ msgid "This value shall not be zero"
+#~ msgstr "Данное значение не должно быть равно нулю"
 
-#: roi/api_exceptions.py:10
-msgid "To process the map please, give map dimensions in um"
-msgstr ""
+#~ msgid "Pinwheel"
+#~ msgstr "Центр ориентационной гиперколонки"
 
-#: roi/api_exceptions.py:17
-msgid "To process the map please, mark at least one pinwheel center"
-msgstr ""
+#~ msgid "Rectangular ROI"
+#~ msgstr "Прямоугольная область интереса"
 
-#: roi/entity/pinwheel/pinwheel_set.py:14
-msgid "Pinwheel"
-msgstr "Центр ориентационной гиперколонки"
+#~ msgid "ROI definition"
+#~ msgstr "Выделение ROI"
 
-#: roi/entity/rectangular_roi/rectangular_roi_set.py:13
-msgid "Rectangular ROI"
-msgstr "Прямоугольная область интереса"
-
-#: roi/migrations/0002_install.py:13
-msgid "ROI definition"
-msgstr "Выделение ROI"
-
-#: roi/serializers/rectangular_roi_serializer.py:33
-msgid "Incorrect combination of ROI border values"
-msgstr "Неверно заданы значения границ областей интереса"
+#~ msgid "Incorrect combination of ROI border values"
+#~ msgstr "Неверно заданы значения границ областей интереса"
 
 #~ msgid "Authorization through IHNA website"
 #~ msgstr "Авторизация через сайт ИВНД и НФ РАН"

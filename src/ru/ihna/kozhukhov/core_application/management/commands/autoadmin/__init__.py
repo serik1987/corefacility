@@ -1,15 +1,23 @@
+import signal
+import time
+import logging
 from argparse import ArgumentParser
+from datetime import timedelta
 from importlib import import_module
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management import BaseCommand, CommandError
+from django.utils import timezone
+from django.utils.translation import gettext as _
 
 from ru.ihna.kozhukhov.core_application.entity.entity_sets.log_set import LogSet
-from ru.ihna.kozhukhov.core_application.exceptions.entity_exceptions import DeserializationException
+from ru.ihna.kozhukhov.core_application.exceptions.entity_exceptions import DeserializationException, \
+    SecurityCheckFailedException, EntityNotFoundException
 from ru.ihna.kozhukhov.core_application.models import PosixRequest
-from ru.ihna.kozhukhov.core_application.models.enums import PosixRequestStatus
+from ru.ihna.kozhukhov.core_application.models.enums import PosixRequestStatus, LogLevel
 from .auto_admin_object import AutoAdminObject
-from .utils import deserialize_all_args
+from .utils import deserialize_all_args, check_allowed_ip
 
 
 class Command(BaseCommand):
@@ -28,7 +36,7 @@ class Command(BaseCommand):
         "confirm": "Confirmation of the POSIX request (for part server configuration only)"
     }
 
-    no_id_actions = ['list']
+    no_id_actions = ['list', '_loop']
 
     request_list_headers = {
         'id': "ID",
@@ -38,7 +46,64 @@ class Command(BaseCommand):
         'status': "Action status",
     }
 
+    sleep_interval = 60.0
+    """ Defines the sleep between two consecutive iterations """
+
+    default_execution_interval = timedelta(minutes=10)
+    """ Default value of the execution interval given that we have FullServerConfiguration """
+
+    execution_interval = None
+    """ How much time the process must be in status CONFIRMED until the autoadmin daemon executes it. """
+
     _action_classes = dict()
+
+    _is_terminated = None
+    """ For loop: whether SIGTERM has been sent to the process """
+
+    _is_terminable = True
+    """
+        True if SIGINT, SIGHUP, SIGQUIT and SIGTERM can terminate the command immediately
+        False if they must wait until the command checks _is_terminated property being True
+    """
+
+    logger = None
+    """ Standard corefacility logger """
+
+    _log = None
+    """ The log associated with a given security check issue. """
+
+    def __init__(self, stdout=None, stderr=None, no_color=False, force_color=False):
+        """
+        Initialize the command.
+        Please, not that in multi-thread execution the program must be constructed only from the main thread.
+
+        :param stdout: the standard output stream to write
+        :param stderr: the standard error stream to write
+        :param no_color: Disable colorization of the output
+        :param force_color: Force colorization of the output
+        """
+        super().__init__(stdout, stderr, no_color, force_color)
+        if settings.CORE_UNIX_ADMINISTRATION:
+            self.execution_interval = self.default_execution_interval
+        elif settings.SUGGEST_UNIX_ADMINISTRATION:
+            self.execution_interval = timedelta()
+        else:
+            raise ImproperlyConfigured("Unrecognized configuration profile")
+        for signal_number in (signal.SIGINT, signal.SIGHUP, signal.SIGTERM, signal.SIGQUIT):
+            signal.signal(signal_number, self.interrupt)
+        self.logger = logging.getLogger("django.corefacility.log")
+
+    def interrupt(self, signal_number, execution_frame):
+        """
+        Interrupts the daemon execution by the loop when it receives some terminating signal.
+
+        :param signal_number: number of a signal that invoked this function
+        :param execution_frame: the execution frame
+        """
+        if self._is_terminable:
+            raise KeyboardInterrupt("The process has been terminated by the user")
+        else:
+            self._is_terminated = True
 
     def add_arguments(self, parser: ArgumentParser):
         """
@@ -157,6 +222,37 @@ class Command(BaseCommand):
         if not settings.CORE_SUGGEST_ADMINISTRATION:
             return
         print("Confirm POSIX action", request_id)
+
+    def _loop(self):
+        """
+        Turns the autadmin command into the infinite loop. The loop can be terminated by the SIGTERM only.
+        """
+        self._is_terminated = False
+        try:
+            while True:
+                self._is_terminable = False
+                initialized_requests = list(PosixRequest.objects.filter(status=PosixRequestStatus.INITIALIZED))
+                for request_model in initialized_requests:
+                    self._analyze_posix_request(request_model)
+                    if self._is_terminated:
+                        break
+                filter_time = timezone.now() - self.execution_interval
+                confirmed_requests = list(
+                    PosixRequest.objects.filter(
+                        status=PosixRequestStatus.CONFIRMED,
+                        initialization_date__lt=filter_time,
+                    )
+                )
+                for request_model in confirmed_requests:
+                    self._execute_posix_request(request_model)
+                    if self._is_terminated:
+                        break
+                if self._is_terminated:
+                    break
+                self._is_terminable = True
+                time.sleep(self.sleep_interval)
+        except KeyboardInterrupt:
+            pass
 
     def _get_posix_request_info(self):
         """
@@ -277,4 +373,69 @@ class Command(BaseCommand):
             action = action_class(*action_args, **action_kwargs)
         except Exception as error:
             raise DeserializationException(request_model.id, error)
+        return action
+
+    def _analyze_posix_request(self, request_model):
+        """
+        Put the request marks as INTIIALIZED, checks it for safety and moves it towards ANALYZED or CONFIRMED state.
+
+        :param request_model: a request itself
+        :return: None
+        """
+        try:
+            self._security_check(request_model)
+            print("Analyzing request ", request_model.id, "...", end="")
+            time.sleep(1)
+            print("Done.")
+        except Exception as error:
+            self.logger.error(str(error))
+            if self._log is not None:
+                self._log.add_record(LogLevel.ERROR, str(error))
+            if isinstance(error, SecurityCheckFailedException):
+                self._log.add_record(
+                    LogLevel.INFO,
+                    _("This is a crucial security error. We decided to permanently interrupt the executed action.")
+                )
+                request_model.delete()
+
+    def _execute_posix_request(self, request_model):
+        """
+        Executes the request marked as CONFIRMED.
+
+        :param request_model: a request itself
+        :return: None
+        """
+        print("Executing request ", request_model.id, "...", end="")
+        time.sleep(1)
+        print("Done.")
+
+    def _security_check(self, request_model):
+        """
+        Provides security check for the request. The security check implies the follo`wing steps:
+        1. If POSIX request doesn't have related log, the security check fails.
+        2. If request was made from the IP address which is not in the list of allowed IP addresses, the security
+        check failed.
+        3. The request model must be deserialized into action object that shall be instance of the AutoAdminObject.
+            If not, the security check failed.
+        4. A valid method must be attached to such an action. If failed, the security check has failed.
+        5. If security check has failed, the program will be logged.
+
+        :return: an instance of AutoAdminObject that contains an action to execute.
+        """
+        try:
+            self._log = LogSet().get(request_model.log_id)
+        except EntityNotFoundException:
+            raise SecurityCheckFailedException("The associated POSIX request was not attached to the model.")
+        if not check_allowed_ip(self._log.ip_address):
+            raise SecurityCheckFailedException(
+                _("The request was made from inappropriate IP address %s") % self._log.ip_address
+            )
+        try:
+            action = self._extract_action(request_model)
+        except DeserializationException as error:
+            raise SecurityCheckFailedException(str(error))
+        if not hasattr(action, request_model.method_name):
+            raise SecurityCheckFailedException(
+                "Method '%s' was not defined in related action object." % request_model.method_name
+            )
         return action
