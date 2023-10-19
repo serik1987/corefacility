@@ -287,6 +287,9 @@ class CorefacilityConfiguration(Configuration):
     # as simple user, gain the SSH access and next use CLI in order to avoid the model layer).
     CORE_ROOT_ONLY = False
 
+    # URL of the application main page
+    URL_BASE = values.Value("http://localhost:8000")
+
     if sys.platform.startswith("win32"):
         del LOGGING["handlers"]["syslog_handler"]
         LOGGING["loggers"]["django.corefacility"]["handlers"].remove("syslog_handler")

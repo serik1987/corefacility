@@ -80,6 +80,8 @@ def check_allowed_ip(ip):
     :param ip: the IP address to check
     :return: True if the IP address is within the set, False otherwise
     """
+    if settings.CORE_SUGGEST_ADMINISTRATION:
+        return True
     ip_is_allowed = False
     for allowed_ip in settings.ALLOWED_IPS:
         if ip in ip_network(allowed_ip, False):

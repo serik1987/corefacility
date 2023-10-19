@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <style>
+            table{
+                border-collapse: collapse;
+            }
+            td{
+                padding: 10px;
+                border: 2px solid rgb(222, 222, 221);
+            }
+            td:first-child{
+                border-left: none;
+            }
+            td:last-child{
+                border-right: none;
+            }
+        </style>
+    </head>
+    <body>
+        <p>Глубокоуважаемый {{admin_name}}!</p>
+        <p>Пользователь собирается выполнить действие, для которого необходимо
+            получение административных прав POSIX.</p>
+        <p></p>
+        <table>
+            <tr>
+                <td>ID действия</td>
+                <td>{{action_id}}</td>
+            </tr>
+            <tr>
+                <td>Дата запроса</td>
+                <td>{{request_date}}</td>
+            </tr>
+            <tr>
+                <td>Класс действия</td>
+                <td>{{action_class}}</td>
+            </tr>
+            <tr>
+                <td>Действие</td>
+                <td>{{action_name}}</td>
+            </tr>
+            <tr>
+                <td>IP-адрес отправителя</td>
+                <td>{{ip}}</td>
+            </tr>
+            <tr>
+                <td>Детали HTTP-запроса</td>
+                <td>{{request_details}}</td>
+            </tr>
+            <tr>
+                <td>Пользователь, запросивший операцию</td>
+                <td>{{request_author}}</td>
+            </tr>
+            <tr>
+                <td>
+                    Лог действия
+                </td>
+                <td>
+                    <a href="{{url_base}}/logs/{{log_id}}/">Подробнее...</a>
+                </td>
+            </tr>
+            <tr>
+                <td>Подтверждение действия</td>
+                <td>
+                    {% if is_suggest %}
+                    Для подтверждения действия войдите через SSH и введите команду:<br>
+                    <pre>sudo corefacility autoadmin confirm {{action_id}}</pre>
+                    {% else %}
+                    Данное действие не требует подтверждения и будет запущено через {{sleep_time}}
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>Отмена действия</td>
+                <td>
+                    Если Вы хотите отменить данную операцию, войдите через SSH и введите команду:
+                    <pre>sudo corefacility autoadmin delete {{action_id}}</pre>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">В процессе выполнения действия будут запущены следующие POSIX-команды</td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <pre>{{command_list}}</pre>
+                </td>
+            </tr>
+        </table>
+
+        <p>
+            Искренне Ваш,<br>
+            corefacility
+        </p>
+    </body>
+</html>

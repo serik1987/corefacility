@@ -1,0 +1,25 @@
+Dear {{admin_name}},
+
+The user intends to execute an action that requires gaining POSIX administrative privileges.
+
+                    Action ID: {{action_id}}
+                 Request date: {{request_date}}
+                 Action class: {{action_class}}
+                       Action: {{action_name}}
+            Sender IP address: {{ip}}
+         HTTP request details: {{request_details}}
+User requesting the operation: {{request_author}}
+           Action-related log: {{url_base}}/logs/{{log_id}}/
+               Action confirm:
+{% if is_suggest %}To confirm the action login using SSH and run the following command: sudo corefacility autoadmin confirm {{action_id}}
+{% else %}The action will be automatically confirmed and launched within the  {{sleep_time}}
+{% endif %}
+            Action withdrawal:
+To withdraw the action, please, login using the SSH and enter the following command:
+sudo corefacility autoadmin delete {{action_id}}
+
+The following POSIX command will be run during the request execution:
+{{command_list}}
+
+Sincerely yours,
+corefacility

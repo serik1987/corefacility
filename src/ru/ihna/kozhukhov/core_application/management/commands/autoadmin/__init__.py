@@ -16,6 +16,7 @@ from ru.ihna.kozhukhov.core_application.exceptions.entity_exceptions import Dese
     SecurityCheckFailedException, EntityNotFoundException
 from ru.ihna.kozhukhov.core_application.models import PosixRequest
 from ru.ihna.kozhukhov.core_application.models.enums import PosixRequestStatus, LogLevel
+from ru.ihna.kozhukhov.core_application.utils import mail
 from .auto_admin_object import AutoAdminObject
 from .utils import deserialize_all_args, check_allowed_ip
 
@@ -58,7 +59,7 @@ class Command(BaseCommand):
     _action_classes = dict()
 
     _is_terminated = None
-    """ For loop: whether SIGTERM has been sent to the process """
+    """ True of the command has been terminated by the SIGTERM, SIGHUP, SIGQUIT or SIGINT loops, False otherwise """
 
     _is_terminable = True
     """
@@ -85,7 +86,7 @@ class Command(BaseCommand):
         super().__init__(stdout, stderr, no_color, force_color)
         if settings.CORE_UNIX_ADMINISTRATION:
             self.execution_interval = self.default_execution_interval
-        elif settings.SUGGEST_UNIX_ADMINISTRATION:
+        elif settings.CORE_SUGGEST_ADMINISTRATION:
             self.execution_interval = timedelta()
         else:
             raise ImproperlyConfigured("Unrecognized configuration profile")
@@ -179,12 +180,7 @@ class Command(BaseCommand):
         except Exception as err:
             raise CommandError("Failed to extract an action from the request model: " + str(err))
         request_details = "%s %s" % (log.request_method, log.log_address)
-        if log.user.name is None and log.user.surname is None:
-            request_author = log.user.login
-        elif log.user.name is None or log.user.surname is None:
-            request_author = "%s [%s]" % (log.user.name or log.user.surname, log.user.login)
-        else:
-            request_author = "%s %s [%s]" % (log.user.name, log.user.surname, log.user.login)
+        request_author = self._get_request_author(log)
 
         request_table = {
             "ID:": request_model.id,
@@ -383,10 +379,8 @@ class Command(BaseCommand):
         :return: None
         """
         try:
-            self._security_check(request_model)
-            print("Analyzing request ", request_model.id, "...", end="")
-            time.sleep(1)
-            print("Done.")
+            action = self._security_check(request_model)
+            self._mail_admins(request_model, action)
         except Exception as error:
             self.logger.error(str(error))
             if self._log is not None:
@@ -426,6 +420,8 @@ class Command(BaseCommand):
             self._log = LogSet().get(request_model.log_id)
         except EntityNotFoundException:
             raise SecurityCheckFailedException("The associated POSIX request was not attached to the model.")
+        if self._log.user is None:
+            raise SecurityCheckFailedException("Anonymous users can't make POSIX requests.")
         if not check_allowed_ip(self._log.ip_address):
             raise SecurityCheckFailedException(
                 _("The request was made from inappropriate IP address %s") % self._log.ip_address
@@ -439,3 +435,49 @@ class Command(BaseCommand):
                 "Method '%s' was not defined in related action object." % request_model.method_name
             )
         return action
+
+    def _mail_admins(self, request_model, action):
+        """
+        Sends E-mail notification to the system administrators
+        """
+        action_method = getattr(action, request_model.method_name)
+        action.call(request_model)
+        command_list = action.flush_command_buffer()
+
+        mail(
+            template_prefix='core/action_request',
+            context_data={
+                'admin_name': settings.ADMIN_NAME,
+                'action_id': request_model.id,
+                'log_id': self._log.id,
+                'request_date': request_model.print_initialization_date(),
+                'action_class': action.__doc__.strip().split('\n')[0],
+                'action_name': action_method.__doc__.strip().split('\n')[0],
+                'ip': str(self._log.ip_address),
+                'request_details': "%s %s" % (self._log.request_method, self._log.log_address),
+                'request_author': self._get_request_author(),
+                'command_list': command_list,
+                'url_base': settings.URL_BASE,
+                'is_suggest': settings.CORE_SUGGEST_ADMINISTRATION,
+                'sleep_time': str(self.default_execution_interval),
+            },
+            subject=_("Request for the administrative task"),
+            recipient=settings.ADMIN_EMAIL,
+        )
+
+    def _get_request_author(self, log=None):
+        """
+        Returns string representation of a user making the request
+
+        :param log: log related to the request or None fi you are inside the _loop()
+        :return: the user related to the request
+        """
+        if log is None:
+            log = self._log
+        if log.user.name is None and log.user.surname is None:
+            request_author = log.user.login
+        elif log.user.name is None or log.user.surname is None:
+            request_author = "%s [%s]" % (log.user.name or log.user.surname, log.user.login)
+        else:
+            request_author = "%s %s [%s]" % (log.user.name, log.user.surname, log.user.login)
+        return request_author

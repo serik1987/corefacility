@@ -4,7 +4,13 @@ from django.template.exceptions import TemplateDoesNotExist
 from django.core.mail import EmailMultiAlternatives
 
 
-def mail(template_prefix: str = None, context_data=None, subject: str = "Test message", recipient: str = None, fail_silently=False):
+def mail(
+		template_prefix: str = None,
+		context_data=None,
+		subject: str = "Test message",
+		recipient: str | list = None,
+		fail_silently=False
+):
 	"""
 	Sends an e-mail using the template. The function if different from
 	django.core.mail.send_mail because it doesn't require the mail body.
@@ -16,9 +22,10 @@ def mail(template_prefix: str = None, context_data=None, subject: str = "Test me
 	'txt' and 'html' (both template files must exist)
 	:param context_data: the context to be substituted
 	:param subject: Mail's subject
-	:param recipient: Mail's recipient
+	:param recipient: Mail's recipient (either string containing the mail recipient of list where all recipients are
+		enumerated).
 	:param fail_silently: If True, the function will not throw an exception in case when mail send fails,
-	:return: None
+	:return: Number of successfully delivered messages
 	"""
 	if context_data is None:
 		context_data = {}
@@ -30,10 +37,12 @@ def mail(template_prefix: str = None, context_data=None, subject: str = "Test me
 	except TemplateDoesNotExist:
 		plain_text = get_template("%s.en-GB.txt" % template_prefix).render(context_data)
 		html = get_template("%s.en-GB.html" % template_prefix).render(context_data)
-	mail_object = EmailMultiAlternatives(subject, plain_text, None, [recipient])
+	if isinstance(recipient, str):
+		recipient = [recipient]
+	mail_object = EmailMultiAlternatives(subject, plain_text, None, recipient)
 	mail_object.attach_alternative(html, "text/html")
 	result = mail_object.send(fail_silently)
-	print(result)
+	return result
 
 
 def get_ip(request):

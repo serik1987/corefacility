@@ -36,6 +36,7 @@ services:
       - ../src/ru:/usr/local/lib/python3.11/dist-packages/ru
       - ../corefacility:/usr/local/bin/corefacility
       - ./virtual-server.settings:/etc/corefacility/django-settings
+      - ./mail:/var/mail
       - ../settings/applications.list:/etc/corefacility/applications.list
       - mysql:/var/lib/mysql
       - virtual-server-www:/var/www/media
@@ -57,6 +58,7 @@ services:
       - ../src/ru:/usr/local/lib/python3.11/dist-packages/ru
       - ../corefacility:/usr/local/bin/corefacility
       - ./lpss-server.settings:/etc/corefacility/django-settings
+      - ./mail:/var/mail
       - ../settings/applications.list:/etc/corefacility/applications.list
       - postgre:/var/lib/postgresql/14/main
       - lpss-server-www:/var/www/media

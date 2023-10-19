@@ -169,6 +169,18 @@ colon (`:`). Put here names of all hosts in such URL separated by commas. The ap
 request designated for another hosts. If you follow the application URL and get `Bad Request (400)` you
 probably incorrectly setup this option.
 
+`DJANGO_URL_BASE` is URL for the Web application main page.
+The value of the property must be in the following form:
+"""
+scheme://hostname
+"""
+(without slash at the end!)
+Here scheme is https is you intend to use HTTPS for your Web server or http otherwise and hostname is
+ (a) 127.0.0.1 if you intend to run the corefacility only locally (SimpleLaunchConfiguration or
+ 		ExtendedLaunchConfiguration);
+ (b) the domain name if you registered domain for your Web server;
+ (c) IP address for your host if you don't register domain for your Web server
+
 `DJANGO_ALLOWED_IPS` When you use `FullServerConfiguration` mention here all IPs from which you can
 provide administration tasks (manage users, groups and projects, adjust performance and hardware options).
 Please, note that they must be internal IPs from your laboratory or University network and IP spoofing
@@ -200,6 +212,10 @@ https://react.i18next.com/
 
 `DJANGO_TIME_ZONE` Defines a timezone where you are (for stand-alone configuration) or where your Web
 Server are (for web server configuration).
+
+`DJANGO_CORE_PROJECT_BASEDIR` Defines a directory where all project files shall be stored. The parameter
+is useful for `VirtualServerConfiguration`, `ExtendedLaunchConfiguration` and `SimpleLaunchConfiguration`
+while `FullServerConfiguration` and `PartServerConfiguration` always use `/home` for this purpose.
 
 ### Database settings
 

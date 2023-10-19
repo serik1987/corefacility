@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <style>
+            table{
+                border-collapse: collapse;
+            }
+            td{
+                padding: 10px;
+                border: 2px solid rgb(222, 222, 221);
+            }
+            td:first-child{
+                border-left: none;
+            }
+            td:last-child{
+                border-right: none;
+            }
+        </style>
+    </head>
+    <body>
+        <p>Dear {{admin_mail}},</p>
+        <p>The user intends to execute an action that requires gaining POSIX administrative privileges.</p>
+        <p></p>
+        <table>
+            <tr>
+                <td>Action ID</td>
+                <td>{{action_id}}</td>
+            </tr>
+            <tr>
+                <td>Request date</td>
+                <td>{{request_date}}</td>
+            </tr>
+            <tr>
+                <td>Action class</td>
+                <td>{{action_class}}</td>
+            </tr>
+            <tr>
+                <td>Action</td>
+                <td>{{action_name}}</td>
+            </tr>
+            <tr>
+                <td>Sender IP address</td>
+                <td>{{ip}}</td>
+            </tr>
+            <tr>
+                <td>HTTP request details</td>
+                <td>{{request_details}}</td>
+            </tr>
+            <tr>
+                <td>User requesting the operation</td>
+                <td>{{request_author}}</td>
+            </tr>
+            <tr>
+                <td>
+                    Action-related log
+                </td>
+                <td>
+                    <a href="{{url_base}}/logs/{{log_id}}/">In detail...</a>
+                </td>
+            </tr>
+            <tr>
+                <td>Action confirmation</td>
+                <td>
+                    {% if is_suggest %}
+                    To confirm the action login to the Server using SSH and call the following command:<br>
+                    <pre>sudo corefacility autoadmin confirm {{action_id}}</pre>
+                    {% else %}
+                    The action doesn't require additional confirm and will be launched within the {{sleep_time}}
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>Action withdrawal</td>
+                <td>
+                    To withdraw this action log in through the SSH and enter the following command:
+                    <pre>sudo corefacility autoadmin delete {{action_id}}</pre>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">The following POSIX command will be run during the request execution</td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <pre>{{command_list}}</pre>
+                </td>
+            </tr>
+        </table>
+
+        <p>
+            Sincerely yours,<br>
+            corefacility
+        </p>
+    </body>
+</html>
