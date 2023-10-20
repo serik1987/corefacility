@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from ....models import User, GroupUser
 from .model_provider import ModelProvider
 from ....exceptions.entity_exceptions import GroupGovernorConstraintFails
@@ -38,4 +40,5 @@ class UserProvider(ModelProvider):
         """
         if GroupUser.objects.filter(user_id=user.id, is_governor=True).count() > 0:
             raise GroupGovernorConstraintFails()
-        super().delete_entity(user)
+        if not settings.CORE_MANAGE_UNIX_USERS:
+            super().delete_entity(user)

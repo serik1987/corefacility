@@ -6,6 +6,7 @@ import uuid
 from django.conf import settings
 
 from ....entity.entity_sets.user_set import UserSet
+from ....entity.providers.model_providers.user_provider import UserProvider
 from ....exceptions.entity_exceptions import ConfigurationProfileException
 from .auto_admin_object import AutoAdminObject
 
@@ -130,6 +131,10 @@ class PosixUser(AutoAdminObject):
         """
         print("DELETE USER")
         print(self)
+        if self.entity:
+            user_model_provider = UserProvider()
+            user_model = user_model_provider.unwrap_entity(self.entity)
+            user_model.delete()
 
     def __str__(self):
         return "PosixUser(login={login}, home_dir={home_dir}, corefacility_user_id={id})".format(

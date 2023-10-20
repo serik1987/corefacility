@@ -368,7 +368,7 @@ class Command(BaseCommand):
             action_args, action_kwargs = deserialize_all_args(request_model.action_arguments)
             action = action_class(*action_args, **action_kwargs)
         except Exception as error:
-            raise DeserializationException(request_model.id, error)
+            raise DeserializationException(request_model, error)
         return action
 
     def _analyze_posix_request(self, request_model):
@@ -381,6 +381,20 @@ class Command(BaseCommand):
         try:
             action = self._security_check(request_model)
             self._mail_admins(request_model, action)
+            if settings.CORE_UNIX_ADMINISTRATION:
+                request_model.status = PosixRequestStatus.CONFIRMED
+                self._log.add_record(
+                    LogLevel.INFO,
+                    _("The request is analyzed and will be launched within the period of {0}")
+                    .format(str(self.execution_interval))
+                )
+            if settings.CORE_SUGGEST_ADMINISTRATION:
+                request_model.status = PosixRequestStatus.ANALYZED
+                self._log.add_record(
+                    LogLevel.INFO,
+                    _("The request is analyzed and awaits for the confirmation of the system administrator.")
+                )
+            request_model.save()
         except Exception as error:
             self.logger.error(str(error))
             if self._log is not None:

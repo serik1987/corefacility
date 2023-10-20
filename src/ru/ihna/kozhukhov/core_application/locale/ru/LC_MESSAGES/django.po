@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-15 01:22+0300\n"
+"POT-Creation-Date: 2023-10-20 02:24+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -179,16 +179,33 @@ msgstr ""
 msgid "The uploaded file is too large"
 msgstr "Загружаемый Вами файл имеет слишком большой размер"
 
-#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:397
+#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:388
+#, python-brace-format
+msgid "The request is analyzed and will be launched within the period of {0}"
+msgstr "Запрос проанализирован и будет выполнен в течение промежутка времени: {0}"
+
+#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:395
+msgid ""
+"The request is analyzed and awaits for the confirmation of the system "
+"administrator."
+msgstr "Запрос проанализирован и ожидает подтверждения системным администратором."
+
+#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:405
 msgid ""
 "This is a crucial security error. We decided to permanently interrupt the "
 "executed action."
-msgstr "Это - критическая ошибка безопасности. Мы приняли решение полностью прервать выполняемое действие."
+msgstr ""
+"Это - критическая ошибка безопасности. Мы приняли решение полностью прервать "
+"выполняемое действие."
 
-#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:430
+#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:441
 #, python-format
 msgid "The request was made from inappropriate IP address %s"
 msgstr "Запрос с IP-адреса %s запрещён."
+
+#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:478
+msgid "Request for the administrative task"
+msgstr "Запрос на совершение административных действий"
 
 #: src/ru/ihna/kozhukhov/core_application/migrations/0002_install.py:13
 msgid "Core functionality"

@@ -141,3 +141,4 @@ dmypy.json
 applications.list
 src/ru/ihna/kozhukhov/corefacility/settings/application_settings.py
 src/ru/ihna/kozhukhov/core_application/ep_urls/projects.py
+locale/
