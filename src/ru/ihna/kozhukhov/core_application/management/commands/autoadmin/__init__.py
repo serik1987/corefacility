@@ -217,7 +217,13 @@ class Command(BaseCommand):
         """
         if not settings.CORE_SUGGEST_ADMINISTRATION:
             return
-        print("Confirm POSIX action", request_id)
+        try:
+            posix_model = PosixRequest.objects.get(status=PosixRequestStatus.ANALYZED, id=request_id)
+            posix_model.status = PosixRequestStatus.CONFIRMED
+            posix_model.save()
+            self.stdout.write("Request number %d has been confirmed." % request_id)
+        except PosixRequest.DoesNotExist:
+            raise CommandError("There is no request with ID=%d that waits for the confirmation" % request_id)
 
     def _loop(self):
         """
