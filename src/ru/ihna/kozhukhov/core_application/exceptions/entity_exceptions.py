@@ -312,3 +312,22 @@ class SecurityCheckFailedException(PosixException):
     An exception throws when autoadmin can't execute the request due to security reasons.
     """
     pass
+
+
+class PosixCommandFailedException(PosixException):
+    """
+    An exception is thrown when this is failed to create, modify or delete the entity becuase some POSIX command
+    has been accomplished with error.
+
+    The POSIX command is stated to be completed with error when its corresponding process has finished with non-zero
+    status code.
+    """
+
+    def __init__(self, posix_command: str, output: str):
+        """
+        Initializes an exception
+
+        :posix_command: a string representing the POSIX command to execute
+        :output: a command output
+        """
+        super().__init__("Command '%s' executed with the following error: '%s'" % (posix_command, output.strip()))

@@ -402,15 +402,7 @@ class Command(BaseCommand):
                 )
             request_model.save()
         except Exception as error:
-            self.logger.error(str(error))
-            if self._log is not None:
-                self._log.add_record(LogLevel.ERROR, str(error))
-            if isinstance(error, SecurityCheckFailedException):
-                self._log.add_record(
-                    LogLevel.INFO,
-                    _("This is a crucial security error. We decided to permanently interrupt the executed action.")
-                )
-                request_model.delete()
+            self._process_request_failure(request_model, error)
 
     def _execute_posix_request(self, request_model):
         """
@@ -419,9 +411,16 @@ class Command(BaseCommand):
         :param request_model: a request itself
         :return: None
         """
-        print("Executing request ", request_model.id, "...", end="")
-        time.sleep(1)
-        print("Done.")
+        try:
+            action = self._security_check(request_model)
+            action.command_emulation = False
+            output = action.call(request_model)
+            request_model.delete()
+            self._log.add_record(LogLevel.INFO, _("The action has been successfully accomplished."))
+            if output != "" and output is not None:
+                self.logger.info(output)
+        except Exception as error:
+            self._process_request_failure(request_model, error)
 
     def _security_check(self, request_model):
         """
@@ -454,6 +453,7 @@ class Command(BaseCommand):
             raise SecurityCheckFailedException(
                 "Method '%s' was not defined in related action object." % request_model.method_name
             )
+        action.log = self._log
         return action
 
     def _mail_admins(self, request_model, action):
@@ -501,3 +501,21 @@ class Command(BaseCommand):
         else:
             request_author = "%s %s [%s]" % (log.user.name, log.user.surname, log.user.login)
         return request_author
+
+    def _process_request_failure(self, request_model, error):
+        """
+        Processes an exceptions raised by request execution or initialization
+
+        :param request_model: the Django model of the request
+        :param error: an exception thrown during the request initialization or execution
+        """
+        from ru.ihna.kozhukhov.core_application.exceptions.entity_exceptions import PosixCommandFailedException
+        self.logger.error(str(error))
+        if self._log is not None and not isinstance(error, PosixCommandFailedException):
+            self._log.add_record(LogLevel.ERROR, str(error))
+        if isinstance(error, SecurityCheckFailedException):
+            self._log.add_record(
+                LogLevel.INFO,
+                _("This is a crucial security error. We decided to permanently interrupt the executed action.")
+            )
+            request_model.delete()

@@ -3,7 +3,8 @@ import subprocess
 
 from django.conf import settings
 
-from ....exceptions.entity_exceptions import ConfigurationProfileException
+from ....exceptions.entity_exceptions import ConfigurationProfileException, PosixCommandFailedException
+from ....models.enums import LogLevel
 
 
 class AutoAdminObject:
@@ -64,12 +65,7 @@ class AutoAdminObject:
         """
         command_list = []
         for command in self._command_buffer:
-            quoted_command = [
-                '"%s"' % cmd_part
-                if self._quote_needed_pattern.search(cmd_part) is not None else cmd_part
-                for cmd_part in command
-            ]
-            command_string = " ".join(quoted_command)
+            command_string = self._get_command_string(command)
             command_list.append(command_string)
         self._command_buffer = list()
         return "\r\n".join(command_list)
@@ -100,10 +96,35 @@ class AutoAdminObject:
             self._command_buffer.append(cmd)
             return command
         else:
-            kwargs.update({
-                "stdout": subprocess.PIPE,
-                "stderr": subprocess.STDOUT,
-                "check": True,
-            })
-            result = subprocess.run(cmd, *args, **kwargs)
-            return result.stdout.decode("utf-8")
+            command_string = self._get_command_string(cmd)
+            self.log.add_record(LogLevel.INFO, command_string)
+            try:
+                kwargs.update({
+                    "stdout": subprocess.PIPE,
+                    "stderr": subprocess.STDOUT,
+                    "check": True,
+                })
+                result = subprocess.run(cmd, *args, **kwargs)
+                output = result.stdout.decode("utf-8")
+                if output != "" and output is not None:
+                    self.log.add_record(LogLevel.INFO, output)
+                return output
+            except subprocess.CalledProcessError as error:
+                output = error.stdout.decode("utf-8")
+                self.log.add_record(LogLevel.ERROR, output)
+                raise PosixCommandFailedException(command_string, output)
+
+    def _get_command_string(self, command):
+        """
+        Transforms the command to the command string
+
+        :param command: a tuple that represents a command to execute
+        :return: a string that represents a command
+        """
+        quoted_command = [
+            '"%s"' % cmd_part
+            if self._quote_needed_pattern.search(cmd_part) is not None else cmd_part
+            for cmd_part in command
+        ]
+        command_string = " ".join(quoted_command)
+        return command_string

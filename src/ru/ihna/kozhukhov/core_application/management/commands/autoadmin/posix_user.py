@@ -103,16 +103,24 @@ class PosixUser(AutoAdminObject):
         if self.login is None or self.home_dir is None:
             self.login = self._shorten_user_login(self.entity.login)
             self.home_dir = os.path.join(settings.CORE_PROJECT_BASEDIR, "u-" + self.login)
-        self.run(
+        output = self.run(
             (
+                # see 'man useradd' shell command for more details
                 "useradd",
-                "-d", self.home_dir,
-                "-m",
-                "-U",
-                "-c", "corefacility user %d" % self.entity_id,
-                self.login
+                "-d", self.home_dir,                                # Specifies the user's home directory
+                "-m",                                               # Tells UNIX to create the users' home directory
+                "-U",                                               # Tells UNIX to create user's primary group
+                "-c", "corefacility user %d" % self.entity_id,      # Comment string to add to /etc/passwd
+                self.login                                          # The POSIX login of the user
             )
         )
+        if self.entity is not None and not self.command_emulation:
+            user_model_provider = UserProvider()
+            user_model = user_model_provider.unwrap_entity(self.entity)
+            user_model.unix_group = self.login
+            user_model.home_dir = self.home_dir
+            user_model.save()
+        return output
 
     def update(self):
         """
