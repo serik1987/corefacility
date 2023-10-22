@@ -384,6 +384,7 @@ class Command(BaseCommand):
         :param request_model: a request itself
         :return: None
         """
+        from ru.ihna.kozhukhov.core_application.exceptions.entity_exceptions import RetryCommandAfterException
         try:
             action = self._security_check(request_model)
             self._mail_admins(request_model, action)
@@ -401,6 +402,8 @@ class Command(BaseCommand):
                     _("The request is analyzed and awaits for the confirmation of the system administrator.")
                 )
             request_model.save()
+        except RetryCommandAfterException:
+            pass
         except Exception as error:
             self._process_request_failure(request_model, error)
 

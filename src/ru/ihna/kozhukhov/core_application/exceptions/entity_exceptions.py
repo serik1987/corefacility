@@ -331,3 +331,12 @@ class PosixCommandFailedException(PosixException):
         :output: a command output
         """
         super().__init__("Command '%s' executed with the following error: '%s'" % (posix_command, output.strip()))
+
+
+class RetryCommandAfterException(PosixException):
+    """
+    The error is thrown when you need to try this operation later.
+    """
+
+    def __init__(self):
+        super().__init__("Retry after exception: the command shall be executed later.")

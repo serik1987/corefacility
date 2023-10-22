@@ -7,7 +7,7 @@ from django.conf import settings
 
 from ....entity.entity_sets.user_set import UserSet
 from ....entity.providers.model_providers.user_provider import UserProvider
-from ....exceptions.entity_exceptions import ConfigurationProfileException
+from ....exceptions.entity_exceptions import ConfigurationProfileException, RetryCommandAfterException
 from .auto_admin_object import AutoAdminObject
 
 
@@ -42,7 +42,7 @@ class PosixUser(AutoAdminObject):
     entity = None
 
     @classmethod
-    def update_static_objects(cls):
+    def get_posix_users(cls):
         """
         An auto admin object has some kind of static objects (e.g., POSIX users or group already registered in the
         operating system).
@@ -59,6 +59,7 @@ class PosixUser(AutoAdminObject):
                                  home_dir=posix_user_info[cls.HOME_DIR_POSITION]
                                  )
                 cls._static_objects.append(posix_user)
+        return cls._static_objects
 
     def __init__(self, entity, login=None, home_dir=None):
         """
@@ -114,12 +115,7 @@ class PosixUser(AutoAdminObject):
                 self.login                                          # The POSIX login of the user
             )
         )
-        if self.entity is not None and not self.command_emulation:
-            user_model_provider = UserProvider()
-            user_model = user_model_provider.unwrap_entity(self.entity)
-            user_model.unix_group = self.login
-            user_model.home_dir = self.home_dir
-            user_model.save()
+        self._update_database_info()
         return output
 
     def update(self):
@@ -128,8 +124,33 @@ class PosixUser(AutoAdminObject):
 
         :return: None
         """
-        print("UPDATE USER")
-        print(self)
+        output = ""
+        if self.login is not None and self.home_dir is not None:
+            available_posix_users = filter(lambda user: user.login == self.login, self.get_posix_users())
+            posix_user_updated = False
+            for _ in available_posix_users:
+                old_login = self.login
+                self.login = self._shorten_user_login(self.entity.login)
+                self.home_dir = os.path.join(settings.CORE_PROJECT_BASEDIR, "u-" + self.login)
+                output = self.run(
+                    (
+                        "usermod",
+                        "-m", "-d", self.home_dir,                  # Change the home directory
+                        "-l", self.login,                           # Also change the user's login
+                        old_login                                   # Old user's login
+                    )
+                )
+                self._update_database_info()
+                posix_user_updated = True
+                break
+            if not posix_user_updated:
+                self.login = None
+                self.home_dir = None
+                output = self.create()
+        else:
+            #  If someone wants to delete the user within the following 10 minutes, he moves into this branch
+            raise RetryCommandAfterException()
+        return output
 
     def delete(self):
         """
@@ -139,6 +160,7 @@ class PosixUser(AutoAdminObject):
         """
         print("DELETE USER")
         print(self)
+        raise NotImplementedError('delete')
         if self.entity:
             user_model_provider = UserProvider()
             user_model = user_model_provider.unwrap_entity(self.entity)
@@ -160,7 +182,7 @@ class PosixUser(AutoAdminObject):
         """
         if len(login) > self.MAX_LOGIN_SIZE:
             login = login[:self.MAX_LOGIN_SIZE]
-        available_logins = [posix_user.login for posix_user in self.get_static_objects()]
+        available_logins = [posix_user.login for posix_user in self.get_posix_users()]
         trials = 0
         while login in available_logins:
             enumerated_login_parts = self.ENUMERATED_USER_TEMPLATE.match(login)
@@ -177,3 +199,14 @@ class PosixUser(AutoAdminObject):
             if trials > self.MAX_LOGIN_TRIALS:
                 login = uuid.uuid4().hex
         return login
+
+    def _update_database_info(self):
+        """
+        When the PosixUser gives the user new login and home directory, this method updates such values.
+        """
+        if self.entity is not None and not self.command_emulation:
+            user_model_provider = UserProvider()
+            user_model = user_model_provider.unwrap_entity(self.entity)
+            user_model.unix_group = self.login
+            user_model.home_dir = self.home_dir
+            user_model.save()

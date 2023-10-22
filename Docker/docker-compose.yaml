@@ -57,11 +57,12 @@ services:
     volumes:
       - ../src/ru:/usr/local/lib/python3.11/dist-packages/ru
       - ../corefacility:/usr/local/bin/corefacility
-      - ./lpss-server.settings:/etc/corefacility/django-settings
       - ./mail:/var/mail
-      - ../settings/applications.list:/etc/corefacility/applications.list
       - postgre:/var/lib/postgresql/14/main
       - lpss-server-www:/var/www/media
+      - ./lpss-server.cfg:/etc
+      - ../settings/applications.list:/etc/corefacility/applications.list
+      - ./lpss-server.settings:/etc/corefacility/django-settings
       - lpss-server-home-dir:/home
       - ../src/ru/ihna/kozhukhov/corefacility/static/favicon.ico:/var/www/static/favicon.ico
       - ../src/ru/ihna/kozhukhov/core_application/static/common.min.css:/var/www/static/common.min.css

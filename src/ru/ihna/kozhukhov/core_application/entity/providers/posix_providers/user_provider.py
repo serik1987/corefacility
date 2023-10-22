@@ -67,7 +67,8 @@ class UserProvider(PosixProvider):
         :param user: the user to which the information shall be set
         :return: nothing
         """
-        if self.is_provider_on():
+        # noinspection PyProtectedMember
+        if self.is_provider_on() and 'login' in user._edited_fields:
             self.unwrap_entity(user).update()
 
     def delete_entity(self, user):
