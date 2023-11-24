@@ -1,10 +1,12 @@
 import csv
 import os
 import re
+import subprocess
 import uuid
 
 from django.conf import settings
 
+from .posix_group import PosixGroup
 from ....entity.entity_sets.user_set import UserSet
 from ....entity.providers.model_providers.user_provider import UserProvider
 from ....exceptions.entity_exceptions import ConfigurationProfileException, RetryCommandAfterException
@@ -39,6 +41,12 @@ class PosixUser(AutoAdminObject):
     HOME_DIR_POSITION = 5
     """ Position of the home directory within the /etc/passwd """
 
+    gid = None
+    """ User's primary GID or None if we don't know about this """
+
+    GID_POSITION = 3
+    """ Position of the user's primary GID """
+
     entity = None
 
     @classmethod
@@ -58,6 +66,7 @@ class PosixUser(AutoAdminObject):
                                  login=posix_user_info[cls.LOGIN_POSITION],
                                  home_dir=posix_user_info[cls.HOME_DIR_POSITION]
                                  )
+                posix_user.gid = posix_user_info[cls.GID_POSITION]
                 cls._static_objects.append(posix_user)
         return cls._static_objects
 
@@ -118,38 +127,104 @@ class PosixUser(AutoAdminObject):
         self._update_database_info()
         return output
 
-    def update(self):
+    def _check_user_for_update(self):
+        """
+        Finds user with the same name as a given user
+        :return: the user with the same name (but not the same PosixUser entity!) at success, None at failure
+        """
+        if self.login is None or self.home_dir is None:
+            raise RetryCommandAfterException()
+        available_posix_user = None
+        available_posix_users = filter(lambda user: user.login == self.login, self.get_posix_users())
+        for user in available_posix_users:
+            available_posix_user = user
+            break
+        return available_posix_user
+
+    def update_login(self):
         """
         Change a given POSIX user in such a way as it corresponds to a given corefacility user
 
         :return: None
         """
         output = ""
-        if self.login is not None and self.home_dir is not None:
-            available_posix_users = filter(lambda user: user.login == self.login, self.get_posix_users())
-            posix_user_updated = False
-            for _ in available_posix_users:
-                old_login = self.login
-                self.login = self._shorten_user_login(self.entity.login)
-                self.home_dir = os.path.join(settings.CORE_PROJECT_BASEDIR, "u-" + self.login)
-                output = self.run(
-                    (
-                        "usermod",
-                        "-m", "-d", self.home_dir,                  # Change the home directory
-                        "-l", self.login,                           # Also change the user's login
-                        old_login                                   # Old user's login
-                    )
+        available_posix_user = self._check_user_for_update()
+        if available_posix_user:
+            old_login = self.login
+            self.login = self._shorten_user_login(self.entity.login)
+            self.home_dir = os.path.join(settings.CORE_PROJECT_BASEDIR, "u-" + self.login)
+            output = self.run(
+                (
+                    "usermod",
+                    "-m", "-d", self.home_dir,                  # Change the home directory
+                    "-l", self.login,                           # Also change the user's login
+                    old_login                                   # Old user's login
                 )
-                self._update_database_info()
-                posix_user_updated = True
-                break
-            if not posix_user_updated:
-                self.login = None
-                self.home_dir = None
-                output = self.create()
+            )
+            self._update_database_info()
         else:
-            #  If someone wants to delete the user within the following 10 minutes, he moves into this branch
-            raise RetryCommandAfterException()
+            self.login = None
+            self.home_dir = None
+            output = self.create()
+        return output
+
+    def set_password(self, new_password):
+        """
+        Sets the new user's password
+        :param new_password: new password to set
+        :return: string containing the output information
+        """
+        output = ""
+        available_posix_user = self._check_user_for_update()
+        if not available_posix_user:
+            self.create()
+        self.run(
+            ("passwd", self.login, ),
+            # The input is required to answer the following question:
+            # Type new password: ******
+            # Re-type new password: ******
+            #
+            # Putting the password into the command is very bad idea because all commands are (a) logged;
+            # (b) sent using E-mail
+            input="{0}\n{0}".format(new_password).encode("utf-8"),
+        )
+        self.update_lock()
+        return output
+
+    def update_lock(self):
+        """
+        Updates the user's lock
+        :return: string containing output information
+        """
+        output = ""
+        available_posix_user = self._check_user_for_update()
+        if not available_posix_user:
+            self.create()
+        desired_lock_status = self.entity.is_locked
+        actual_lock_status = subprocess.run(
+            ("passwd", "-S", self.login),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+        )
+        actual_lock_status = actual_lock_status \
+            .stdout \
+            .decode('utf-8') \
+            .split()[1]
+        if actual_lock_status.upper() == 'NP':  # When the password is not set, the POSIX accounts can't
+                                        # be distinguished by
+                                        # 'locked' and 'non-locked', i.e.: all accounts are locked on the level of the
+                                        # operating system
+            return
+        elif actual_lock_status.upper() == 'P':  # Password was set, the account is unlocked
+            actual_lock_status = False
+        elif actual_lock_status.upper() == 'L':  # Password was set but the account is locked
+            actual_lock_status = True
+        else:
+            raise ValueError("Undocumented lock status '%s' for POSIX account '%s'" % (actual_lock_status, self.login))
+        if desired_lock_status and not actual_lock_status:
+            self.run(('passwd', '-l', self.login))
+        if not desired_lock_status and actual_lock_status:
+            self.run(('passwd', '-u', self.login))
         return output
 
     def delete(self):
@@ -158,13 +233,15 @@ class PosixUser(AutoAdminObject):
 
         :return: None
         """
-        print("DELETE USER")
-        print(self)
-        raise NotImplementedError('delete')
-        if self.entity:
-            user_model_provider = UserProvider()
-            user_model = user_model_provider.unwrap_entity(self.entity)
-            user_model.delete()
+        if self.login is not None and self.home_dir is not None:
+            available_user = self._check_user_for_update()
+            if available_user is not None:
+                primary_gid = available_user.gid
+                self.run(('userdel', '-rf', available_user.login))
+                posix_groups = filter(lambda group: group.gid == primary_gid, PosixGroup.get_posix_groups())
+                for group in posix_groups:
+                    self.run(('groupdel', group.name))
+        self._delete_user_from_database()
 
     def __str__(self):
         return "PosixUser(login={login}, home_dir={home_dir}, corefacility_user_id={id})".format(
@@ -210,3 +287,12 @@ class PosixUser(AutoAdminObject):
             user_model.unix_group = self.login
             user_model.home_dir = self.home_dir
             user_model.save()
+
+    def _delete_user_from_database(self):
+        """
+        When the PosixUser deletes the user, this method deletes it from the database
+        """
+        if self.entity is not None and not self.command_emulation:
+            user_model_provider = UserProvider()
+            user_model = user_model_provider.unwrap_entity(self.entity)
+            user_model.delete()

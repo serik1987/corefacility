@@ -86,6 +86,8 @@ import {ReactComponent as ExclamationMark} from 'corefacility-base/shared-view/i
  */
 export default class UpdateForm extends Form{
 
+	showDeletedObject = true;
+
 	constructor(props){
 		super(props);
 		this.handleClose = this.handleClose.bind(this);
@@ -310,7 +312,7 @@ export default class UpdateForm extends Form{
 			return <Navigate to={this.state.redirect}/>;
 		}
 
-		if (this._formObject && this._formObject.state === EntityState.deleted){
+		if (this._formObject && this._formObject.state === EntityState.deleted && this.showDeletedObject){
 			return (
 				<ErrorMessage className="already-deleted">
 					<i>{t("The requested resource has already been deleted.")}</i>

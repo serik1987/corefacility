@@ -21,14 +21,9 @@ class PasswordResetMixin:
         with transaction.atomic():
             user = self.get_object()
             new_password = user.generate_password()
-            if PosixProvider().is_provider_on():
-                try:
-                    posix_user = PosixUser.find_by_login(user.unix_group)
-                    posix_user.set_password(new_password)
-                    if user.is_locked:
-                        posix_user.lock()
-                except OperatingSystemUserNotFoundException:
-                    pass
-            request.corefacility_log.response_body = "***"
             user.update()
+            provider = PosixProvider()
+            provider.set_password(user, new_password)
+            if hasattr(request, 'corefacility_log'):
+                request.corefacility_log.response_body = "***"
         return Response({"password": new_password})

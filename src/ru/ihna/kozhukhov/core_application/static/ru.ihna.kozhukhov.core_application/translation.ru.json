@@ -19,6 +19,7 @@
 	"Choose an application from the list below...": "Выберите приложение из списка...",
 	"Please, select a file to upload": "Пожалуйста, выберите файл для загрузки",
 	"The functional map must be saved in a special NPY file. Use this facility to upload this.": "Функциональная карта должна быть сохранена в специальный NPY файл. Используйте этот элемент для того, чтобы закачать файл на диск.",
+	"A file that you are trying to upload is too large.": "Файл, который Вы собираетесь загрузить, слишком большой.",
 	"Basic settings": "Основные настройки",
 	"Edit this value": "Отредактировать данное значение",
 	"Finish edit": "Завершить редактирование",
@@ -147,6 +148,7 @@
 	"The password was set.": "Пароль пользователя задан.",
 	"The password was not set.": "Пароль пользователя не задан.",
 	"User delete confirmation": "Подтверждение удаления пользователя",
+	"Delete user": "Удаление пользователя",
 	"There are no users satisfying search criteria.": "Не найдены пользователи, удовлетворяющие поисковым критериям.",
 	"The login is required for the user identification process during authentication": "Для идентификации пользователя при выполнении аутентификации требуется указать имя пользователя (латиницей)",
 	"The first name is required for better visualization": "Имя пользователя требуется для его лучшей визуализации",
@@ -162,6 +164,7 @@
 	"To get access to the corefacility use the following credentials:": "Для получения доступа к corefacility используйте следующие авторизационные данные:",
 	"The activation mail has been successfully sent to the user.": "Письмо с активационным ключём успешно отправлено пользователю.",
 	"The user password is: {PASSWORD} Please, set this password in the operating system using the following command:": "Пароль пользователя: {PASSWORD} Пожалуйста, установите пароль в операционной системе, используя следующую команду:",
+	"The user will be deleted within the following several minutes.": "Пользователь будет удалён в течение следующих нескольких минут.",
 
 	"Synchronization": "Синхронизация",
 	"Synchronization completed.": "Синхронизация завершена.",

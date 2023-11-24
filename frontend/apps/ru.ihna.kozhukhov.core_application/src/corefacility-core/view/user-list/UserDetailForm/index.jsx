@@ -24,6 +24,8 @@ export default class UserDetailForm extends UpdateForm{
 
 	RELOAD_STATUS_CODES = [401, 403, 404];
 
+	showDeletedObject = false;
+
 	constructor(props){
 		super(props);
 		this.changePassword = this.changePassword.bind(this);
@@ -116,37 +118,8 @@ export default class UserDetailForm extends UpdateForm{
 	async printPassword(event){
 		let apiVersion = window.SETTINGS.client_version;
 		let path = `/api/${apiVersion}/users/${this._formObject.id}/password-reset/`;
-		let password = null;
-		if (window.SETTINGS.suggest_administration){
-			let user = this._formObject;
-			let oldLock = user.is_locked;
-			if (!oldLock){
-				user.is_locked = true;
-				if (!(await this.doSuggestedAction(() => user.update()))){
-					user.is_locked = oldLock;
-					return;
-				}
-			}
-			let response = await client.post(path, {});
-			password = response.password;
-			let stage_status = await window.application.openModal("posix_action", {
-				"message": t("The user password is: {PASSWORD} Please, set this password in the operating system using the following command:")
-					.replace("{PASSWORD}", password),
-				"bashScript": ["passwd " + user.login],
-			});
-			if (!stage_status){
-				return;
-			}
-			user.is_locked = oldLock;
-			if (!(await this.doSuggestedAction(() => user.update()))){
-				user.is_locked = true;
-				return;
-			}
-		} else {
-			let response = await client.post(path, {});
-			password = response.password
-		}
-		tpl_password(this._formObject.login, password);
+		let response = await client.post(path, {});
+		tpl_password(this._formObject.login, response.password);
 	}
 
 	async sendActivationCode(event){
@@ -174,6 +147,18 @@ export default class UserDetailForm extends UpdateForm{
 		this.setState({
 			showAuthorizationWidgets: false,
 		});
+	}
+
+	/** Handles press on the "Remove" button that has to delete the _formObject
+	 * 	from all external service
+	 */
+	async handleDelete(event){
+		let result = await super.handleDelete(event);
+		await window.application.openModal('message', {
+			title: t("Delete user"),
+			body: t("The user will be deleted within the following several minutes."),
+		});
+		return result;
 	}
 
 	/**	Transforms Javascript exception to the error message in the message bar.

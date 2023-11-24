@@ -45,3 +45,9 @@ export class LengthRequiredError extends HttpError{}
 export class TooManyRequestsError extends HttpError{}
 
 export class ServerSideError extends HttpError{}
+
+export class RequestTooLongError extends HttpError{
+	constructor(){
+		super(413, {'detail': t("A file that you are trying to upload is too large.")});
+	}
+}

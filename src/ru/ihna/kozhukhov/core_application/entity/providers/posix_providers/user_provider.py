@@ -63,13 +63,30 @@ class UserProvider(PosixProvider):
 
     def update_entity(self, user):
         """
-        Sets information to the user
+        Sets information to user
         :param user: the user to which the information shall be set
         :return: nothing
         """
+        if not self.is_provider_on():
+            return
+        posix_user = self.unwrap_entity(user)
         # noinspection PyProtectedMember
-        if self.is_provider_on() and 'login' in user._edited_fields:
-            self.unwrap_entity(user).update()
+        if 'login' in user._edited_fields:
+            posix_user.update_login()
+        # noinspection PyProtectedMember
+        if 'is_locked' in user._edited_fields:
+            posix_user.update_lock()
+
+    def set_password(self, user, new_password):
+        """
+        Changes password for the POSIX user.
+        The update_entity method is not suitable for this because the User entity doesn't know its current password.
+        :param user: The User entity
+        :param new_password: The new password to set.
+        """
+        if self.is_provider_on():
+            posix_user = self.unwrap_entity(user)
+            posix_user.set_password(new_password)
 
     def delete_entity(self, user):
         """
