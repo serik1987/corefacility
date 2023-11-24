@@ -27,7 +27,7 @@ class GroupReader(RawSqlQueryReader):
 
         self.count_builder \
             .add_select_expression(self.count_builder.select_total_count()) \
-            .add_data_source("core_group")
+            .add_data_source("core_application_group")
 
         self.items_builder\
             .add_select_expression("core_application_group.id") \
@@ -43,8 +43,8 @@ class GroupReader(RawSqlQueryReader):
             .add_join(
                 self.items_builder.JoinType.INNER,
                 SqlTable("core_application_groupuser", "governors"),
-                "ON (governors.group_id=core_group.id AND governors.is_governor)")\
-            .add_join(self.items_builder.JoinType.INNER, "core_user",
+                "ON (governors.group_id=core_application_group.id AND governors.is_governor)")\
+            .add_join(self.items_builder.JoinType.INNER, "core_application_user",
                       "ON (core_application_user.id=governors.user_id)")
     
     def apply_name_filter(self, search_string):

@@ -73,6 +73,6 @@ class UserReader(SqlModelReader):
             return
         for builder in [self.items_builder, self.count_builder]:
             builder.data_source.add_join(builder.JoinType.INNER, "core_application_groupuser",
-                                         "ON (core_application_groupuser.user_id=core_user.id)")
+                                         "ON (core_application_groupuser.user_id=core_application_user.id)")
             builder.main_filter &= \
                 StringQueryFilter("core_application_groupuser.group_id=%s", group.id)
