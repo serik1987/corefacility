@@ -56,6 +56,7 @@ class GroupViewSet(EntityViewSet):
             raise ValidationError(detail="The request body must contain the only field: 'user_id'. "
                                          "The value of this field must be integer")
         user = self.get_entity_or_404(UserSet(), user_id)
+        user.log = group.log
         try:
             group.users.add(user)
         except EntityOperationNotPermitted:
@@ -95,6 +96,7 @@ class GroupViewSet(EntityViewSet):
         except ValueError:
             user_lookup = kwargs['user_lookup']
         user = self.get_entity_or_404(UserSet(), user_lookup)
+        user.log = group.log
         try:
             group.users.remove(user)
         except EntityOperationNotPermitted:

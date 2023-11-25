@@ -3,6 +3,7 @@ from django.conf import settings
 from ...entity_sets.project_set import ProjectSet
 
 from .posix_provider import PosixProvider
+from .user_provider import UserProvider
 
 
 class PermissionProvider(PosixProvider):
@@ -86,6 +87,7 @@ class PermissionProvider(PosixProvider):
 		:param user: a user which group list must be updated
 		:return: nothing
 		"""
-		if user.unix_group is None or user.unix_group == "" or not self.is_provider_on():
-			return
-		raise NotImplementedError("TO-DO: update_group_list")
+		if self.is_provider_on():
+			user_provider = UserProvider()
+			posix_user = user_provider.unwrap_entity(user)
+			posix_user.update_supplementary_groups()

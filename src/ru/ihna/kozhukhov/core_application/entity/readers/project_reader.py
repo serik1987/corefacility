@@ -103,8 +103,8 @@ class ProjectReader(RawSqlQueryReader):
                     "ON (root_user.group_id=root_group_id AND root_user.user_id=%d)" % int(user.id))\
                 .add_join(
                     builder.JoinType.LEFT,
-                    SqlTable("core_application_projectpermission", "acl"),
-                    "ON (acl.project_id=core_project.id)")\
+                    SqlTable("core_application_permission", "acl"),
+                    "ON (acl.project_id=core_application_project.id)")\
                 .add_join(
                     builder.JoinType.LEFT,
                     SqlTable("core_application_accesslevel", "acl_value"),

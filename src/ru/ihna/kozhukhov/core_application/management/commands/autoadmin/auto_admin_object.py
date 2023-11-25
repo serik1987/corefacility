@@ -121,9 +121,11 @@ class AutoAdminObject:
         :param command: a tuple that represents a command to execute
         :return: a string that represents a command
         """
+        if isinstance(command, str):
+            return command
         quoted_command = [
             '"%s"' % cmd_part
-            if self._quote_needed_pattern.search(cmd_part) is not None else cmd_part
+            if self._quote_needed_pattern.search(cmd_part) is not None or cmd_part == "" else cmd_part
             for cmd_part in command
         ]
         command_string = " ".join(quoted_command)

@@ -3,6 +3,7 @@ from ru.ihna.kozhukhov.core_application.entity.entity_sets.group_set import Grou
 from .fields import EntityField, RelatedEntityField, ManagedEntityField
 from .field_managers.user_manager import UserManager
 from .providers.model_providers.group_provider import GroupProvider as ModelProvider
+from .providers.posix_providers.group_provider import GroupProvider as PosixProvider
 
 
 class Group(Entity):
@@ -14,7 +15,7 @@ class Group(Entity):
 
     _entity_set_class = GroupSet
 
-    _entity_provider_list = [ModelProvider()]
+    _entity_provider_list = [PosixProvider(), ModelProvider()]
 
     _required_fields = ["name", "governor"]
 

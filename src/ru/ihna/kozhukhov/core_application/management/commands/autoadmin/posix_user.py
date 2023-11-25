@@ -178,7 +178,7 @@ class PosixUser(AutoAdminObject):
         available_posix_user = self._check_user_for_update()
         if not available_posix_user:
             self.create()
-        self.run(
+        output = self.run(
             ("passwd", self.login, ),
             # The input is required to answer the following question:
             # Type new password: ******
@@ -222,9 +222,32 @@ class PosixUser(AutoAdminObject):
         else:
             raise ValueError("Undocumented lock status '%s' for POSIX account '%s'" % (actual_lock_status, self.login))
         if desired_lock_status and not actual_lock_status:
-            self.run(('passwd', '-l', self.login))
+            output = self.run(('passwd', '-l', self.login))
         if not desired_lock_status and actual_lock_status:
-            self.run(('passwd', '-u', self.login))
+            output = self.run(('passwd', '-u', self.login))
+        return output
+
+    def update_supplementary_groups(self, print_update_groups=False):
+        """
+        Updates all supplementary groups for the user, according to what project it belongs to.
+        """
+        available_posix_user = self._check_user_for_update()
+        if not available_posix_user:
+            self.create()
+
+        from ru.ihna.kozhukhov.core_application.entity.project import ProjectSet
+        posix_group_list = set()
+        project_set = ProjectSet()
+        project_set.user = self.entity
+        for project in project_set:
+            print(project)
+            raise NotImplementedError("Project was found but we have no idea what to do with this!")
+
+        output = self.run(
+            (
+                "usermod", "-G", ",".join(posix_group_list), self.login,
+            )
+        )
         return output
 
     def delete(self):
