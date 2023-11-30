@@ -171,29 +171,30 @@ class PermissionManager(EntityValueManager):
     def __build_iteration_query(self):
         builder = settings.QUERY_BUILDER_CLASS()
         builder \
-            .add_select_expression("core_group.id") \
-            .add_select_expression("core_group.name") \
-            .add_select_expression("core_user.id") \
-            .add_select_expression("core_user.login") \
-            .add_select_expression("core_user.name") \
-            .add_select_expression("core_user.surname") \
-            .add_select_expression("core_accesslevel.id") \
-            .add_select_expression("core_accesslevel.type") \
-            .add_select_expression("core_accesslevel.alias") \
-            .add_select_expression("core_accesslevel.name") \
+            .add_select_expression("core_application_group.id") \
+            .add_select_expression("core_application_group.name") \
+            .add_select_expression("core_application_user.id") \
+            .add_select_expression("core_application_user.login") \
+            .add_select_expression("core_application_user.name") \
+            .add_select_expression("core_application_user.surname") \
+            .add_select_expression("core_application_accesslevel.id") \
+            .add_select_expression("core_application_accesslevel.alias") \
+            .add_select_expression("core_application_accesslevel.name") \
             .add_data_source(self.permission_table) \
             .set_main_filter(StringQueryFilter("%s.%s=%%s" % (self.permission_table, self.entity_link_field),
                                                self.entity.id)) \
             .add_order_term("%s.group_id IS NULL" % self.permission_table, builder.ASC) \
-            .add_order_term("core_group.name", builder.ASC)
+            .add_order_term("core_application_group.name", builder.ASC)
         builder.data_source \
-            .add_join(builder.JoinType.LEFT, "core_group", "ON (core_group.id=%s.group_id)" % self.permission_table) \
-            .add_join(builder.JoinType.LEFT, "core_groupuser",
-                      "ON (core_groupuser.group_id=core_group.id AND core_groupuser.is_governor)") \
-            .add_join(builder.JoinType.LEFT, "core_user",
-                      "ON (core_user.id=core_groupuser.user_id)") \
-            .add_join(builder.JoinType.INNER, "core_accesslevel",
-                      "ON (core_accesslevel.id=%s.access_level_id)" % self.permission_table)
+            .add_join(builder.JoinType.LEFT, "core_application_group",
+                      "ON (core_application_group.id=%s.group_id)" % self.permission_table) \
+            .add_join(builder.JoinType.LEFT, "core_application_groupuser",
+                      "ON (core_application_groupuser.group_id=core_application_group.id "
+                      "AND core_application_groupuser.is_governor)") \
+            .add_join(builder.JoinType.LEFT, "core_application_user",
+                      "ON (core_application_user.id=core_application_groupuser.user_id)") \
+            .add_join(builder.JoinType.INNER, "core_application_accesslevel",
+                      "ON (core_application_accesslevel.id=%s.access_level_id)" % self.permission_table)
         query = builder.build()
         return query
 
@@ -201,7 +202,7 @@ class PermissionManager(EntityValueManager):
         with connection.cursor() as cursor:
             cursor.execute(query[0], query[1:])
             for group_id, group_name, governor_id, governor_login, governor_name, governor_surname,\
-                    level_id, level_type, level_alias, level_name in cursor.fetchall():
+                    level_id, level_alias, level_name in cursor.fetchall():
                 if group_id is not None:
                     group_object = ModelEmulator(
                         id=group_id,
@@ -218,7 +219,6 @@ class PermissionManager(EntityValueManager):
                     group = None
                 level_object = ModelEmulator(
                     id=level_id,
-                    type=level_type,
                     alias=level_alias,
                     name=level_name
                 )

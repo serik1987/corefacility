@@ -1,6 +1,9 @@
 import zlib
 from django.conf import settings
 
+from ru.ihna.kozhukhov.core_application.management.commands.autoadmin.auto_admin_wrapper_object import \
+    AutoAdminWrapperObject
+from ru.ihna.kozhukhov.core_application.management.commands.autoadmin.posix_group import PosixGroup
 from .posix_provider import PosixProvider
 
 
@@ -12,13 +15,6 @@ class ProjectProvider(PosixProvider):
     MAX_GROUP_NAME_LENGTH = 10
 
     _permission_provider = None
-
-    @staticmethod
-    def _get_posix_group_name(alias):
-        if len(alias) > ProjectProvider.MAX_GROUP_NAME_LENGTH:
-            return "p" + str(zlib.crc32(alias.encode("utf-8")))[:11]
-        else:
-            return alias
 
     @property
     def permission_provider(self):
@@ -33,9 +29,7 @@ class ProjectProvider(PosixProvider):
         :param project: a project which corresponding group has to be loaded
         :return: a PosixGroup connecting to the project
         """
-        if self.is_provider_on():
-            group_name = self._get_posix_group_name(project.alias)
-            raise NotImplementedError("TO-DO: load the group")
+        pass
 
     def create_entity(self, project):
         """
@@ -44,8 +38,8 @@ class ProjectProvider(PosixProvider):
         :return: nothing
         """
         if self.is_provider_on():
-            posix_group = self._create_posix_group(project)
-            self.permission_provider.register_root_group(project, posix_group)
+            posix_group = self.unwrap_entity(project)
+            posix_group.create()
 
     def resolve_conflict(self, project, posix_group):
         """
@@ -54,10 +48,7 @@ class ProjectProvider(PosixProvider):
         :param posix_group: a POSIX group to be checked
         :return: nothing
         """
-        if self.is_provider_on():
-            project._unix_group = posix_group.name
-            project.notify_field_changed("unix_group")
-            self.permission_provider.register_root_group(project, posix_group)
+        pass
 
     def update_entity(self, project):
         """
@@ -66,7 +57,12 @@ class ProjectProvider(PosixProvider):
         :return: nothing
         """
         if self.is_provider_on():
-            raise NotImplementedError("TO-DO: update_entity")
+            posix_group = self.unwrap_entity(project)
+            if 'alias' in project._edited_fields:
+                posix_group.update_alias()
+            if 'root_group' in project._edited_fields:
+                posix_group.update_root_group(project._old_root_group_id)
+                project._old_root_group_id = None
 
     def delete_entity(self, project):
         """
@@ -75,7 +71,8 @@ class ProjectProvider(PosixProvider):
         :return: nothing
         """
         if self.is_provider_on():
-            raise NotImplementedError("TO-DO: delete_entity")
+            posix_group = self.unwrap_entity(project)
+            posix_group.delete()
 
     def wrap_entity(self, external_object):
         """
@@ -91,11 +88,7 @@ class ProjectProvider(PosixProvider):
         :param project: a project which POSIX group shall be found
         :return: a given POSIX group
         """
-        if project.unix_group == "" or project.unix_group is None:
-            group_alias = self._get_posix_group_name(project.alias)
-        else:
-            group_alias = project.unix_group
-        raise NotImplementedError("TO-DO: unwrap_entity")
+        return AutoAdminWrapperObject(PosixGroup, project)
 
     def is_provider_on(self):
         """"
@@ -103,26 +96,3 @@ class ProjectProvider(PosixProvider):
         :return: True if the provider routines will be applied, False otherwise
         """
         return not self.force_disable and settings.CORE_MANAGE_UNIX_GROUPS
-
-    def _create_posix_group(self, project):
-        """
-        Creates the UNIX group based on a given project
-        :param project: a project which group must be created
-        :return: corresponding UNIX group
-        """
-        raise NotImplementedError("TO-DO: _create_posix_group")
-
-    def _update_posix_group(self, project, posix_group):
-        """
-        Changes the UNIX group name if this is necessary
-        :param project: a corresponding project entity
-        :param posix_group: POSIX group which name must be changed
-        :return: nothing
-        """
-        actual_group_name = posix_group.name
-        desired_group_name = self._get_posix_group_name(project.alias)
-        if actual_group_name != desired_group_name:
-            posix_group.name = desired_group_name
-            posix_group.update()
-            project._unix_group = desired_group_name
-            project.notify_field_changed("unix_group")

@@ -6,7 +6,6 @@ import uuid
 
 from django.conf import settings
 
-from .posix_group import PosixGroup
 from ....entity.entity_sets.user_set import UserSet
 from ....entity.providers.model_providers.user_provider import UserProvider
 from ....exceptions.entity_exceptions import ConfigurationProfileException, RetryCommandAfterException
@@ -25,6 +24,7 @@ class PosixUser(AutoAdminObject):
     """ Maximum number of attempts to select a distinguishable login """
 
     ENUMERATED_USER_TEMPLATE = re.compile(r"^(.*)(\d+)$")
+    """ Template for enumerated users, i.e., user1, user2, ... """
 
     POSIX_USER_FILE = "/etc/passwd"
     """ Location of the file with POSIX users """
@@ -127,7 +127,7 @@ class PosixUser(AutoAdminObject):
         self._update_database_info()
         return output
 
-    def _check_user_for_update(self):
+    def check_user_for_update(self):
         """
         Finds user with the same name as a given user
         :return: the user with the same name (but not the same PosixUser entity!) at success, None at failure
@@ -148,7 +148,7 @@ class PosixUser(AutoAdminObject):
         :return: None
         """
         output = ""
-        available_posix_user = self._check_user_for_update()
+        available_posix_user = self.check_user_for_update()
         if available_posix_user:
             old_login = self.login
             self.login = self._shorten_user_login(self.entity.login)
@@ -175,7 +175,7 @@ class PosixUser(AutoAdminObject):
         :return: string containing the output information
         """
         output = ""
-        available_posix_user = self._check_user_for_update()
+        available_posix_user = self.check_user_for_update()
         if not available_posix_user:
             self.create()
         output = self.run(
@@ -197,7 +197,7 @@ class PosixUser(AutoAdminObject):
         :return: string containing output information
         """
         output = ""
-        available_posix_user = self._check_user_for_update()
+        available_posix_user = self.check_user_for_update()
         if not available_posix_user:
             self.create()
         desired_lock_status = self.entity.is_locked
@@ -227,11 +227,14 @@ class PosixUser(AutoAdminObject):
             output = self.run(('passwd', '-u', self.login))
         return output
 
-    def update_supplementary_groups(self, print_update_groups=False):
+    def update_supplementary_groups(self, exclude=None):
         """
         Updates all supplementary groups for the user, according to what project it belongs to.
+
+        :param exclude: name of the POSIX group to exclude from the group list or None, if don't do this.
         """
-        available_posix_user = self._check_user_for_update()
+        output = ""
+        available_posix_user = self.check_user_for_update()
         if not available_posix_user:
             self.create()
 
@@ -239,15 +242,44 @@ class PosixUser(AutoAdminObject):
         posix_group_list = set()
         project_set = ProjectSet()
         project_set.user = self.entity
+        project_dictionary = dict()
         for project in project_set:
-            print(project)
-            raise NotImplementedError("Project was found but we have no idea what to do with this!")
+            if project.unix_group:
+                posix_group_list.add(project.unix_group)
+                project_dictionary[project.unix_group] = project
+        if exclude is not None:
+            posix_group_list.remove(exclude)
+            del project_dictionary[exclude]
 
-        output = self.run(
+        if self.home_dir:
+            for filename in os.listdir(self.home_dir):
+                filename = os.path.join(self.home_dir, filename)
+                if not os.path.islink(filename):
+                    continue
+                target = os.readlink(filename)
+                related_unix_group = None
+                for unix_group, project in project_dictionary.items():
+                    if project.project_dir == target:
+                        related_unix_group = unix_group
+                        break
+                else:
+                    output += self.run(
+                        (
+                            "rm", filename
+                        )
+                    )
+                if related_unix_group:
+                    del project_dictionary[related_unix_group]
+            for project in project_dictionary.values():
+                project_dir_link = os.path.join(self.home_dir, project.unix_group)
+                self.run(("ln", "-s", project.project_dir, project_dir_link))
+
+        output += self.run(
             (
                 "usermod", "-G", ",".join(posix_group_list), self.login,
             )
         )
+
         return output
 
     def delete(self):
@@ -256,8 +288,9 @@ class PosixUser(AutoAdminObject):
 
         :return: None
         """
+        from .posix_group import PosixGroup
         if self.login is not None and self.home_dir is not None:
-            available_user = self._check_user_for_update()
+            available_user = self.check_user_for_update()
             if available_user is not None:
                 primary_gid = available_user.gid
                 self.run(('userdel', '-rf', available_user.login))
@@ -313,7 +346,7 @@ class PosixUser(AutoAdminObject):
 
     def _delete_user_from_database(self):
         """
-        When the PosixUser deletes the user, this method deletes it from the database
+        When the PosixUser deletes the user, this method deletes it from the database.
         """
         if self.entity is not None and not self.command_emulation:
             user_model_provider = UserProvider()

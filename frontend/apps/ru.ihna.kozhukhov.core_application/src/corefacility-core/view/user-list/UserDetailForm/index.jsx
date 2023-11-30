@@ -154,10 +154,12 @@ export default class UserDetailForm extends UpdateForm{
 	 */
 	async handleDelete(event){
 		let result = await super.handleDelete(event);
-		await window.application.openModal('message', {
-			title: t("Delete user"),
-			body: t("The user will be deleted within the following several minutes."),
-		});
+		if (window.SETTINGS.unix_administration || window.SETTINGS.suggest_administration){
+			await window.application.openModal('message', {
+				title: t("Delete user"),
+				body: t("The user will be deleted within the following several minutes."),
+			});
+		}
 		return result;
 	}
 

@@ -139,6 +139,7 @@ class MainWindow(BaseWindow):
         self.kwargs['lang'] = str(self.language_code)
         self.kwargs['email_support'] = settings.EMAIL_SUPPORT
         self.kwargs['suggest_administration'] = settings.CORE_SUGGEST_ADMINISTRATION
+        self.kwargs['unix_administration'] = settings.CORE_UNIX_ADMINISTRATION
         if hasattr(self.request, 'password'):
             self.kwargs['login'] = self.request.user.login
             self.kwargs['password'] = self.request.password

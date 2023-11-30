@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from ....models import Project, Permission
 from .model_provider import ModelProvider
 from .group_provider import GroupProvider
@@ -66,3 +68,13 @@ class ProjectProvider(ModelProvider):
         entity._root_group = group_provider.wrap_entity(entity._root_group)
         entity._governor = entity._root_group.governor
         return entity
+
+    def delete_entity(self, project):
+        """
+        Deletes the entity from the external entity source
+
+        :param project: the entity to be deleted
+        :return: nothing
+        """
+        if not settings.CORE_MANAGE_UNIX_GROUPS:
+            super().delete_entity(project)

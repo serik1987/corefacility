@@ -89,12 +89,12 @@ export default class ItemList extends React.Component{
 			this.setState({
 				itemArray: [entity, ...this.state.itemArray],
 			});
-			this.scrollComponent.scroll(0, 0);
+			this.scrollComponent && this.scrollComponent.scroll(0, 0);
 		} else {
 			this.setState({
 				itemArray: [...this.state.itemArray, entity],
 			});
-			this.scrolLComponent.scroll(0, Infinity);
+			this.scrollComponent && this.scrolLComponent.scroll(0, Infinity);
 		}
 	}
 

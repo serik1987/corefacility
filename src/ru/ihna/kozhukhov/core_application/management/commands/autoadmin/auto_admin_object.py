@@ -70,6 +70,19 @@ class AutoAdminObject:
         self._command_buffer = list()
         return "\r\n".join(command_list)
 
+    def copy_command_list(self, destination):
+        """
+        Copies command list from here to another AutoAdminObject.
+        The command buffer will be flushed after this operation. When the command emulation mode is turned off,
+        the function does nothing.
+
+        :param destination: another AutoAdminObject to copy to.
+        """
+        if self.command_emulation:
+            for command in self._command_buffer:
+                destination.run(command)
+            self._command_buffer = list()
+
     def call(self, posix_request):
         """
         Calls a method stored into the database

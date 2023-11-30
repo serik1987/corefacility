@@ -13,7 +13,7 @@ class ProjectPermissionManager(PermissionManager):
     _permission_model = "core.models.ProjectPermission"
     """ Defines particular model connects your entity model, the Group model and particular access level """
 
-    _permission_table = "core_projectpermission"
+    _permission_table = "core_application_permission"
     """ Defines the SQL table where permission information is stored """
 
     _entity_link_field = "project_id"

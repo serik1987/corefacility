@@ -20,7 +20,7 @@ class Project(ArbitraryAccessLevelEntity):
 
     _entity_set_class = ProjectSet
 
-    _entity_provider_list = [PosixProvider(), ProjectFilesProvider(), ModelProvider()]
+    _entity_provider_list = [ProjectFilesProvider(), ModelProvider(), PosixProvider()]
 
     _required_fields = ["alias", "name", "root_group"]
 
@@ -44,6 +44,9 @@ class Project(ArbitraryAccessLevelEntity):
         "is_user_governor": BooleanField(
             description="Whether the user is governor for group with 'full' access (if applicable)")
     }
+
+    _old_root_group_id = None
+    """ When you change the project group, ID of the previous root group will be set here. """
 
     @classmethod
     def get_access_level_hierarchy(cls):
@@ -81,9 +84,14 @@ class Project(ArbitraryAccessLevelEntity):
         :param value: the field value to set
         :return: nothing
         """
+        old_root_group_id = None
+        if name == "root_group":
+            old_root_group_id = self.root_group.id
         super().__setattr__(name, value)
         if name == "root_group":
             self._public_fields["governor"] = value.governor
+        if old_root_group_id is not None:
+            self._old_root_group_id = old_root_group_id
 
     def __eq__(self, other):
         """
