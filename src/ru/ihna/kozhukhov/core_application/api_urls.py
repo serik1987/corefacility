@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from ru.ihna.kozhukhov.core_application.views import View404, UserViewSet, GroupViewSet, ProjectViewSet, LoginView, \
     ProfileView, AccessLevelView, \
-    ProjectPermissionViewSet, SynchronizationView, LogViewSet, LogRecordViewSet, WidgetsView, ProjectModulesListView, \
+    PermissionViewSet, SynchronizationView, LogViewSet, LogRecordViewSet, WidgetsView, ProjectModulesListView, \
     ModuleSettingsViewSet, EntryPointListView, AuthorizationMethodSetupView
 from ru.ihna.kozhukhov.core_application.views import ProfileAvatarView
 
@@ -11,7 +11,7 @@ router = DefaultRouter()
 router.register(r'users', UserViewSet, basename="users")
 router.register(r'groups', GroupViewSet, basename="groups")
 router.register(r'projects', ProjectViewSet, basename="projects")
-router.register(r'projects/(?P<project_lookup>\w+)/permissions', ProjectPermissionViewSet,
+router.register(r'projects/(?P<project_lookup>\w+)/permissions', PermissionViewSet,
                 basename="project-permissions")
 router.register(r'settings', ModuleSettingsViewSet, basename='settings')
 router.register(r'logs', LogViewSet, basename="logs")

@@ -5,7 +5,7 @@ from .user import UserViewSet
 from .group import GroupViewSet
 from .project import ProjectViewSet
 from .access_level import AccessLevelView
-from .project_permission_viewset import ProjectPermissionViewSet
+from .permission_viewset import PermissionViewSet
 from .login import LoginView
 from .profile import ProfileView
 from .synchronization_view import SynchronizationView

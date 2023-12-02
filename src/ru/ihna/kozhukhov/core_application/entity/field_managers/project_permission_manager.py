@@ -1,6 +1,7 @@
 from django.db import transaction
 
 from .permission_manager import PermissionManager
+from ..entity_sets.access_level_set import AccessLevelSet
 from ...exceptions.entity_exceptions import EntityOperationNotPermitted
 from ..group import Group
 
@@ -10,7 +11,7 @@ class ProjectPermissionManager(PermissionManager):
     Manages access control lists for a particular project.
     """
 
-    _permission_model = "core.models.ProjectPermission"
+    _permission_model = "ru.ihna.kozhukhov.core_application.models.permission.Permission"
     """ Defines particular model connects your entity model, the Group model and particular access level """
 
     _permission_table = "core_application_permission"
@@ -57,9 +58,9 @@ class ProjectPermissionManager(PermissionManager):
             raise EntityOperationNotPermitted()
         else:
             with self._get_transaction_mechanism():
+                old_access_level = self.get(group)
                 super().set(group, access_level)
-                if access_level.alias != "no_access":
-                    self.permission_provider.insert_group(self.entity, group)
+                self.permission_provider.update_access_level(self.entity, group, old_access_level, access_level)
 
     def get(self, group):
         """
@@ -88,8 +89,10 @@ class ProjectPermissionManager(PermissionManager):
             raise EntityOperationNotPermitted()
         else:
             with self._get_transaction_mechanism():
+                old_access_level = self.get(group)
+                new_access_level = AccessLevelSet().get('no_access')
                 super().delete(group)
-                self.permission_provider.remove_group(self.entity, group)
+                self.permission_provider.update_access_level(self.entity, group, old_access_level, new_access_level)
 
     def is_root_group(self, group):
         """

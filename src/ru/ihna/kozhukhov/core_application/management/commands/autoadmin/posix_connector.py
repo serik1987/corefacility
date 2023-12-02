@@ -1,3 +1,4 @@
+from ru.ihna.kozhukhov.core_application.entity.entity_sets.log_set import LogSet
 from .auto_admin_object import AutoAdminObject
 from .posix_user import PosixUser
 
@@ -12,13 +13,13 @@ class PosixConnector(AutoAdminObject):
     log = None
     """ The log attached """
 
-    def __init__(self, log):
+    def __init__(self, log_id=None):
         """
-        :param log: The corefacility log to be attached
+        :param log_id: ID of the attached corefacility log or None if no log was attached
         """
         super().__init__()
-        if log is not None:
-            self.log = log
+        if log_id is not None:
+            self.log = LogSet().get(log_id)
 
     def update_connections(self, ids):
         """
@@ -28,6 +29,6 @@ class PosixConnector(AutoAdminObject):
         for entity_id in ids:
             posix_user = PosixUser(entity_id)
             posix_user.command_emulation = self.command_emulation
+            posix_user.log = self.log
             posix_user.update_supplementary_groups()
-            if self.command_emulation:
-                self._command_buffer.append(posix_user.flush_command_buffer())
+            posix_user.copy_command_list(self)

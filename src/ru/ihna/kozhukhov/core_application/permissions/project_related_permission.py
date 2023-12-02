@@ -51,6 +51,8 @@ class ProjectRelatedPermission(IsAuthenticated):
         else:
             request.project_access_level = request.project.user_access_level
             request.is_project_superuser = request.project.is_user_governor
+        if hasattr(request, "corefacility_log"):
+            request.project.log = request.corefacility_log
         return self.has_project_permission(request, view, request.project, request.project_access_level,
                                            request.is_project_superuser)
 

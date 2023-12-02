@@ -75,7 +75,12 @@ class PermissionManager(EntityValueManager):
             if access_level.alias == "no_access":
                 return
             else:
-                raise NotImplementedError("This feature is correct correct but still not implemented yet")
+                raise EntityOperationNotPermitted()
+        if group.id == self.entity.root_group.id:
+            if access_level.alias == "full":
+                return
+            else:
+                raise EntityOperationNotPermitted()
         try:
             permission = self.permission_model.objects.get(**{
                 self.entity_link_field: self._get_entity_id(self.entity),
@@ -157,8 +162,6 @@ class PermissionManager(EntityValueManager):
         for entity in entity_list:
             if entity.state in {"creating", "deleted"}:
                 raise EntityOperationNotPermitted()
-        if access_level is not None:
-            raise EntityOperationNotPermitted()
 
     def _get_entity_id(self, entity):
         """

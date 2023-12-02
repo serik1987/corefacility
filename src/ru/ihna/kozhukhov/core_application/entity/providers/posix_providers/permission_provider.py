@@ -1,5 +1,8 @@
 from django.conf import settings
 
+from ru.ihna.kozhukhov.core_application.management.commands.autoadmin.auto_admin_wrapper_object import \
+	AutoAdminWrapperObject
+from ru.ihna.kozhukhov.core_application.management.commands.autoadmin.posix_connector import PosixConnector
 from ...entity_sets.project_set import ProjectSet
 
 from .posix_provider import PosixProvider
@@ -57,29 +60,22 @@ class PermissionProvider(PosixProvider):
 			return
 		raise NotImplementedError("TO-DO: register_root_group")
 
-	def insert_group(self, project, group):
+	def update_access_level(self, project, group, old_access_level, new_access_level):
 		"""
-		Provides all POSIX-level operations related to adding some project permission
-		:param project: project which permission is intended to be added (an entity)
-		:param group: scientific group related to such permission (an entity)
-		:return: nothing
+		Provides all POSIX operations related to modification of the project permission.
+		:param project: related project
+		:param group: group which users must modify their permission.
+		:param old_access_level: an access level that is used to be before the level change
+		:param new_access_level: desired access level to set by this method
 		"""
-		if project.unix_group is None or project.unix_group == "" or \
-			not self.is_provider_on():
-			return
-		raise NotImplementedError("TO-DO: insert_group")
-
-	def remove_group(self, project, group):
-		"""
-		Provides all POSIX-level operations related to removing some project permissions
-		:param project: project which permission is intended to be added (an entity)
-		:param group: scientific group related to such permission (an entity)
-		:return: nothing
-		"""
-		if project.unix_group is None or project.unix_group == "" or \
-			not self.is_provider_on():
-			return
-		raise NotImplementedError("TO-DO: remove_group")
+		old_access_forbidden = old_access_level.alias == "no_access"
+		new_access_forbidden = new_access_level.alias == "no_access"
+		if old_access_forbidden != new_access_forbidden:
+			user_ids = list()
+			for user in group.users:
+				user_ids.append(user.id)
+			connector = AutoAdminWrapperObject(PosixConnector, project.log.id)
+			connector.update_connections(user_ids)
 
 	def update_group_list(self, user):
 		"""
