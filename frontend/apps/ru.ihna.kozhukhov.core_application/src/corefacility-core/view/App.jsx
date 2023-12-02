@@ -19,10 +19,9 @@ import ProfileWindow from './profile/ProfileWindow';
 import GroupListWindow from './group-list/GroupListWindow';
 import GroupUserWindow from './group-list/GroupUserWindow';
 import ProjectListWindow from './project-list/ProjectListWindow';
-import {ProjectSettingsWindow, RootGroupSettingsWindow, ProjectAdministrationWindow, ProjectApplicationSettingsWindow} 
+import {ProjectSettingsWindow, RootGroupSettingsWindow, ProjectAdministrationWindow} 
 	from './project-list/project-detail-windows';
 import ProjectApplicationListWindow from './application-list/ProjectApplicationListWindow';
-import ProjectApplicationWindow from './application-list/ProjectApplicationWindow';
 
 
 /** This is the root component for the core application
@@ -68,15 +67,11 @@ export default class App extends BaseApp{
 		else if (this.token !== null && this.activationCode === null){
 			let adminPermissions = window.application.user.is_superuser;
 			let noSupportPermission = !window.application.user.is_support;
-			let defaultUrl = null;
-
-			defaultUrl = "/projects/";
+			let defaultUrl = "/projects/";
 
 			return (
 				<Routes>
-					<Route path="/projects/:projectLookup/apps/:appLookup/" element={<ProjectApplicationWindow/>}/>
 					<Route path="/projects/:lookup/apps/" element={<ProjectApplicationListWindow/>}/>
-					<Route path="/projects/:lookup/appsettings/" element={<ProjectApplicationSettingsWindow/>}/>
 					<Route path="/projects/:lookup/administration/" element={<ProjectAdministrationWindow/>}/>
 					<Route path="/projects/:lookup/root/" element={<RootGroupSettingsWindow/>}/>
 					<Route path="/projects/:lookup/" element={<ProjectSettingsWindow/>}/>

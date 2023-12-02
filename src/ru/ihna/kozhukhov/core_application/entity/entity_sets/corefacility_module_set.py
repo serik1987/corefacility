@@ -22,7 +22,6 @@ class CorefacilityModuleSet(EntitySet):
         "entry_point": ("ru.ihna.kozhukhov.core_application.entity.entry_point.EntryPoint", None),
         "is_enabled": (bool, None),
         "is_application": (bool, None),
-        "project": ("ru.ihna.kozhukhov.core_application.entity.project.Project", None),
         "uuid": (UUID, None)
     }
 

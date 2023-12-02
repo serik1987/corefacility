@@ -19,7 +19,7 @@ router.register(r'logs/(?P<log_id>\d+)/records', LogRecordViewSet, basename="log
 
 urlpatterns = [
 
-    path(r'core/projects/<str:project_lookup>/', ProjectModulesListView.as_view(), name="module-list-projects"),
+    # path(r'core/projects/<str:project_lookup>/', ProjectModulesListView.as_view(), name="module-list-projects"),
     # path(r'core/projects/<str:project_lookup>/',
     #      include(("ru.ihna.kozhukhov.core_application.ep_urls.projects", "projects"))),
 

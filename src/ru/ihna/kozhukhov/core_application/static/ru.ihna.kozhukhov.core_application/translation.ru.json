@@ -315,6 +315,7 @@
 	"New permission": "Новое разрешение",
 	"Please, select a group which permission must be added": "Пожалуйста, выберите коллектив, для которого Вы хотите добавить разрешения",
 	"You have already add this group to the access control list": "Вы уже добавили эту группу в список прав доступа",
+	"Remove this permission": "Удалить это разрешение",
 
 	"Select an application to add to the project...": "Выберите приложение, которое Вы хотите добавить в проект...",
 	"Please, specify an application to add to the application list.": "Пожалуйста, выберите приложение, которое Вы хотите добавить добавить в список приложений.",
@@ -329,5 +330,7 @@
 
 	"Add new data": "Добавить новые данные",
 	"Please, select the data from the left pane.": "Пожалуйста, выберите данные в левой панели",
-	"Edit": "Редактировать"
+	"Edit": "Редактировать",
+
+	"This area is under construction. Please, accept our appologizes for the temporary inconvenience.": "Данный раздел находится в стадии разработки. Мы приносим извинения за временные неудобства."
 }

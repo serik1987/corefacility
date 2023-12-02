@@ -15,7 +15,6 @@ import Window404 from 'corefacility-core/view/base/Window404';
 import ProjectSettingsForm from './ProjectSettingsForm';
 import RootGroupLoader from './RootGroupLoader';
 import ProjectPermissionEditor from './ProjectPermissionEditor';
-import ProjectApplciationListEditor from './ProjectApplicationListEditor';
 
 
 /** 
@@ -65,8 +64,6 @@ class _ProjectDetailWindow extends NavigationWindow{
 			return t("Project's root group");
 		case 'administration':
 			return t("Project administration");
-		case 'appsettings':
-			return t("Project application list");
 		}
 	}
 
@@ -112,12 +109,6 @@ class _ProjectDetailWindow extends NavigationWindow{
 						icon={<AdministrationIcon/>}
 						text={t("Project administration")}
 					/>,
-					<SidebarItem
-						href={`/projects/${this.props.lookup}/appsettings/`}
-						current={this.props.subroute === 'appsettings'}
-						icon={<AppRegistrationIcon/>}
-						text={t("Application list")}
-					/>
 				]}
 			>
 				{this.props.subroute === 'settings' && <ProjectSettingsForm
@@ -137,11 +128,6 @@ class _ProjectDetailWindow extends NavigationWindow{
 					ref={this.setReloadCallback}
 					on404={this.handle404}
 					onNoRootGroup={this.handleNoRootGroup}
-				/>}
-				{this.props.subroute === 'appsettings' && <ProjectApplciationListEditor
-					projectLookup={this.props.lookup}
-					ref={this.setReloadCallback}
-					on404={this.handle404}
 				/>}
 			</Sidebar>
 		);
@@ -188,10 +174,3 @@ export function ProjectAdministrationWindow(props){
 	return <_ProjectDetailWindow lookup={lookup} subroute="administration"/>
 }
 
-/**
- * 	Represents applicatoin administration (add to the project, remove from the project)
- */
-export function ProjectApplicationSettingsWindow(props){
-	let {lookup} = useParams();
-	return <_ProjectDetailWindow lookup={lookup} subroute="appsettings"/>
-}

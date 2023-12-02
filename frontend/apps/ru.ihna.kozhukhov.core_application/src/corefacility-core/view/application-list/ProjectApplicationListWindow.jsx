@@ -1,4 +1,5 @@
 import {useParams} from 'react-router-dom';
+import styled from 'styled-components';
 
 import {translate as t} from 'corefacility-base/utils';
 import Hyperlink from 'corefacility-base/shared-view/components/Hyperlink';
@@ -6,11 +7,9 @@ import Hyperlink from 'corefacility-base/shared-view/components/Hyperlink';
 import NavigationWindow from 'corefacility-core/view/base/NavigationWindow';
 import Window404 from 'corefacility-core/view/base/Window404';
 
-import ProjectApplicationListLoader from './ProjectApplicationListLoader';
 
-
-/** Represents list of all applications connected to the 'projects' entry point that are (a) applications; (b) enabled;
- * 	(c) connected to the project; (d) connection is enabled.
+/** 
+ * 	This component is deprecated and will be replaced in the nearest future.
  * 
  * 	Props:
  * 	--------------------------------------------------------------------------------------------------------------------
@@ -59,13 +58,14 @@ class _ProjectApplicationListWindow extends NavigationWindow{
 	 *                            Such a component must implement the reload() method
 	 */
 	renderContent(){
+		const Message = styled.p`
+			padding-left: 30px;
+			padding-right: 26px;
+			font-style: italic;
+		`;
+
 		return (
-			<ProjectApplicationListLoader
-				projectLookup={this.props.projectLookup}
-				on404={this.handle404}
-				ref={this.setReloadCallback}
-				onProjectFound={this.handleProjectFound}
-			/>
+			<Message>{t("This area is under construction. Please, accept our appologizes for the temporary inconvenience.")}</Message>
 		);
 	}
 
