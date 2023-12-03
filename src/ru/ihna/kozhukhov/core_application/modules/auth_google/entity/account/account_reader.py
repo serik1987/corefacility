@@ -13,11 +13,11 @@ class AccountReader(ExternalAuthorizationAccountReader):
 
     _entity_provider = AccountProvider()
 
-    _lookup_table_name = "google_account"
+    _lookup_table_name = "auth_google_account"
 
     def initialize_query_builder(self):
         super().initialize_query_builder()
-        self.items_builder.add_select_expression("google_account.email")
+        self.items_builder.add_select_expression("auth_google_account.email")
 
     def create_external_object(self, account_id, user_id, user_login, user_name, user_surname,
                                user_email, user_phone, user_is_locked, user_is_superuser, email):

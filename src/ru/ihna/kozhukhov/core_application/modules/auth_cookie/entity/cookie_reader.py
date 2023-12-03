@@ -10,6 +10,6 @@ class CookieReader(TokenReader):
 
     _entity_provider = CookieProvider()
 
-    _lookup_table_name = "cookie_cookie"
+    _lookup_table_name = "auth_cookie_cookie"
 
     _query_debug = False

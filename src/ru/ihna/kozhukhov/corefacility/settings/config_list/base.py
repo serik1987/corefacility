@@ -269,7 +269,7 @@ class CorefacilityConfiguration(Configuration):
             "django.corefacility.log": {
                 "level": "DEBUG",
                 "propagate": False,
-                "handlers": ["stream_handler", "mail_admins"],  # TO-DO: add syslog handler again!
+                "handlers": ["stream_handler", "mail_admins", "syslog_handler"],
             }
         }
     }

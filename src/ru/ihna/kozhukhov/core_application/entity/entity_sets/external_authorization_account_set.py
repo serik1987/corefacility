@@ -24,5 +24,5 @@ class ExternalAuthorizationAccountSet(EntitySet):
     """ Fill in this field by another class responsible for finding appropriate account using the token """
 
     _entity_filter_list = {
-        "user": ["core.entity.user.User", None]
+        "user": ["ru.ihna.kozhukhov.core_application.entity.user.User", None]
     }

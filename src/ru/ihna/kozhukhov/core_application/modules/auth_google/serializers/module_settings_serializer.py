@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from ..serializers import ModuleSettingsSerializer as BaseSettingsSerializer
+from ru.ihna.kozhukhov.core_application.serializers import ModuleSettingsSerializer as BaseSettingsSerializer
 
 
 class ModuleSettingsSerializer(BaseSettingsSerializer):

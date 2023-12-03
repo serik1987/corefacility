@@ -1,7 +1,7 @@
 from datetime import timedelta
 from rest_framework import serializers
 
-from ....serializers import ModuleSettingsSerializer
+from ru.ihna.kozhukhov.core_application.serializers import ModuleSettingsSerializer
 
 
 class ModuleSerializer(ModuleSettingsSerializer):

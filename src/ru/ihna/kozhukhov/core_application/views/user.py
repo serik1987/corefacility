@@ -36,7 +36,25 @@ class UserViewSet(AvatarMixin, PasswordResetMixin, EntityViewSet):
         "name": EntityViewSet.standard_filter_function("q", str),
     }
 
+    def filter_queryset(self, user_set):
+        """
+        Adjusts filter parameters of the UserSet object
+
+        :param user_set: the UserSet object before the parameters are adjusted
+        :return: the UserSet object after all parameters are adjusted
+        """
+        user_set = super().filter_queryset(user_set)
+        user_set.is_support = False
+        return user_set
+
     def destroy(self, request, *args, **kwargs):
+        """
+        Removes the user from the database.
+
+        :param request: the HTTP request received
+        :param args: always ()
+        :param kwargs: user ID or alias
+        """
         user = self.get_object()
         if user.id == request.user.id:
             raise PermissionDenied(detail=_("You can't delete yourself."))

@@ -46,6 +46,7 @@ class App(AuthorizationModule):
 
         :return: the authorization method name.
         """
+        _("Authorization through Mail.ru")
         return "Authorization through Mail.ru"
 
     def get_html_code(self):
