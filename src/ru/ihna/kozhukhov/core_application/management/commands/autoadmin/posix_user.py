@@ -29,25 +29,32 @@ class PosixUser(AutoAdminObject):
     POSIX_USER_FILE = "/etc/passwd"
     """ Location of the file with POSIX users """
 
-    login = None
-    """ The POSIX login for the user """
-
-    LOGIN_POSITION = 0
-    """ Position of the user login within the /etc/passwd """
-
-    home_dir = None
-    """ The user's home directory """
-
     HOME_DIR_POSITION = 5
     """ Position of the home directory within the /etc/passwd """
-
-    gid = None
-    """ User's primary GID or None if we don't know about this """
 
     GID_POSITION = 3
     """ Position of the user's primary GID """
 
+    LOGIN_POSITION = 0
+    """ Position of the user login within the /etc/passwd """
+
+    SUPPORTED_ACCESS_LEVELS = {'full', 'data_full'}
+    """
+        Access levels which the user shall have in order to receive reading and writing UNIX permissions to the
+        project directory.
+    """
+
+    login = None
+    """ The POSIX login for the user """
+
+    home_dir = None
+    """ The user's home directory """
+
+    gid = None
+    """ User's primary GID or None if we don't know about this """
+
     entity = None
+    """ The User entity associated with a given POSIX user or None if no idea or no user is associated """
 
     @classmethod
     def get_posix_users(cls):
@@ -244,10 +251,11 @@ class PosixUser(AutoAdminObject):
         project_set.user = self.entity
         project_dictionary = dict()
         for project in project_set:
-            if project.unix_group:
+            if project.unix_group and \
+                    project.get_proper_access_level(project.user_access_level) in self.SUPPORTED_ACCESS_LEVELS:
                 posix_group_list.add(project.unix_group)
                 project_dictionary[project.unix_group] = project
-        if exclude is not None:
+        if exclude is not None and exclude in posix_group_list:
             posix_group_list.remove(exclude)
             del project_dictionary[exclude]
 
@@ -263,16 +271,12 @@ class PosixUser(AutoAdminObject):
                         related_unix_group = unix_group
                         break
                 else:
-                    output += self.run(
-                        (
-                            "rm", filename
-                        )
-                    )
+                    output += self.run(("rm", filename))
                 if related_unix_group:
                     del project_dictionary[related_unix_group]
             for project in project_dictionary.values():
                 project_dir_link = os.path.join(self.home_dir, project.unix_group)
-                self.run(("ln", "-s", project.project_dir, project_dir_link))
+                output += self.run(("ln", "-s", project.project_dir, project_dir_link))
 
         output += self.run(
             (

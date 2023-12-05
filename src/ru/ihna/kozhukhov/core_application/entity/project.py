@@ -85,7 +85,7 @@ class Project(ArbitraryAccessLevelEntity):
         :return: nothing
         """
         old_root_group_id = None
-        if name == "root_group":
+        if name == "root_group" and self.root_group is not None:
             old_root_group_id = self.root_group.id
         super().__setattr__(name, value)
         if name == "root_group":

@@ -35,23 +35,26 @@ class PosixGroup(AutoAdminObject):
     NUMBERED_GROUP_TEMPLATE = re.compile(r"^(\d+)$")
     """ Template for numbered groups, i.e., 1, 2, 3, ... """
 
-    name = None
-    """ Name of the POSIX group """
-
     NAME_POSITION = 0
     """ Position of a name within the POSIX group """
-
-    gid = None
-    """ group ID or None if we don't know """
 
     GID_POSITION = 2
     """ Position of the group ID """
 
-    user_list = None
-    """ List of all users or None if we don't know """
-
     USER_LIST_POSITION = 3
     """ Position related to the comma-separated user list """
+
+    PROJECT_DIR_PERMISSIONS = "02770"
+    """ Permissions for the newly created project directory """
+
+    name = None
+    """ Name of the POSIX group """
+
+    gid = None
+    """ group ID or None if we don't know """
+
+    user_list = None
+    """ List of all users or None if we don't know """
 
     entity = None
     """ A Project entity related to the POSIX group or None if we don't know """
@@ -144,7 +147,7 @@ class PosixGroup(AutoAdminObject):
         for user in self.entity.root_group.users:
             posix_user = PosixUser(user)
             if posix_user.check_user_for_update() is None:
-                posix_user.create()
+                output += posix_user.create()
             user_list.add((posix_user.login, posix_user.home_dir))
         if self.name is None or self.project_dir is None:
             self._generate_unix_group_name()
@@ -153,7 +156,8 @@ class PosixGroup(AutoAdminObject):
         output += self.run(("groupadd", self.name))
         output += self.run(("mkdir", self.project_dir))
         output += self.run(("chown", owner, self.project_dir))
-        output += self.run(("chmod", "02750", self.project_dir))
+        output += self.run(("chmod", self.PROJECT_DIR_PERMISSIONS, self.project_dir))
+        output += self.run(("usermod", "-aG", self.name, settings.CORE_WORKER_PROCESS_USER))
         for user in user_list:
             login, home_dir = user
             output += self.run(("usermod", "-aG", self.name, login))
@@ -210,43 +214,35 @@ class PosixGroup(AutoAdminObject):
 
         return output
 
-    def exclude_users_in_group(self, group):
-        """
-        Excludes all users related in particular corefacility group from the POSIX group.
-
-        :param group: the group which users shall be excluded.
-        :return: POSIX output.
-        """
-        raise NotImplementedError("exclude_users_in_group")
-
     def update_alias(self):
         """
         Updates the name of the POSIX group and the home directory according to the project alias.
         """
         output = ""
         available_group = self.check_group_for_update()
-        if available_group is not None:
-            old_group_name = self.name
-            old_project_dir = self.project_dir
-            self._generate_unix_group_name()
-            self.project_dir = self._generate_project_dir()
-            output += self.run(("groupmod", "-n", self.name, old_group_name))
-            output += self.run(("mv", old_project_dir, self.project_dir))
-            for user in self._find_all_users():
-                if not user.home_dir:
-                    raise RetryCommandAfterException()
-                for filename in os.listdir(user.home_dir):
-                    fullname = os.path.join(user.home_dir, filename)
-                    if not os.path.islink(fullname):
-                        continue
-                    target = os.readlink(fullname)
-                    if target == old_project_dir:
-                        new_link_name = os.path.join(user.home_dir, self.name)
-                        output += self.run(("rm", fullname))
-                        output += self.run(("ln", "-s", self.project_dir, new_link_name))
-            self._update_database_info()
-        else:
-            output += self.create()
+        if available_group is None:
+            return self.create()
+
+        old_group_name = self.name
+        old_project_dir = self.project_dir
+        self._generate_unix_group_name()
+        self.project_dir = self._generate_project_dir()
+        output += self.run(("groupmod", "-n", self.name, old_group_name))
+        output += self.run(("mv", old_project_dir, self.project_dir))
+        for user in self._find_all_users():
+            if not user.home_dir:
+                raise RetryCommandAfterException()
+            for filename in os.listdir(user.home_dir):
+                fullname = os.path.join(user.home_dir, filename)
+                if not os.path.islink(fullname):
+                    continue
+                target = os.readlink(fullname)
+                if target == old_project_dir:
+                    new_link_name = os.path.join(user.home_dir, self.name)
+                    output += self.run(("rm", fullname))
+                    output += self.run(("ln", "-s", self.project_dir, new_link_name))
+        self._update_database_info()
+
         return output
 
     def update_root_group(self, old_root_group_id=None):

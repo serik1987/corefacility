@@ -36,6 +36,9 @@ class FullServerConfiguration(CorefacilityConfiguration):
     # as simple user, gain the SSH access and next use CLI in order to avoid the model layer).
     CORE_ROOT_ONLY = True
 
+    # Owner of the corefacility process that is responsible for processing HTTP requests.
+    CORE_WORKER_PROCESS_USER = values.Value('www-data')
+
     @classmethod
     def check_config_possibility(cls):
         """

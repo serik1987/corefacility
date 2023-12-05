@@ -3,6 +3,7 @@ from django.conf import settings
 from ru.ihna.kozhukhov.core_application.management.commands.autoadmin.auto_admin_wrapper_object import \
 	AutoAdminWrapperObject
 from ru.ihna.kozhukhov.core_application.management.commands.autoadmin.posix_connector import PosixConnector
+from ru.ihna.kozhukhov.core_application.management.commands.autoadmin.posix_user import PosixUser
 from ...entity_sets.project_set import ProjectSet
 
 from .posix_provider import PosixProvider
@@ -49,17 +50,6 @@ class PermissionProvider(PosixProvider):
 				for user in group.users:
 					yield user
 
-	def register_root_group(self, project, posix_group=None):
-		"""
-		Adds all users from the root group to the project
-		:param project: the project which users shall be registered
-		:param posix_group: POSIX group related to the project or None if you want to calculate the group automatically
-		:return: nothing
-		"""
-		if not self.is_provider_on():
-			return
-		raise NotImplementedError("TO-DO: register_root_group")
-
 	def update_access_level(self, project, group, old_access_level, new_access_level):
 		"""
 		Provides all POSIX operations related to modification of the project permission.
@@ -68,14 +58,14 @@ class PermissionProvider(PosixProvider):
 		:param old_access_level: an access level that is used to be before the level change
 		:param new_access_level: desired access level to set by this method
 		"""
-		old_access_forbidden = old_access_level.alias == "no_access"
-		new_access_forbidden = new_access_level.alias == "no_access"
+		old_access_forbidden = old_access_level.alias not in PosixUser.SUPPORTED_ACCESS_LEVELS
+		new_access_forbidden = new_access_level.alias not in PosixUser.SUPPORTED_ACCESS_LEVELS
 		if old_access_forbidden != new_access_forbidden:
-			user_ids = list()
+			user_ids = set()
 			for user in group.users:
-				user_ids.append(user.id)
+				user_ids.add(user.id)
 			connector = AutoAdminWrapperObject(PosixConnector, project.log.id)
-			connector.update_connections(user_ids)
+			connector.update_connections(list(user_ids))
 
 	def update_group_list(self, user):
 		"""
