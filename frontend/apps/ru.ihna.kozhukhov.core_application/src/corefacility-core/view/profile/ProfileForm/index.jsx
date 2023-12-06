@@ -225,8 +225,10 @@ export default class ProfileForm extends UpdateForm{
                             <div className={style.credentials}>
                                 <Label>{t("UNIX account name")}</Label>
                                 <CredentialsOutput>{this._formObject && this._formObject.unix_group}</CredentialsOutput>
-                                <Label>{t("Password")}</Label>
-                                <PasswordChanger {...this.getFieldProps('password')}/>
+                                {window.SETTINGS.user_can_change_password && [
+                                    <Label>{t("Password")}</Label>,
+                                    <PasswordChanger {...this.getFieldProps('password')}/>
+                                ]}
                                 <Label>{t("Home directory")}</Label>
                                 <CredentialsOutput>{this._formObject && this._formObject.home_dir}</CredentialsOutput>
                             </div>

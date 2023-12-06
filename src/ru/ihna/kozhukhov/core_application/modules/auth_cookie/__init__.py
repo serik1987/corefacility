@@ -59,7 +59,6 @@ class App(AuthorizationModule):
         :return: nothing
         """
         from .entity.cookie import Cookie
-        print("set cookie")
         expiry_term = self.get_cookie_lifetime()
         token = request.get_signed_cookie(settings.COOKIE_NAME, default="", max_age=expiry_term)
         if token and refresh and not hasattr(request, "corefacility_cookie"):

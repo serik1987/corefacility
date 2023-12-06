@@ -208,4 +208,14 @@ export default class ModuleForm extends UpdateForm{
 		);
 	}
 
+	async handleSubmit(event){
+		let result = await super.handleSubmit(event);
+		if (result === true){
+			window.application.openModal('message', {
+				title: t("Settings change"),
+				body: t("To finally apply the settings all users must restart their Web browser pages."),
+			})
+		}
+	}
+
 }

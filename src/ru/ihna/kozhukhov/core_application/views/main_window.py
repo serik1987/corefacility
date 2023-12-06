@@ -39,6 +39,7 @@ class MainWindow(BaseWindow):
         super().__init__(*args, **kwargs)
         self.module_set.is_enabled = True
         self.module_set.is_application = True
+        App().reset()
 
     def get_context_data(self, path='', uuid=None, **kwargs):
         """
@@ -140,6 +141,7 @@ class MainWindow(BaseWindow):
         self.kwargs['email_support'] = settings.EMAIL_SUPPORT
         self.kwargs['suggest_administration'] = settings.CORE_SUGGEST_ADMINISTRATION
         self.kwargs['unix_administration'] = settings.CORE_UNIX_ADMINISTRATION
+        self.kwargs['user_can_change_password'] = App().user_can_change_password()
         if hasattr(self.request, 'password'):
             self.kwargs['login'] = self.request.user.login
             self.kwargs['password'] = self.request.password

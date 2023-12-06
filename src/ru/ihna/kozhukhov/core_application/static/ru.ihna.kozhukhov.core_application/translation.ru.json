@@ -236,6 +236,8 @@
 	"To activate the module please, turn on at least one Synchronization action": "Чтобы активировать модуль, включите хотя бы одно Действие при синхронизации",
 	"Save and Synchronize": "Сохранить и синхронизовать",
 	"The synchronization can't be started until this module is disabled": "Нельзя запустить синхронизацию, пока модуль неактивен",
+	"Settings change": "Изменение настроек",
+	"To finally apply the settings all users must restart their Web browser pages.": "Для того, чтобы окончательно применить настройки, все пользователи должны перезагрузить страницы своих Web-браузеров.",
 
 	"User login.": "Авторизация пользователя",
 	"Authorization methods": "Способы авторизации",

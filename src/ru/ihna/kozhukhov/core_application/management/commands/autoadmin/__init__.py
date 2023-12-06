@@ -233,17 +233,23 @@ class Command(BaseCommand):
         try:
             while True:
                 self._is_terminable = False
-                initialized_requests = list(PosixRequest.objects.filter(status=PosixRequestStatus.INITIALIZED))
+                initialized_requests = list(
+                    PosixRequest.objects
+                    .filter(status=PosixRequestStatus.INITIALIZED)
+                    .order_by('initialization_date')
+                )
                 for request_model in initialized_requests:
                     self._analyze_posix_request(request_model)
                     if self._is_terminated:
                         break
                 filter_time = timezone.now() - self.execution_interval
                 confirmed_requests = list(
-                    PosixRequest.objects.filter(
+                    PosixRequest.objects
+                    .filter(
                         status=PosixRequestStatus.CONFIRMED,
                         initialization_date__lt=filter_time,
                     )
+                    .order_by('initialization_date')
                 )
                 for request_model in confirmed_requests:
                     self._execute_posix_request(request_model)
@@ -264,7 +270,7 @@ class Command(BaseCommand):
         """
         posix_request_info = []
         # noinspection PyUnresolvedReferences
-        for posix_request_model in PosixRequest.objects.all():
+        for posix_request_model in PosixRequest.objects.order_by('initialization_date'):
             try:
                 action_class = self._get_action_class(posix_request_model)
                 action_class_description = action_class.__doc__.strip().split('\n')[0]
