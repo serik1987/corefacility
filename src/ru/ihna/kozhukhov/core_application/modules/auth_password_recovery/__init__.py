@@ -3,6 +3,7 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.core.signing import Signer, BadSignature
 from rest_framework.exceptions import ValidationError
+from ...entity.providers.posix_providers.user_provider import UserProvider
 from ...entry_points.authorizations import AuthorizationModule
 from ...entity.entity_sets.user_set import UserSet
 from ...exceptions.entity_exceptions import EntityNotFoundException
@@ -83,6 +84,9 @@ class PasswordRecoveryAuthorization(AuthorizationModule):
             user_set.is_support = False
             user_set.is_locked = False
             user = user_set.get(activation_info['user_id'])
+            if hasattr(request, "corefacility_log"):
+                user.log = request.corefacility_log
+                user.log.user = user
             user_activation_code = activation_info['user_activation_code']
         except EntityNotFoundException:
             return None
@@ -94,6 +98,8 @@ class PasswordRecoveryAuthorization(AuthorizationModule):
         request.password = user.generate_password()
         user.activation_code_hash.clear()
         user.update()
+        provider = UserProvider()
+        provider.set_password(user, request.password)
         return user
 
     def try_api_authorization(self, request):
@@ -131,7 +137,5 @@ class PasswordRecoveryAuthorization(AuthorizationModule):
         :return: nothing. If the operation is impossible, raise exception
         """
         if new_value:
-            if settings.CORE_SUGGEST_ADMINISTRATION:
-                raise ValidationError({'is_enabled': _("The module can't be enabled in partial server configuration")})
             if not settings.EMAIL_SUPPORT:
                 raise ValidationError({'is_enabled': _("The module can't be enabled without email support")})

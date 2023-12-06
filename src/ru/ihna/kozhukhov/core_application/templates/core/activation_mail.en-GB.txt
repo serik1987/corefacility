@@ -6,5 +6,5 @@ To activate this, please, follow:
 
 {{activation_url}}
 
-Best regards,
-Administrator of the {{host}}
+Sincerely yours,
+corefacility

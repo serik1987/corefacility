@@ -281,9 +281,11 @@ export default class UserDetailForm extends UpdateForm{
 											{t("Print password")}
 										</Hyperlink>
 									</div>
-									{window.SETTINGS.email_support && !window.SETTINGS.suggest_administration && can_be_activated_using_email &&
-										<div className={styles.changer_button}>
-											<Hyperlink onClick={event => this.changePassword(event, this.sendActivationCode)} inactive={this.state.inactive}>
+									{window.SETTINGS.email_support && can_be_activated_using_email && <div className={styles.changer_button}>
+											<Hyperlink
+												onClick={event => this.changePassword(event, this.sendActivationCode)}
+												inactive={this.state.inactive}
+											>
 												{t("Send activation code")}
 											</Hyperlink>
 										</div>
