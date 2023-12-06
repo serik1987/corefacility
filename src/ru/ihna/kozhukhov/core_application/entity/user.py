@@ -98,6 +98,7 @@ class User(Entity):
         with self._get_transaction_mechanism():
             for group in self.groups:
                 if group.governor.id == self.id:
+                    group.log = self.log
                     group.force_delete()
             self.delete()
 

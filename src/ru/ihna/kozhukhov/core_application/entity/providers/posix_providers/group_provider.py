@@ -51,6 +51,7 @@ class GroupProvider(PosixProvider):
         :return: nothing
         """
         if self.is_provider_on():
-            ids = [user.id for user in group.users if user.id != group.governor.id]
-            posix_connector = AutoAdminWrapperObject(PosixConnector, group.log)
+            ids = [user.id for user in group.users]
+            posix_connector = AutoAdminWrapperObject(PosixConnector, group.log.id)
+            posix_connector.log = group.log
             posix_connector.update_connections(ids)

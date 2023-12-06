@@ -165,6 +165,7 @@
 	"The activation mail has been successfully sent to the user.": "Письмо с активационным ключём успешно отправлено пользователю.",
 	"The user password is: {PASSWORD} Please, set this password in the operating system using the following command:": "Пароль пользователя: {PASSWORD} Пожалуйста, установите пароль в операционной системе, используя следующую команду:",
 	"The user will be deleted within the following several minutes.": "Пользователь будет удалён в течение следующих нескольких минут.",
+	"The cascade user remove mechanism doesn't work in full server or part server configuration. Please, remove all extra groups or extra projects manually.": "Механизм каскадного удаления пользователя не работает для конфигураций полного или частичного сервера. Пожалуйста, удалите лишние группы и лишние проекты вручную.",
 
 	"Synchronization": "Синхронизация",
 	"Synchronization completed.": "Синхронизация завершена.",

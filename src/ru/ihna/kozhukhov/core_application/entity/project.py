@@ -71,8 +71,7 @@ class Project(ArbitraryAccessLevelEntity):
 
         :return: nothing
         """
-        with transaction.atomic():
-            self.delete()
+        self.delete()
 
     def __setattr__(self, name, value):
         """

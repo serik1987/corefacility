@@ -154,7 +154,7 @@ export default class UserDetailForm extends UpdateForm{
 	 */
 	async handleDelete(event){
 		let result = await super.handleDelete(event);
-		if (window.SETTINGS.unix_administration || window.SETTINGS.suggest_administration){
+		if (result === true && (window.SETTINGS.unix_administration || window.SETTINGS.suggest_administration)){
 			await window.application.openModal('message', {
 				title: t("Delete user"),
 				body: t("The user will be deleted within the following several minutes."),
@@ -168,7 +168,7 @@ export default class UserDetailForm extends UpdateForm{
 	 * 	@param {Error} error Javascript exception
 	 * 	@param {function} tryAgainFunction an optional parameter. If tryAgainFunction is not null or undefined,
 	 * 		the user receives "Action required" dialog box and presses Continue, the tryAgainFunction will be executed.
-	 * 	@return {string} globalError the global error to lift up the state
+	 * 	@return {string} globalError the global error to lift up the state, true on success, false on fail.
 	 */
 	async handleError(error, tryAgainFunction){
 		if (error instanceof BadRequestError && error.name === 'GroupGovernorConstraintFails'){
@@ -177,8 +177,19 @@ export default class UserDetailForm extends UpdateForm{
 				prompt: error.message,
 			});
 			if (allowToForce){
-				tryAgainFunction(true);
+				return await tryAgainFunction(true);
+			} else {
+				return false;
 			}
+		} else if (error instanceof BadRequestError && error.name === 'ProjectRootGroupConstraintFails' &&
+			(window.SETTINGS.unix_administration || window.SETTINGS.suggest_administration)) {
+			this.setState({
+				inactive: false,
+				errors: {},
+				globalError: t("The cascade user remove mechanism doesn't work in full server or part server " +
+					"configuration. Please, remove all extra groups or extra projects manually.")
+			});
+			return false;
 		} else {
 			return await super.handleError(error, tryAgainFunction);
 		}

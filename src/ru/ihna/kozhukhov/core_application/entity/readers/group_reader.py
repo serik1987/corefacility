@@ -66,7 +66,7 @@ class GroupReader(RawSqlQueryReader):
         :return: nothing
         """
         user_source = "core_application_groupuser"
-        user_condition = "ON (core_application_groupuser.group_id=core_group.id)"
+        user_condition = "ON (core_application_groupuser.group_id=core_application_group.id)"
         user_filter = StringQueryFilter("core_application_groupuser.user_id=%s", user.id)
 
         for builder in [self.items_builder, self.count_builder]:

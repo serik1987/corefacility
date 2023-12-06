@@ -39,6 +39,7 @@ class Group(Entity):
             project_set = ProjectSet()
             project_set.root_group = self
             for project in project_set:
+                project.log = self.log
                 project.force_delete()
             self.delete()
 

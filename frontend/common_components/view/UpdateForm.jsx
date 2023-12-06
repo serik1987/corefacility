@@ -234,9 +234,10 @@ export default class UpdateForm extends Form{
 		let self = this;
 		let userWantsToDelete = await this.promptDelete(event);
 		if (!userWantsToDelete){
-			return;
+			return false;
 		}
-		(async function tryAgainFunction(force = false){
+		return await (async function tryAgainFunction(force = false){
+			let result = false;
 			try{
 				self.setState({
 					errors: {},
@@ -248,11 +249,13 @@ export default class UpdateForm extends Form{
 				} else {
 					await self._formObject.delete();
 				}
+				result = true;
 			} catch (error){
 				self.handleError(error, tryAgainFunction);
 			} finally {
 				self.setState({inactive: false});
 			}
+			return result;
 		})();
 	}
 
