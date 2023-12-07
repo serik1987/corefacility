@@ -81,11 +81,7 @@ export default class ProjectListEditor extends CoreListEditor{
 
 	/** Name of the button that adds new entity */
 	get addItemButtonName(){
-		if (!window.SETTINGS.suggest_administration || window.application.user.is_superuser){
-			return t("Create New Project");
-		} else {
-			return null;
-		}
+		return t("Create New Project");
 	}
 
 	/** Returns class of the entity which list must be downloaded from the external server

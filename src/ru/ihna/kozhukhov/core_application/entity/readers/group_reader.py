@@ -79,7 +79,7 @@ class GroupReader(RawSqlQueryReader):
                 .add_join(
                     self.items_builder.JoinType.INNER,
                     SqlTable("core_application_groupuser", "governors"),
-                    "ON (governors.group_id=core_group.id AND governors.is_governor)")
+                    "ON (governors.group_id=core_application_group.id AND governors.is_governor)")
             for builder in [self.items_builder, self.count_builder]:
                 builder.main_filter &= StringQueryFilter("governors.user_id=%s", governor.id)
 

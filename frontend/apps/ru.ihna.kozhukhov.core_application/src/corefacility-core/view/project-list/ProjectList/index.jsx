@@ -60,7 +60,6 @@ export default class ProjectList extends PaginatedList{
 
         let isGovernor = project.is_user_governor == true;
         let isSuperuser = window.application.user.is_superuser == true;
-        let isPermissionRequired = window.SETTINGS.suggest_administration == true;
 
         return (
                 <ImagedListItem
@@ -81,11 +80,11 @@ export default class ProjectList extends PaginatedList{
                             tooltip={t("Project settings")}
                             src={<SettingsIcon/>}
                         />
-                        {(!isPermissionRequired || isSuperuser) && <Icon
+                        <Icon
                             onClick={event => this.handleRemove(event, project)}
                             tooltip={t("Remove project")}
                             src={<RemoveIcon/>}
-                        />}
+                        />
                     </div>}
             </ImagedListItem>        
         );

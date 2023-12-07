@@ -85,10 +85,10 @@ class GroupViewSet(EntityViewSet):
         """
         Removes user from the group users
 
-        :param request:
-        :param args:
-        :param kwargs:
-        :return:
+        :param request: the HTTP request received from the client
+        :param args: arguments revealed from parsing the request URL
+        :param kwargs: keyword arguments revealed from parsing the request URL
+        :return: the HTTP response that will be sent to the client
         """
         group = self.get_object()
         try:
@@ -108,10 +108,10 @@ class GroupViewSet(EntityViewSet):
         """
         Suggests the user for adding
 
-        :param request:
-        :param args:
-        :param kwargs:
-        :return:
+        :param request: the HTTP request received from the client
+        :param args: arguments revealed from parsing the request URL
+        :param kwargs: keyword arguments revealed from parsing the request URL
+        :return: the HTTP response that will be sent to the client
         """
         group_set = GroupSet()
         if not request.user.is_superuser and "all" not in request.query_params:
