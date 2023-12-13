@@ -1,5 +1,14 @@
 import i18next from "i18next";
 
+const MEMORY_UNITS = {
+	'Tb': 1024 * 1024 * 1024 * 1024,
+	'Gb': 1024 * 1024 * 1024,
+	'Mb': 1024 * 1024,
+	'Kb': 1024,
+	'B':  1,
+}
+const PRECISION = 2;
+
 
 /** Waits for a given number of milliseconds.
  *  @async
@@ -46,4 +55,21 @@ export function translate(message){
 	}
 
 	return translation;
+}
+
+/**
+ *  Transforms the memory measure to human-readable format.
+ * 	@param {Number} size 		Memory size in bytes
+ * 	@return {String} 			A string like '4.2 Gb' or '3.8 Mb'
+ */
+export function humanReadableMemory(size){
+	size = Math.round(size);
+	for (let unit in MEMORY_UNITS){
+		let unitValue = MEMORY_UNITS[unit];
+		if (Math.abs(size) > unitValue){
+			return `${(size / unitValue).toFixed(PRECISION)} ${translate(unit)}`;
+		}
+	}
+
+	return '0';
 }

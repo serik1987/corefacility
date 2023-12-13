@@ -3,6 +3,7 @@ import UpdateForm from 'corefacility-base/view/UpdateForm';
 import Scrollable from 'corefacility-base/shared-view/components/Scrollable';
 import Hyperlink from 'corefacility-base/shared-view/components/Hyperlink';
 import Label from 'corefacility-base/shared-view/components/Label';
+import Table from 'corefacility-base/shared-view/components/Table';
 
 import Log from 'corefacility-core/model/entity/Log';
 
@@ -168,43 +169,27 @@ export default class LogDetailForm extends UpdateForm{
 							{records && records.length !== 0 && 
 								<section>
 									<h2>{t("Log records")}</h2>
-									<div className={styles.records}>
-										<div className={`${styles.record_cell} ${styles.record_header}`}>
-											{t("Record date")}
-										</div>
-										<div className={`${styles.record_cell} ${styles.record_header}`}>
-											{t("Record time")}
-										</div>
-										<div className={`${styles.record_cell} ${styles.record_header}`}>
-											{t("Severity level")}
-										</div>
-										<div className={`${styles.record_cell} ${styles.record_header}`}>
-											{t("Message")}
-										</div>
-										<hr/>
-										{records.map(record => {
+									<Table
+										columns={[
+											t("Record date"),
+											t("Record time"),
+											t("Severity level"),
+											t("Message"),
+										]}
+										data={records.map(record => {
 											let recordTime = record.record_time;
 											return [
-												<div className={styles.record_cell}>
-													{recordTime.toLocaleDateString()}
-												</div>,
-												<div className={styles.record_cell}>
-													{recordTime.toLocaleTimeString()}.{recordTime.getMilliseconds()}
-												</div>,
-												<div className={styles.record_cell}>
-													{record.level.toUpperCase()}
-												</div>,
-												<div className={styles.record_cell}>
-													{record.message
-														.split("\n")
-														.map(messageLine => {
-															return <div>{messageLine}</div>;
-														}
-													)}
-												</div>,
+												recordTime.toLocaleDateString(),
+												`${recordTime.toLocaleTimeString()}.${recordTime.getMilliseconds()}`,
+												record.level.toUpperCase(),
+												record.message
+													.split("\n")
+													.map(messageLine => {
+														return <div>{messageLine}</div>;
+													}),
 											];
 										})}
-									</div>
+									/>
 								</section>
 							}
 						</form>

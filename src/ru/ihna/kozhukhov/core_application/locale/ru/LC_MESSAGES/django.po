@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-20 02:24+0300\n"
+"POT-Creation-Date: 2023-12-09 04:59+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -179,33 +179,39 @@ msgstr ""
 msgid "The uploaded file is too large"
 msgstr "Загружаемый Вами файл имеет слишком большой размер"
 
-#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:388
+#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:401
 #, python-brace-format
 msgid "The request is analyzed and will be launched within the period of {0}"
-msgstr "Запрос проанализирован и будет выполнен в течение промежутка времени: {0}"
+msgstr ""
+"Запрос проанализирован и будет выполнен в течение промежутка времени: {0}"
 
-#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:395
+#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:408
 msgid ""
 "The request is analyzed and awaits for the confirmation of the system "
 "administrator."
-msgstr "Запрос проанализирован и ожидает подтверждения системным администратором."
+msgstr ""
+"Запрос проанализирован и ожидает подтверждения системным администратором."
 
-#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:405
+#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:428
+msgid "The action has been successfully accomplished."
+msgstr ""
+
+#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:455
+#, python-format
+msgid "The request was made from inappropriate IP address %s"
+msgstr "Запрос с IP-адреса %s запрещён."
+
+#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:493
+msgid "Request for the administrative task"
+msgstr "Запрос на совершение административных действий"
+
+#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:528
 msgid ""
 "This is a crucial security error. We decided to permanently interrupt the "
 "executed action."
 msgstr ""
 "Это - критическая ошибка безопасности. Мы приняли решение полностью прервать "
 "выполняемое действие."
-
-#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:441
-#, python-format
-msgid "The request was made from inappropriate IP address %s"
-msgstr "Запрос с IP-адреса %s запрещён."
-
-#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:478
-msgid "Request for the administrative task"
-msgstr "Запрос на совершение административных действий"
 
 #: src/ru/ihna/kozhukhov/core_application/migrations/0002_install.py:13
 msgid "Core functionality"
@@ -287,11 +293,15 @@ msgstr ""
 msgid "The e-mail must be ended to @gmail.com"
 msgstr "E-mail должен заканчиваться на @gmail.com"
 
-#: src/ru/ihna/kozhukhov/core_application/modules/auth_mailru/__init__.py:94
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_mailru/__init__.py:49
+msgid "Authorization through Mail.ru"
+msgstr "Авторизация через Mail.ru"
+
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_mailru/__init__.py:95
 msgid "User's email in the Mail.Ru mailbox"
 msgstr "E-mail пользователя в почтовом ящике Mail.Ru"
 
-#: src/ru/ihna/kozhukhov/core_application/modules/auth_mailru/__init__.py:156
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_mailru/__init__.py:157
 msgid ""
 "To authorize through the Mail.Ru you need to grant a read-only access to "
 "your personal details"
@@ -300,11 +310,11 @@ msgstr ""
 "на чтение Ваших персональных данных из аккаунта Mail.Ru. Это не предполагает "
 "наличие доступа на их изменение"
 
-#: src/ru/ihna/kozhukhov/core_application/modules/auth_mailru/__init__.py:159
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_mailru/__init__.py:160
 msgid "Authorization code did not received from the Mail.Ru server"
 msgstr "Код авторизации не был получен через сервер Mail.Ru"
 
-#: src/ru/ihna/kozhukhov/core_application/modules/auth_mailru/__init__.py:188
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_mailru/__init__.py:189
 msgid ""
 "Your mail.ru account has not been attached to your corefacility account. "
 "Please, login using another authorization method and attach your mail.ru "
@@ -315,25 +325,21 @@ msgstr ""
 "авторизации, после чего привяжите Вашу учётную запись mail.ru к учётной "
 "записи corefacility, используя для этого настройки Вашего профиля."
 
-#: src/ru/ihna/kozhukhov/core_application/modules/auth_mailru/__init__.py:259
-#: src/ru/ihna/kozhukhov/core_application/modules/auth_mailru/__init__.py:261
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_mailru/__init__.py:260
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_mailru/__init__.py:262
 msgid "To turn this field on please, ensure that this is not empty"
 msgstr "Для того, чтобы включить модуль, убедитесь, что это поле не пустое"
 
-#: src/ru/ihna/kozhukhov/core_application/modules/auth_mailru/__init__.py:263
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_mailru/__init__.py:264
 msgid "The authorization process will not work when this value equals to zero"
 msgstr ""
 "Процесс авторизации не будет работать, если значение этого поля равно нулю"
 
-#: src/ru/ihna/kozhukhov/core_application/modules/auth_password_recovery/__init__.py:47
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_password_recovery/__init__.py:48
 msgid "Password recovery function"
 msgstr "Функция восстановления пароля"
 
-#: src/ru/ihna/kozhukhov/core_application/modules/auth_password_recovery/__init__.py:135
-msgid "The module can't be enabled in partial server configuration"
-msgstr "Этот модуль нельзя включить в конфигурации частичного сервера"
-
-#: src/ru/ihna/kozhukhov/core_application/modules/auth_password_recovery/__init__.py:137
+#: src/ru/ihna/kozhukhov/core_application/modules/auth_password_recovery/__init__.py:141
 msgid "The module can't be enabled without email support"
 msgstr ""
 "Этот модуль нельзя включить, так как Ваш сервер не поддерживает отправку E-"
@@ -388,22 +394,26 @@ msgstr ""
 msgid "Incorrect credentials."
 msgstr "Неверные учётные данные."
 
-#: src/ru/ihna/kozhukhov/core_application/views/user.py:42
+#: src/ru/ihna/kozhukhov/core_application/views/system_information.py:182
+msgid "Unrecognized platform"
+msgstr "Неизвестная платформа"
+
+#: src/ru/ihna/kozhukhov/core_application/views/user.py:60
 msgid "You can't delete yourself."
 msgstr "Вы не можете удалить самого себя"
 
-#: src/ru/ihna/kozhukhov/core_application/views/user.py:84
+#: src/ru/ihna/kozhukhov/core_application/views/user.py:102
 msgid "Account activation"
 msgstr "Активация аккаунта"
+
+#~ msgid "The module can't be enabled in partial server configuration"
+#~ msgstr "Этот модуль нельзя включить в конфигурации частичного сервера"
 
 #~ msgid "Authorization through Cookie"
 #~ msgstr "Авторизация через Cookie"
 
 #~ msgid "Authorization through Google"
 #~ msgstr "Авторизация через Google"
-
-#~ msgid "Authorization through Mail.ru"
-#~ msgstr "Авторизация через Mail.ru"
 
 #~ msgid "Add application"
 #~ msgstr "Добавление приложения в проект"

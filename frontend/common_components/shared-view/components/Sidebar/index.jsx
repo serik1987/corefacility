@@ -17,7 +17,7 @@ import style from './style.module.css';
  * 	
  * 	Component props:
  * 	--------------------------------------------------------------------------------------------------------------------
- * 	@param {Array of SidebarItem} items 			All items to display.
+ * 	@param {Array of SidebarItem} items 			All items to display. Each item must be a SidebarItem or similar
  * 	@param {string} 			  cssSuffix 		Additional CSS classes to attach.
  * 
  * 	Component state:

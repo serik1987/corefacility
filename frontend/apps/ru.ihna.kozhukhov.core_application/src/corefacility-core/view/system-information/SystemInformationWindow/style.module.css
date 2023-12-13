@@ -1,0 +1,135 @@
+/* Common styles */
+
+.window_header > article > * > div{
+	padding-left: 0;
+	padding-right: 0;
+}
+
+.header{
+	font-size: 30px;
+	line-height: 64px;
+}
+
+.panel{
+	padding: 32px 16px 32px 0;
+}
+
+.current_statistics_panel{
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	/* grid-template-rows: min-content repeat(2, minmax(300px, 1fr)); */
+	grid-template-rows: min-content repeat(2, 1fr);
+	gap: 20px;
+	height: 100%;
+	box-sizing: border-box;
+}
+
+.current_statistics_panel section{
+	border: 1px solid rgb(218, 220, 224);
+	border-radius: 3px;
+	box-shadow: 1px 1px 3px 0 rgba(0, 0, 0, 0.27);
+	padding: 25px;
+}
+
+.current_statistics_panel h2{
+	margin: 0;
+	font-size: 20px;
+	font-weight: 600;
+	color: rgb(95, 99, 104);
+}
+
+.uptime_section{
+	grid-column: 1 / span 2;
+}
+
+.cpu_section, .memory_section, .disk_section{
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.cpu_section h2, .memory_section h2, .disk_section h2{
+	flex-grow: 0;
+}
+
+.cpu_section :global .chart, .memory_section :global .chart, .disk_section :global .chart{
+	flex-grow: 1;
+}
+
+.disk_section{
+	
+}
+
+.network_section{
+	
+}
+
+
+
+/* Legends for the pie chart */
+
+.pie_chart_legend_group{
+	flex-grow: 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+.pie_chart_legend{
+	flex-grow: 0;
+}
+
+.pie_chart_label{
+	
+}
+
+.pie_chart_graphic_label{
+	display: inline-block;
+	vertical-align: middle;
+	margin-right: 10px;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+}
+
+.pie_chart_text_label{
+	display: inline-block;
+	vertical-align: middle;
+	line-height: 20px;
+}
+
+
+
+/* Common system information */
+
+.sysinfo{
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	border: 1px solid rgb(218, 220, 224);
+	border-radius: 5px;
+}
+
+.sysinfo > *{
+	border-bottom: 1px solid rgb(217, 220, 224);
+	padding: 10px 15px;
+	line-height: 20px;
+}
+
+.sysinfo dt{
+
+}
+
+.sysinfo dd{
+	margin-left: 0;
+}
+
+.sysinfo dt:last-of-type, .sysinfo dd:last-of-type{
+	border-bottom: none;
+}
+
+.sysinfo small{
+	display: block;
+	line-height: 1;
+	font-size: 0.8em;
+	font-style: italic;
+}

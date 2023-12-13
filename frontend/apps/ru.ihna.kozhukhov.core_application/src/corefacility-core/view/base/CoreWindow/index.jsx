@@ -115,21 +115,26 @@ export default class CoreWindow extends Window{
 								<Icon tooltip={t("Account Settings")} src={<PersonImage/>}/>
 							}
 							items={[
-								!window.application.user.is_support && <Hyperlink href="/profile/">{t("Profile")}</Hyperlink>,
+								!window.application.user.is_support && 
+									<Hyperlink href="/profile/">{t("Profile")}</Hyperlink>,
 								<Hyperlink href="/groups/">{t("Groups")}</Hyperlink>,
 								<Hyperlink onClick={this.handleLogout}>{t("Logout")}</Hyperlink>,
 							]}
 						/>
-						{window.application.user.is_superuser && <DropDownMenu
+						<DropDownMenu
 							caption={
 								<Icon tooltip={t("Application Settings")} src={<SettingsImage/>}/>
 							}
 							items={[
-								<Hyperlink href="/users/">{t("Users")}</Hyperlink>,
-								<Hyperlink href="/logs/">{t("Logs")}</Hyperlink>,
-								<Hyperlink href="/settings/">{t("Application Settings")}</Hyperlink>,
+								window.application.user.is_superuser &&
+									<Hyperlink href="/users/">{t("Users")}</Hyperlink>,
+								window.application.user.is_superuser &&
+									<Hyperlink href="/logs/">{t("Logs")}</Hyperlink>,
+								window.application.user.is_superuser &&
+									<Hyperlink href="/settings/">{t("Application Settings")}</Hyperlink>,
+								<Hyperlink href="/sysinfo/">{t("System information")}</Hyperlink>
 							]}
-						/>}
+						/>
 					</div>
 					<div className={styles.controls}>
 						{ this.renderControls() }

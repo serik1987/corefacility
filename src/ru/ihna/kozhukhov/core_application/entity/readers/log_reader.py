@@ -2,7 +2,7 @@ from ipaddress import ip_address
 
 from .raw_sql_query_reader import RawSqlQueryReader
 from .query_builders.query_filters import StringQueryFilter
-from .model_emulators import ModelEmulator, time_from_db, prepare_time
+from .model_emulators import ModelEmulator, time_from_db, prepare_time, ModelEmulatorFileField
 from ..providers.model_providers.log_provider import LogProvider
 
 
@@ -37,6 +37,7 @@ class LogReader(RawSqlQueryReader):
             .add_select_expression("core_application_user.login")\
             .add_select_expression("core_application_user.name")\
             .add_select_expression("core_application_user.surname")\
+            .add_select_expression("core_application_user.avatar")\
             .add_data_source("core_application_log")\
             .add_order_term("core_application_log.request_date", direction=self.items_builder.DESC)
         self.items_builder.data_source\
@@ -133,11 +134,17 @@ class LogReader(RawSqlQueryReader):
     def create_external_object(self, log_id, request_date, log_address, request_method, operation_description,
                                request_body, input_data, ip_address, geolocation, response_status, response_body,
                                output_data,
-                               user_id, user_login, user_name, user_surname):
+                               user_id, user_login, user_name, user_surname, user_avatar):
         if user_id is None:
             user = None
         else:
-            user = ModelEmulator(id=user_id, login=user_login, name=user_name, surname=user_surname)
+            user = ModelEmulator(
+                id=user_id,
+                login=user_login,
+                name=user_name,
+                surname=user_surname,
+                avatar=ModelEmulatorFileField(name=user_avatar)
+            )
         return ModelEmulator(
             id=log_id,
             request_date=time_from_db(request_date),
@@ -151,5 +158,5 @@ class LogReader(RawSqlQueryReader):
             geolocation=geolocation,
             response_status=response_status,
             response_body=response_body,
-            output_data=output_data
+            output_data=output_data,
         )

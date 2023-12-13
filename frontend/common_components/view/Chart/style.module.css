@@ -1,0 +1,12 @@
+.container canvas{
+	display: block;
+	margin: 0 auto;
+}
+
+.container.debug_mode{
+	outline: 1px solid green;
+}
+
+.container.debug_mode canvas{
+	outline: 1px solid red;
+}

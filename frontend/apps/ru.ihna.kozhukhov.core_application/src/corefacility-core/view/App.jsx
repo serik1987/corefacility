@@ -22,6 +22,7 @@ import ProjectListWindow from './project-list/ProjectListWindow';
 import {ProjectSettingsWindow, RootGroupSettingsWindow, ProjectAdministrationWindow} 
 	from './project-list/project-detail-windows';
 import ProjectApplicationListWindow from './application-list/ProjectApplicationListWindow';
+import SystemInformationWindow from './system-information/SystemInformationWindow';
 
 
 /** This is the root component for the core application
@@ -84,6 +85,7 @@ export default class App extends BaseApp{
 					{adminPermissions && <Route path="/settings/" element={<SettingsWindow/>} />}
 					{adminPermissions && <Route path="/users/:lookup/" element={<UserDetailWindow/>} />}
 					{adminPermissions && <Route path="/users/" element={<UserListWindow/>} />}
+					<Route path="/sysinfo/" element={<SystemInformationWindow/>}/>
 					<Route path="/" element={<Navigate to={defaultUrl}/>} />
 					<Route path="*" element={<Window404/>}/>
 				</Routes>

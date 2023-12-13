@@ -1,3 +1,6 @@
 {
-	"Authorize": "Login"
+	"Authorize": "Login",
+	"CPU_LOAD_AVERAGE_DESCRIPTION": "The CPU load average reflects averaged number of processes in running or waiting state. The optimal amount of this value always equals to total number of CPU cores. If this number is less than the number of CPU cores, it means that your CPU is not completely used, so you need to create new jobs and/or increase the number of worker processes If this number is greater that the total number of CPU cores, it means that your CPU is overloaded which in turn declines its performance, so, you need to decline the number of jobs or the number of worker processes. If the CPU average load is the same as the number of cores but you CPU still works slowly, this means that it's time to replace your CPU by the newer one.",
+	"AVAILABLE_PHYSICAL_MEMORY_DESCRIPTION": "If the amount of available physical memory has finished, you need to cancel some job, finish some processes or buy and install extra operating memory",
+	"AVAILABLE_SWAP_MEMORY_DESCRIPTION": "Usually the amount of engaged swap memory doesn't exceed 100 Mb. However such an amount may grow when one of the following conditions met: the available physical memory is over or some programs have thrown a lot of trash to the physical memory"
 }

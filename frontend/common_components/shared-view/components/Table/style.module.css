@@ -1,0 +1,22 @@
+.table{
+	display: grid;
+	grid-gap: 5px;
+}
+
+.table hr{
+	margin: 0;
+	width: 100%;
+}
+
+.cell{
+	font-weight: 400;
+}
+
+
+.header{
+	font-weight: 500;
+}
+
+.row_header{
+	font-weight: 600;
+}

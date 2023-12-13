@@ -50,7 +50,7 @@ export default class LogList extends PaginatedList{
      *              - its onClick prop must be equal to this.props.onItemSelect
      */
     renderItemContent(log){
-        let avatar = "/static/core/user.svg"
+        let avatar = "/static/ru.ihna.kozhukhov.core_application/user.svg"
         if (log.user){
             avatar = log.user.avatar;
         }
