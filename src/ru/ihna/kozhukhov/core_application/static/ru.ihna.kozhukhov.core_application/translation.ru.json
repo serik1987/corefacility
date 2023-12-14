@@ -378,5 +378,23 @@
 	"Platform": "Платформа",
 	"Kernel version": "Версия ядра",
 	"Operating system name": "Название операционной системы",
-	"Operating system type": "Тип операционной системы"
+	"Operating system type": "Тип операционной системы",
+
+	"Process list": "Список процессов",
+	"Please wait while the process list is loading.": "Пожалуйста, подождите, пока список процессов не загрузится",
+	"% CPU": "% процессора",
+	"% Memory": "% памяти",
+	"Virtual memory size": "Размер виртуальной памяти",
+	"# pages consuming": "Количество страниц памяти",
+	"Status": "Статус",
+	"Start time": "Время запуска",
+	"Duration": "Длительность",
+	"Terminal number": "Номер терминала",
+	"Command": "Команда",
+	"Running": "Работает",
+	"Sleeping": "Спит",
+	"Zombie": "Зомби",
+	"High priority": "Высокий приоритет",
+	"Low priority": "Низкий приоритет",
+	"Session leader": "Лидер сессии"
 }

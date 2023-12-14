@@ -389,6 +389,10 @@ export default class SystemInformationWindow extends CoreWindow{
 
 	componentWillUnmount(){
 		this.__resizeObserver.disconnect(this.chartContainer);
+
+		if (this.__timeout !== null){
+			clearTimeout(this.__timeout);
+		}
 	}
 
 	/**

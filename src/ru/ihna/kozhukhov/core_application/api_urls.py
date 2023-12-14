@@ -6,6 +6,7 @@ from ru.ihna.kozhukhov.core_application.views import View404, UserViewSet, Group
     PermissionViewSet, SynchronizationView, LogViewSet, LogRecordViewSet, WidgetsView, \
     ModuleSettingsViewSet, EntryPointListView, AuthorizationMethodSetupView, SystemInformationView
 from ru.ihna.kozhukhov.core_application.views import ProfileAvatarView
+from ru.ihna.kozhukhov.core_application.views.process_information import ProcessInformation
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet, basename="users")
@@ -29,6 +30,7 @@ urlpatterns = [
     path(r'widgets/<uuid:module_uuid>/<str:entry_point_alias>/', WidgetsView.as_view(), name="widgets"),
     path(r'settings/<uuid:uuid>/entry-points/', EntryPointListView.as_view(), name="entry-points"),
     path(r'sysinfo/', SystemInformationView.as_view(), name='system-information'),
+    path(r'procinfo/', ProcessInformation.as_view(), name="process-information"),
 
               ] + router.urls + [
 

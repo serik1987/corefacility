@@ -1,0 +1,15 @@
+.container{
+	padding: 20px 0;
+}
+
+.container :global .table{
+	gap: 10px;
+	font-size: 12px;
+}
+
+@media screen and (max-width: 1000px){
+	.container :global .table{
+		font-size: 10px;
+		word-wrap: break-word;
+	}
+}

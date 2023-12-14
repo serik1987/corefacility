@@ -1,0 +1,24 @@
+.sorted_column{
+	display: flex;
+	justify-content: start;
+	align-items: center;
+}
+
+.sorted_column :global .hyperlink{
+	line-height: 16px;
+}
+
+.sorted_icon{
+	margin-left: 5px;
+	width: 16px;
+	height: 16px;
+}
+
+.sorted_icon svg{
+	width: 16px;
+	height: 16px;
+}
+
+.sorted_icon:global(.asc) svg{
+	transform: rotate(180deg);
+}

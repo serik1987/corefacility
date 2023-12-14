@@ -132,7 +132,8 @@ export default class CoreWindow extends Window{
 									<Hyperlink href="/logs/">{t("Logs")}</Hyperlink>,
 								window.application.user.is_superuser &&
 									<Hyperlink href="/settings/">{t("Application Settings")}</Hyperlink>,
-								<Hyperlink href="/sysinfo/">{t("System information")}</Hyperlink>
+								<Hyperlink href="/sysinfo/">{t("System information")}</Hyperlink>,
+								<Hyperlink href="/procinfo/">{t("Process list")}</Hyperlink>
 							]}
 						/>
 					</div>

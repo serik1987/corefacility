@@ -27,7 +27,7 @@ export default class Table extends React.Component{
 			columnNumber++;
 		}
 		let temporaryTableStyle = {
-			gridTemplateColumns: `repeat(4, ${columnNumber})`,
+			gridTemplateColumns: `repeat(${columnNumber}, 1fr)`,
 		}
 		let temporaryHrStyle = {
 			gridColumn: `span ${columnNumber}`,

@@ -14,7 +14,7 @@ import styles from './style.module.css';
  * 
  * 	You can locate any kind of React elements here.
  * 
- * 	*  The component has internal states.
+ * 	*  The component has no internal states.
  */
 export default class Hyperlink extends Button{
 
