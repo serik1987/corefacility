@@ -86,10 +86,12 @@ export default class Scrollable extends React.Component{
 		let overflowYClass = overflowY ? ` ${styles.overflow_y}` : '';
         let cssSuffix = this.props.cssSuffix ? ' ' + this.props.cssSuffix.trim() : '';
 
-		return(<div className={`scrollable ${styles.scrollable}${overflowXClass}${overflowYClass}${cssSuffix}`}
+		return(
+            <div className={`scrollable ${styles.scrollable}${overflowXClass}${overflowYClass}${cssSuffix}`}
                 onScroll={this.handleScroll} ref={this.scrollContainer}>
-			{this.props.children}
-		</div>);
+			     {this.props.children}
+		      </div>
+        );
 	}
 
     getSnapshotBeforeUpdate(prevProps, prevState){

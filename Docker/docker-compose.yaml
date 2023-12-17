@@ -68,6 +68,7 @@ services:
       - ../src/ru/ihna/kozhukhov/core_application/static/common.min.css:/var/www/static/common.min.css
       - ../src/ru/ihna/kozhukhov/core_application/static/ru.ihna.kozhukhov.core_application:/var/www/static/ru.ihna.kozhukhov.core_application
       - ../venv/lib/python3.11/site-packages/rest_framework/static/rest_framework:/var/www/static/rest_framework
+      - /var/log/corefacility:/var/log/corefacility
 volumes:
   mysql:
   virtual-server-www:

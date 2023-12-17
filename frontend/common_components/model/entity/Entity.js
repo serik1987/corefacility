@@ -245,9 +245,11 @@ export default class Entity{
 		}
 		searchProvider.searchParams = searchParams;
 		let entities = await searchProvider.findEntities();
+		/*
 		if (entities instanceof Array){
 			entities.map(entity => { return entity._state = EntityState.found; });
 		}
+		*/
 		return entities;
 	}
 

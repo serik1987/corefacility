@@ -21,6 +21,10 @@ import style from './style.module.css';
  * 	@param {function} 	onSortSelection		Triggers when the user changes the sorting column or the sort order.
  * 											The callback function has two arguments: a column selected by the user
  * 											and the sorted order specified by him.
+ * 	@param {String} 	sortingColumn 		A column along which the sorting has been performed. The property turns
+ * 											the system into fully controllable mode.
+ * 	@param {String} 	order 				A sorting order. Allowed values: 'asc' and 'desc'. Useless for fully
+ * 											uncontrollable mode.
  * 	@param {Array}		sortable 			List of columns along which sorting is possible. null or undefined means
  * 											that the sorting along each column is possible.
  * 	--------------------------------------------------------------------------------------------------------------------
@@ -59,7 +63,7 @@ export default class SortedTable extends React.Component{
 	 * 	The sorting order
 	 */
 	get order(){
-		if (this.state.sortingCOlumn === undefined){
+		if (this.state.sortingColumn === undefined){
 			return this.state.order;
 		} else {
 			return this.props.order;

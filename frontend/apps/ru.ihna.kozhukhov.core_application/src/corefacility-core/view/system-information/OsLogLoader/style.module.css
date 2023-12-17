@@ -1,0 +1,70 @@
+/* CSS for the filter */
+.date_filter > div{
+	display: inline-block;
+	vertical-align: top;
+}
+
+/* CSS for filters */
+
+.filter > div{
+	margin-bottom: 10px;
+}
+
+.date_from_wrapper, .date_to_wrapper{
+	margin-right: 5px;
+}
+
+.date_from_wrapper input, .date_to_wrapper input{
+	width: 290px;
+}
+
+.time_from_wrapper{
+	margin-right: 10px;
+}
+
+.time_from_wrapper :global .text-input,
+.time_to_wrapper :global .text-input{
+	padding-top: 32px;
+}
+
+.time_from_wrapper input,
+.time_to_wrapper input{
+	width: 100px;
+}
+
+.host_filter, .file_filter, .message_filter{
+	width: 395px;
+}
+
+.filter .filter_button{
+	margin-top: 20px;
+	margin-bottom: 0;
+}
+
+.filter_button button{
+	margin: 0;
+}
+
+
+
+/* CSS for the result table */
+
+.item_list :global .table{
+	padding-left: 0;
+	padding-right: 0;
+	column-gap: 15px;
+	grid-template-columns: auto auto minmax(0, 1fr) !important;
+}
+
+.item_list :global .table > div:nth-of-type(3n){
+	word-wrap: break-word;
+}
+
+.item_list :global .table > div:not(:nth-of-type(3n)){
+	white-space: nowrap;
+}
+
+.item_list button{
+	display: block;
+	margin: 20px auto;
+}

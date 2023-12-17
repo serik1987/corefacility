@@ -58,6 +58,17 @@ export function translate(message){
 }
 
 /**
+ * 	Checks whether a given date is valid
+ * 
+ * 	@param {Date} date 		the date to check
+ * 	@return {boolean} 		true if the date is valid, false otherwise
+ */
+export function isDateValid(date){
+	return !isNaN(date.getTime());
+
+}
+
+/**
  *  Transforms the memory measure to human-readable format.
  * 	@param {Number} size 		Memory size in bytes
  * 	@return {String} 			A string like '4.2 Gb' or '3.8 Mb'

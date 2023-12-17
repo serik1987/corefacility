@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 from ru.ihna.kozhukhov.core_application.views import View404, UserViewSet, GroupViewSet, ProjectViewSet, LoginView, \
     ProfileView, AccessLevelView, \
     PermissionViewSet, SynchronizationView, LogViewSet, LogRecordViewSet, WidgetsView, \
-    ModuleSettingsViewSet, EntryPointListView, AuthorizationMethodSetupView, SystemInformationView
+    ModuleSettingsViewSet, EntryPointListView, AuthorizationMethodSetupView, SystemInformationView, OperatingSystemLogs
 from ru.ihna.kozhukhov.core_application.views import ProfileAvatarView
 from ru.ihna.kozhukhov.core_application.views.process_information import ProcessInformation
 
@@ -31,6 +31,7 @@ urlpatterns = [
     path(r'settings/<uuid:uuid>/entry-points/', EntryPointListView.as_view(), name="entry-points"),
     path(r'sysinfo/', SystemInformationView.as_view(), name='system-information'),
     path(r'procinfo/', ProcessInformation.as_view(), name="process-information"),
+    path(r'os-logs/', OperatingSystemLogs.as_view(), name="os-logs")
 
               ] + router.urls + [
 

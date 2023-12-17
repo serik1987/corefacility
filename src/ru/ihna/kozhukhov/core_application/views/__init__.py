@@ -19,3 +19,4 @@ from .module_settings import ModuleSettingsViewSet
 from .entry_point_list import EntryPointListView
 from .authorization_method_setup import AuthorizationMethodSetupView
 from .system_information import SystemInformationView
+from .os_logs import OperatingSystemLogs

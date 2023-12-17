@@ -396,5 +396,19 @@
 	"Zombie": "Зомби",
 	"High priority": "Высокий приоритет",
 	"Low priority": "Низкий приоритет",
-	"Session leader": "Лидер сессии"
+	"Session leader": "Лидер сессии",
+
+	"OS Logs": "Логи ОС",
+	"Operating system logs": "Логи операционной системы",
+	"No logs were loaded.": "Логи не были загружены.",
+	"Date and time": "Дата и время",
+	"Show logs from": "Показать логи от",
+	"Apply filter": "Применить фильтр",
+	"Invalid time": "Неверное время",
+	"to": "до",
+	"The log end date shall not be less than the log start date": "Дата окончания логов не должна быть меньше, чем дата их начала",
+	"All hosts": "Все хосты",
+	"Log files": "Файлы логов",
+	"All files": "Все файлы",
+	"Message pattern (use regular expressions)": "Паттерн сообщения (используйте регулярные выражения)"
 }
