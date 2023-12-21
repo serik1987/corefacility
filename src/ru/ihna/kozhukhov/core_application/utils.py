@@ -2,6 +2,18 @@ from django.conf import settings
 from django.template.loader import get_template
 from django.template.exceptions import TemplateDoesNotExist
 from django.core.mail import EmailMultiAlternatives
+from django.utils.translation import gettext as _
+
+
+KILOBYTE = 1024
+MEGABYTE = 1024 * KILOBYTE
+GIGABYTE = 1024 * MEGABYTE
+TERABYTE = 1024 * GIGABYTE
+BYTE_STR = _("B")
+KILOBYTE_STR = _("kB")
+MEGABYTE_STR = _("Mb")
+GIGABYTE_STR = _("Gb")
+TERABYTE_STR = _("Tb")
 
 
 def mail(
@@ -57,3 +69,21 @@ def get_ip(request):
 	else:
 		ip_address = request.META['REMOTE_ADDR']
 	return ip_address
+
+
+def human_readable_memory(size: int) -> str:
+	"""
+	Converts the memory size (in bytes) to its human-readable analogue
+	"""
+	if size >= TERABYTE:
+		readable_size = "%1.2f %s" % (size / TERABYTE, TERABYTE_STR)
+	elif size >= GIGABYTE:
+		readable_size = "%1.2f %s" % (size / GIGABYTE, GIGABYTE_STR)
+	elif size >= MEGABYTE:
+		readable_size = "%1.2f %s" % (size / MEGABYTE, MEGABYTE_STR)
+	elif size >= KILOBYTE:
+		readable_size = "%1.2f %s" % (size / KILOBYTE, KILOBYTE_STR)
+	else:
+		readable_size = "%i %s" % (size, BYTE_STR)
+
+	return readable_size

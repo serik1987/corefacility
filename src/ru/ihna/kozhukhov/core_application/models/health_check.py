@@ -17,3 +17,11 @@ class HealthCheck(models.Model):
     bytes_sent = models.PositiveBigIntegerField()
     bytes_received = models.PositiveBigIntegerField()
     temperature = models.JSONField()
+
+    def __str__(self):
+        return ("HealthCheck(date={date}, cpu_load={cpu_load}, ram_free={ram_free}, swap_free={swap_free}," +
+                "hdd_free={hdd_free}, bytes_sent={bytes_sent}, bytes_received={bytes_received}, " +
+                "temperature={temperature})") \
+            .format(date=self.date, cpu_load=self.cpu_load, ram_free=self.ram_free, swap_free=self.swap_free,
+                    hdd_free=self.hdd_free, bytes_sent=self.bytes_sent, bytes_received=self.bytes_received,
+                    temperature=self.temperature)

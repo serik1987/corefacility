@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-15 19:16+0300\n"
+"POT-Creation-Date: 2023-12-20 21:35+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -162,7 +162,11 @@ msgid ""
 "corefacility installation by adjustment of rsyslog daemon in such a way as "
 "it writes logs directly to /var/log/corefacility/syslog and /var/log/"
 "corefacility/auth.log files"
-msgstr "Директория /var/log/corefacility не существует. Пожалуйста, завершите установки приложения corefacility, настроив демон rsyslog таким образом, чтобы все логи операционной системы писались в файлы /var/log/corefacility/syslog и var/log/corefacility/auth.log"
+msgstr ""
+"Директория /var/log/corefacility не существует. Пожалуйста, завершите "
+"установки приложения corefacility, настроив демон rsyslog таким образом, "
+"чтобы все логи операционной системы писались в файлы /var/log/corefacility/"
+"syslog и var/log/corefacility/auth.log"
 
 #: src/ru/ihna/kozhukhov/core_application/exceptions/synchronization_exceptions.py:21
 msgid ""
@@ -220,6 +224,30 @@ msgid ""
 msgstr ""
 "Это - критическая ошибка безопасности. Мы приняли решение полностью прервать "
 "выполняемое действие."
+
+#: src/ru/ihna/kozhukhov/core_application/management/commands/health_check.py:88
+msgid "ALARM: critical values of important server health parameters detected"
+msgstr "ВНИМАНИЕ: обнаружено превышение критических значений важных характеристик сервера"
+
+#: src/ru/ihna/kozhukhov/core_application/management/commands/health_check.py:132
+msgid "CPU"
+msgstr "Процессор"
+
+#: src/ru/ihna/kozhukhov/core_application/management/commands/health_check.py:138
+msgid "Free operating memory"
+msgstr "Свободная оперативная память"
+
+#: src/ru/ihna/kozhukhov/core_application/management/commands/health_check.py:144
+msgid "Free swap memory"
+msgstr "Свободная память подкачки"
+
+#: src/ru/ihna/kozhukhov/core_application/management/commands/health_check.py:151
+msgid "Free space at"
+msgstr "Свободное место на"
+
+#: src/ru/ihna/kozhukhov/core_application/management/commands/health_check.py:177
+msgid "Temperature for"
+msgstr "Температура для"
 
 #: src/ru/ihna/kozhukhov/core_application/migrations/0002_install.py:13
 msgid "Core functionality"
@@ -398,11 +426,31 @@ msgstr ""
 "Ваше устройство имеет монитор со слишком малым разрешением. Пожалуйста, "
 "запустите это приложение на устройстве с большим разрешением"
 
+#: src/ru/ihna/kozhukhov/core_application/utils.py:12
+msgid "B"
+msgstr "байт"
+
+#: src/ru/ihna/kozhukhov/core_application/utils.py:13
+msgid "kB"
+msgstr "Кб"
+
+#: src/ru/ihna/kozhukhov/core_application/utils.py:14
+msgid "Mb"
+msgstr "Мб"
+
+#: src/ru/ihna/kozhukhov/core_application/utils.py:15
+msgid "Gb"
+msgstr "Гб"
+
+#: src/ru/ihna/kozhukhov/core_application/utils.py:16
+msgid "Tb"
+msgstr "Тб"
+
 #: src/ru/ihna/kozhukhov/core_application/views/login.py:37
 msgid "Incorrect credentials."
 msgstr "Неверные учётные данные."
 
-#: src/ru/ihna/kozhukhov/core_application/views/system_information.py:182
+#: src/ru/ihna/kozhukhov/core_application/views/system_information.py:172
 msgid "Unrecognized platform"
 msgstr "Неизвестная платформа"
 

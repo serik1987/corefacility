@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <style>
+        table{
+            border-collapse: collapse;
+        }
+        td{
+            padding: 10px;
+            border: 2px solid rgb(222, 222, 221);
+        }
+        td:first-child{
+            border-left: none;
+        }
+        td:last-child{
+            border-right: none;
+        }
+        tr.critical{
+            font-weight: 600;
+            color: #c53929;
+        }
+    </style>
+</head>
+<body>
+	<p>Глубокоуважаемый(ая) {{admin_name}}!</p>
+    <p>Некоторые параметры работоспособности системы превысили свои критические значения.</p>
+    <table>
+        <tr>
+            <td>Параметр</td>
+            <td>Значение</td>
+            <td>Критическое значение</td>
+        </tr>
+        {% for key, values in criticals.items %}
+        <tr class="{% if values.is_critical%}critical{% else %}non-critical{%endif%}">
+            <td>{{key}}</td>
+            <td>{{values.actual_value}}</td>
+            <td>{{values.critical_value}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <p>Пожалуйста, примите, все необходимые меры. В противном случае работоспособность сервера может стремительно упасть.</p>
+	<p>
+            Искренне Ваш,<br>
+            corefacility
+        </p>
+</body>
+</html>

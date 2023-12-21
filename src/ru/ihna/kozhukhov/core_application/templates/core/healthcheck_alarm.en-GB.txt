@@ -1,0 +1,12 @@
+Dear {{admin_name}},
+
+Some health system parameters exceed their critical values.
+
+{% for key, values in criticals.items %}
+{{key}}: {{values.actual_value}} (Critical value: {{values.critical_value}})
+{% endfor %}
+
+Please, take all necessary actions. Otherwise, the server performance will be steadily declined.
+
+Sincerely yours,
+Corefacility

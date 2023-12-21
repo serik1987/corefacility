@@ -9,16 +9,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from ..management.commands.health_check import Command as HealthChecker
+
 
 class SystemInformationView(APIView):
     """
     Provides general information about the system.
     """
 
-    STATIONARY_MOUNT_POINT_FILE = "/etc/fstab"
-    STATIONARY_MOUNT_POINT_LINE = \
-        re.compile(r'^(?P<filesystem>[^#\s]+)\s+(?P<mount_point>[^#\s]+)\s+(?P<type>[^#\s]+)\s+(?P<options>[^#\s]+)\s+'
-                   r'(?P<dump>[^#\s]+)\s+(?P<pass>[^#\s]+)(?:\s*#.*)?$')
     CPU_INFORMATION_FILE = "/proc/cpuinfo"
     SUPPORTED_PLATFORMS = {
         "Linux": psutil.LINUX,
@@ -31,7 +29,6 @@ class SystemInformationView(APIView):
         "Sun OS": psutil.SUNOS,
         "AIX": psutil.AIX,
     }
-
 
     permission_classes = [IsAuthenticated]
 
@@ -133,20 +130,13 @@ class SystemInformationView(APIView):
             return
 
         mount_points = dict()
-        with open(self.STATIONARY_MOUNT_POINT_FILE, 'r') as mount_point_file:
-            for mount_point_string in mount_point_file:
-                mount_point_info = self.STATIONARY_MOUNT_POINT_LINE.match(mount_point_string)
-                if mount_point_info is None:
-                    continue
-                mount_point = mount_point_info['mount_point']
-                if mount_point == 'none':
-                    mount_point = None
-                if mount_point is not None:
-                    disk_usage = psutil.disk_usage(mount_point)
-                    mount_points[mount_point] = {
-                        'available': disk_usage.free,
-                        'total': disk_usage.total,
-                    }
+        for mount_point in HealthChecker.read_mount_points():
+            disk_usage = psutil.disk_usage(mount_point)
+            mount_points[mount_point] = {
+                'available': disk_usage.free,
+                'total': disk_usage.total,
+            }
+
         system_information['disk_info'] = mount_points
 
     def _fill_network_usage(self, system_information):

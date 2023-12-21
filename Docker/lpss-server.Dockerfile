@@ -7,6 +7,9 @@ RUN apt-get install -y postgresql
 RUN pip install psycopg2
 ENV pg_version=$pg_version
 
+# Installation of lm-sensors
+RUN apt-get install -y lm-sensors
+
 # Last settings
 ENV IMAGE_NAME=lpss-server
 CMD /usr/sbin/sshd && pg_ctlcluster ${pg_version} main start && nginx && \

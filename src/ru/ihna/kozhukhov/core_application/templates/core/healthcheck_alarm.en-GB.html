@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <style>
+        table{
+            border-collapse: collapse;
+        }
+        td{
+            padding: 10px;
+            border: 2px solid rgb(222, 222, 221);
+        }
+        td:first-child{
+            border-left: none;
+        }
+        td:last-child{
+            border-right: none;
+        }
+        tr.critical{
+            font-weight: 600;
+            color: #c53929;
+        }
+    </style>
+</head>
+<body>
+	<p>Dear {{admin_name}},</p>
+    <p>Some health system parameters exceed their critical values.</p>
+    <table>
+        <tr>
+            <td>Parameter</td>
+            <td>Value</td>
+            <td>Critical value</td>
+        </tr>
+        {% for key, values in criticals.items %}
+        <tr class="{% if values.is_critical%}critical{% else %}non-critical{%endif%}">
+            <td>{{key}}</td>
+            <td>{{values.actual_value}}</td>
+            <td>{{values.critical_value}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <p>Please, take all necessary actions. Otherwise, the server performance will be steadily declined.</p>
+	<p>
+            Sincerely yours,<br>
+            corefacility
+        </p>
+</body>
+</html>
