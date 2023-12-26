@@ -25,6 +25,13 @@ import ProjectApplicationListWindow from './application-list/ProjectApplicationL
 import SystemInformationWindow from './system-information/SystemInformationWindow';
 import ProcessListWindow from './system-information/ProcessListWindow';
 import OsLogWindow from './system-information/OsLogWindow';
+import {
+	HealthCheckCpu,
+	HealthCheckMemory,
+	HealthCheckDisk,
+	HealthCheckNetwork,
+	HealthCheckTemperature
+} from './health-check/HealthCheckWindow';
 
 
 /** This is the root component for the core application
@@ -89,6 +96,15 @@ export default class App extends BaseApp{
 					{adminPermissions && <Route path="/users/" element={<UserListWindow/>} />}
 					<Route path="/sysinfo/" element={<SystemInformationWindow/>}/>
 					<Route path="/procinfo/" element={<ProcessListWindow/>}/>
+					<Route path="/health-check/" element={<HealthCheckCpu category="cpu"/>}/>
+					<Route path="/health-check/cpu/" element={<HealthCheckCpu category="cpu"/>}/>
+					<Route path="/health-check/memory/" element={<HealthCheckMemory category="memory"/>}/>
+					<Route path="/health-check/disk/" element={<HealthCheckDisk category="disk"/>}/>
+					<Route path="/health-check/network/" element={<HealthCheckNetwork category="network"/>}/>
+					<Route
+						path="/health-check/temperature/"
+						element={<HealthCheckTemperature category="temperature"/>}
+					/>
 					<Route path="/os-logs/" element={<OsLogWindow/>}/>
 					<Route path="/" element={<Navigate to={defaultUrl}/>} />
 					<Route path="*" element={<Window404/>}/>

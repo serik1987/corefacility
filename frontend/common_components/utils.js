@@ -1,6 +1,6 @@
 import i18next from "i18next";
 
-const MEMORY_UNITS = {
+export const MEMORY_UNITS = {
 	'Tb': 1024 * 1024 * 1024 * 1024,
 	'Gb': 1024 * 1024 * 1024,
 	'Mb': 1024 * 1024,
@@ -74,13 +74,28 @@ export function isDateValid(date){
  * 	@return {String} 			A string like '4.2 Gb' or '3.8 Mb'
  */
 export function humanReadableMemory(size){
+	let units = suitableMemoryUnits(size);
+	return `${(size / units.factor).toFixed(PRECISION)} ${translate(units.name)}`;
+}
+
+/**
+ * 	Chooses a proper memory units for a given memory size in bytes
+ * 	@param {Number} size 		The memory size in bytes
+ * 	@return {object} 			The result contains the following fields:
+ * 		@param {string} name 		Name of the unit
+ * 		@param 
+ */
+export function suitableMemoryUnits(size){
 	size = Math.round(size);
 	for (let unit in MEMORY_UNITS){
 		let unitValue = MEMORY_UNITS[unit];
 		if (Math.abs(size) > unitValue){
-			return `${(size / unitValue).toFixed(PRECISION)} ${translate(unit)}`;
+			return {
+				name: unit,
+				factor: unitValue,
+			}
 		}
 	}
 
-	return '0';
+	return {name: 'B', factor: 0}
 }

@@ -134,7 +134,8 @@ export default class CoreWindow extends Window{
 									<Hyperlink href="/settings/">{t("Application Settings")}</Hyperlink>,
 								<Hyperlink href="/sysinfo/">{t("System information")}</Hyperlink>,
 								<Hyperlink href="/procinfo/">{t("Process list")}</Hyperlink>,
-								<Hyperlink href="/os-logs/">{t("OS Logs")}</Hyperlink>
+								<Hyperlink href="/os-logs/">{t("OS Logs")}</Hyperlink>,
+								<Hyperlink href="/health-check/cpu/">{t("Health status")}</Hyperlink>,
 							]}
 						/>
 					</div>

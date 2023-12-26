@@ -1,0 +1,17 @@
+.container{
+	display: flex;
+	gap: 20px;
+	flex-direction: column;
+}
+
+.container :global .toolbar{
+	flex: 0;
+}
+
+.container :global .chart{
+	flex: 1;
+}
+
+.container :global .legend{
+	flex: 0;
+}

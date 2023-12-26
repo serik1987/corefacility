@@ -61,6 +61,8 @@
 	"Expand the sidebar": "Развернуть боковую панель",
 	"Collapse": "Свернуть",
 	"Expand": "Развернуть",
+	"Zoom in": "Увеличить масштаб",
+	"Zoom out": "Уменьшить масштаб",
 
 	"Mon": "Пн",
 	"Tue": "Вт",
@@ -410,5 +412,11 @@
 	"All hosts": "Все хосты",
 	"Log files": "Файлы логов",
 	"All files": "Все файлы",
-	"Message pattern (use regular expressions)": "Паттерн сообщения (используйте регулярные выражения)"
+	"Message pattern (use regular expressions)": "Паттерн сообщения (используйте регулярные выражения)",
+
+	"Health status": "Состояние системы",
+	"Memory": "Память",
+	"Disks": "Диски",
+	"Network": "Сеть",
+	"Temperature": "Температура"
 }

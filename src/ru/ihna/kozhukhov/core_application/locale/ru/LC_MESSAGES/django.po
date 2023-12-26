@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-20 21:35+0300\n"
+"POT-Creation-Date: 2023-12-22 00:20+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -225,27 +225,32 @@ msgstr ""
 "Это - критическая ошибка безопасности. Мы приняли решение полностью прервать "
 "выполняемое действие."
 
-#: src/ru/ihna/kozhukhov/core_application/management/commands/health_check.py:88
+#: src/ru/ihna/kozhukhov/core_application/management/commands/health_check.py:121
 msgid "ALARM: critical values of important server health parameters detected"
-msgstr "ВНИМАНИЕ: обнаружено превышение критических значений важных характеристик сервера"
+msgstr ""
+"ВНИМАНИЕ: обнаружено превышение критических значений важных характеристик "
+"сервера"
 
-#: src/ru/ihna/kozhukhov/core_application/management/commands/health_check.py:132
+#: src/ru/ihna/kozhukhov/core_application/management/commands/health_check.py:170
+#: src/ru/ihna/kozhukhov/core_application/views/health_check.py:198
 msgid "CPU"
 msgstr "Процессор"
 
-#: src/ru/ihna/kozhukhov/core_application/management/commands/health_check.py:138
+#: src/ru/ihna/kozhukhov/core_application/management/commands/health_check.py:176
+#: src/ru/ihna/kozhukhov/core_application/views/health_check.py:202
 msgid "Free operating memory"
 msgstr "Свободная оперативная память"
 
-#: src/ru/ihna/kozhukhov/core_application/management/commands/health_check.py:144
+#: src/ru/ihna/kozhukhov/core_application/management/commands/health_check.py:182
+#: src/ru/ihna/kozhukhov/core_application/views/health_check.py:202
 msgid "Free swap memory"
 msgstr "Свободная память подкачки"
 
-#: src/ru/ihna/kozhukhov/core_application/management/commands/health_check.py:151
+#: src/ru/ihna/kozhukhov/core_application/management/commands/health_check.py:189
 msgid "Free space at"
 msgstr "Свободное место на"
 
-#: src/ru/ihna/kozhukhov/core_application/management/commands/health_check.py:177
+#: src/ru/ihna/kozhukhov/core_application/management/commands/health_check.py:215
 msgid "Temperature for"
 msgstr "Температура для"
 
@@ -445,6 +450,14 @@ msgstr "Гб"
 #: src/ru/ihna/kozhukhov/core_application/utils.py:16
 msgid "Tb"
 msgstr "Тб"
+
+#: src/ru/ihna/kozhukhov/core_application/views/health_check.py:208
+msgid "Network output traffic"
+msgstr "Исходящий сетевой трафик"
+
+#: src/ru/ihna/kozhukhov/core_application/views/health_check.py:208
+msgid "Network input traffic"
+msgstr "Входящий сетевой трафик"
 
 #: src/ru/ihna/kozhukhov/core_application/views/login.py:37
 msgid "Incorrect credentials."

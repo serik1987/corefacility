@@ -501,7 +501,7 @@ export default class SystemInformationWindow extends CoreWindow{
 			let diskSpaceFree = humanReadableMemory(diskSpaces.available);
 			let diskSpaceTotal = humanReadableMemory(diskSpaces.total);
 			diskSpaceInfo[mountPoint] = `${t("Free")}: ${diskSpaceFree} / ${diskSpaceTotal}`;
-			diskTotal += diskSpaceTotal;
+			diskTotal += diskSpaces.total;
 		}
 		this.setState({
 			diskUsage: diskUsage,

@@ -12,20 +12,22 @@ import style from './style.module.css';
  * 	Props:
  * 	--------------------------------------------------------------------------------------------------------------------
  * 	@param {any}		data 						The input data that shall be graphically represented
- * 	@param {boolean}	noRepaint					true - the chart will not be rendered after repaint,
- * 													false - the chart will be rendered after repaint.
+ * 	@param {boolean}	noRepaint					true - the chart will not be repainted after rendering
+ * 														(suitable for multiple charts at a single page),
+ * 													false - the chart will be repainted after rendering
+ * 														(suitable for a single stand-alone chart).
  * 	@param {boolean}	visible						true - the chart will be visible (default value),
  * 													false - the chart will be hidden
- * 	@param {boolean}	followResize				true - run callbacks at the canvas resize (default value),
- * 													false - don't run callbacks at the canvas resize
+ * 	@param {boolean}	followResize				true - repaint canvas automatically after the component resize
+ * 													(default value),
+ * 													false - this is the parent component that is responsible for the
+ * 													resizing
  * 													Set this prop to true is there are multiple charts in the parent
  * 													component and the internal chart resizer work improperly. In this
  * 													case you must develop an external chart resizer.
  * 	--------------------------------------------------------------------------------------------------------------------
  * 
- * 	State:
- * 	--------------------------------------------------------------------------------------------------------------------
- * 	--------------------------------------------------------------------------------------------------------------------
+ * 	The component is completely stateless.
  */
 export default class Chart extends React.Component{
 
@@ -48,8 +50,12 @@ export default class Chart extends React.Component{
 	/** the CSS styles for the container. This option is valid only during the execution of paintFigures(...) method */
 	_containerStyle = null;
 
+	/** true if the chart has already been painted, false otherwise */
+	_painted = false;
+
 	constructor(props){
 		super(props);
+		this._handleMouseEvents = this._handleMouseEvents.bind(this);
 
 		this.__canvasRef = React.createRef();
 		this.__containerRef = React.createRef();
@@ -58,6 +64,7 @@ export default class Chart extends React.Component{
 		this._canvasHeight = null;
 		this.__resizeRequired = false;
 		this.__inactive = false;
+		this._painted = false;
 
 		this.state = {
 			_rendering: false,
@@ -79,7 +86,13 @@ export default class Chart extends React.Component{
 
 		return (
 			<div className={`${style.container} chart${additionalClasses}`} ref={this.__containerRef}>
-				{this.visible && <canvas ref={this.__canvasRef}></canvas>}
+				{this.visible && <canvas
+					ref={this.__canvasRef}
+					onMouseDown={this._handleMouseEvents}
+					onMouseMove={this._handleMouseEvents}
+					onMouseUp={this._handleMouseEvents}
+					onMouseLeave={this._handleMouseEvents}
+				></canvas>}
 			</div>
 		);
 	}
@@ -101,6 +114,7 @@ export default class Chart extends React.Component{
 
 	componentWillUnmount(){
 		this.__resizeObserver.disconnect();
+		this._painted = false;
 	}
 
 	/**
@@ -181,6 +195,7 @@ export default class Chart extends React.Component{
 		if (this._debugMode){
 			console.log("The active state is OFF");
 		}
+		this._painted = true;
 	}
 
 	/**
@@ -232,6 +247,14 @@ export default class Chart extends React.Component{
 
 		this.canvas.width = this._canvasWidth;
 		this.canvas.height = this._canvasHeight;
+	}
+
+	/**
+	 * 	Triggers when the user presses the mouse button, releases the mouse button or moves the mouse button
+	 * 
+	 * 	@param {Event} 		event 		The event triggered by the user
+	 */
+	_handleMouseEvents(event){
 	}
 
 }
