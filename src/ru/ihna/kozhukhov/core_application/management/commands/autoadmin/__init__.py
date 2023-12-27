@@ -89,7 +89,10 @@ class Command(BaseCommand):
         elif settings.CORE_SUGGEST_ADMINISTRATION:
             self.execution_interval = timedelta()
         else:
-            raise ImproperlyConfigured("Unrecognized configuration profile")
+            raise ImproperlyConfigured("The autoadmin daemon can't be run under a given configuration profile or "
+                                       "the configuration profile is not recognized. Please, bear in mind that "
+                                       "autoadmin supports only FullServerConfiguration and PartServerConfiguration "
+                                       "profiles.")
         for signal_number in (signal.SIGINT, signal.SIGHUP, signal.SIGTERM, signal.SIGQUIT):
             signal.signal(signal_number, self.interrupt)
         self.logger = logging.getLogger("django.corefacility.log")
