@@ -1,6 +1,23 @@
-# Installation and usage instruction
+# Main usage
 
-## Developers
+The corefacility facilitates the neuroscience research and application of high-performance servers in Neuroscience
+by providing the following features:
+
+1. The corefacility provides very simple and understandeable interface that:
+   1. doesn't engage the server resource (e.g., the CPU time, operating memory);
+   2. doesn't decline the server uptime;
+   3. allows several users to work on the same server simultaneously.
+2. The corefacility manages user accounts and provides the following security issues:
+   1. GUI interface for managing the opertating system users and group;
+   2. Managing user access rights to the experimental data;
+   3. User authorization, authentication, accounting, lock/unlock etc.
+3. The corefacility operates some administrative tasks in background:
+   1. Alarming the user when sufficient health check values are beyond the normal range (i.e., when the CPU temperature
+is too high or amount of free operating memory is too low).
+   2. Providing the every-month health check diagnostics and experimental database backups.
+4. The corefacility will distribute computational resources among different users.
+
+# Developers
 
 (c) Sergei Kozhukhov, scientist in the Institute of Higher Nervous Activity, RAS
 
@@ -17,68 +34,94 @@ E-mail: admin@ihna.ru
 
 Phone number: +7 (495) 334-70-00
 
-## Замечание для русскоязычных пользователей
+# Замечание для русскоязычных пользователей
 
 Работая с данным продуктом, Вы принимаете условия лицензионного соглашения, изложенные в файле LICENSE.txt
 
 К сожалению, данная инструкция доступна на английском языке. В случае возникновения каких-либо затруднений
 в установке пожалуйста, обратитесь к разработчикам за консультацией.
 
-## Installation instructions
+# Installation instructions
 
-The program works in stand-alone and Web server configuration. The stand-alone configuration must be
-installed on your personal computer and is suitable for your personal use only. The Web Server
-configuration usually installs on special Web Servers and provides cloud data storage and cloud data
-processing. However, web server configuration is highly difficult and requires a person with special
-skills.
+In order to start the installation process choose one of the following system configurations:
 
-The following reading will help you to gain such skills:
-Nemett, E., Snyder G. Unix and Linux System Administration Handbook. Fifth Edition. 
+* __Full server configuration__: The configuration is suitable for dedicated / virtual private servers and imply that
+you gain the administrative privileges to corefacility. The corefacility under the full server configuration will 
+provide an automatic management of operating system accounts and groups and user access to experimental data.
 
-### Requirements
+* __Part server configuration__: The configuration is also suuitable for dedicated / virtual private servers but doesn't
+provide an automatic management of operating system accounts and groups. This means that the corefacility is still able
+to provide the account management but only with the help of the system administrator. Use such configuration if you
+don't trust the security solutions of the corefacility.
 
-_Operating system_: Any operating system where you can install Python 3 and GitHub is good.
-However, if you have non-POSIX operating systems (including Microsoft Windows) you can run this application
-only in stand-alone configuration.
+* __Standalone configuration__: The configuration is suitable for your own computer and laptop when you want to run
+the experimental data processing programme that requires the corefacility framework. The corefacility under the
+standalone configuration will not provide the management of operating system accounts and will not manage an access
+to experimental data.
 
-This program works under Python 3.10 or higher. Also, you are required to install python3-pip v. 22.2.2
-or higher and use this to install the Python packages mentioned below:
+## Installation instruction for the full server configuration and the part server configuration.
 
-* psutil >= 5.8.0
-* python-dotenv >= 0.19.2
-* Django >= 4.1.1
-* django-configurations >= 2.4
-* djangorestframework >= 3.13.1
-* pillow >= 9.2.0
-* parameterized >= 0.8.1
-* pytz >= 2022.2.1
-* colorama >= 0.4.4
-* urllib3 >= 1.26.9
-* bs4
-* dateutils
-* numpy >= 1.23.2
-* matplotlib >= 3.5.3
-* scipy >= 1.9.1
+We imply that you are an experienced Linux user. So, if this is not the case, refer to the following literature to
+fill the gaps in such skills:
 
-Also, GitHub client is required for the installation and update process. You need to install it as well.
-If you doesn't intend to use this application in stand-alone configuration you need cron to be installed.
+Nemett, E., Snyder G. Unix and Linux System Administration Handbook. Fifth Edition.
 
-### Download the application
+The reference manual below is one of several possible ways to install the corefacility.
 
-Create the folder where your application will be located. Open the command line interpreter and go to
-this folder using the `cd` command. Next, type the following:
+### Pre-requisites
+
+We imply that you try to install the corefacility to the high-performance server without GUI support. Such configuration
+is the most preferrable because the GUI support wastes extra resources, declines the server uptime and can be
+replaced by the corefacility Web-based GUI that doesn't waste extra resorces and affect the server uptime.
+
+The corefacility supports only UNIX-like operating systems under this support. The reference below is written for
+the Linux Ubuntu Server operating system. This means that any other UNIX-like operating system is also OK but you
+have to make necessary corrections when reading this manual.
+
+The installation requires administrative rights even when the corefacility is run under the part server configuration.
+So, if you don't have such rights, gain them.
+
+First, upgrade all packages in your operating system:
 
 ```commandline
-git clone https://github.com/serik1987/corefacility.git
-cd corefacility
+sudo apt update
+sudo apt upgrade
 ```
 
-### Necessary environment
+Next, ensure, that the Python v. 3.10 or higher has already been installed.
 
-The corefacility understands POSIX-compliant operating system and Windows operating system. Such operating systems
-don't require any settins mentioned in this section. However, corefacility will fail to run under another operating
-systems until you specify the `COREFACILITY_SETTINGS_DIR` environmental variable that equals to the folder where you
-should put the settings
+```commandline
+sudo apt install python3 python3-dev python3-pip libpq-dev
+```
+
+### Download and install the corefacility package
+
+In order to download and install the corefacility follow the link below that contains the list of corefacility releases:
+
+```
+https://github.com/serik1987/corefacility/releases
+```
+
+Select the latest release, next, click on Assets and move the mouse to the name of the .whl file. Then you need to
+right-click on the whl-file and copy the link to the release installation file to the clipboard.
+
+To go the command line of your server type the `wget`, put space and paste the information from the clipboard to the
+terminal. In the long run, you have to see something like this:
+
+```commandline
+wget https://github.com/serik1987/corefacility/releases/download/v.0.0.1/corefacility-0.0.1-py3-none-any.whl
+```
+
+Press Enter to execute the command. The command will download the distribution to the home folder on the server.
+
+After the package has been downloaded use the following command to install this.
+
+```commandline
+sudo pip install $(ls *.whl)
+```
+
+You have to inquire that your current directory contains only one whl-file. If this is not the case, the command above
+will not work, you have to replace the `$(ls *.whl)` directive to the name of the recently downloaded file. 
 
 ### Preliminary setup
 
