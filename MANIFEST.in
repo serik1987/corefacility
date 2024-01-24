@@ -2,3 +2,4 @@ graft src/ru/ihna/kozhukhov/core_application/locale
 graft src/ru/ihna/kozhukhov/core_application/static
 graft src/ru/ihna/kozhukhov/core_application/templates
 graft src/ru/ihna/kozhukhov/corefacility/static
+graft src/ru/ihna/kozhukhov/corefacility/settings/defaults
