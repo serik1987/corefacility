@@ -60,7 +60,12 @@ class ConfigLauncher:
         """
         if cls.SETTINGS_DIR is None:
             cls.find_settings_dir()
-        return os.path.join(cls.SETTINGS_DIR, cls._preliminary_settings_filename)
+        try:
+            os.scandir(cls.SETTINGS_DIR)
+        except PermissionError:
+            raise PermissionError("You don't have necessary privileges to use the corefacility CLI interface")
+        filename = os.path.join(cls.SETTINGS_DIR, cls._preliminary_settings_filename)
+        return filename
 
     @classmethod
     def select_config_profile(cls):
