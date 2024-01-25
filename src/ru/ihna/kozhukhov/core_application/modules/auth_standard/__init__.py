@@ -51,6 +51,9 @@ class StandardAuthorization(LoginPasswordAuthorization):
         try:
             user_set = UserSet()
             user_set.is_locked = False
+            user_set.is_support = False
+            # The support user can't authorize if authomatic authorization is switched off
+            # If authomatic authorization is switched on, the whole method is unreachable
             user = user_set.get(login)
         except EntityNotFoundException:
             return None
