@@ -1,4 +1,4 @@
-# Main usage
+# 1. Main usage
 
 The corefacility facilitates the neuroscience research and application of high-performance servers in Neuroscience
 by providing the following features:
@@ -17,7 +17,7 @@ is too high or amount of free operating memory is too low).
    2. Providing the every-month health check diagnostics and experimental database backups.
 4. The corefacility will distribute computational resources among different users.
 
-# Developers
+# 2. Developers
 
 (c) Sergei Kozhukhov, scientist in the Institute of Higher Nervous Activity, RAS
 
@@ -34,14 +34,14 @@ E-mail: admin@ihna.ru
 
 Phone number: +7 (495) 334-70-00
 
-# Замечание для русскоязычных пользователей
+# 3. Замечание для русскоязычных пользователей
 
 Работая с данным продуктом, Вы принимаете условия лицензионного соглашения, изложенные в файле LICENSE.txt
 
 К сожалению, данная инструкция доступна на английском языке. В случае возникновения каких-либо затруднений
 в установке пожалуйста, обратитесь к разработчикам за консультацией.
 
-# Installation instructions
+# 4. Installation instructions
 
 In order to start the installation process choose one of the following system configurations:
 
@@ -59,7 +59,7 @@ the experimental data processing programme that requires the corefacility framew
 standalone configuration will not provide the management of operating system accounts and will not manage an access
 to experimental data.
 
-## Installation instruction for the full server configuration and the part server configuration.
+## 4.1. Installation instruction for the full server configuration and the part server configuration.
 
 We imply that you are an experienced Linux user. So, if this is not the case, refer to the following literature to
 fill the gaps in such skills:
@@ -68,14 +68,14 @@ Nemett, E., Snyder G. Unix and Linux System Administration Handbook. Fifth Editi
 
 The reference manual below is one of several possible ways to install the corefacility.
 
-### Pre-requisites
+### 4.1.1. Pre-requisites
 
 We imply that you try to install the corefacility to the high-performance server without GUI support. Such configuration
 is the most preferrable because the GUI support wastes extra resources, declines the server uptime and can be
 replaced by the corefacility Web-based GUI that doesn't waste extra resorces and affect the server uptime.
 
-The corefacility supports only UNIX-like operating systems under this support. The reference below is written for
-the Linux Ubuntu Server operating system. This means that any other UNIX-like operating system is also OK but you
+This kind of corefacility configuration support only UNIX-like operating systems. The reference below is written for
+the Linux Ubuntu Server operating system. This means that any other UNIX-like operating system is also OK, but you
 have to make necessary corrections when reading this manual.
 
 The installation requires administrative rights even when the corefacility is run under the part server configuration.
@@ -109,7 +109,7 @@ To go the command line of your server type the `wget`, put space and paste the i
 terminal. In the long run, you have to see something like this:
 
 ```commandline
-wget https://github.com/serik1987/corefacility/releases/download/v.0.0.1/corefacility-0.0.1-py3-none-any.whl
+wget https://github.com/serik1987/corefacility/releases/download/v.0.0.2/corefacility-0.0.2-py3-none-any.whl
 ```
 
 Press Enter to execute the command. The command will download the distribution to the home folder on the server.
@@ -123,335 +123,397 @@ sudo pip install $(ls *.whl)
 You have to inquire that your current directory contains only one whl-file. If this is not the case, the command above
 will not work, you have to replace the `$(ls *.whl)` directive to the name of the recently downloaded file. 
 
-### Preliminary setup
+### 4.1.2. Preliminary setup
 
 Scan the corefacility application for list of all available extensions. This could be done by the following
 command
 
 ```commandline
-corefacility configure
+sudo corefacility configure
 ```
 
-After this command will run correctly, you will see the `settings` folder. The next step is to configure
+After this command will run correctly, you will see the `/etc/corefacility/django-settings` folder.
+The next step is to configure
 the application by changing special .env files. Each such file contain line in the following form:
 
 ```dotenv
 key=value
 ```
 
-The value to change in on the right of the equal (`=`) sign. Do it without changing the key.
+where a name of an option is on the left side of the equal (=) sign and value of such an option is on the right side
+of the equal sign. Please, change the value of the option and don't touch the name of the option.
 
-### Selection of application configuration mode.
-The only option `DJANGO_CONFIGURATION` is responsible for the application running mode. Value of this
-option is given configuration mode. All such modes are mentioned below.
+### 4.1.3. Selection of application configuration mode
 
-The very easy configuration mode is `SimpleLaunchConfiguration`. This is the only configuration that works
-in non-POSIX operating system (including Microsoft Windows), so use it if this is your case.
-The `SimpleLaunchConfiguration` allows a stand-alone usage of this application, gathering and processing
-the data. However, it doesn't allow you cloud storage and cloud processing, the performance options
-are highly non-optimal (I mean, only one CPU kernel will be engaged during the processing), doesn't provide
-hardware health-check and adjustment.
+To select the configuration profile you need to open the `/etc/corefacility/django-settings/preliminary.env` file.
 
-The next mode is `ExtendedLaunchConfiguration`. This mode is as easy to install as
-`SimpleLaunchConfiguration` but requires POSIX-compliant operating system (Mac OS X, Linux, another
-Unix-like operating system is good). Such configuration also requires a stand-alone usage as well as
-setting up performance options, hardware health-check and adjustment. However, cloud storage is not
-possible. Use this option if you are the only person responsible for the data processing and don't need
-any cloud storage.
+The file has the only option - `DJANGO_CONFIGURATION`. Please, type here one of the following configuration values:
 
-`VirtualServerConfiguration` allows to organize cloud storage and cloud data processing given that
-computational difficulty of the task is low (i.e., the task can be accomplished for less than a second).
-Only one CPU kernel is used for any computations. Any performance optimization, hardware health-check and
-adjustment is not possible. You this option if you rent cheap virtual hosting service for the data cloud
-storage.
+* `FullServerConfiguration` for the full server configuration (automatics confirmation of POSIX administrative
+operations)
+* `PartSeverConfiguration` for the partial server configuration (manual confirmation of POSIX administrative operations)
 
-Any other configuration options require either VPS/VDS service or dedicated Web Server or buying your
-own Web server.
+Despite what configuration mode is selected, all administrative operations will be performed by a special daemon,
+not the Web server itself.
 
-`FullServerConfiguration` has absolutely no restrictions: you can organize cloud data storage and
-processing, provide administration of the operating system accounts and groups (this is needed for SSH
-access to all users), adjust CPU optimization, hardware health-check and adjustment. If you select this
-option, the program installation will be the hardest. Also, the Shell crawler process requires
-administrative privileges. (_However this is not the case for worker processes of your Web server._)
+### 4.1.4. Preliminary security settings
 
-`PartServerConfiguration` We always try to provide all necessary security tests and find and fix all
-found security holes. However, this is OK that you don't trust our application, treat it as insecure and
-don't  want it to give an administrative privileges to it. Under this configuration the application will not
-require administrative privileges. However, it requires your attention when somebody wants to create
-users and projects and during the hardware health-check and adjust routines, performance optimization etc.
-(i.e., such features will be accomplished by corefacility + SSH + yourself logged in using your sudo account
-and are impossible solely by corefacility).
+You need to specify the system POSIX user on behalf of which the Web server will process request. Such specification
+must be selected based on the following notes:
 
-| Configuration options         | Cloud storage | POSIX account administration                       | Hardware health-check and adjustments                                                                     | Number of CPU cores for data processing and simulation  | Operating system required |
-|-------------------------------|---------------|----------------------------------------------------|-----------------------------------------------------------------------------------------------------------|---------------------------------------------------------|---------------------------|
-| `SimpleLaunchConfiguration`   | Not allowed   | Not provided                                       | Not provided                                                                                              | 1                                                       | Any                       |
-| `ExtendedLaunchConfiguration` | Not allowed   | Not provided                                       | Provided                                                                                                  | As many as you have                                     | POSIX-compliant           |
-| `VirtualServerConfiguration`  | Allowed       | Not provided                                       | Not provided                                                                                              | 1, algorithm execution time is not less that 2 seconds. | POSIX-compliant           |
-| `FullServerConfiguration`     | Allowed       | Provided                                           | Provided                                                                                                  | As many as you have                                     | POSIX-compliant           |
-| `PartServerConfiguration`     | Allowed       | Requires attention of the Web server administrator | Hardware health-check is provided. Any other operations require attention of the web server administrator | As many as you have                                     | POSIX-compliant           |
+1. A POSIX process that is responsible for processing the HTTP requests must be allowed to perform all actions defined
+by its specification.
+2. When the Web server is hacked, it must not be allowed to provide operating system administrative tasks.
 
-### Basic settings
+Based on these notes you must ensure that the special POSIX account for the Web server has been created. To do this
+use the following command:
 
-Open the `basics.env` file to adjust the application Basic settings.
-
-The first setting is E-mail address. The corefacility application will send an E-mail to administrators
-in case of troubles. `DJANGO_ADMIN_NAME` and `DJANGO_ADMIN_EMAIL` options are responsible for this.
-Value of the `DJANGO_ADMIN_NAME` will be written to the To: field of an emergency e-mail. The e-mail itself
-will be sent to the address defined by the value of the `DJANGO_ADMIN_EMAIL` option
-
-`DJANGO_ALLOWED_HOST` Left this field intact in `SimpleLaunchConfiguration` and
-`ExtendedLaunchConfiguration` profile. If your application is needed to have cloud hosting it implies that
-some URL corresponds to such application. An example of such URL:
+```commandline
+cat /etc/passwd | grep www-data
 ```
-http://192.168.0.20
-http://hendrikje.uni-tuebingen.de:1500
+
+If such account doesn't exist, create it by using the following command:
+```commandline
+sudo useadd -r -d / -s /bin/false www-data
 ```
-and so on...
-Such a URL consists of protocol name (HTTP or HTTP secured), host name and port number preceded by the
-colon (`:`). Put here names of all hosts in such URL separated by commas. The application will not respond
-request designated for another hosts. If you follow the application URL and get `Bad Request (400)` you
-probably incorrectly setup this option.
 
-`DJANGO_URL_BASE` is URL for the Web application main page.
-The value of the property must be in the following form:
-"""
-scheme://hostname
-"""
-(without slash at the end!)
-Here scheme is https is you intend to use HTTPS for your Web server or http otherwise and hostname is
- (a) 127.0.0.1 if you intend to run the corefacility only locally (SimpleLaunchConfiguration or
- 		ExtendedLaunchConfiguration);
- (b) the domain name if you registered domain for your Web server;
- (c) IP address for your host if you don't register domain for your Web server
+We assume on the rest of this instruction that a given system account has the following name: `www-data`. Make certain
+corrections if this is not true.
 
-`DJANGO_ALLOWED_IPS` When you use `FullServerConfiguration` mention here all IPs from which you can
-provide administration tasks (manage users, groups and projects, adjust performance and hardware options).
-Please, note that they must be internal IPs from your laboratory or University network and IP spoofing
-protecting must be turned on for your Internet gateway (e.g., laboratory router). Otherwise, this option
-will not work. This option is ignored in any other types of configurations: `VirtualServerConfiguration`
-and `PartServerConfiguration` allows administration and network adjust tasks from any IP,
-`ExtendedLaunchConfiguration` and `SimpleLaunchConfiguration` don't support data transmission over the
-network.
+At last, you have to change the ownership of your settings directory:
 
-`DJANGO_DEBUG` At first start turn this option to `yes`. When you finish your application and the
-application will work correctly turn this option to `no`. Also, turn this option to `yes` when you develop
-an extension to this application. Another point is `SimpleLaunchConfiguration` and
-`ExtendedLaunchConfiguration` will not work when `DJANGO_DEBUG` is `no`. So, set it to `yes` for such modes.
+```commandline
+sudo chown www-data:www-data /etc/corefacility/django-settings
+```
 
-`DJANGO_LANGUAGE_CODE` Defines language and locale of all messages generated by the corefacility. Two
-languages only are supported here:
-`ru-RU` Russian
+Because the Django settings contain credentials to personal data of all corefacility users they must be protected from
+reading and writing:
+
+```commandline
+sudo chmod 0750 /etc/corefacility/django-settings
+```
+
+### 4.1.5. Basic settings
+
+To adjust basics settings of the corefacility application you are required to open the
+`/etc/corefacility/django-settings/basics.env` file. You have to adjust the following options:
+
+* `DJANGO_ADMIN_NAME` Your full name.
+* `DJANGO_ADMIN_EMAIL` Your e-mail address. In case of troubles error messages will be sent here. Also, when POSIX
+administrator operations are executed by corefacility you will also receive corresponding notifications on this address.
+* `DJANGO_ALLOWED_HOSTS` When the corefacility Web server receives the HTTP request, it contains the `Host:` header.
+If the host name specified in this header is not in the list provided by this option the request will be rejected.
+You are recommended to specify the IP address as well as domain name of your server / virtual server. Separate several
+host names by commas (don't use spaces, only commas).
+An example is: `DJANGO_ALLOWED_HOSTS=192.168.0.10,corefacility.ru,www.corefacility.ru`
+* `DJANGO_ALLOWED_IPS` administrative operations (i.e., CRUD operations on users or projects, setting project rights)
+can be made only from IP addresses mentioned in this list. List items shall be separated by commands and can contain
+either IP addresses for stand-alone hosts or adresses for the whole network written by means of CIDR notation.
+* `DJANGO_DEBUG` leave this value to `yes`
+* `DJANGO_LANGUAGE_CODE` defines the language for the Web interface. This option doesn't affect the language of the
+Command Line Interface (CLI). The language code must contain the name of the language and locale codes separated by
+dash. The language and locale codes must be written using the ISO 639-1 standards. An examples:
+
 `en-GB` English (Great Britain)
-Another languages will be available if you create special language files. See reference here on how to do
-it:
 
-(a) Language files for Backend:
+`ru-RU` Russian (Russia)
 
-https://docs.djangoproject.com/en/4.2/topics/i18n/translation/#localization-how-to-create-language-files
+* `DJANGO_TIME_ZONE` The time zone where your server is located. Examples are: `Europe/Moscow`, `UTC` etc. Please, find
+the full list of timezones here: `https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#cite_note-1`.
+* `DJANGO_CORE_WORKER_PROCESS_USER` You must create a special pseudo-user on behalf of which the Web server will run.
+Use `useradd` or `adduser` POSIX commands for such a purpose
 
-(b) Language files for Frontend:
 
-https://react.i18next.com/
-
-`DJANGO_TIME_ZONE` Defines a timezone where you are (for stand-alone configuration) or where your Web
-Server are (for web server configuration).
-
-`DJANGO_CORE_PROJECT_BASEDIR` Defines a directory where all project files shall be stored. The parameter
-is useful for `VirtualServerConfiguration`, `ExtendedLaunchConfiguration` and `SimpleLaunchConfiguration`
-while `FullServerConfiguration` and `PartServerConfiguration` always use `/home` for this purpose.
-
-### Database settings
-
-Database is a special kind of storage where metadata, user list, logs, groups and project etc. are saved.
-
-Database is some kind of information on your disk which access is managed by a special system, called
-Database Management System. Corefacility supports the following Database Management Systems:
-
-`PostgreSQL` (https://www.postgresql.org/) has higher performance and more features. However, this is
-difficult to install this one. Use PostgreSQL for `FullServerConfiguration` and `PartServerConfiguration`.
-You can use this management system in `VirtualServerConfiguration` if your hosting provider support this.
-
-`MySQL` (https://mysql.com/) has less performance and less features. Use this database management system
-when your hosting provider doesn't support PostgreSQL.
-
-`SQLite` this is the only database system embedded to Corefacility (i.e., no difficult preliminary
-installation is required). However, the management system is very slow. Also, this management system
-doesn't support multiple request made at the same time. Such a feature doesn't allow it to use for the
-cloud storage. You this management system for configuration where cloud storage is not allowed.
-
-The table below mention advantages and disadvantages of all three systems.
-
-| Database Management System | Performance | Deals with simultaneous queries | Installation process | Backend name                    | Additional python package to install |
-|----------------------------|-------------|---------------------------------|----------------------|---------------------------------|--------------------------------------|
-| PostgreSQL                 | high        | Yes                             | Hard                 | `django.db.backends.postgresql` | `psycopg2`                           |
-| MySQL                      | low         | Yes                             | Hard                 | `django.db.backends.mysql`      | `mysqlclient`                        |
-| SQLite                     | low         | No                              | Not required         | `django.db.backends.sqlite3`    | Not required                         |
-
-When you choose proper Database management system, you have to install this. After installation has been
-completed provide some administration tasks:
-* issue credentials that corefacility will use to log in on the database server (username and password);
-* create database for the corefacility application;
-* grant permissions to the user you currently created.
-In the long run you must have the following access details for PostgreSQL and MySQL:
-* Address of the SQL server (its domain name, host name or IP address). Use `localhost` if Database management system has been installed on the same server as corefacility;
-* A port listening by the SQL server. By default, PostgreSQL listens to the port number 5432 and MySQL listens to the port 3306
-* username
-* password
-* database name
-Write down such access details somewhere on your paper.
-
-Next, you have to install python package that is required to link Corefacility with your Database management
-system. Refer to the last column of the table above to find out which package is required. This step is not
-necessary for the SQLite.
-
-Open `sql.env` file inside the `settings` folder to tell corefacility how it should connect to the Database
-Management system.
-
-#### Database properties when you use SQLite
-
-`DJANGO_SQL_BACKEND` Set to `django.db.backends.sqlite3`
-
-`DJANGO_SQL_NAME` Name of a file where the database will be stored. The file is not required to exist
-because it will be created during the following installation steps. However, be sure that the directory where
-this file will be located exists and is available for writing. Come up with any arbitrary name of this file.
-The preferrable file extension is `.sqlite3` or `.db`. Put full name of the file to this option.
-
-Any other options will be ignored.
-
-#### Database properties when you use PostgreSQL or MySQL
-
-`DJANGO_SQL_BACKEND` Corresponding backend name. Refer to the table above to find out value of this feature.
-
-`DJANGO_SQL_NAME` Name of the database that you have been created
-
-`DJANGO_SQL_SERVER` Put address of the SQL server here
-
-`DJANGO_SQL_PORT` Put here a port listening by the SQL server.
-
-`DJANGO_SQL_USER` Name of the user to log in
-
-`DJANGO_SQL_PASSWORD` Password for the user to log in
-
-`DJANGO_SQL_INIT_COMMAND` If some initial query is required for correct job of the database, use this option
-to write down such a query.
-
-#### Migration of the data
-
-**Migration** is a process of creation of all necessary tables in a database you have been created. If you
-choose SQLite, migration is also a process of creation of database file and putting all tables here.
-
-To provide migration, run the following command:
+To check that all settings have been made correctly run the following command:
 
 ```commandline
-corefacility migrate
+sudo -u www-data corefacility shell
 ```
 
-### Construction the Web server stack
+If you see the Python shell it means that all settings have been made correctly. Quit from the shell by running the
+following command:
 
-If you use `SimpleLaunchConfiguration` or `ExtendedLaunchConfiguration` this step must be definitely
-omitted because everything is ready for the application launch.
-
-#### Static and py files
-
-The corefacility contains two major file types: static files and py files. The corefacility also have
-another types of the files, however they are beyond the scope of this section. You Web server must cope
-with static files and py files in different way. The static files must be delivered to the connected user
-as they are: they will be downloaded, opened and used by the Web browser of your colleague, not your Web
-server. These files contain _Application frontend_.
-
-The py files must be run by your Web server with the aid of the Python interpreter. These files will be
-launched in response to the user's request. The result of their execution will be delivered to the client.
-These files are called _Application backend_.
-
-When the user interacts with corefacility he uses a mouse and a keyboard. All signals from these input
-devices are processed by the _Application frontend_. Application frontend constructs and sends _HTTP request_
-to the Web server. HTTP request is some piece of information that delivers from the user's PC to your
-Web server that tells Web Server what to do and what the user wants from it. When the Web Server receives
-the HTTP request it runs _Application backend_ (or py files) that process such request. The application
-backend generates another piece of information called _HTTP response_ that tells the user's PC about the
-result of the operating and supply it with all necessary data. The HTTP response is delivered to the 
-user's PC and process by the Application backend that shows operation results on the screen.
-
-#### How your Web Server works
-
-Three program must be worked together on your Web server: nginx, gunicorn and corefacility.
-
-**nginx** accepts requests from the user and determines whether the user's Web browser requires static files
-to be delivered here or accomplish some task on the Web server by means of execution of py files here.
-If this is request for static files delivering such files will be delivered as they are, without any change.
-In case when the user need to perform some job on the Web server, nginx does nothing with request and
-send it to the next application called gunicorn.
-
-**gunicorn** is responsible for the data transmission between nginx and corefacility and management of
-the corefacility itself. gunicorn is connected with nginx by means of the Web socket.
-
-**corefacility** is run by the gunicorn accept the request data from them, does the job required by the user
-and gives output data to the gunicorn.
-
-At this stage of installation process you need to construct a chain containing three applications:
-nginx <-> gunicorn <-> corefacility
-
-#### How to do it in VPS/VDS, Dedicated Server, your personal Web Server
-
-* Install and configure nginx
-* Install and configure gunicorn.
-* Connect nginx and gunicorn by the UNIX socket.
-
-In order to connect gunicorn and corefacility tell gunicorn to find out `application` object in
-`corefacility.wsgi` module and use it for the HTTP request handling. The working directory for the gunicorn
-application is `corefacility`.
-
-#### How to do it in the Virtual Hosting
-
-Some of the actions mentioned above has already been done by your hosting provider. Follow instructions
-suggested to your hosting provider.
-
-#### Copy static files to your document root
-
-The **nginx** Web server can either deliver file located to the special directory named _Document root_ or
-deliver the request to **gunicorn** by means of the UNIX socket. If you know your document root create
-directory for static and media files here (_Media files_ are files uploaded by the user for the public
-access, e.g., user's avatar, project icon etc.). Open the `staticfiles.env` file and write down full paths
-to directory where you wish to store static and media files. Static files directory is value of the 
-`DJANGO_STATIC_ROOT` option and media files directory is value of the `DJANGO_MEDIA_ROOT` option.
-
-After you finish setting up the `staticfiles.env` files run the following command that copy all static files:
-```commandline
-corefacility collectstatic
+```python
+quit()
 ```
 
-### Trial launch
+### 4.1.6. Installation of SQL server
 
-If everything is OK you need to run your Web server. To run the Web server in `SimpleLaunchConfiguration`
-and `ExtendedLaunchConfiguration` use the following command:
+The SQL database management system is required to store information about users and projects, optimize the search,
+resolve the conflicts when several processes request the same resource etc.
+
+We strongly recommend you to use PostgreSQL server for such a purpose. However, you are also free to use MySQL. Any
+other database management systems are not supported by corefacility.
+
+The instructions mentioned in this section imply that you use PostgreSQL. This is your responsibility to find another
+instructions related to the MySQL.
+
+First of all, check for `https://postgresql.org/download` to find how to install the PostgreSQL on your server. After
+you do this successfully create stand-alone database for the corefacility web server using the following command:
 
 ```commandline
-corefacility runserver
+sudo -u postgres createdb corefacility
 ```
 
-and follow the address printed on the console.
+Create a special SQL user on behalf of which the corefacility Web server will send SQL queries to the database server.
 
-If you use another configuration profiles you are required to start nginx and gunicorn services or
-restart them if they have already been started.
+```commandline
+sudo -u postgres createuser -P corefacility
+```
 
-Be sure that the corefacility main window was loaded correctly.
+Think and type the password of this user.
 
-### Adjustment of E-mail delivery
+Next, enter the corefacility database:
 
-Omit this section for `SimpleLaunchConfiguration` and `ExtendedLaunchConfiguration` since they don't
-support E-mail delivery.
+```commandline
+sudo -u postgres psql corefacility
+```
 
-E-mail delivery allows the users to recover their passwords and warn administrator about troubles occured
-with their Web server. To deliver e-mail you need to install and configure the SMTP server or to use
-external SMTP server provided by such famous mail systems as Google or Mail.ru etc. In first case be sure
-that your Web server is not treated as mail spam engine by the Gmail, Mail.ru etc. (This is impossible to
-done if your Web server doesn't have public or 'white' IP address.) In the second case ensure that
-connection to the SMTP is not treated by the SMTP server as suspicious attempt to hack the account.
+Change the privileges for the corefacility user:
 
-Whenever which method you use you will give mail connection details. Put such details to the `email.env`
-file located in the `settings` directory.
+```sql
+GRANT ALL ON DATABASE corefacility TO corefacility;
+GRANT ALL ON SCHEMA public TO corefacility;
+```
 
-### SSL encryption properties
+Exit from the SQL client by typing:
+
+```
+\q
+```
+
+After you installed the SQL server you have to install the SQL client. The SQL client is a special Python package
+that is used by the corefacility to interact with the SQL server. Use `psycopg2` for the PostgreSQL and `mysqlclient`
+for the MySQL. In case of Postgresql use the following command to install the SQL client:
+
+```commandline
+sudo pip install psycopg2
+```
+
+Open the `/etc/corefacility/django-settings/sql.env` file to write down the SQL settings. The SQL settings are required
+for corefacility to access the SQL database. You need to adjust the following settings:
+
+* `DJANGO_SQL_BACKEND` If you selected the Postgresql use the following value: `django.db.backends.postgresql`
+If toy selected the MySQL use the following value: `django.db.backends.mysql`
+* `DJANGO_SQL_NAME` Name of the database (Use `corefacility` in the example above).
+* `DJANGO_SQL_SERVER` Address of your SQL server (Use `localhost` in the example above).
+* `DJANGO_SQL_PORT` A port listening by the SQL server. If you didn't change the SQL server default settings,
+PostgreSQL listens to the port `5432` while MySQL listens to the port `3306`.
+* `DJANGO_SQL_USER` Name of the database user on behalf of which the corefacility accesses the database.
+Use `corefacility` in the example above
+* `DJANGO_SQL_PASSWORD` A password you have set for the corefacility database user. Have you still remembered it?
+
+And the last stage is to create SQL tables. Allow the corefacility to do this by running the following command:
+
+```commandline
+sudo corefacility migrate
+```
+
+If the migration process completed successfully, this means that all corefacility settings have been accomplished.
+
+### 4.1.7. Distribution of static  and media files
+
+__Static files__ are stand-alone files containing in the corefacility distribution that the server must distribute to
+the client hosts as they are, that is, without any modification. The static files include a frontend application, CSS
+tables, translation tables used by the Web browser, images and icons etc.
+
+__Media files__ are stand-alone files uploaded by the corefacility users that: (a) have public access (i.e., anybody
+can read these files); (b) shall be distributed by the server to the client hosts without any modification. Examples of
+media files are user's avatars, project icons etc.
+
+corefacility can't distribute media files among the client effectively. So, you need to use a third-party Web server
+for such purpose. We recommend you to use nginx.
+
+First, look at the `https://nginx.org/ru/linux_packages.html`. Follow instructions mentioned there to download and
+install the nginx server.
+
+The following text is based on the assumption that the public root for the nginx server is `/usr/share/nginx/html`.
+If you intend to store the Web server files to another directory, just make necessary substitutions in the POSIX
+commands given below.
+
+First of all, you need to configure the nginx server. Download the special configuration made for the corefacility:
+
+```commandline
+wget https://raw.githubusercontent.com/serik1987/corefacility/main/server_config/nginx/default.conf
+```
+
+This command will download the `default.conf` file to your folder. Copy this file to the nginx configuration folder:
+
+```commandline
+sudo cp default.conf /etc/nginx/conf.d
+```
+
+You can modify the nginx configuration files at this stage and check that the configuration options are valid. After
+you finish doing this restart the nginx server to apply the configuration settings:
+
+```commandline
+sudo service nginx restart
+```
+
+Change the ownership to the document root:
+
+```commandline
+sudo chown -R www-data:www-data /usr/share/nginx/html
+sudo chmod 02775 /usr/share/nginx/html
+```
+
+Check that the nginx user is in the www-data group:
+
+```commandline
+sudo usermod -aG www-data nginx
+```
+
+Next, tell the corefacility where the static files are located. To do this, open the
+`/etc/corefacility/django-settings/staticfiles.env` file for editing. Adjust the following options:
+
+* `DJANGO_STATIC_ROOT` an absolute path to the folder where static files are located. This folder shall be `static` and
+must be located inside the document root of the nginx server.
+* `DJANGO_MEDIA_ROOT` an absolute path to the folder where media files are located. This folder shall be `media` and
+must be located inside the document root of the nginx server.
+
+Here is an example of an optimal settings for this file:
+
+```commandline
+DJANGO_STATIC_ROOT=/usr/share/nginx/html/static
+DJANGO_MEDIA_ROOT=/usr/share/nginx/html/media
+```
+
+When all settings are done: fill the document root of your nginx folder by the corefacility static and media files:
+
+```commandline
+sudo corefacility collectstatic
+```
+
+Ensure that the `/usr/share/nginx/html` folder contains the following sub-folders:
+
+* `media` that must be empty at this stage. Media files will be located at this directory.
+* `static` filled by the static files.
+
+Ensure that the static files are distributed correctly. To do this, follow the following URL in your Web browser:
+
+```commandline
+https://<your-host-name>/static/ru.ihna.kozhukhov.core_application/user.svg
+```
+
+You must see the user icon.
+
+### 4.1.8. Connecting nginx and gunicorn
+
+The nginx Web server accepts all HTTP requests from the client hosts. In order to make the corefacility server working,
+some of the requests must be redirected from the nginx to the corefacility. The easiest way to do this is to install
+a simple connector called `gunicorn`. To install the gunicorn use the following command:
+
+```commandline
+sudo apt install gunicorn
+```
+
+The gunicorn is another Web server. All HTTP requests excluding the requests to static files are received by nginx,
+then redirects to the gunicorn that are processed by the corefacility. The connection between nginx and gunicorn is
+established by the Unix socket. Such a socket must be accessible for the root and the www-data user (effective users
+for both web servers) but inaccessible for ordinary POSIX users. The best way to do this is to create a specific folder
+where such socket is located:
+
+```commandline
+sudo mkdir /var/gunicorn
+sudo chown www-data:www-data /var/gunicorn
+sudo chmod 0770 /var/gunicorn
+```
+
+Open the `/etc/nginx/conf.d/default.conf` file and ensure that it refers to the `/var/gunicorn/gunicorn.sock` file.
+
+On the next stage check that the corefacility Web server works file: Try the following command on the command line:
+
+```commandline
+sudo -u www-data gunicorn
+    --workers=3 \
+    --bind=unix:/var/gunicorn/gunicorn.sock \
+    --access-logfile=/var/log/gunicorn/access.log \
+    --error-logfile=/var/log/gunicorn/error.log
+    ru.ihna.kozhukhov.corefacility.wsgi:application
+```
+
+Ensure that the gunicorn server started correctly. Then, ensure that corefacility works correctly - just follow the link
+on your Web browser: `http://<name-or-IP-address-of-your-Web-server`.
+
+If everything is file, press <Ctrl-C> to quit the gunicorn Web server.
+
+The last stage is to tell the systemd to run the gunicorn server at startup.
+
+To do this, first, download the systemd configuration for the gunicorn.
+
+```commandline
+wget https://raw.githubusercontent.com/serik1987/corefacility/main/server_config/gunicorn.service
+```
+
+Next, copy this configuration file to the systemd system configuration folder:
+
+```commandline
+sudo cp gunicorn.service /etc/systemd/system
+```
+
+Then, edit this file is necessary. Finally, start and enable the gunicorn service.
+
+```commandline
+sudo systemctl start gunicorn
+sudo systemctl enable gunicorn
+```
+
+You can restart your server to ensure that the corefacility server works correcly.
+
+### 4.1.9. Adjustment of E-mail delivery
+
+All corefacility users are required to receive E-mails from your server. The e-mails are important for the password
+recovery and notification about an important things. To allow the corefacility to deliver e-mails you need to first,
+adjust the SMTP server (this is an application that delivers mails) and second, adjust the interaction between the
+corefacility and the SMTP server.
+
+You can choose an internal or external SMTP server. An internal one is an SMTP server application (a postfix is a good
+example) that you need to install and configure. An external server is https://www.mail.ru, https://www.gmail.com etc.
+services where you need to create an additional mail box (e.g., corefacility_no-reply@gmail.com etc.). Check the
+reference manual of your external server, this will help you to adjust the corefacility.
+
+The external server is the only option when your server has no public access (i.e., is accessible from intranet or VPN).
+
+To adjust the integration between the corefacility and the SMTP server open the
+`/etc/corefacility/django-settings/email.env` file for editing. Set up the following options:
+
+* `DJANGO_DEFAULT_FROM_EMAIL` the mailbox your created on the external or internal SMTP server. Despite what kind of
+server you use, you need one external mailbox for the corefacility.
+* `DJANGO_EMAIL_BACKEND` for this type of configuration it must be equal to
+`django.core.mail.backends.smtp.EmailBackend`
+* `DJANGO_EMAIL_HOST` E-mail host name. Consult the reference manual on the SMTP server for details.
+* `DJANGO_EMAIL_PORT` Port listening by the SMTP service. Consult the reference manual on the SMTP server for details.
+* `DJANGO_EMAIL_HOST_USER` Login from the mailbox account.
+* `DJANGO_EMAIL_HOST_PASSWORD` Password from the mailbox account.
+* `DJANGO_EMAIL_SUBJECT_PREFIX` Prefix to the E-mail headers.
+* `DJANGO_EMAIL_USE_TLS` whether the SMTP server uses the TLS encryption. Available values are: `yes` or `no`
+* `DJANGO_EMAIL_USE_SSL` whether the SMTP server uses the SSL encryption. Available values are: `yes` or `no`
+
+When all these settings are made, check out how they are correct. Just do the following things.
+
+First, enter the corefacility shell:
+
+```commandline
+sudo -u www-data corefacility shell
+```
+
+Next, try to send e-mail:
+
+```python
+from django.core.mail import send_mail
+send_mail("This is the test message", "A test message from the corefacility.", "no-reply@gmail.com", ["your-box@gmail.com"])
+```
+
+where "no-reply@gmail.com" must be substituted to the additional mailbox you created for the corefacility and
+"your-box@gmail.com" is your personal mailbox.
+
+Ensure that the test mail has been delivered successfully and close the Python interpreter.
+
+```python
+quit()
+```
+
+### 4.1.10. SSL encryption properties
 
 SSL encryption allow you to encrypt your corefacility account credentials when transmitting from the user's
 PC to the Web server. This is required when the credentials are sent by the global network and hence can

@@ -1,0 +1,17 @@
+[Unit]
+Description=corefacility
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/
+ExecStart=/bin/gunicorn \
+    --workers=3 \
+    --bind=unix:/run/gunicorn/gunicorn.sock \
+    --access-logfile=/var/log/gunicorn/access.log \
+    --error-logfile=/var/log/gunicorn/error.log \
+    ru.ihna.kozhukhov.corefacility.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
