@@ -1,0 +1,13 @@
+[Unit]
+Description=Corefacility background daemon
+
+[Service]
+ExecStart=/usr/local/bin/corefacility-daemon
+ExecReload=kill -HUP $MAINPID
+Environment=PYTHONUNBUFFERED=1
+Restart=on-failure
+Type=notify
+SyslogIdentifier=corefacility
+
+[Install]
+WantedBy=default.target

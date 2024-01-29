@@ -4,7 +4,7 @@ build-backend="setuptools.build_meta"
 
 [project]
 name="corefacility"
-version="0.0.2"
+version="0.0.4"
 dependencies=[
     "psutil",
     "python-dotenv",
@@ -25,6 +25,7 @@ dependencies=[
 
 [project.scripts]
 corefacility="ru.ihna.kozhukhov.corefacility.cli:main"
+corefacility-daemon="ru.ihna.kozhukhov.corefacility.daemon:main"
 
 [tools.setuptools]
 include-package-data=true

@@ -1,11 +1,12 @@
 [Unit]
-Description=corefacility
+Description=corefacility WSGI server (gunicorn)
 After=network.target
 
 [Service]
 User=www-data
 Group=www-data
 WorkingDirectory=/
+SyslogIdentifier=Corefacility Web Server
 ExecStart=/bin/gunicorn \
     --workers=3 \
     --bind=unix:/run/gunicorn/gunicorn.sock \
