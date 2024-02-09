@@ -154,7 +154,6 @@ class PosixUser(AutoAdminObject):
 
         :return: None
         """
-        output = ""
         available_posix_user = self.check_user_for_update()
         if available_posix_user:
             old_login = self.login
