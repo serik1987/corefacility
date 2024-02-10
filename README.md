@@ -448,12 +448,13 @@ wget https://raw.githubusercontent.com/serik1987/corefacility/main/server_config
 Next, copy this configuration file to the systemd system configuration folder:
 
 ```commandline
-sudo cp gunicorn.service /etc/systemd/system
+sudo cp server_config/gunicorn.service /etc/systemd/system
 ```
 
 Then, edit this file is necessary. Finally, start and enable the gunicorn service.
 
 ```commandline
+sudo systemctl daemon-reload
 sudo systemctl start gunicorn
 sudo systemctl enable gunicorn
 ```
@@ -488,6 +489,9 @@ server you use, you need one external mailbox for the corefacility.
 * `DJANGO_EMAIL_SUBJECT_PREFIX` Prefix to the E-mail headers.
 * `DJANGO_EMAIL_USE_TLS` whether the SMTP server uses the TLS encryption. Available values are: `yes` or `no`
 * `DJANGO_EMAIL_USE_SSL` whether the SMTP server uses the SSL encryption. Available values are: `yes` or `no`
+The last two options can't be both equal to `yes`.
+
+In case of troubles ask an administrator of your SMTP server or refer to its reference manual.
 
 When all these settings are made, check out how they are correct. Just do the following things.
 
@@ -518,67 +522,127 @@ quit()
 SSL encryption allow you to encrypt your corefacility account credentials when transmitting from the user's
 PC to the Web server. This is required when the credentials are sent by the global network and hence can
 be read by unrestricted number of anonymous users (i.e., from the home of your colleague to the Web server
-located on your job or from Moscow to St.Petersburg etc.). The encryption process is the following: the
-Web browser encrypts the data and delivers the encrypted ones. The encrtypted data can't be read and analyze
-without the decryption process. And the decryption must be done only by your Web server.
+located on your job or from Moscow to St.Petersburg etc.). The encryption is not required when you use corefacility
+within the local Institutional network or use SSL for such a purpose.
 
-Omit this section if encryption is not required (i.e., when you transmit the data
-using the wired connections within your laboratory etc.) Don't do anything in this section when your
-Web server is under `SimpleLaunchConfiguration` or `ExtendedLaunchConfiguration`.
+Omit this section when the encryption is not required. If encryption is required issue an SSL certificate for your
+server. You can follow this Website for such a purpose (https://letsencrypt.org/ru/). Follow instructions on how to
+install the SSL certificate on your server. You will probably need to change **nginx** configuration files.
 
-In any other cases issue the SSL certificate from the authorization center and configure your **nginx** to
-deal with such certificate.  Ensure that SSL encryption works OK. To do this, open the following address:
-
-```
-https://<your-web-server-address>/
-```
-
-Yes, your protocol is HTTPS. If the page was loaded the SSL encryption works OK and hence you can start
-adjustment of the corefacility security settings.
+After the SSL encryption has been passed you can open the `/etc/corefacility/django-settings/security.env` file to
+adjust the following options:
 
 `DJANGO_SECURE_SSL_REDIRECT` When the user uses insecure channel (i.e., he accesses the Website by means
-of `http://`, not `https://`) his request will not be considered and his Web browser will be redirected
-to the similar page but uses `https://` for communication. Available values: `yes`, `no`.
+of `http://`, not `https://`) the corefacility will redirect him to the secured channel. This prevents the data
+transmission using the insecure channel. Available values: `yes`, `no`.
 
 `DJANGO_SECURE_SSL_HOSTNAME` If the previous option was set to `yes` this option must refer to the web
 server to redirect when the user uses `http://`. Omit this option is you want the user to redirect to the
 same Web server.
 
-`DJANGO_SECURE_HSTS_SECONDS` tells the browser that your Web server works with HTTPS only. The Web browser
-will not use HTTP protocol any more to connect to your Web server. Number defines amount of seconds that
-the browser will remember this option.
+`DJANGO_SECURE_HSTS_SECONDS` non-zero value will tell the corefacility to append the `Strict-Transport-Security`
+header at the end of response headers when delivering the HTTP response to the Web browser through the nginx. In this
+case, you need to specify the time, in seconds, that the browser should remember that a site is only to be accessed
+using HTTPS.
 
 `DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS` If previous option was set, the Web browser will apply this rule
-to all subdomains. Available values: `yes`, `no.`
+to all subdomains by using the `includeSubDomains` parameters in the value of the `Strict-Transport-Security` header.
+Available values: `yes`, `no`
 
-`DJANGO_SECURE_HSTS_PRELOAD` the Web server tells all Google Chrome Web browsers to use HTTPS only when
-connecting to your Web Server. Doesn't work for another Web browsers.
+`DJANGO_SECURE_HSTS_PRELOAD` when `DJANGO_SECURE_HSTS_SECONDS` is enabled, adds the `preload` parameter to the value of
+the `DJANGO_SECURE_HSTS_SECONDS` header.
 
-### Final launch
+### 4.1.11. Adjustment of the systemd
 
-The last thing you should do is to open the `basics.env` file and set `DJANGO_DEBUG` to `no`. This is not
-required for the `SimpleLaunchConfiguration` and `ExtendedLaunchConfiguration`.
+When the corefacility works in full server configuration or part server configuration, it requires two components to be
+launched. The first one is Web-server that processes HTTP requests from the remote server and sends HTTP responses to
+the remote user. You have already run the server (see section 4.1.8 for details). For the sake of security this server
+is not run under the root privileges. So you can't use it to add users and projects because this action requires to
+add related POSIX users and groups and make changes in the `/home` directory.
 
-Next, follow the corefacility Web address and open the main page.
+To solve this problem another daemon process should be run. Its name is `corefacility-daemon`. The `corefacility-daemon`
+starts two child processes which functions are:
+1. intercommunications with the corefacility Web server that allowed to create Unix users and groups on demand, access
+to the `/home` directory etc.
+2. monitoring the server health parameters such as CPU, memory and HDD usage, temperature values, network loading etc.
 
-### SECURITY ALERT!
+Both processes are run under the root user.
 
-As you can see there is no accounts, user names and passwords on your Web Server! This is fine when you
-work with `SimpleLaunchConfiguration` and `ExtendedLaunchConfiguration` but absolutely disgusting when your
-Web server is accessible via the Internel. In the last case do the following:
+To make the `corefacility-daemon` running at the server boot and stopping after the server shutdown copy the following
+`systemd` unit:
 
-* Open Settings -> Users.
-* Create your own personal account.
-* Issue a password for you.
-* Open Settings -> Application settings.
-* Go to Authorization branch on the left tree.
-* Click on standard authorization and put the checkbox at the left of "Enabled" on the right panel. Save the settings.
-* Click on the automatic authorization on that tree on the left panel and clear checkbox at the left of the "Enabled" on the right panel. Save the settings.
-* Reload the Web browser window.
-* Enter your login and password.
-* Now the corefacility is safe
+```commandline
+sudo cp server_config/corefacility.service /etc/systemd/system
+```
 
-### Corefacility update
+Change the `corefacility.service` file on demand.
+
+At, last, you have to start and enable a given unit:
+
+```commandline
+sudo systemctl daemon-reload
+sudo systemctl start corefacility
+sudo systemctl enable corefacility
+```
+
+### 4.1.12. Configuring the syslog daemon
+
+The POSIX-like operating system has standard configuration settings for the syslog daemon. However, the problem is they
+are dependent on a certain kind of operating system. If you use Linux they are also dependent on certain kind of
+Linux distibution. Hence, in order to let the corefacility to read and analyze the operating system logs you need
+to induce small ammendments to the syslog configuration files. Just do the following things:
+
+```commandline
+sudo cp server_config/rsyslogd/corefacility.conf /etc/rsyslog.d
+```
+
+Change the `corefacility.conf` file on demand.
+
+At last, restart the `rsyslog` service.
+
+```commandline
+sudo systemctl restart rsyslog
+```
+
+
+### 4.1.13. Must-have GUI settings of the corefacility
+
+When everything is done, the corefacility GUI must work. If this is the case, you must follow the following address:
+
+```commandline
+http://<your-web-server>
+```
+
+You will see the list of all projects. Next, follow the Settings -> Users -> Add user to add yourself.
+Fill in your login, name, surname, e-mail and phone and press `Add`. The corefacility system will add you to the
+database.
+
+Next, you need to click on yourself and open personal setting for your own user account. Click on the 'Superuser'
+checkbox to make yourself superuser. Then, use the 'User's password' section to issue the password to yourself
+(this is better to use the 'Print password' option).
+
+When these preliminary actions were done, and you have remembered your own password to have to turn on the standard
+authorization and turn off the automatic authorization. In order to do this, first follow
+Settings -> Application settings menu. Then, pick up "Core application -> Authorization method ->
+Standard authorization" on the left tree, click the "Enable" checkbox and press "Save" button.
+To disable the automatic authorization you have to select the "Core application -> Authorization method -> 
+Automatic authorization" on the left tree, remove the check from the "Enable" checkbox and press the "Save" button.
+
+Reload the Web page to ensure that the user is not authorized automatically when follow on the Web server.
+
+
+### 4.1.14. The final step
+
+When everything has been done, disable the corefacility debug mode. Open the
+`/etc/corefacility/django-settings/basics.env` for writing, set the `DEBUG` option to `no`, save and close the file
+and use the following command to restart the Web server:
+
+```commandline
+sudo systemctl restart gunicorn
+```
+
+
+# Corefacility update
 
 Always update your corefacility application because new updated version contain bug fixes and security
 improvements. The corefacility application can be updated by the following command:
