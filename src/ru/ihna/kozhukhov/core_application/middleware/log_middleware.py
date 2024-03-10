@@ -42,7 +42,8 @@ class LogMiddleware:
         :param request: the request which log shall be created
         :return: nothing
         """
-        if settings.DEBUG or request.method not in self.NON_LOGGING_METHOD:
+        if settings.DEBUG or request.method not in self.NON_LOGGING_METHOD or \
+                (request.method == 'GET' and 'activation_code' in request.GET):
             try:
                 ip_address = get_ip(request)
                 log = Log(log_address=request.path, request_method=request.method, ip_address=ip_address)
