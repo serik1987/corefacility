@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-22 00:20+0300\n"
+"POT-Creation-Date: 2024-08-15 22:45+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -191,33 +191,33 @@ msgstr ""
 msgid "The uploaded file is too large"
 msgstr "Загружаемый Вами файл имеет слишком большой размер"
 
-#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:401
+#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:404
 #, python-brace-format
 msgid "The request is analyzed and will be launched within the period of {0}"
 msgstr ""
 "Запрос проанализирован и будет выполнен в течение промежутка времени: {0}"
 
-#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:408
+#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:411
 msgid ""
 "The request is analyzed and awaits for the confirmation of the system "
 "administrator."
 msgstr ""
 "Запрос проанализирован и ожидает подтверждения системным администратором."
 
-#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:428
+#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:431
 msgid "The action has been successfully accomplished."
-msgstr ""
+msgstr "Действие успешно выполнено."
 
-#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:455
+#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:458
 #, python-format
 msgid "The request was made from inappropriate IP address %s"
 msgstr "Запрос с IP-адреса %s запрещён."
 
-#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:493
+#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:496
 msgid "Request for the administrative task"
 msgstr "Запрос на совершение административных действий"
 
-#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:528
+#: src/ru/ihna/kozhukhov/core_application/management/commands/autoadmin/__init__.py:531
 msgid ""
 "This is a crucial security error. We decided to permanently interrupt the "
 "executed action."
@@ -271,6 +271,42 @@ msgid ""
 msgstr ""
 "Выбор (пользователь может включить только один модуль для данной точки "
 "доступа)"
+
+#: src/ru/ihna/kozhukhov/core_application/models/enums/labjournal_field_type.py:10
+msgid "Boolean field"
+msgstr "Булево поле"
+
+#: src/ru/ihna/kozhukhov/core_application/models/enums/labjournal_field_type.py:11
+msgid "String"
+msgstr "Строка"
+
+#: src/ru/ihna/kozhukhov/core_application/models/enums/labjournal_field_type.py:12
+msgid "Integer or float number"
+msgstr "Целочисленное или вещественное число"
+
+#: src/ru/ihna/kozhukhov/core_application/models/enums/labjournal_field_type.py:13
+msgid "Discrete"
+msgstr "Дискретный"
+
+#: src/ru/ihna/kozhukhov/core_application/models/enums/labjournal_hashtag_type.py:10
+msgid "Record hashtag"
+msgstr "Хештег записи"
+
+#: src/ru/ihna/kozhukhov/core_application/models/enums/labjournal_hashtag_type.py:11
+msgid "File hashtag"
+msgstr "Хештег файла"
+
+#: src/ru/ihna/kozhukhov/core_application/models/enums/labjournal_record_type.py:10
+msgid "Data record"
+msgstr "Запись экспериментальных данных"
+
+#: src/ru/ihna/kozhukhov/core_application/models/enums/labjournal_record_type.py:11
+msgid "Service record"
+msgstr "Служебная запись"
+
+#: src/ru/ihna/kozhukhov/core_application/models/enums/labjournal_record_type.py:12
+msgid "Category record"
+msgstr "Категория"
 
 #: src/ru/ihna/kozhukhov/core_application/models/enums/log_level.py:9
 msgid "Debugging message"
