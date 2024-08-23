@@ -11,13 +11,15 @@ class EntityAliasField(EntityField):
 
     ENTITY_ALIAS_PATTERN = re.compile(r'^[A-Za-z0-9-_.]+$')
 
-    def __init__(self, max_length=None):
+    def __init__(self, max_length=None, pattern=None):
         """
         Defines the alias entity.
 
         :param max_length: maximum length of the entity object
+        :param pattern: the pattern to substitute
         """
         super().__init__(str, min_length=1, max_length=max_length, description="Entity alias")
+        self.pattern = pattern
 
     def correct(self, value):
         """
@@ -27,7 +29,8 @@ class EntityAliasField(EntityField):
         :return: the alias value that will actually be set
         """
         raw_value = super().correct(value)
-        if self.ENTITY_ALIAS_PATTERN.match(raw_value):
+        pattern = self.pattern or self.ENTITY_ALIAS_PATTERN
+        if pattern.match(raw_value):
             return raw_value
         else:
             raise EntityFieldInvalid("Entity")

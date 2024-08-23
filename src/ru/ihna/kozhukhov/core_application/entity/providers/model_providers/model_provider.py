@@ -210,6 +210,12 @@ class ModelProvider(EntityProvider):
         return external_object
 
     def _unwrap_entity_properties(self, external_object, entity):
+        """
+        Copies all entity properties from the entity object to the external_object
+
+        :param external_object: Destination of the properties
+        :param entity: Source of the properties
+        """
         for field_name in self.model_fields:
             if field_name in entity._edited_fields:
                 field_value = getattr(entity, '_' + field_name)

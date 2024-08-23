@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-15 22:45+0300\n"
+"POT-Creation-Date: 2024-08-19 20:13+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,6 +56,14 @@ msgstr "Проект"
 #: src/ru/ihna/kozhukhov/core_application/entity/entity_sets/user_set.py:11
 msgid "User"
 msgstr "Пользователь"
+
+#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_record/record_set.py:14
+msgid "Laboratory journal record"
+msgstr "Запись в лабораторном журнале"
+
+#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_record/root_category_record.py:18
+msgid "Root record"
+msgstr "Корневая запись"
 
 #: src/ru/ihna/kozhukhov/core_application/entry_points/authorizations.py:36
 msgid "Authorization methods"

@@ -31,7 +31,7 @@ class RelatedEntityField(EntityField):
         if isinstance(self._entity_class, str):
             self._entity_class = import_string(self._entity_class)
         if not isinstance(value, self._entity_class):
-            raise EntityFieldInvalid("The value is not a proper entity")
+            raise EntityFieldInvalid("")
         if value.state == "creating" or value.state == "deleted":
-            raise RuntimeError("Incorrect of the attaching entity")
+            raise RuntimeError("Incorrect state of the attaching entity")
         return value

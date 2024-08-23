@@ -11,7 +11,7 @@ class LabjournalRecord(models.Model):
     parent_category = models.ForeignKey(
         "LabjournalRecord",
         null=True,
-        help_text="Parent category",
+        help_text="Parent category or NULL if root",
         on_delete=models.RESTRICT,
     )
 
@@ -35,7 +35,7 @@ class LabjournalRecord(models.Model):
     )
 
     datetime = models.DateTimeField(
-        null=False,
+        null=True,
         help_text="Date and time of the start of event",
         db_index=True,
     )
@@ -55,7 +55,7 @@ class LabjournalRecord(models.Model):
 
     name = models.CharField(
         null=True,
-        help_text="Head of the service record (if applicable",
+        help_text="Head of the service record (if applicable)",
         max_length=256,
         db_index=True,
     )

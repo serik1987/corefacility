@@ -58,14 +58,15 @@ class PermissionProvider(PosixProvider):
 		:param old_access_level: an access level that is used to be before the level change
 		:param new_access_level: desired access level to set by this method
 		"""
-		old_access_forbidden = old_access_level.alias not in PosixUser.SUPPORTED_ACCESS_LEVELS
-		new_access_forbidden = new_access_level.alias not in PosixUser.SUPPORTED_ACCESS_LEVELS
-		if old_access_forbidden != new_access_forbidden:
-			user_ids = set()
-			for user in group.users:
-				user_ids.add(user.id)
-			connector = AutoAdminWrapperObject(PosixConnector, project.log.id)
-			connector.update_connections(list(user_ids))
+		if self.is_provider_on():
+			old_access_forbidden = old_access_level.alias not in PosixUser.SUPPORTED_ACCESS_LEVELS
+			new_access_forbidden = new_access_level.alias not in PosixUser.SUPPORTED_ACCESS_LEVELS
+			if old_access_forbidden != new_access_forbidden:
+				user_ids = set()
+				for user in group.users:
+					user_ids.add(user.id)
+				connector = AutoAdminWrapperObject(PosixConnector, project.log.id)
+				connector.update_connections(list(user_ids))
 
 	def update_group_list(self, user):
 		"""

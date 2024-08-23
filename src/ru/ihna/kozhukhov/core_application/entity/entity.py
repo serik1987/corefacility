@@ -319,7 +319,10 @@ class Entity:
         """
         if name in self._public_field_description:
             description = self._public_field_description[name]
-            raw_value = description.correct(value)
+            try:
+                raw_value = description.correct(value)
+            except EntityFieldInvalid:
+                raise EntityFieldInvalid(name)
             self._public_fields[name] = raw_value
             self._edited_fields.add(name)
             if self.__state == "saved" or self.__state == "loaded":

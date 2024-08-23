@@ -6,7 +6,7 @@ class EntityObject:
     """
 
     _entity = None
-    """ The entity inside the project """
+    """ The entity inside the object """
 
     _entity_class = None
     """ The entity class that is used to create the entity itself """
@@ -66,11 +66,11 @@ class EntityObject:
 
     def __init__(self, use_defaults=True, **kwargs):
         """
-        Creates the entity object that results to creating an entity
+        Checks the entity to test and puts it inside the entity object
 
-        :param use_defaults: if True, the constructor will use the _default_create_kwargs fields. Otherwise this
+        :param use_defaults: if True, the constructor will use the _default_create_kwargs fields. Otherwise, this
         class property will be ignored
-        :param kwargs: Any additional field values that shall be embedded to the entity or 'id' that reflects the
+        :param kwargs: Any additional field values that shall be assigned to the entity or 'id' that reflects the
         entity ID
         """
         if 'id' in kwargs:
@@ -81,7 +81,7 @@ class EntityObject:
             options.update(kwargs)
         else:
             options = kwargs
-        self._entity = self.get_entity_class()(**options)
+        self._entity = self.get_new_entity(options)
         self._entity_fields = options
 
     @property
@@ -129,6 +129,15 @@ class EntityObject:
         """
         return self._default_change_kwargs.keys()
 
+    def get_new_entity(self, options):
+        """
+        Creates the new Entity object and fills its fields by the options dictionary
+
+        :param options: the field => value dictionary to prefill the entity fields
+        :return: the entity created
+        """
+        return self.get_entity_class()(**options)
+
     def create_entity(self):
         """
         Creates an entity wrapped to this entity object and stores the entity to the database.
@@ -154,8 +163,18 @@ class EntityObject:
         else:
             options = kwargs
         for name, value in options.items():
-            setattr(self._entity, name, value)
+            self.set_field(name, value, options)
             self._entity_fields[name] = value
+
+    def set_field(self, name, value, options):
+        """
+        Modifies the entity fields
+
+        :param name: name of the field to modify
+        :param value: the modifying value
+        :param options: all other options
+        """
+        setattr(self._entity, name, value)
 
     def reload_entity(self):
         """

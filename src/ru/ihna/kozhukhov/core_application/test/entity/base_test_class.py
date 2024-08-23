@@ -40,9 +40,12 @@ class BaseTestClass(MediaFilesTestCase):
 
     def test_object_creating_default(self):
         """
-        Tests how the object will be created with default values
+        State-diagram test
 
-        :return: nothing
+        1. The entity created with some predefined fields
+        2. Assert that all entity properties are properly set
+        3. Assert that the entity can't be updated or deleted
+        3. The entity was successfully stored in all of its external sources
         """
         obj = self.get_entity_object_class()()
         self._check_creating_entity(obj.entity, False)
@@ -57,10 +60,12 @@ class BaseTestClass(MediaFilesTestCase):
 
     def test_object_creating_default_plus_changed(self):
         """
-        This test case will create new entity then changes some entity fields and at last store entity data
-        to the database
+        State-diagram test
 
-        :return: nothing
+        1. Create the entity
+        2. Modify the entity fields twice
+        3. Check that all fields were properly set
+        4. Save entity to the external storage
         """
         obj = self.get_entity_object_class()()
         obj.change_entity_fields()
@@ -70,9 +75,13 @@ class BaseTestClass(MediaFilesTestCase):
 
     def test_object_created_default(self):
         """
-        Tests how the object can be created with default values
+        State-diagram test
 
-        :return: nothing
+        1. Create the entity
+        2. Save the entity to the external sources
+        3. Check that all fields were properly set
+        4. Check that the _edited_fields are empty
+        5. Check that the given entity can't be neither created nor updated
         """
         obj = self.get_entity_object_class()()
         obj.create_entity()
@@ -87,9 +96,14 @@ class BaseTestClass(MediaFilesTestCase):
 
     def test_object_created_plus_changed_default(self):
         """
-        Tests if the object has been created and correctly changed
+        State-diagram test
 
-        :return: nothing
+        1. Create the entity
+        2. Save the entity to the external sources
+        3. Modify entity fields
+        4. Check whether all fields were properly set
+        5. Check that all changed fields are inside the _changed_entity_fields array
+        6. Check that another invocation of the create() method is impossible
         """
         obj = self.get_entity_object_class()()
         obj.create_entity()
@@ -120,9 +134,16 @@ class BaseTestClass(MediaFilesTestCase):
 
     def test_object_created_updated_and_loaded_default(self):
         """
-        Tests whether the object can be successfully loaded after it has been created and updated
+        State-diagram test
 
-        :return: nothing
+        1. Create new entity
+        2. Save entity to the external storage
+        3. Modify entity fields
+        4. Update changes
+        5. Reload entity
+        6. Check that all fields were properly loaded
+        7. Check that there are no _edited_fields
+        8. Check that the recently loaded entity can be neither created nor updated
         """
         obj = self.get_entity_object_class()()
         obj.create_entity()
@@ -138,6 +159,17 @@ class BaseTestClass(MediaFilesTestCase):
             obj.entity.update()
 
     def test_object_created_and_loaded_default(self):
+        """
+        State-diagram test
+
+        1. Create entity.
+        2. Save the entity to the external sources
+        3. Reload the entity from the external sources
+        4. Check that all fields were properly reloaded
+        5. Check that no fields were mentioned in the _edited_fields
+        6. Check that the entity duplicate can't be created again
+        7. Check that the entity can't be updated since no fields were changed since the last loading
+        """
         obj = self.get_entity_object_class()()
         obj.create_entity()
         obj.reload_entity()
@@ -151,6 +183,16 @@ class BaseTestClass(MediaFilesTestCase):
             obj.entity.update()
 
     def test_object_created_loaded_and_changed(self):
+        """
+        State-diagram test
+
+        1. Create the entity
+        2. Store entity in the external sources
+        3. Reload entity from these external sources
+        4. Change entity fields
+        5. Ensure that the entity id and state are valid
+        6. Ensure that the entity duplicate can't be created again
+        """
         obj = self.get_entity_object_class()()
         obj.create_entity()
         obj.reload_entity()
@@ -182,6 +224,11 @@ class BaseTestClass(MediaFilesTestCase):
         self._check_entity_delete(obj)
 
     def _do_entity_update(self, obj):
+        """
+        Changes entity fields to the predefined values and updates the entity
+
+        :param obj: the entity object
+        """
         obj.change_entity_fields()
         obj.entity.update()
 
@@ -268,10 +315,14 @@ class BaseTestClass(MediaFilesTestCase):
 
     def _check_creating_entity(self, entity, fields_changed):
         """
-        Checks whether all entity fields were in place when the entity is 'CREATING'.
-        The entity fields will be checked given that the entity object was created with no keyword arguments.
+        Checks that the entity
+        (a) has no ID
+        (b) has its state put to 'creating'
+        (c) has no wrapped object
+        (d) all entity fields were properly set
 
-        :return: nothing
+        :param fields_changed: True if the fields were set by the entity_object.change_entity_fields() routine
+        False if the fields did not tought since the last entity creation
         """
         self.assertIsNone(entity.id, "Entity ID is not None before the entity create")
         self.assertEquals(entity.state, "creating", "Entity state is not 'creating' before the entity create")
@@ -357,7 +408,7 @@ class BaseTestClass(MediaFilesTestCase):
 
     def _check_fields_changed(self, entity, field_list):
         """
-        Checks whether the certain and only certain fields in the entity was changed
+        Checks that the entity's _edited_fields property corresponds to the changes history
 
         :param entity: the entity to test
         :param field_list: field list to check in the entity object
@@ -367,7 +418,7 @@ class BaseTestClass(MediaFilesTestCase):
                           "the Entity._edited_fields doesn't contain appropriate field number")
         for field in field_list:
             self.assertIn(field, entity._edited_fields,
-                          "The field '%s' is not within the list of the edited fields")
+                          "The field '%s' is not within the list of the edited fields" % field)
 
     def _check_default_fields(self, entity):
         """
@@ -381,11 +432,10 @@ class BaseTestClass(MediaFilesTestCase):
 
     def _check_default_change(self, entity):
         """
-        Checks whether the fields were properly change.
-        The method deals with default data only.
+        Checks whether the fields were properly changed during the call of the entity_object.change_entity_fields()
+        method
 
-        :param entity: the entity to store
-        :return: nothing
+        :param entity: the entity to check
         """
         raise NotImplementedError("The _check_default_change method must be implemented when extending this base class")
 
