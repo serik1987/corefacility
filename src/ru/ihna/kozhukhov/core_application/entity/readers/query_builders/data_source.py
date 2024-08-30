@@ -107,7 +107,7 @@ class Subquery(DataSource):
         Initializes the query builder
 
         :param query_builder: the query builder itself. Be aware that some features available in the main query
-            is inavailable in subquery due to SQL syntax specifications.
+        is inavailable in subquery due to SQL syntax specifications.
         :param tbl_alias: the table alias
         """
         super().__init__()

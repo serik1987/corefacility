@@ -4,6 +4,7 @@ from ru.ihna.kozhukhov.core_application.entity.entity_sets.entity_set import Ent
 from ru.ihna.kozhukhov.core_application.models.enums.labjournal_record_type import LabjournalRecordType
 from ru.ihna.kozhukhov.core_application.models import LabjournalRootRecord
 from ru.ihna.kozhukhov.core_application.entity.readers.model_emulators import ModelEmulator
+from .complex_interval import ComplexInterval
 from .record_reader import RecordReader
 from .root_record_provider import RootRecordProvider
 
@@ -37,6 +38,9 @@ class RecordSet(EntitySet):
         'user': ("ru.ihna.kozhukhov.core_application.entity.user.User", None),
         'alias': (str, None),
         'type': (LabjournalRecordType, None),
+        'datetime': (ComplexInterval, None),
+        'types': (list, None),
+        'name': (str, None),
     }
     """ List of all entity filters """
 

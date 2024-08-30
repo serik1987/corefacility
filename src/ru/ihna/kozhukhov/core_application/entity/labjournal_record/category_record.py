@@ -33,3 +33,13 @@ class CategoryRecord(Record):
             description="Base directory (relatively to the base directory of the parent category)"
         )
     })
+
+    @property
+    def children(self):
+        """
+        All children relating to a given category
+        """
+        from .record_set import RecordSet
+        record_set = RecordSet()
+        record_set.parent_category = self
+        return record_set

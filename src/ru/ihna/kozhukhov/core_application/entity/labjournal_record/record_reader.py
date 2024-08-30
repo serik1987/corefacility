@@ -1,8 +1,11 @@
+from datetime import timedelta
+
 from ru.ihna.kozhukhov.core_application.entity.readers.raw_sql_query_reader import RawSqlQueryReader
 from .record_provider import RecordProvider
-from ..readers.model_emulators import ModelEmulator, time_from_db
+from ..readers.model_emulators import ModelEmulator, time_from_db, prepare_time
 from ..readers.query_builders.data_source import SqlTable
-from ..readers.query_builders.query_filters import StringQueryFilter
+from ..readers.query_builders.query_filters import StringQueryFilter, OrQueryFilter, SearchQueryFilter
+from ...models.enums.labjournal_record_type import LabjournalRecordType
 
 
 class RecordReader(RawSqlQueryReader):
@@ -51,7 +54,7 @@ class RecordReader(RawSqlQueryReader):
                             null_direction=self.items_builder.NULLS_FIRST)
 
         self.count_builder \
-            .add_select_expression(self.count_builder.select_total_count()) \
+            .add_select_expression(self.count_builder.select_total_count('record.id')) \
             .add_data_source(SqlTable('core_application_labjournalrecord', 'record'))
 
         for builder in self.items_builder, self.count_builder:
@@ -115,6 +118,48 @@ class RecordReader(RawSqlQueryReader):
         )
         self.items_builder.add_select_expression('check_info.user_id')
         self._user_context = user
+
+    def apply_datetime_filter(self, interval):
+        """
+        Passes only records which datetime field is within a given interval
+
+        :param interval: a ComplexInterval instance
+        """
+        less_transform_function = prepare_time
+        high_transform_function = lambda t: prepare_time(t - timedelta(seconds=1))
+        query_filter = interval.to_sql('record.datetime', less_transform_function, high_transform_function)
+        if query_filter is not None:
+            self.items_builder.main_filter &= query_filter
+            self.count_builder.main_filter &= query_filter
+
+    def apply_types_filter(self, types):
+        """
+        Passes only records having certain types
+
+        :param types: an iterable object containing available types
+        """
+        for record_type in types:
+            if not isinstance(record_type, LabjournalRecordType):
+                raise ValueError("The type is not a valid instance LabjournalRecordType")
+                # Ensures no SQL injections
+        if len(types) > 0:
+            query = OrQueryFilter(
+                *[StringQueryFilter("record.type = '%s'" % str(record_type)) for record_type in types]
+            )
+            self.items_builder.main_filter &= query
+            self.count_builder.main_filter &= query
+        else:
+            self.items_builder.main_filter &= StringQueryFilter("1 = 0")
+            self.count_builder.main_filter &= StringQueryFilter("1 = 0")
+
+    def apply_name_filter(self, name):
+        """
+        Passes only records which name starts from a given line
+
+        :param name: the name to apply
+        """
+        for builder in self.items_builder, self.count_builder:
+            builder.main_filter &= SearchQueryFilter("record.name", name, must_start=True)
 
     def create_external_object(self,
                                type,
