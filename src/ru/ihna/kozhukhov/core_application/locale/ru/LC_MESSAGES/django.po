@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-19 20:13+0300\n"
+"POT-Creation-Date: 2024-09-03 23:05+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -57,11 +57,19 @@ msgstr "Проект"
 msgid "User"
 msgstr "Пользователь"
 
-#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_record/record_set.py:14
+#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_parameter_descriptor/exceptions.py:9
+msgid "The descriptor value with similar ID was created"
+msgstr "Значение кастомного параметра с тем же самым ID уже создано"
+
+#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_parameter_descriptor/parameter_descriptor_set.py:14
+msgid "Custom parameter descriptor"
+msgstr "Дескриптор кастомного параметра"
+
+#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_record/record_set.py:23
 msgid "Laboratory journal record"
 msgstr "Запись в лабораторном журнале"
 
-#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_record/root_category_record.py:18
+#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_record/root_category_record.py:48
 msgid "Root record"
 msgstr "Корневая запись"
 
@@ -118,18 +126,18 @@ msgstr "Невозможно создать требуемый ресурс, т�
 msgid "%s with such values can't exist"
 msgstr "Поле %s с подобными значениями не существует"
 
-#: src/ru/ihna/kozhukhov/core_application/exceptions/entity_exceptions.py:35
+#: src/ru/ihna/kozhukhov/core_application/exceptions/entity_exceptions.py:40
 msgid "The entity operation is not permitted"
 msgstr "Указанная операция над сущностью невозможна"
 
-#: src/ru/ihna/kozhukhov/core_application/exceptions/entity_exceptions.py:47
+#: src/ru/ihna/kozhukhov/core_application/exceptions/entity_exceptions.py:52
 msgid ""
 "This feature is not supported for current database engine. Use another one"
 msgstr ""
 "Данное свойство не поддерживается на установленной Вами СУБД. Установка "
 "PostgreSQL решит эту проблему"
 
-#: src/ru/ihna/kozhukhov/core_application/exceptions/entity_exceptions.py:52
+#: src/ru/ihna/kozhukhov/core_application/exceptions/entity_exceptions.py:57
 msgid ""
 "The user is a governor of at least one group. Its delete will automatically "
 "remove these groups and reflect another user rights. Are you sure?"
@@ -139,7 +147,7 @@ msgstr ""
 "изменению прав доступа других пользователей к тому или иному функционалу. Вы "
 "желаете продолжить?"
 
-#: src/ru/ihna/kozhukhov/core_application/exceptions/entity_exceptions.py:59
+#: src/ru/ihna/kozhukhov/core_application/exceptions/entity_exceptions.py:64
 msgid ""
 "The group is a root group for at least one project. Its delete will "
 "automatically remove these projects and reflect another user rights. Are you "
@@ -149,16 +157,16 @@ msgstr ""
 "удаление приведёт к автоматическому уничтожению этих проектов, а также "
 "изменит права доступа других пользователей к функционалу. Продолжить?"
 
-#: src/ru/ihna/kozhukhov/core_application/exceptions/entity_exceptions.py:66
+#: src/ru/ihna/kozhukhov/core_application/exceptions/entity_exceptions.py:71
 #, python-format
 msgid "Unable to write to %s directory."
 msgstr "Невозможно произвести запись в директорию %s"
 
-#: src/ru/ihna/kozhukhov/core_application/exceptions/entity_exceptions.py:150
+#: src/ru/ihna/kozhukhov/core_application/exceptions/entity_exceptions.py:155
 msgid "Error during installation of the module"
 msgstr "Ошибка в процессе установки модуля"
 
-#: src/ru/ihna/kozhukhov/core_application/exceptions/entity_exceptions.py:162
+#: src/ru/ihna/kozhukhov/core_application/exceptions/entity_exceptions.py:167
 msgid ""
 "This module has a parent module that have not been completely installed yet"
 msgstr ""

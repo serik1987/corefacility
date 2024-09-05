@@ -1,7 +1,8 @@
 from django.db import transaction
 from django.utils.module_loading import import_string
 
-from ..exceptions.entity_exceptions import EntityOperationNotPermitted, EntityProvidersNotDefined, EntityFieldInvalid
+from ..exceptions.entity_exceptions import EntityOperationNotPermitted, EntityProvidersNotDefined, EntityFieldInvalid, \
+    EntityFieldRequiredException
 
 
 class Entity:
@@ -196,7 +197,7 @@ class Entity:
         self.check_entity_providers_defined()
         for field in self._required_fields:
             if field not in self._public_fields:
-                raise EntityFieldInvalid(field)
+                raise EntityFieldRequiredException(field)
         with self._get_transaction_mechanism():
             for provider in self._entity_provider_list:
                 another_entity = provider.load_entity(self)
@@ -264,6 +265,8 @@ class Entity:
         :return: a short entity representation
         """
         s = self.get_entity_class_name()
+        if s is None:
+            s = self.__class__.__name__
         if self.id is not None:
             s += " (ID = %s) " % self.id
         else:

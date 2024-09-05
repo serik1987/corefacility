@@ -24,6 +24,9 @@ class QueryBuilder:
     _null_direction_fragments = {DEFAULT_NULL_ORDER: None, NULLS_FIRST: " NULLS FIRST", NULLS_LAST: " NULLS LAST"}
     _nulls_direction_support = True
 
+    _quote_name_sign = '`'
+    """ Determines the sign for quote names """
+
     def __init__(self):
         """
         Initializes the query builder
@@ -268,6 +271,17 @@ class QueryBuilder:
         """
         raise NotImplementedError("QueryBuilder.select_string_concatenation is not implemented")
 
+    @classmethod
+    def json_object_aggregation(cls, name, value):
+        """
+        Returns an SQL query expression that aggregates name/value pairs containing in different rows as a single
+        JSON object. Values can be NULL's but not names
+
+        :param name: expression or a column name that will be used as JSON keys
+        :param value: expression or a column value that will be used as JSON values
+        """
+        raise NotImplementedError("QueryBuilder.json_object_aggregation is not implemented")
+
     def add_data_source(self, data_source):
         """
         Adds data source to the query.
@@ -501,6 +515,17 @@ class QueryBuilder:
         :return: a string containing the limit expression
         """
         raise NotImplementedError("build_limit is not implemented for your query builder")
+
+    def quote_name(self, name):
+        """
+        Quotes the name
+
+        :param name: the name before the quote
+        :return: the name after the quote
+        """
+        name_parts = name.split('.')
+        new_name_parts = [self._quote_name_sign + name_part + self._quote_name_sign for name_part in name_parts]
+        return '.'.join(new_name_parts)
 
     def __str__(self):
         """

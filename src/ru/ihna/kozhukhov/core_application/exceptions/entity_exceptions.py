@@ -22,6 +22,11 @@ class EntityFieldInvalid(EntityException):
         super().__init__(_("%s with such values can't exist") % entity_name)
 
 
+class EntityFieldRequiredException(EntityException):
+    def __init__(self, field_name):
+        super().__init__("The field %s is required for the entity" % field_name)
+
+
 class SupportUserModificationNotAllowed(EntityException):
 
     def __init__(self):

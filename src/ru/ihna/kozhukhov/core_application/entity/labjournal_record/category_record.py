@@ -43,3 +43,13 @@ class CategoryRecord(Record):
         record_set = RecordSet()
         record_set.parent_category = self
         return record_set
+
+    @property
+    def descriptors(self):
+        """
+        Descriptors that belong immediately to the category
+        """
+        from ..labjournal_parameter_descriptor.parameter_descriptor_set import ParameterDescriptorSet
+        descriptor_set = ParameterDescriptorSet()
+        descriptor_set.category = self
+        return descriptor_set

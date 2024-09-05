@@ -31,6 +31,17 @@ class SqliteQueryBuilder(QueryBuilder):
         """
         return " || ".join(args)
 
+    @classmethod
+    def json_object_aggregation(cls, name, value):
+        """
+        Returns an SQL query expression that aggregates name/value pairs containing in different rows as a single
+        JSON object. Values can be NULL's but not names
+
+        :param name: expression or a column name that will be used as JSON keys
+        :param value: expression or a column value that will be used as JSON values
+        """
+        return "json_group_object(%s, %s)" % (name, value)
+
     def build_limit(self):
         """
         Constructs the LIMIT expression

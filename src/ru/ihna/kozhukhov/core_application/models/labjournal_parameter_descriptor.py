@@ -33,7 +33,7 @@ class LabjournalParameterDescriptor(models.Model):
 
     index = models.PositiveSmallIntegerField(
         help_text="Parameters with a higher index will be displaced below parameters with a lower index",
-        null=False,
+        null=True,
     )
 
     description = models.CharField(
@@ -59,7 +59,7 @@ class LabjournalParameterDescriptor(models.Model):
         max_length=256,
         help_text="Default value for the field or NULL if the field doesn't have default field",
         null=True,
-    ),
+    )
 
     for_data_record = models.BooleanField(
         help_text="Applicable for the data records",
@@ -90,5 +90,5 @@ class LabjournalParameterDescriptor(models.Model):
     )
 
     class Meta:
-        unique_together = [["project_id", "identifier"], ["category_id", "index"]]
+        unique_together = [["project_id", "identifier"]]
         ordering = ("index",)
