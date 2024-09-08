@@ -2,12 +2,13 @@ from django.db import models
 from django.utils.module_loading import import_string
 
 from ru.ihna.kozhukhov.core_application.models import LabjournalParameterView
+from ru.ihna.kozhukhov.core_application.entity.providers.model_providers.labjournal_individual_options_provider import \
+    LabjournalIndividualOptionsProvider
 
-from ..providers.model_providers.model_provider import ModelProvider
 from ..labjournal_parameter_descriptor.parameter_descriptor_provider import ParameterDescriptorProvider
 
 
-class ViewedParameterProvider(ModelProvider):
+class ViewedParameterProvider(LabjournalIndividualOptionsProvider):
     """
     Provides data interaction between the ViewedParameter object and the database
     """
@@ -20,33 +21,6 @@ class ViewedParameterProvider(ModelProvider):
 
     _descriptor_provider = ParameterDescriptorProvider()
     """ A provider that is used to wrap a child parameter descriptor """
-
-    def load_entity(self, entity):
-        """
-        The method checks that the entity has already been loaded from the database.
-        EntityProviders shall use the entity 'id' or '_wrapped' properties of the corresponding
-        entity.
-
-        The entity 'id' field is a unique entity number given by the database system. The entity
-        id doesn't relate to UID, GID or PID values given to entities by the Unix-like operating
-        systems
-
-        :param entity: the entity to load
-        :return: the entity value
-        """
-        if entity.id is not None or entity._wrapped is not None:
-            return entity
-        else:
-            try:
-                lookup_object = LabjournalParameterView.objects.get(
-                    project_id=entity.category.project.id,
-                    category_id=entity.category.id,
-                    user_id=entity.user.id,
-                    descriptor_id=entity.descriptor.id,
-                )
-                return self.wrap_entity(lookup_object)
-            except self.entity_model.DoesNotExist:
-                return None
 
     def delete_entity(self, entity):
         """
@@ -85,18 +59,12 @@ class ViewedParameterProvider(ModelProvider):
         :param external_object: the object loaded using such external source
         :return: the entity that wraps the external object
         """
-        if isinstance(self._entity_class, str):
-            self._entity_class = import_string(self._entity_class)
-        create_kwargs = {"_src": external_object, "id": external_object.id}
-        if hasattr(external_object, 'index'):
-            create_kwargs['index'] = external_object.index
+        entity = super().wrap_entity(external_object)
         if hasattr(external_object, 'descriptor'):
-            create_kwargs['descriptor'] = self._descriptor_provider.wrap_entity(external_object.descriptor)
-        if hasattr(external_object, 'category'):
-            create_kwargs['category'] = external_object.category
-        if hasattr(external_object, 'user'):
-            create_kwargs['user'] = external_object.user
-        return self.entity_class(**create_kwargs)
+            entity._descriptor = self._descriptor_provider.wrap_entity(external_object.descriptor)
+        if hasattr(external_object, 'index'):
+            entity._index = external_object.index
+        return entity
 
     def _unwrap_entity_properties(self, external_object, entity):
         """
@@ -105,6 +73,7 @@ class ViewedParameterProvider(ModelProvider):
         :param external_object: Destination of the properties
         :param entity: Source of the properties
         """
+        super()._unwrap_entity_properties(external_object, entity)
         if 'index' in entity._edited_fields:
             external_object.index = entity._index
         if external_object.index is None:
@@ -122,8 +91,18 @@ class ViewedParameterProvider(ModelProvider):
             entity._index = external_object.index
         if 'descriptor' in entity._edited_fields:
             external_object.descriptor_id = entity._descriptor.id
-        if 'category' in entity._edited_fields:
-            external_object.category_id = entity._category.id
-            external_object.project_id = entity._category.project.id
-        if 'user' in entity._edited_fields:
-            external_object.user_id = entity._user.id
+
+    def _get_lookup_object(self, entity):
+        """
+        Calculates the Django model that contains duplicates of throws the DoesNotExist exception if the entity
+        has no duplicates
+
+        :param entity: Entity which duplicates must be calculated
+        :return: object with the same class as defined in the _entity_model property
+        """
+        return LabjournalParameterView.objects.get(
+            project_id=entity.category.project.id,
+            category_id=entity.category.id,
+            user_id=entity.user.id,
+            descriptor_id=entity.descriptor.id,
+        )

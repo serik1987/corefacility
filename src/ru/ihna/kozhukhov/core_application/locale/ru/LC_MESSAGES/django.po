@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-07 20:17+0300\n"
+"POT-Creation-Date: 2024-09-08 20:01+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -73,7 +73,11 @@ msgstr "Запись в лабораторном журнале"
 msgid "Root record"
 msgstr "Корневая запись"
 
-#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_viewed_parameter/viewed_parameter_set.py:14
+#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_search_properties/search_properties_set.py:15
+msgid "Individual search parameters"
+msgstr "Индивидуальные параметры поиска"
+
+#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_viewed_parameter/viewed_parameter_set.py:16
 msgid "Viewed Parameter"
 msgstr "Просматриваемый параметр"
 

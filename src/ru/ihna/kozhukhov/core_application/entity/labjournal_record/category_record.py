@@ -1,7 +1,7 @@
 from ru.ihna.kozhukhov.core_application.entity.fields.entity_field import EntityField
-from ru.ihna.kozhukhov.core_application.entity.fields.read_only_field import ReadOnlyField
 from ru.ihna.kozhukhov.core_application.entity.fields.date_time_field import DateTimeReadOnlyField
 from ru.ihna.kozhukhov.core_application.models.enums.labjournal_record_type import LabjournalRecordType
+from ru.ihna.kozhukhov.core_application.exceptions.entity_exceptions import EntityNotFoundException
 
 from .record import Record
 
@@ -65,3 +65,22 @@ class CategoryRecord(Record):
         viewed_parameters.category = self
         viewed_parameters.user = context
         return viewed_parameters
+
+    def get_search_properties(self, context):
+        """
+        Returns search properties for a particular user
+
+        :param context: the user context to retrieve
+        """
+        try:
+            from ..labjournal_search_properties import SearchPropertiesSet
+            search_properties = SearchPropertiesSet()
+            search_properties.category = self
+            search_properties.user = context
+            return search_properties.get(None)
+        except EntityNotFoundException:
+            from ..labjournal_search_properties import SearchProperties
+            search_properties = SearchProperties()
+            search_properties.category = self
+            search_properties.user = context
+            return search_properties

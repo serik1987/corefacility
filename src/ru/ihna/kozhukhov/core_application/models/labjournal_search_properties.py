@@ -9,11 +9,18 @@ class LabjournalSearchProperties(models.Model):
     (hence, all records will be shown)
     """
 
+    project = models.ForeignKey(
+        "Project",
+        on_delete=models.CASCADE,
+        help_text="Related project",
+        null=True,
+    )
+
     category = models.ForeignKey(
         "LabjournalRecord",
         on_delete=models.CASCADE,
         help_text="Category which search parameters are checked by the user",
-        null=False,
+        null=True,
     )
 
     user = models.ForeignKey(

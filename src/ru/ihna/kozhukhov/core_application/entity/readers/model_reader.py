@@ -13,7 +13,7 @@ class ModelReader(EntityReader):
     _entity_model_class = None
     """ The entity model that is used for seeking a proper entity data """
 
-    __entity_data = None
+    _entity_data = None
     """ The QuerySet that corresponds to all entity data found """
 
     _filter_map = {}
@@ -30,11 +30,11 @@ class ModelReader(EntityReader):
 
         :param kwargs: filter keyword arguments
         """
-        self.__entity_data = self.entity_model_class.objects
+        self._entity_data = self.entity_model_class.objects
         for name, value in kwargs.items():
             if name in self._filter_map:
                 name = self._filter_map[name]
-            self.__entity_data = self.__entity_data.filter(**{name: value})
+            self._entity_data = self._entity_data.filter(**{name: value})
 
     @property
     def entity_model_class(self):
@@ -59,7 +59,7 @@ class ModelReader(EntityReader):
         :return: a single Entity object
         """
         try:
-            return self.__entity_data.get(**kwargs)
+            return self._entity_data.get(**kwargs)
         except self.get_entity_provider().entity_model.DoesNotExist:
             raise EntityNotFoundException()
 
@@ -73,9 +73,9 @@ class ModelReader(EntityReader):
 
         :return: the iterator of Entity objects
         """
-        if not isinstance(self.__entity_data, QuerySet):
-            self.__entity_data = self.__entity_data.all()
-        for external_object in self.__entity_data:
+        if not isinstance(self._entity_data, QuerySet):
+            self._entity_data = self._entity_data.all()
+        for external_object in self._entity_data:
             yield external_object
 
     def __getitem__(self, index):
@@ -91,10 +91,10 @@ class ModelReader(EntityReader):
         :param index: either integer or slice instance
         :return: see above
         """
-        if not isinstance(self.__entity_data, QuerySet):
-            self.__entity_data = self.__entity_data.all()
+        if not isinstance(self._entity_data, QuerySet):
+            self._entity_data = self._entity_data.all()
         try:
-            return self.__entity_data[index]
+            return self._entity_data[index]
         except (AssertionError, IndexError):
             raise EntityNotFoundException()
 
@@ -106,4 +106,4 @@ class ModelReader(EntityReader):
 
         :return: total number of entities that can be read
         """
-        return self.__entity_data.count()
+        return self._entity_data.count()
