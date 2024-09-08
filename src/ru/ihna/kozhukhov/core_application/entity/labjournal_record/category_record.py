@@ -53,3 +53,15 @@ class CategoryRecord(Record):
         descriptor_set = ParameterDescriptorSet()
         descriptor_set.category = self
         return descriptor_set
+
+    def get_viewed_parameters(self, context):
+        """
+        Returns list of all viewed parameters
+
+        :param context: the user context to use
+        """
+        from ..labjournal_viewed_parameter import ViewedParameterSet
+        viewed_parameters = ViewedParameterSet()
+        viewed_parameters.category = self
+        viewed_parameters.user = context
+        return viewed_parameters

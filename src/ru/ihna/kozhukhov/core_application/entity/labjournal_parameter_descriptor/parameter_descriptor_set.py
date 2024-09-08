@@ -2,13 +2,13 @@ from django.db.models import F
 from django.utils.translation import gettext_lazy as _
 
 from ru.ihna.kozhukhov.core_application.models import LabjournalParameterDescriptor
-from ru.ihna.kozhukhov.core_application.entity.entity_sets.entity_set import EntitySet
+from ru.ihna.kozhukhov.core_application.entity.entity_sets.swappable_entity_set import SwappableEntitySet
 from ru.ihna.kozhukhov.core_application.entity.labjournal_record.category_record import CategoryRecord
 
 from .parameter_descriptor_reader import ParameterDescriptorReader
 
 
-class ParameterDescriptorSet(EntitySet):
+class ParameterDescriptorSet(SwappableEntitySet):
     """
     Container where all parameter descriptors are stored
     """
@@ -73,30 +73,15 @@ class ParameterDescriptorSet(EntitySet):
         LabjournalParameterDescriptor.objects.bulk_update(descriptor_models, ['index'])
         self._is_parked = True
 
-    def swap(self, descriptor1, descriptor2):
+    def _subcontainer_condition(self):
         """
-        Changes the descriptor sort order by swapping descriptor1 and descriptor2
+        Returns True if certain container withing which entities can be swapped is specified
+        """
+        return self.category is not None
 
-        :param descriptor1: the first descriptor to swap (a ParameterDescriptor instance or integer)
-        :param descriptor2: the second descriptor to swap (a ParameterDescriptor instance or integer)
+    def _get_subcontainer_queryset(self):
         """
-        from .parameter_descriptor import ParameterDescriptor
-        if self.category is None:
-            raise RuntimeError("To swap two descriptors please, specify the related category")
-        descriptor_models = LabjournalParameterDescriptor.objects \
+        Returns the QuerySet object that reveals Django models related to all entities within the container
+        """
+        return LabjournalParameterDescriptor.objects \
             .filter(category_id=self.category.id, project_id=self.category.project.id)
-        if isinstance(descriptor1, ParameterDescriptor):
-            descriptor1 = descriptor1.id
-        if isinstance(descriptor2, ParameterDescriptor):
-            descriptor2 = descriptor2.id
-        try:
-            descriptor_model1 = descriptor_models.get(id=descriptor1)
-            descriptor_model2 = descriptor_models.get(id=descriptor2)
-        except LabjournalParameterDescriptor.DoesNotExist:
-            raise ValueError("Can't swap descriptors that don't relate to selected category")
-        if descriptor_model1.index is None or descriptor_model2.index is None:
-            raise RuntimeError("this method can't be invoked without call of the park() method")
-        if descriptor_model1.index != descriptor_model2.index:
-            descriptor_model1.index, descriptor_model2.index = descriptor_model2.index, descriptor_model1.index
-            descriptor_model1.save()
-            descriptor_model2.save()

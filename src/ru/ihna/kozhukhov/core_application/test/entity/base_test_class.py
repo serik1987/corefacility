@@ -233,7 +233,7 @@ class BaseTestClass(MediaFilesTestCase):
         obj.entity.update()
 
     def _test_field(self, field_name, field_value, updated_value, exception_to_throw, route_number, use_defaults=True,
-                    **additional_kwargs):
+                    assertion_function=None, **additional_kwargs):
         """
         Provides the test for a standalone field
 
@@ -246,9 +246,14 @@ class BaseTestClass(MediaFilesTestCase):
             TEST_CHANGE_CREATE_AND_LOAD, TEST_CREATE_CHANGE_AND_LOAD, TEST_CREATE_LOAD_AND_CHANGE)
         :param use_defaults: True to use defaults put into the entity_object. False if additional arguments shall be
             put instead of defaults
+        :param assertion_function: The function to compare actual and expected results
         :param additional_kwargs: Some additional create object arguments to put
         :return: nothing
         """
+        if assertion_function is None:
+            assertion_function = lambda actual, expected: self.assertEquals(actual, expected,
+                          "The value '%s' for field '%s' doesn't either stored or retrieved correctly" %
+                          (last_value, field_name))
         initial_kwargs = {field_name: field_value}
         initial_kwargs.update(additional_kwargs)
         if exception_to_throw is None:
@@ -274,9 +279,7 @@ class BaseTestClass(MediaFilesTestCase):
         else:
             last_value = updated_value
         actual_value = getattr(obj.entity, field_name)
-        self.assertEquals(actual_value, last_value,
-                          "The value '%s' for field '%s' doesn't either stored or retrieved correctly" %
-                          (last_value, field_name))
+        assertion_function(actual_value, last_value)
 
     def _test_read_only_field(self, field_name, sample_value, throwing_exception=ValueError):
         """

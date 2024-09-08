@@ -79,6 +79,8 @@ class ParameterDescriptorReader(RawSqlQueryReader):
 
         :param category: a category to apply
         """
+        if category is None:
+            raise ValueError("Value of the category filter must be a valid category")
         for builder in self.items_builder, self.count_builder:
             if category.id is None:
                 builder.main_filter &= StringQueryFilter("descriptor.category_id IS NULL")

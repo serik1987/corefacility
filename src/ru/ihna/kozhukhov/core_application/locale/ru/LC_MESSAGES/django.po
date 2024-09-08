@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-03 23:05+0300\n"
+"POT-Creation-Date: 2024-09-07 20:17+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -61,7 +61,7 @@ msgstr "Пользователь"
 msgid "The descriptor value with similar ID was created"
 msgstr "Значение кастомного параметра с тем же самым ID уже создано"
 
-#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_parameter_descriptor/parameter_descriptor_set.py:14
+#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_parameter_descriptor/parameter_descriptor_set.py:16
 msgid "Custom parameter descriptor"
 msgstr "Дескриптор кастомного параметра"
 
@@ -72,6 +72,10 @@ msgstr "Запись в лабораторном журнале"
 #: src/ru/ihna/kozhukhov/core_application/entity/labjournal_record/root_category_record.py:48
 msgid "Root record"
 msgstr "Корневая запись"
+
+#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_viewed_parameter/viewed_parameter_set.py:14
+msgid "Viewed Parameter"
+msgstr "Просматриваемый параметр"
 
 #: src/ru/ihna/kozhukhov/core_application/entry_points/authorizations.py:36
 msgid "Authorization methods"

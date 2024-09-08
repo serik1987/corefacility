@@ -7,6 +7,11 @@ class LabjournalParameterView(models.Model):
     If the parameter was not mentioned in this table it must be shown
     """
 
+    index = models.PositiveSmallIntegerField(
+        help_text="Consequtive index for the field",
+        null=False,
+    )
+
     descriptor = models.ForeignKey(
         "LabjournalParameterDescriptor",
         on_delete=models.CASCADE,
@@ -14,11 +19,18 @@ class LabjournalParameterView(models.Model):
         null=False,
     )
 
-    record = models.ForeignKey(
+    project = models.ForeignKey(
+        "Project",
+        on_delete=models.CASCADE,
+        help_text="The related project",
+        null=False,
+    )
+
+    category = models.ForeignKey(
         "LabjournalRecord",
         on_delete=models.CASCADE,
         help_text="Record where the parameter must be shown or hidden",
-        null=False,
+        null=True,
     )
 
     user = models.ForeignKey(
@@ -28,18 +40,7 @@ class LabjournalParameterView(models.Model):
         null=False,
     )
 
-    is_visible = models.BooleanField(
-        help_text="True if the field must be visible; False otherwise",
-        null=False,
-    )
-
-    index = models.PositiveSmallIntegerField(
-        help_text="Consequtive index for the field",
-        null=False,
-    )
-
     class Meta:
         unique_together = [
-            ["record_id", "user_id", "descriptor_id"],
-            ["record_id", "user_id", "index"]
+            ["project_id", "category_id", "user_id", "descriptor_id"],
         ]

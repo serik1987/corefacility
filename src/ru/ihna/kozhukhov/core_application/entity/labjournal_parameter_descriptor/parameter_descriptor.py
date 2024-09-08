@@ -67,11 +67,3 @@ class ParameterDescriptor(Entity):
             raise NotImplementedError("This is the base class: you can't inherit from this")
         else:
             self._public_fields['type'] = self._default_type
-
-    def swap(self, new_index: int):
-        """
-        Swaps two parameter descriptors
-
-        :param new_index: index of the new position for a given element
-        """
-        raise NotImplementedError('swap')
