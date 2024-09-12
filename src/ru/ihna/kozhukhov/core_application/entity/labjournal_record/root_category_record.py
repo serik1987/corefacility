@@ -27,6 +27,7 @@ class RootCategoryRecord(CategoryRecord):
     del _public_field_description['parent_category']
     del _public_field_description['alias']
     del _public_field_description['checked']
+    del _public_field_description['hashtags']
     _public_field_description['project'] = RelatedEntityField(
         "ru.ihna.kozhukhov.core_application.entity.project.Project",
         description="Related project"

@@ -2,16 +2,13 @@ import re
 from datetime import datetime
 
 from ru.ihna.kozhukhov.core_application.entity.entity import Entity
-from ru.ihna.kozhukhov.core_application.entity.fields.related_entity_field import RelatedEntityField
-from ru.ihna.kozhukhov.core_application.entity.fields.read_only_field import ReadOnlyField
-from ru.ihna.kozhukhov.core_application.entity.fields.entity_alias_field import EntityAliasField
-from ru.ihna.kozhukhov.core_application.entity.fields.date_time_field import DateTimeField
-from ru.ihna.kozhukhov.core_application.entity.fields.boolean_field import BooleanField
-from ru.ihna.kozhukhov.core_application.entity.fields.entity_field import EntityField
-from .category_startdate_provider import CategoryStartdateProvider
+from ru.ihna.kozhukhov.core_application.entity.fields import \
+    RelatedEntityField, ReadOnlyField, EntityAliasField, DateTimeField, BooleanField, EntityField, ManagedEntityField
+from ru.ihna.kozhukhov.core_application.entity.labjournal_hashtags import RecordHashtagManager
 
 from .record_set import RecordSet
 from .record_provider import RecordProvider
+from .category_startdate_provider import CategoryStartdateProvider
 from .record_check_provider import RecordCheckProvider
 
 
@@ -69,6 +66,8 @@ class Record(Entity):
         'checked': BooleanField(default=False, description="The user has checked the field"),
 
         'type': ReadOnlyField("The record type (D for data, S for service, C for category)"),
+
+        'hashtags': ManagedEntityField(RecordHashtagManager, description="Attached hashtags"),
 
         'comments': EntityField(str, max_length=16_384, description="Extra record")
     }

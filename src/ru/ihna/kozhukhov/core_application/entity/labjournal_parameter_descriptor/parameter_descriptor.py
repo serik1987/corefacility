@@ -1,13 +1,9 @@
 import re
 
 from ru.ihna.kozhukhov.core_application.entity.entity import Entity
-from ru.ihna.kozhukhov.core_application.entity.fields import (
-    RelatedEntityField,
-    EntityAliasField,
-    ReadOnlyField,
-    EntityField,
-    BooleanField,
-)
+from ru.ihna.kozhukhov.core_application.entity.fields import \
+    RelatedEntityField, EntityAliasField, ReadOnlyField, EntityField, BooleanField, ManagedEntityField
+from ru.ihna.kozhukhov.core_application.entity.labjournal_hashtags import DescriptorHashtagManager
 
 from .parameter_descriptor_set import ParameterDescriptorSet
 from .parameter_descriptor_provider import ParameterDescriptorProvider
@@ -41,6 +37,8 @@ class ParameterDescriptor(Entity):
         'required': BooleanField(default=False, description="The parameter is required to fill"),
         'default': ReadOnlyField(description="Default value"),
         'record_type': RecordTypeField(description="Type of records where the parameter is applicable"),
+        'hashtags': ManagedEntityField(DescriptorHashtagManager,
+                                       description="Hashtag for records where this parameter is defined")
     }
 
     _default_type = None

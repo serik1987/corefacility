@@ -11,6 +11,8 @@ from ru.ihna.kozhukhov.core_application.models.labjournal_record import Labjourn
 from ru.ihna.kozhukhov.core_application.models.enums.labjournal_record_type import LabjournalRecordType
 from ru.ihna.kozhukhov.core_application.entity.providers.model_providers.model_provider import ModelProvider
 
+from ..labjournal_hashtags.hashtag_provider import HashtagProvider
+
 
 class RecordProvider(ModelProvider):
     """
@@ -37,6 +39,9 @@ class RecordProvider(ModelProvider):
         'S': "ru.ihna.kozhukhov.core_application.entity.labjournal_record.service_record.ServiceRecord",
         'C': "ru.ihna.kozhukhov.core_application.entity.labjournal_record.category_record.CategoryRecord",
     }
+
+    _hashtag_provider = HashtagProvider()
+    """ The hashtag provider is used for wrapping the record hashtags """
 
     @property
     def model_fields(self):
@@ -194,6 +199,11 @@ class RecordProvider(ModelProvider):
             entity._user = external_object.user
         if hasattr(external_object, 'checked'):
             entity._checked = external_object.checked
+        if hasattr(external_object, 'hashtags'):
+            entity._hashtags = [
+                self._hashtag_provider.wrap_entity(hashtag_external_object)
+                for hashtag_external_object in external_object.hashtags
+            ]
         return entity
 
     def _unwrap_entity_properties(self, external_object, entity):

@@ -1,11 +1,17 @@
 from datetime import timedelta
+import json
+from json import JSONDecodeError
+from django.conf import settings
 
 from ru.ihna.kozhukhov.core_application.entity.readers.raw_sql_query_reader import RawSqlQueryReader
+from ru.ihna.kozhukhov.core_application.entity.readers.model_emulators import ModelEmulator, time_from_db, prepare_time
+from ru.ihna.kozhukhov.core_application.entity.readers.query_builders.data_source import SqlTable, Subquery
+from ru.ihna.kozhukhov.core_application.entity.readers.query_builders.query_filters import \
+    StringQueryFilter, OrQueryFilter, SearchQueryFilter, AndQueryFilter
+from ru.ihna.kozhukhov.core_application.models.enums import LabjournalHashtagType, LabjournalRecordType
+
+from ..labjournal_hashtags import RecordHashtag
 from .record_provider import RecordProvider
-from ..readers.model_emulators import ModelEmulator, time_from_db, prepare_time
-from ..readers.query_builders.data_source import SqlTable
-from ..readers.query_builders.query_filters import StringQueryFilter, OrQueryFilter, SearchQueryFilter
-from ...models.enums.labjournal_record_type import LabjournalRecordType
 
 
 class RecordReader(RawSqlQueryReader):
@@ -24,6 +30,12 @@ class RecordReader(RawSqlQueryReader):
 
     _user_context = None
     """ The user context that will be automatically put to all assigned entities """
+
+    _hashtag_filter = None
+    """ Hashtag filter to apply """
+
+    _hashtag_logic_filter = None
+    """ Logic of the hashtag filter to apply """
 
     def initialize_query_builder(self):
         """
@@ -48,13 +60,26 @@ class RecordReader(RawSqlQueryReader):
             .add_select_expression('record.finish_time') \
             .add_select_expression('record.base_directory') \
             .add_select_expression('record.name') \
+            .add_select_expression(self.items_builder.json_object_aggregation('hashtag.id', 'hashtag.description')) \
             .add_data_source(SqlTable('core_application_labjournalrecord', 'record')) \
             .add_order_term('record.datetime',
                             direction=self.items_builder.ASC,
                             null_direction=self.items_builder.NULLS_FIRST)
 
+        self.items_builder.data_source.add_join(
+            self.items_builder.JoinType.LEFT,
+            SqlTable('core_application_labjournalhashtagrecord', 'hashtag_connector'),
+            "ON (hashtag_connector.record_id = record.id)"
+        )
+        self.items_builder.data_source.add_join(
+            self.items_builder.JoinType.LEFT,
+            SqlTable("core_application_labjournalhashtag", 'hashtag'),
+            "ON (hashtag.id = hashtag_connector.hashtag_id)"
+        )
+        self.items_builder.add_group_term("record.id")
+
         self.count_builder \
-            .add_select_expression(self.count_builder.select_total_count('record.id')) \
+            .add_select_expression(self.count_builder.select_total_count('record.id', distinct=True)) \
             .add_data_source(SqlTable('core_application_labjournalrecord', 'record'))
 
         for builder in self.items_builder, self.count_builder:
@@ -161,9 +186,83 @@ class RecordReader(RawSqlQueryReader):
         for builder in self.items_builder, self.count_builder:
             builder.main_filter &= SearchQueryFilter("record.name", name, must_start=True)
 
+    def apply_hashtags_filter(self, hashtags):
+        """
+        Passes only records containing given hashtags
+
+        :param hashtags: list of hashtag entities or hashtag IDs
+        """
+        if self._hashtag_logic_filter is not None:
+            if len(hashtags) > 0:
+                if self._hashtag_logic_filter.value == "and":
+                    self.apply_hashtags_and_filter(hashtags)
+                elif self._hashtag_logic_filter.value == "or":
+                    self.apply_hashtags_or_filter(hashtags)
+            else:
+                self._hashtag_filter = hashtags
+
+    def apply_hashtag_logic_filter(self, hashtag_logic):
+        """
+        Defines the logic that the hashtags should be applied
+
+        :param hashtag_logic: one out of the predefined hashtag logic
+        """
+        if self._hashtag_filter is not None:
+            if len(self._hashtag_filter) > 0:
+                if hashtag_logic.value == "and":
+                    self.apply_hashtags_and_filter(self._hashtag_filter)
+                elif hashtag_logic.value == "or":
+                    self.apply_hashtags_or_filter(self._hashtag_filter)
+        else:
+            self._hashtag_logic_filter = hashtag_logic
+
+    def apply_hashtags_and_filter(self, hashtags):
+        """
+        Passes only records that contains all given hashtags
+
+        :param hashtags: list of hashtag entities or IDs
+        """
+        hashtags = [hashtag.id if isinstance(hashtag, RecordHashtag) else hashtag for hashtag in hashtags]
+        subquery_builder = settings.QUERY_BUILDER_CLASS()
+        subquery_builder \
+            .add_select_expression("record_id") \
+            .add_select_expression(subquery_builder.select_total_count('hashtag_id'), alias="hashtag_count") \
+            .add_data_source("core_application_labjournalhashtagrecord") \
+            .set_main_filter(OrQueryFilter(*[
+                StringQueryFilter("hashtag_id=%s", hashtag_id) for hashtag_id in hashtags
+            ])) \
+            .add_group_term("record_id")
+
+        for builder in self.items_builder, self.count_builder:
+            builder.data_source.add_join(
+                self.items_builder.JoinType.INNER,
+                Subquery(subquery_builder, "hashtag_stats"),
+                "ON (hashtag_stats.record_id = record.id)"
+            )
+            builder.main_filter &= StringQueryFilter("hashtag_stats.hashtag_count=%s", len(hashtags))
+
+    def apply_hashtags_or_filter(self, hashtags):
+        """
+        Passes only records that contain any of the given hashtag
+
+        :param hashtags: list of hashtag entities of  IDs
+        """
+        hashtags = [hashtag.id if isinstance(hashtag, RecordHashtag) else hashtag for hashtag in hashtags]
+        filter_condition = OrQueryFilter(*[
+            StringQueryFilter("hashtag_filter.hashtag_id=%s", hashtag_id) for hashtag_id in hashtags
+        ])
+        for builder in self.items_builder, self.count_builder:
+            builder.data_source.add_join(
+                self.items_builder.JoinType.INNER,
+                SqlTable("core_application_labjournalhashtagrecord", "hashtag_filter"),
+                "ON (hashtag_filter.record_id = record.id)"
+            )
+            builder.main_filter &= filter_condition
+
+
     def create_external_object(self,
-                               type,
-                               id,
+                               record_type,
+                               record_id,
                                project_id,
                                project_alias,
                                root_group_id,
@@ -177,18 +276,20 @@ class RecordReader(RawSqlQueryReader):
                                finish_time,
                                base_directory,
                                name,
+                               hashtag_info,
                                user_id=None
                                ):
-        self._entity_provider.current_type = type
+        self._entity_provider.current_type = record_type
+        project_emulator = ModelEmulator(
+            id=project_id,
+            alias=project_alias,
+            root_group=ModelEmulator(
+                id=root_group_id,
+            )
+        )
         emulator = ModelEmulator(
-            id=id,
-            project=ModelEmulator(
-                id=project_id,
-                alias=project_alias,
-                root_group=ModelEmulator(
-                    id=root_group_id,
-                )
-            ),
+            id=record_id,
+            project=project_emulator,
             parent_category_id=parent_category_id,
             level=level,
             alias=alias,
@@ -208,13 +309,24 @@ class RecordReader(RawSqlQueryReader):
                 id=parent_category_id,
                 datetime=time_from_db(parent_category_datetime),
                 finish_time=time_from_db(parent_category_finish_time),
-                project=ModelEmulator(
-                    id=project_id,
-                    alias=project_alias,
-                    root_group=ModelEmulator(
-                        id=root_group_id,
-                    )
-                )
+                project=project_emulator
             ))
+
+        if isinstance(hashtag_info, str):
+            try:
+                hashtag_info = json.loads(hashtag_info)
+            except JSONDecodeError:
+                hashtag_info = None
+        if hashtag_info is not None and len(hashtag_info) > 0:
+            hashtag_list = [
+                ModelEmulator(
+                    id=int(hashtag_id),
+                    description=hashtag_description,
+                    project=project_emulator,
+                    type=LabjournalHashtagType.record,
+                )
+                for hashtag_id, hashtag_description in hashtag_info.items()
+            ]
+            emulator.add_field('hashtags', hashtag_list)
 
         return emulator

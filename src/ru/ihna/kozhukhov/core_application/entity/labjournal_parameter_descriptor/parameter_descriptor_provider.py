@@ -1,6 +1,7 @@
 from django.utils.module_loading import import_string
 
 from ru.ihna.kozhukhov.core_application.entity.providers.model_providers.model_provider import ModelProvider
+from ru.ihna.kozhukhov.core_application.entity.labjournal_hashtags.hashtag_provider import HashtagProvider
 from ru.ihna.kozhukhov.core_application.models import LabjournalParameterDescriptor
 from ru.ihna.kozhukhov.core_application.models.enums.labjournal_record_type import LabjournalRecordType
 from ru.ihna.kozhukhov.core_application.models.enums.labjournal_field_type import LabjournalFieldType
@@ -27,6 +28,9 @@ class ParameterDescriptorProvider(ModelProvider):
         'S': _entity_class_prefix + ".string_parameter_descriptor.StringParameterDescriptor",
         'D': _entity_class_prefix + ".discrete_parameter_descriptor.DiscreteParameterDescriptor",
     }
+
+    _hashtag_provider = HashtagProvider()
+    """ The provider will be used to wrap child hashtags """
 
     @property
     def entity_class(self):
@@ -118,6 +122,11 @@ class ParameterDescriptorProvider(ModelProvider):
                 entity._values = external_object.values
             else:
                 entity._values = list()
+        if hasattr(external_object, 'hashtags'):
+            entity._hashtags = [
+                self._hashtag_provider.wrap_entity(external_hashtag_object)
+                for external_hashtag_object in external_object.hashtags
+            ]
         return entity
 
     def _unwrap_entity_properties(self, external_object, entity):

@@ -1,3 +1,5 @@
+from enum import Enum
+
 from django.utils.translation import gettext_lazy as _
 
 from ru.ihna.kozhukhov.core_application.entity.entity_sets.entity_set import EntitySet
@@ -20,6 +22,13 @@ class RecordSet(EntitySet):
     type The record type filter (not suitable for the root record)
     """
 
+    class LogicType(Enum):
+        """
+        Represents one of the predefined logic types
+        """
+        AND = "and"
+        OR = "or"
+
     _entity_name = _("Laboratory journal record")
     """ Default human-readable name of the entity """
 
@@ -41,6 +50,8 @@ class RecordSet(EntitySet):
         'datetime': (ComplexInterval, None),
         'types': (list, None),
         'name': (str, None),
+        'hashtags': (list, None),
+        'hashtag_logic': (LogicType, None),
     }
     """ List of all entity filters """
 

@@ -2,11 +2,11 @@ import json
 
 from ru.ihna.kozhukhov.core_application.entity.readers.query_builders.data_source import SqlTable
 from ru.ihna.kozhukhov.core_application.entity.readers.raw_sql_query_reader import RawSqlQueryReader
+from ru.ihna.kozhukhov.core_application.entity.readers.query_builders.query_filters import StringQueryFilter
 from ru.ihna.kozhukhov.core_application.entity.readers.model_emulators import ModelEmulator
+from ru.ihna.kozhukhov.core_application.models.enums import LabjournalHashtagType, LabjournalRecordType
 
 from .parameter_descriptor_provider import ParameterDescriptorProvider
-from ..readers.query_builders.query_filters import StringQueryFilter
-from ...models.enums.labjournal_record_type import LabjournalRecordType
 
 
 class ParameterDescriptorReader(RawSqlQueryReader):
@@ -15,6 +15,7 @@ class ParameterDescriptorReader(RawSqlQueryReader):
     """
 
     _query_debug = False
+    """ Should be equal to False everywhere except a special case of debugging this class """
 
     _entity_provider = ParameterDescriptorProvider()
     """
@@ -55,6 +56,9 @@ class ParameterDescriptorReader(RawSqlQueryReader):
             .add_select_expression(
                 self.items_builder.json_object_aggregation('available_values.id', 'available_values.description')
             ) \
+            .add_select_expression(
+                self.items_builder.json_object_aggregation('hashtag.id', 'hashtag.description')
+            ) \
             .add_data_source(SqlTable('core_application_labjournalparameterdescriptor', 'descriptor')) \
             .add_group_term("descriptor.id") \
             .add_order_term(
@@ -67,11 +71,22 @@ class ParameterDescriptorReader(RawSqlQueryReader):
             .add_data_source(SqlTable('core_application_labjournalparameterdescriptor', 'descriptor')) \
             .add_select_expression(self.count_builder.select_total_count('descriptor.id'))
 
-        self.items_builder.data_source.add_join(
-            self.items_builder.JoinType.LEFT,
-            SqlTable("core_application_labjournalparameteravailablevalue", "available_values"),
-            "ON (available_values.descriptor_id = descriptor.id)"
-        )
+        self.items_builder.data_source \
+            .add_join(
+                self.items_builder.JoinType.LEFT,
+                SqlTable("core_application_labjournalparameteravailablevalue", "available_values"),
+                "ON (available_values.descriptor_id = descriptor.id)"
+            ) \
+            .add_join(
+                self.items_builder.JoinType.LEFT,
+                SqlTable("core_application_labjournaldescriptorhashtag", "hashtag_connection"),
+                "ON (hashtag_connection.descriptor_id = descriptor.id)"
+            ) \
+            .add_join(
+                self.items_builder.JoinType.LEFT,
+                SqlTable("core_application_labjournalhashtag", "hashtag"),
+                "ON (hashtag.id = hashtag_connection.hashtag_id)"
+            )
 
     def apply_category_filter(self, category):
         """
@@ -102,17 +117,20 @@ class ParameterDescriptorReader(RawSqlQueryReader):
                                for_category_record,
                                units,
                                available_values_alias,
-                               available_values_description
+                               available_values_description,
+                               hashtag_info,
                                ):
         """
         Transforms the query result row into any external object that is able to read by the entity reader
         """
         record_types = list()
+
         if default is not None:
             if descriptor_type == 'B':  # BooleanParameterDescriptor
                 default = default == 'True'
             elif descriptor_type == 'N':  # NumberParameterDescriptor
                 default = float(default)
+
         if for_data_record:
             record_types.append(LabjournalRecordType.data)
         if for_service_record:
@@ -121,6 +139,7 @@ class ParameterDescriptorReader(RawSqlQueryReader):
             record_types.append(LabjournalRecordType.category)
         if self._category is None:
             raise RuntimeError("The reader can't work when no category was selected")
+
         external_object = ModelEmulator(
             type=descriptor_type,
             id=descriptor_id,
@@ -132,8 +151,10 @@ class ParameterDescriptorReader(RawSqlQueryReader):
             default=default,
             record_type=record_types,
         )
+
         if descriptor_type == 'N':
             external_object.units = units
+
         if descriptor_type == 'D' and available_values_alias is not None and available_values_description is not None \
                 and available_values_alias != "{:null}" and available_values_description != "{:null}":
             if isinstance(available_values_alias, str):
@@ -151,4 +172,21 @@ class ParameterDescriptorReader(RawSqlQueryReader):
                     'description': value_description,
                 })
             external_object.add_field('values', available_values)
+
+        if isinstance(hashtag_info, str):
+            try:
+                hashtag_info = json.loads(hashtag_info)
+            except json.JSONDecodeError:
+                hashtag_info = None
+        if hashtag_info is not None:
+            hashtag_list = list()
+            for hashtag_id, hashtag_description in hashtag_info.items():
+                hashtag_list.append(ModelEmulator(
+                    id=int(hashtag_id),
+                    description=hashtag_description,
+                    project=self._category.project,
+                    type=LabjournalHashtagType.record,
+                ))
+            external_object.add_field('hashtags', hashtag_list)
+
         return external_object
