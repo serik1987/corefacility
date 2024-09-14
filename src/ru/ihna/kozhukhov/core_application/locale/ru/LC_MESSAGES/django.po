@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-08 20:01+0300\n"
+"POT-Creation-Date: 2024-09-13 05:12+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -57,6 +57,14 @@ msgstr "Проект"
 msgid "User"
 msgstr "Пользователь"
 
+#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_file/file_set.py:11
+msgid "File attached to the experimental data record"
+msgstr "Файл, прикреплённый к экспериментальной записи"
+
+#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_hashtags/hashtag_set.py:15
+msgid "Hashtag"
+msgstr "Хештег"
+
 #: src/ru/ihna/kozhukhov/core_application/entity/labjournal_parameter_descriptor/exceptions.py:9
 msgid "The descriptor value with similar ID was created"
 msgstr "Значение кастомного параметра с тем же самым ID уже создано"
@@ -65,15 +73,15 @@ msgstr "Значение кастомного параметра с тем же 
 msgid "Custom parameter descriptor"
 msgstr "Дескриптор кастомного параметра"
 
-#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_record/record_set.py:23
+#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_record/record_set.py:32
 msgid "Laboratory journal record"
 msgstr "Запись в лабораторном журнале"
 
-#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_record/root_category_record.py:48
+#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_record/root_category_record.py:49
 msgid "Root record"
 msgstr "Корневая запись"
 
-#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_search_properties/search_properties_set.py:15
+#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_search_properties/search_properties_set.py:16
 msgid "Individual search parameters"
 msgstr "Индивидуальные параметры поиска"
 

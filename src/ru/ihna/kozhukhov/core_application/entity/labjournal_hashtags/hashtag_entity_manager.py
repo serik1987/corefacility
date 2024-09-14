@@ -22,6 +22,9 @@ class HashtagEntityManager(EntityValueManager):
     _entity_field = None
     """ Name of a column in the association table where entity IDs are stored  """
 
+    _project_lookup_field = 'project_id'
+    """ A column inside the database that contains project IDs """
+
     def add(self, entity_list):
         """
         Adds the hashtag to given entities
@@ -108,13 +111,13 @@ class HashtagEntityManager(EntityValueManager):
     def _check_entities_exist(self, entity_ids):
         """
         Check that all entities within the given entity list exists. If at least one entity doesn't exist
-        EntityDuplicatedException will be thrown
+        EntityNotFoundException will be thrown
 
         :param entity_ids: a set of IDs of entities which are required to check.
         """
-        created_entities_to_add = len(self._entity_table.objects.filter(
-            pk__in=entity_ids,
-            project_id=self._entity.project.id,
-        ))
+        created_entities_to_add = len(self._entity_table.objects.filter(**{
+            "pk__in": entity_ids,
+            self._project_lookup_field: self._entity.project.id,
+        }))
         if created_entities_to_add != len(entity_ids):
             raise EntityNotFoundException()

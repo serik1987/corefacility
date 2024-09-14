@@ -6,6 +6,7 @@ from parameterized import parameterized
 from ru.ihna.kozhukhov.core_application.entity.labjournal_record import DataRecord, RootCategoryRecord, RecordSet
 from ru.ihna.kozhukhov.core_application.entity.labjournal_parameter_descriptor import BooleanParameterDescriptor, \
     ParameterDescriptorSet
+from ru.ihna.kozhukhov.core_application.entity.labjournal_file import File, FileSet
 from ru.ihna.kozhukhov.core_application.entity.labjournal_hashtags import RecordHashtag, Hashtag, FileHashtag, \
     HashtagSet
 from ru.ihna.kozhukhov.core_application.models import \
@@ -16,7 +17,7 @@ from ru.ihna.kozhukhov.core_application.exceptions.entity_exceptions import \
 
 from .labjournal_test_mixin import LabjournalTestMixin
 
-entities_to_test = 'record', 'descriptor'
+entities_to_test = 'record', 'descriptor', 'file'
 
 def entities_provider():
     return [(entity,) for entity in entities_to_test]
@@ -40,12 +41,27 @@ def hashtags_created_provider():
     ]
     return [
         (entity_name, hashtags_to_add, exception_to_throw)
-        for entity_name in entities_to_test
+        for entity_name in ('record', 'descriptor')
         for (hashtags_to_add, exception_to_throw) in data
+    ] + [
+        ('file', ['neurons'], None,),
+        ('file', ['neurons', 'imaging'], None,),
+        ('file', ['neurons', 'imaging', 'behavior'], None,),
+        ('file', ['neurons', 'behavior'], None,),
+        ('file', ['propofol', 'arduan', 'dexamethasone'], None,),
+        ('file', ['neurons', 'propofol', 'behavior'], None,),
+        ('file', ['neurons'], None,),
+        ('file', [], None,),
+        ('file', ['neurons', 'arduan'], None,),
+        ('file', [''], ValueError,),
+        ('file', ["="*64], None,),
+        ('file', ["="*65], ValueError,),
+        ('file', ['bad_file_hashtag'], EntityDuplicatedException,),
+        ('file', [1234], ValueError,),
     ]
 
 def hashtags_double_add_provider():
-    data = [
+    record_hashtags_data = [
         (['grating', 'retinotopy'], ['grating', 'retinotopy', 'trees']),
         (['grating', 'retinotopy'], ['propofol']),
         (['grating', 'retinotopy', 'trees'], []),
@@ -60,21 +76,47 @@ def hashtags_double_add_provider():
         (['grating', 'retinotopy'], ['trees', 'propofol']),
         (['grating'], ['trees']),
     ]
+    file_hashtags_data = [
+        (['neurons', 'imaging'], ['neurons', 'imaging', 'behavior']),
+        (['neurons', 'imaging'], ['propofol']),
+        (['neurons', 'imaging', 'behavior'], []),
+        (['neurons', 'imaging'], []),
+        (['neurons', 'imaging', 'behavior'], ['neurons']),
+        (['neurons', 'imaging', 'behavior'], ['neurons', 'imaging', 'behavior']),
+        (['neurons'], []),
+        (['neurons'], ['propofol', 'arduan']),
+        (['neurons'], ['neurons', 'propofol', 'behavior']),
+        (['neurons', 'imaging', 'behavior'], ['neurons', 'imaging']),
+        (['neurons', 'imaging', 'behavior'], ['propofol', 'arduan', 'dexamethasone']),
+        (['neurons', 'imaging'], ['behavior', 'propofol']),
+        (['neurons'], ['behavior']),
+    ]
     return [
         (entity_name, initial_value, final_value, reload_required)
-        for entity_name in entities_to_test
-        for initial_value, final_value in data
+        for entity_name in ('record', 'descriptor')
+        for initial_value, final_value in record_hashtags_data
+        for reload_required in (True, False)
+    ] + [
+        ('file', initial_value, final_value, reload_required)
+        for initial_value, final_value in file_hashtags_data
         for reload_required in (True, False)
     ]
 
 def hashtags_remove_provider():
-    hashtag_add_list = ([], ['grating'], ['grating', 'retinotopy'], ['grating', 'retinotopy', 'trees'])
-    hashtag_remove_list = hashtag_add_list + ([1234], ['propofol'],)
+    record_hashtag_add_list = ([], ['grating'], ['grating', 'retinotopy'], ['grating', 'retinotopy', 'trees'])
+    file_hashtag_add_list = ([], ['neurons'], ['neurons', 'imaging'], ['neurons', 'imaging', 'behavior'])
+    record_hashtag_remove_list = record_hashtag_add_list + ([1234], ['propofol'],)
+    file_hashtag_remove_list = file_hashtag_add_list + ([1234], ['propofol'],)
     return [
         (entity_name, initial_hashtags, removing_hashtags, reload_required)
-        for entity_name in entities_to_test
-        for initial_hashtags in hashtag_add_list
-        for removing_hashtags in hashtag_remove_list
+        for entity_name in ('record', 'descriptor')
+        for initial_hashtags in record_hashtag_add_list
+        for removing_hashtags in record_hashtag_remove_list
+        for reload_required in (False, True)
+    ] + [
+        ('file', initial_hashtags, removing_hashtags, reload_required)
+        for initial_hashtags in file_hashtag_add_list
+        for removing_hashtags in file_hashtag_remove_list
         for reload_required in (False, True)
     ]
 
@@ -93,8 +135,8 @@ class TestHashtagManager(LabjournalTestMixin, TestCase):
     _trees_hashtag = None
     """ The third hashtag to test """
 
-    _sample_hashtags = None
-    """ All sample hashtags as description => hashtag dictionary """
+    _sample_record_hashtags = None
+    """ All sample records hashtags arranged as Python dictionary """
 
     _sample_category = None
     """ Represents some sample category where we will create new records """
@@ -111,6 +153,27 @@ class TestHashtagManager(LabjournalTestMixin, TestCase):
         'file': LabjournalFileHashtag,
     }
 
+    _sample_file = None
+    """ Some sample file """
+
+    _neurons_hashtag = None
+    """ A hashtag for neurons file """
+
+    _imaging_hashtag = None
+    """ A hashtag for imaging file """
+
+    _behavior_hashtag = None
+    """ A hashtag for behavior file """
+
+    _sample_file_hashtags = None
+    """ All sample file hashtags arranged as Python dictionary """
+
+    _sample_hashtags = None
+    """ All sample hashtags arranged as Python dictionary """
+
+    fake_hashtag_id = None
+    """ Some ID that it guaranteed not to belong to any existent hashtag """
+
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -125,7 +188,7 @@ class TestHashtagManager(LabjournalTestMixin, TestCase):
         cls._trees_hashtag = RecordHashtag(description="trees", project=cls.optical_imaging)
         cls._trees_hashtag.create()
 
-        cls._sample_hashtags = {
+        cls._sample_record_hashtags = {
             'grating': cls._grating_hashtag,
             'retinotopy': cls._retinotopy_hashtag,
             'trees': cls._trees_hashtag,
@@ -144,19 +207,55 @@ class TestHashtagManager(LabjournalTestMixin, TestCase):
         )
         cls._sample_descriptor.create()
 
+        data_record_set = cls._sample_category.children
+        data_record_set.types = [LabjournalRecordType.data]
+        cls._sample_data_record = data_record_set[0]
+        cls._sample_file = File(name="open_ephys.dat", record=cls._sample_data_record)
+        cls._sample_file.create()
+
+        cls._neurons_hashtag = FileHashtag(description="neurons", project=cls.optical_imaging)
+        cls._neurons_hashtag.create()
+
+        cls._imaging_hashtag = FileHashtag(description="imaging", project=cls.optical_imaging)
+        cls._imaging_hashtag.create()
+
+        cls._behavior_hashtag = FileHashtag(description="behavior", project=cls.optical_imaging)
+        cls._behavior_hashtag.create()
+
+        cls._sample_file_hashtags = {
+            'neurons': cls._neurons_hashtag,
+            'imaging': cls._imaging_hashtag,
+            'behavior': cls._behavior_hashtag,
+        }
+
+        cls._sample_hashtags = cls._sample_record_hashtags | cls._sample_file_hashtags
+
+        fake_hashtag = RecordHashtag(description="fake", project=cls.optical_imaging)
+        fake_hashtag.create()
+        cls.fake_hashtag_id = fake_hashtag.id
+        fake_hashtag.delete()
+
     def setUp(self):
         self._grating_hashtag = TestHashtagManager._grating_hashtag
         self._retinotopy_hashtag = TestHashtagManager._retinotopy_hashtag
         self._trees_hashtag = TestHashtagManager._trees_hashtag
         self._sample_category = TestHashtagManager._sample_category
         self._sample_record = TestHashtagManager._sample_record
-        self._sample_hashtags = TestHashtagManager._sample_hashtags
+        self._sample_record_hashtags = TestHashtagManager._sample_record_hashtags
         self._sample_descriptor = TestHashtagManager._sample_descriptor
+
+
+        self._neurons_hashtag = TestHashtagManager._neurons_hashtag
+        self._imaging_hashtag = TestHashtagManager._imaging_hashtag
+        self._behavior_hashtag = TestHashtagManager._behavior_hashtag
+        self._sample_file_hashtags = TestHashtagManager._sample_file_hashtags
+
+        self._sample_hashtags = TestHashtagManager._sample_hashtags
 
     @parameterized.expand([('add',), ('remove',),])
     def test_record_creating_state(self, method_name):
         """
-        Tests the hashtag add for creating record
+        Tests the hashtag manipulation for creating record
 
         :param method_name: the method to test - 'add' or 'remove'
         """
@@ -169,20 +268,31 @@ class TestHashtagManager(LabjournalTestMixin, TestCase):
     @parameterized.expand([('add',), ('remove',)])
     def test_descriptor_creating_state(self, method_name):
         """
-        Tests the hashtag add for creating descriptor
+        Tests the hashtag manipulation for creating descriptor
 
         :param method_name: name of the method to test
         """
         with self.assertRaises(EntityOperationNotPermitted,
-                               msg="The hashtag can't be added to descriptor when this is not in external storage"):
+                               msg="The hashtag can't be added to descriptor " +
+                                   "when the descriptor is not in external storage"):
             descriptor = BooleanParameterDescriptor()
             getattr(descriptor.hashtags, method_name)([self._grating_hashtag.id])
             print(descriptor)
 
+    @parameterized.expand([('add',), ('remove',),])
+    def test_file_creating_state(self, method_name):
+        """
+        Tests the hashtag manipulation for creating labjournal file
+        """
+        with self.assertRaises(EntityOperationNotPermitted,
+                               msg="The hashtag can't be added to file when the file is not in external storage"):
+            file = File()
+            getattr(file.hashtags, method_name)([self._imaging_hashtag.id])
+
     @parameterized.expand([('add',), ('remove',)])
     def test_record_deleted_state(self, method_name):
         """
-        Tests the hashtag add for deleted record
+        Tests the hashtag manipulation for deleted record
 
         :param method_name: 'add' for testing add() method, 'remove' for testing remove method
         """
@@ -195,7 +305,7 @@ class TestHashtagManager(LabjournalTestMixin, TestCase):
     @parameterized.expand([('add',), ('remove',), ])
     def test_descriptor_deleted_state(self, method_name):
         """
-        Tests the hashtag add for deleted state
+        Tests the hashtag manipulation for deleted state
         """
         descriptor_set = ParameterDescriptorSet()
         descriptor_set.category = self._sample_descriptor.category
@@ -204,6 +314,18 @@ class TestHashtagManager(LabjournalTestMixin, TestCase):
         with self.assertRaises(EntityOperationNotPermitted,
                                msg="The hashtag can't be added to descriptor when this is not in external storage"):
             getattr(sample_descriptor.hashtags, method_name)([self._grating_hashtag.id])
+
+    @parameterized.expand([('add',), ('remove',),])
+    def test_file_deleted_state(self, method_name):
+        """
+        Tests the hashtag manipulation for deleted state
+        """
+        file_set = FileSet()
+        labjournal_file = file_set.get(self._sample_file.id)
+        labjournal_file.delete()
+        with self.assertRaises(EntityOperationNotPermitted,
+                               msg="The hashtag can't be added to file when this is not in external storage"):
+            getattr(labjournal_file.hashtags, method_name)([self._grating_hashtag.id])
 
     @parameterized.expand(hashtags_created_provider())
     def test_record_hashtags_created(self, entity_name, hashtag_list, exception_to_throw):
@@ -274,7 +396,7 @@ class TestHashtagManager(LabjournalTestMixin, TestCase):
         sample_entity = self._reload_sample_entity(sample_entity, entity_name)
         self.assertHashtagList(sample_entity, expected_hashtags)
 
-    @parameterized.expand([('record',), ('descriptor',), ])
+    @parameterized.expand(entities_provider())
     def test_hashtags_bad_project(self, entity_name):
         """
         Tests whether hashtags can be added if they belong to the other project than the entity created
@@ -282,10 +404,14 @@ class TestHashtagManager(LabjournalTestMixin, TestCase):
         :param entity_name: what entity to test: 'record', 'descriptor' or 'file'
         """
         sample_entity = self._create_sample_entity(entity_name,
-            category=RootCategoryRecord(project=self.the_rabbit_project)
+            category=RootCategoryRecord(project=self.the_rabbit_project).children[0]
         )
+        if entity_name == 'file':
+            sample_hashtag = self._behavior_hashtag
+        else:
+            sample_hashtag = self._trees_hashtag
         with self.assertRaises(ValueError, msg="Hashtags from different projects have been successfully mixed"):
-            sample_entity.hashtags.add([self._trees_hashtag.id])
+            sample_entity.hashtags.add([sample_hashtag.id])
 
     @parameterized.expand([('record',), ('descriptor',),])
     def test_record_hashtags_bad_type(self, entity_name):
@@ -295,13 +421,16 @@ class TestHashtagManager(LabjournalTestMixin, TestCase):
         :param entity_name: type of the entity to test: 'record' or 'descriptor'
         """
         sample_entity = self._create_sample_entity(entity_name)
-        sample_hashtag = FileHashtag(
-            description="Hello, World!",
-            project=self.optical_imaging,
-        )
-        sample_hashtag.create()
         with self.assertRaises(ValueError, msg="The file hashtag has been successfully added"):
-            sample_entity.hashtags.add([sample_hashtag.id])
+            sample_entity.hashtags.add([self._neurons_hashtag.id])
+
+    def test_file_hashtag_bad_type(self):
+        """
+        Tests whether the record hashtag can be successfully added to files
+        """
+        sample_entity = self._create_sample_entity('file')
+        with self.assertRaises(ValueError, msg="The record hashtag has been successfully added to a file"):
+            sample_entity.hashtags.add([self._grating_hashtag.id])
 
     def test_hashtag_access_root_category(self):
         """
@@ -319,7 +448,11 @@ class TestHashtagManager(LabjournalTestMixin, TestCase):
         :param entity_name: what would you like to test: 'record', 'descriptor', 'file'
         """
         sample_entity = self._create_sample_entity(entity_name)
-        sample_entity.hashtags.add([self._grating_hashtag.id])
+        if entity_name == 'file':
+            sample_hashtag = self._neurons_hashtag
+        else:
+            sample_hashtag = self._grating_hashtag
+        sample_entity.hashtags.add([sample_hashtag.id])
         sample_entity.delete()
         self.assertEquals(self.association_models[entity_name].objects.count(), 0,
                           "The hashtag associations are not automatically removed on entity remove")
@@ -331,10 +464,16 @@ class TestHashtagManager(LabjournalTestMixin, TestCase):
 
         :param entity_name: what would you like to test: 'record', 'descriptor' or 'file'
         """
+        if entity_name == 'file':
+            sample_hashtag = self._neurons_hashtag
+            hashtag_type = LabjournalHashtagType.file
+        else:
+            sample_hashtag = self._grating_hashtag
+            hashtag_type = LabjournalHashtagType.record
         hashtag_set = HashtagSet()
-        hashtag_set.type = LabjournalHashtagType.record
+        hashtag_set.type = hashtag_type
         hashtag_set.project = self.optical_imaging
-        sample_hashtag = hashtag_set.get(self._grating_hashtag.id)
+        sample_hashtag = hashtag_set.get(sample_hashtag.id)
         sample_entity = self._create_sample_entity(entity_name)
         sample_entity.hashtags.add([sample_hashtag.id])
         sample_hashtag.delete()
@@ -351,14 +490,22 @@ class TestHashtagManager(LabjournalTestMixin, TestCase):
 
         :param entity_name: what would you like to test: 'record', 'descriptor' or 'file'
         """
+        if entity_name == 'file':
+            hashtags1 = [self._neurons_hashtag, self._imaging_hashtag]
+            hashtags2 = [self._neurons_hashtag, self._behavior_hashtag]
+        else:
+            hashtags1 = [self._grating_hashtag, self._retinotopy_hashtag]
+            hashtags2 = [self._grating_hashtag, self._trees_hashtag]
+        hashtags1_final = [hashtag.id for hashtag in hashtags1]
+        hashtags2_final = [hashtag.id for hashtag in hashtags2]
         entity1 = self._create_sample_entity(entity_name)
         entity2 = self._create_sample_entity(entity_name, alias="other")
-        entity1.hashtags.add([self._grating_hashtag.id, self._retinotopy_hashtag.id])
-        entity2.hashtags.add([self._grating_hashtag.id, self._trees_hashtag.id])
+        entity1.hashtags.add(hashtags1_final)
+        entity2.hashtags.add(hashtags2_final)
         entity1 = self._reload_sample_entity(entity1, entity_name)
         entity2 = self._reload_sample_entity(entity2, entity_name)
-        self.assertHashtagList(entity1, [self._grating_hashtag, self._retinotopy_hashtag])
-        self.assertHashtagList(entity2, [self._grating_hashtag, self._trees_hashtag])
+        self.assertHashtagList(entity1, hashtags1)
+        self.assertHashtagList(entity2, hashtags2)
 
     @parameterized.expand(entities_provider())
     def test_hashtag_remove_interaction(self, entity_name):
@@ -367,17 +514,25 @@ class TestHashtagManager(LabjournalTestMixin, TestCase):
 
         :param entity_name: what would you like to test: 'record', 'descriptor' or 'file'
         """
+        if entity_name == 'file':
+            hashtags1 = [self._neurons_hashtag, self._imaging_hashtag]
+            hashtags2 = [self._neurons_hashtag, self._behavior_hashtag]
+        else:
+            hashtags1 = [self._grating_hashtag, self._retinotopy_hashtag]
+            hashtags2 = [self._grating_hashtag, self._trees_hashtag]
+        hashtags1_final = [hashtag.id for hashtag in hashtags1]
+        hashtags2_final = [hashtag.id for hashtag in hashtags2]
         entity1 = self._create_sample_entity(entity_name)
         entity2 = self._create_sample_entity(entity_name, alias="other")
-        entity1.hashtags.add([self._grating_hashtag.id, self._retinotopy_hashtag.id])
-        entity2.hashtags.add([self._grating_hashtag.id, self._trees_hashtag.id])
+        entity1.hashtags.add(hashtags1_final)
+        entity2.hashtags.add(hashtags2_final)
         entity1 = self._reload_sample_entity(entity1, entity_name)
         entity2 = self._reload_sample_entity(entity2, entity_name)
-        entity1.hashtags.remove([self._grating_hashtag.id])
+        entity1.hashtags.remove({hashtags1_final[0]})
         entity1 = self._reload_sample_entity(entity1, entity_name)
         entity2 = self._reload_sample_entity(entity2, entity_name)
-        self.assertHashtagList(entity1, [self._retinotopy_hashtag])
-        self.assertHashtagList(entity2, [self._grating_hashtag, self._trees_hashtag])
+        self.assertHashtagList(entity1, hashtags1[1:])
+        self.assertHashtagList(entity2, hashtags2)
 
     def assertHashtagList(self, entity, expected_hashtags):
         """
@@ -417,6 +572,14 @@ class TestHashtagManager(LabjournalTestMixin, TestCase):
                 required=True,
                 record_type=[LabjournalRecordType.data, LabjournalRecordType.service,],
             )
+        elif entity_name == 'file':
+            children = category.children
+            children.types = [LabjournalRecordType.data]
+            sample_data_record = children[0]
+            sample_entity = File(
+                name=alias,
+                record=sample_data_record,
+            )
         else:
             raise ValueError("The argument value is not correct")
         sample_entity.create()
@@ -434,6 +597,8 @@ class TestHashtagManager(LabjournalTestMixin, TestCase):
             sample_entity = self._sample_category.children.get(sample_entity.id)
         elif entity_name == 'descriptor':
             sample_entity = self._sample_category.descriptors.get(sample_entity.id)
+        elif entity_name == 'file':
+            sample_entity = FileSet().get(sample_entity.id)
         else:
             raise ValueError("The argument value is not correct")
         return sample_entity
@@ -450,6 +615,9 @@ class TestHashtagManager(LabjournalTestMixin, TestCase):
             for hashtag in hashtag_list
         ]
         final_hashtag_list = ['grating' if x == 'bad_hashtag' else x for x in final_hashtag_list]
+        final_hashtag_list = ['neurons' if x == 'bad_file_hashtag' else x for x in final_hashtag_list]
+        final_hashtag_list = [self.fake_hashtag_id if x == 1234 else x for x in final_hashtag_list]
+
         return final_hashtag_list
 
     def _get_hashtag_list_for_use(self, hashtag_list):

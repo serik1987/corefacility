@@ -23,4 +23,4 @@ class FileHashtagManager(HashtagManager):
         """
         Returns the related project
         """
-        raise NotImplementedError("TO-DO: FileHashtagManager.project")
+        return self._entity.record.project

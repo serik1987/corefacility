@@ -2,7 +2,7 @@ from ru.ihna.kozhukhov.core_application.models.enums import LabjournalHashtagTyp
 from ru.ihna.kozhukhov.core_application.entity.fields import ManagedEntityField
 
 from .hashtag import Hashtag
-from .file_hashtag_manager import FileHashtagManager
+from .hashtag_file_manager import HashtagFileManager
 
 
 class FileHashtag(Hashtag):
@@ -15,5 +15,5 @@ class FileHashtag(Hashtag):
 
     _public_field_description = {
         **Hashtag._public_field_description,
-        'files': ManagedEntityField(FileHashtagManager, description="Files this hashtag is attached to")
+        'files': ManagedEntityField(HashtagFileManager, description="Files this hashtag is attached to")
     }

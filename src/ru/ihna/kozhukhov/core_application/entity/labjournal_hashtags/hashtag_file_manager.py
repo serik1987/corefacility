@@ -15,3 +15,6 @@ class HashtagFileManager(HashtagEntityManager):
 
     _entity_field = 'file_id'
     """ Name of a column in the association table where entity IDs are stored  """
+
+    _project_lookup_field = 'record__project_id'
+    """ A column inside the database that contains project IDs """

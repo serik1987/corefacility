@@ -11,10 +11,11 @@ from ru.ihna.kozhukhov.core_application.exceptions.entity_exceptions import \
 from ru.ihna.kozhukhov.core_application.models.enums import LabjournalHashtagType, LabjournalRecordType
 
 from .labjournal_test_mixin import LabjournalTestMixin
+from ...entity.labjournal_file import File, FileSet
 
 
 def entity_provider():
-    return [('record',), ('descriptor',), ]
+    return [('record',), ('descriptor',), ('file',),]
 
 def entity_manager_provider():
     return [
@@ -42,9 +43,15 @@ def multiple_records_provider():
 
 hashtag_classes = {
     'record': RecordHashtag,
+    'descriptor': RecordHashtag,
     'file': FileHashtag
 }
 
+hashtag_types = {
+    'record': LabjournalHashtagType.record,
+    'descriptor': LabjournalHashtagType.record,
+    'file': LabjournalHashtagType.file
+}
 
 class TestHashtagEntityManager(LabjournalTestMixin, TestCase):
     """
@@ -65,10 +72,25 @@ class TestHashtagEntityManager(LabjournalTestMixin, TestCase):
         cls.most_seldom_hashtag = RecordHashtag(description="редчайший", project=cls.optical_imaging)
         cls.most_seldom_hashtag.create()
 
+        cls.chess_file_hashtag = FileHashtag(description="шахматный", project=cls.optical_imaging)
+        cls.chess_file_hashtag.create()
+
+        cls.seldom_file_hashtag = FileHashtag(description="редкий", project=cls.optical_imaging)
+        cls.seldom_file_hashtag.create()
+
+        cls.most_seldom_file_hashtag = FileHashtag(description="редчайший", project=cls.optical_imaging)
+        cls.most_seldom_file_hashtag.create()
+
         cls.hashtag_collection = {
             'chess': cls.chess_hashtag,
             'seldom': cls.seldom_hashtag,
             'most_seldom': cls.most_seldom_hashtag,
+        }
+
+        cls.file_hashtag_collection = {
+            'chess': cls.chess_file_hashtag,
+            'seldom': cls.seldom_file_hashtag,
+            'most_seldom': cls.most_seldom_file_hashtag,
         }
 
         root_record = RootCategoryRecord(project=cls.optical_imaging)
@@ -111,10 +133,38 @@ class TestHashtagEntityManager(LabjournalTestMixin, TestCase):
             if descriptor_index % 4 == 0:
                 cls.most_seldom_descriptors.append(descriptor)
 
+        sample_children = cls.sample_category.children
+        sample_children.types = [LabjournalRecordType.data]
+        sample_data = sample_children[0]
+
+        cls.all_files = list()
+        cls.chess_files = list()
+        cls.seldom_files = list()
+        cls.most_seldom_files = list()
+        for file_index in range(12):
+            file = File(
+                record=sample_data,
+                name="file-%d.dat" % file_index
+            )
+            file.create()
+            cls.all_files.append(file)
+            if file_index % 2 == 0:
+                cls.chess_files.append(file)
+            if file_index % 3 == 0:
+                cls.seldom_files.append(file)
+            if file_index % 4 == 0:
+                cls.most_seldom_files.append(file)
+
         cls.descriptor_set_collection = {
             'chess': cls.chess_descriptors,
             'seldom': cls.seldom_descriptors,
             'most_seldom': cls.most_seldom_descriptors,
+        }
+
+        cls.file_set_collection = {
+            'chess': cls.chess_files,
+            'seldom': cls.seldom_files,
+            'most_seldom': cls.most_seldom_files,
         }
 
         cls.descriptor_id_collection = {
@@ -123,19 +173,28 @@ class TestHashtagEntityManager(LabjournalTestMixin, TestCase):
             'most_seldom': {descriptor.id for descriptor in cls.most_seldom_descriptors}
         }
 
+        cls.file_id_collection = {
+            'chess': {file.id for file in cls.chess_files},
+            'seldom': {file.id for file in cls.seldom_files},
+            'most_seldom': {file.id for file in cls.most_seldom_files}
+        }
+
         cls.entity_set_collection = {
             'record': cls.record_set_collection,
             'descriptor': cls.descriptor_set_collection,
+            'file': cls.file_set_collection,
         }
 
         cls.entity_id_collection = {
             'record': cls.record_id_collection,
             'descriptor': cls.descriptor_id_collection,
+            'file': cls.file_id_collection,
         }
 
         cls.all_entities = {
             'record': cls.all_records,
             'descriptor': cls.all_descriptors,
+            'file': cls.all_files,
         }
 
         cls.chess_hashtag.records.add(cls.chess_records)
@@ -146,12 +205,20 @@ class TestHashtagEntityManager(LabjournalTestMixin, TestCase):
         cls.seldom_hashtag.descriptors.add(cls.seldom_descriptors)
         cls.most_seldom_hashtag.descriptors.add(cls.most_seldom_descriptors)
 
+        cls.chess_file_hashtag.files.add(cls.chess_files)
+        cls.seldom_file_hashtag.files.add(cls.seldom_files)
+        cls.most_seldom_file_hashtag.files.add(cls.most_seldom_files)
+
     def setUp(self):
         self.chess_hashtag = TestHashtagEntityManager.chess_hashtag
+        self.chess_file_hashtag = TestHashtagEntityManager.chess_file_hashtag
         self.seldom_hashtag = TestHashtagEntityManager.seldom_hashtag
+        self.seldom_file_hashtag = TestHashtagEntityManager.seldom_file_hashtag
         self.most_seldom_hashtag = TestHashtagEntityManager.most_seldom_hashtag
+        self.most_seldom_file_hashtag = TestHashtagEntityManager.most_seldom_file_hashtag
         self.sample_category = TestHashtagEntityManager.sample_category
         self.hashtag_collection = TestHashtagEntityManager.hashtag_collection
+        self.file_hashtag_collection = TestHashtagEntityManager.file_hashtag_collection
         self.all_records = TestHashtagEntityManager.all_records
         self.chess_records = TestHashtagEntityManager.chess_records
         self.seldom_records = TestHashtagEntityManager.seldom_records
@@ -163,6 +230,11 @@ class TestHashtagEntityManager(LabjournalTestMixin, TestCase):
         self.most_seldom_descriptors = TestHashtagEntityManager.most_seldom_descriptors
         self.descriptor_set_collection = TestHashtagEntityManager.descriptor_set_collection
         self.descriptor_id_collection = TestHashtagEntityManager.descriptor_id_collection
+        self.chess_files = TestHashtagEntityManager.chess_files
+        self.seldom_files = TestHashtagEntityManager.seldom_files
+        self.most_seldom_files = TestHashtagEntityManager.most_seldom_files
+        self.file_set_collection = TestHashtagEntityManager.file_set_collection
+        self.file_id_collection = TestHashtagEntityManager.file_id_collection
         self.entity_set_collection = TestHashtagEntityManager.entity_set_collection
         self.entity_id_collection = TestHashtagEntityManager.entity_id_collection
         self.all_entities = TestHashtagEntityManager.all_entities
@@ -175,7 +247,7 @@ class TestHashtagEntityManager(LabjournalTestMixin, TestCase):
         :param entity_name: name of the entity to test - 'record', 'descriptor' or 'file'
         :param method_name: what method to test - 'add' or 'remove'
         """
-        custom_hashtag = RecordHashtag(
+        custom_hashtag = hashtag_classes[entity_name](
             description="произвольный",
             project=self.optical_imaging,
         )
@@ -194,8 +266,12 @@ class TestHashtagEntityManager(LabjournalTestMixin, TestCase):
         """
         hashtag_list = HashtagSet()
         hashtag_list.project = self.optical_imaging
-        hashtag_list.type = LabjournalHashtagType.record
-        sample_hashtag = hashtag_list.get(self.chess_hashtag.id)
+        hashtag_list.type = hashtag_types[entity_name]
+        if entity_name == 'file':
+            sample_hashtag_id = self.chess_file_hashtag.id
+        else:
+            sample_hashtag_id = self.chess_hashtag.id
+        sample_hashtag = hashtag_list.get(sample_hashtag_id)
         sample_hashtag.delete()
         with self.assertRaises(EntityOperationNotPermitted,
                                msg="The hashtag can't be attached when this is in DELETED state"):
@@ -214,7 +290,7 @@ class TestHashtagEntityManager(LabjournalTestMixin, TestCase):
         """
         entities_to_add = list(self.entity_set_collection[entity_name]['chess'])[:entity_number]
         entity_ids_to_add = {entity.id for entity in entities_to_add}
-        sample_hashtag = self.create_sample_hashtag('record')
+        sample_hashtag = self.create_sample_hashtag(entity_name)
         if hashtag_reload_needed:
             sample_hashtag = self.reload_sample_hashtag(sample_hashtag)
         getattr(sample_hashtag, entity_name + 's').add(entities_to_add[:duplicated_entity_number])
@@ -240,7 +316,7 @@ class TestHashtagEntityManager(LabjournalTestMixin, TestCase):
         """
         entities_to_remove = list(self.entity_set_collection[entity_name]['chess'])[:entity_number]
         entity_ids_to_remove = {entity.id for entity in entities_to_remove}
-        sample_hashtag = self.create_sample_hashtag('record')
+        sample_hashtag = self.create_sample_hashtag(entity_name)
         if hashtag_reload_needed:
             sample_hashtag = self.reload_sample_hashtag(sample_hashtag)
         getattr(sample_hashtag, entity_name + 's').remove(entities_to_remove[:duplicated_entity_number])
@@ -264,12 +340,16 @@ class TestHashtagEntityManager(LabjournalTestMixin, TestCase):
         sample_entity = self.create_sample_entity(entity_name)
         bad_id = sample_entity.id
         sample_entity.delete()
+        if entity_name == 'file':
+            sample_hashtag = self.chess_file_hashtag
+        else:
+            sample_hashtag = self.chess_hashtag
         with self.assertRaises(EntityNotFoundException,
                                msg="Hashtag has been successfully added to non-existent entity"):
-            getattr(self.chess_hashtag, entity_name + 's').add([bad_id])
+            getattr(sample_hashtag, entity_name + 's').add([bad_id])
 
     @parameterized.expand(entity_provider())
-    def test_add_bad_record_id(self, entity_name):
+    def test_remove_bad_record_id(self, entity_name):
         """
         Tests whether the remove() works correctly if ID of non-existent entity was put
 
@@ -278,9 +358,13 @@ class TestHashtagEntityManager(LabjournalTestMixin, TestCase):
         sample_entity = self.create_sample_entity(entity_name)
         bad_id = sample_entity.id
         sample_entity.delete()
+        if entity_name == 'file':
+            sample_hashtag = self.chess_file_hashtag
+        else:
+            sample_hashtag = self.chess_hashtag
         # Both outcomes are OK: successful execution with no changes and throwing the EntityNotFoundException
         try:
-            getattr(self.chess_hashtag, entity_name + 's').remove([bad_id])
+            getattr(sample_hashtag, entity_name + 's').remove([bad_id])
         except EntityNotFoundException:
             pass
 
@@ -292,9 +376,13 @@ class TestHashtagEntityManager(LabjournalTestMixin, TestCase):
         :param entity_name: what entity to test: 'record', 'descriptor' or 'file'
         """
         sample_entity = self.create_sample_entity(entity_name, project=self.the_rabbit_project)
+        if entity_name == 'file':
+            sample_hashtag = self.chess_file_hashtag
+        else:
+            sample_hashtag = self.chess_hashtag
         with self.assertRaises(EntityNotFoundException,
                                msg="Hashtag has been successfully added to entity from another project"):
-            getattr(self.chess_hashtag, entity_name + 's').add([sample_entity.id])
+            getattr(sample_hashtag, entity_name + 's').add([sample_entity.id])
 
     @parameterized.expand(entity_manager_provider())
     def test_entity_in_creating_state(self, entity_name, method_name):
@@ -304,9 +392,13 @@ class TestHashtagEntityManager(LabjournalTestMixin, TestCase):
         :param entity_name: what entity to test: 'record', 'descriptor' or 'file'
         """
         sample_entity = self.create_sample_entity(entity_name, create_in_db=False)
+        if entity_name == 'file':
+            sample_hashtag = self.chess_file_hashtag
+        else:
+            sample_hashtag = self.chess_hashtag
         with self.assertRaises(EntityNotFoundException,
                                msg="Hashtag has been successfully added to the entity in CREATING state"):
-            entity_manager = getattr(self.chess_hashtag, entity_name + 's')
+            entity_manager = getattr(sample_hashtag, entity_name + 's')
             getattr(entity_manager, method_name)([sample_entity])
 
     @parameterized.expand(entity_manager_provider())
@@ -361,6 +453,13 @@ class TestHashtagEntityManager(LabjournalTestMixin, TestCase):
                 required=False,
                 record_type=[LabjournalRecordType.service],
             )
+        elif entity_name == 'file':
+            data = category.children
+            data.types = [LabjournalRecordType.data]
+            sample_entity = File(
+                name="xxx",
+                record=data[0]
+            )
         else:
             raise ValueError("The entity '%s' is not supported" % entity_name)
         if create_in_db:
@@ -381,6 +480,9 @@ class TestHashtagEntityManager(LabjournalTestMixin, TestCase):
             descriptor_set = ParameterDescriptorSet()
             descriptor_set.category = self.sample_category
             reloaded_entity = descriptor_set.get(entity.id)
+        elif entity_name == 'file':
+            file_set = FileSet()
+            reloaded_entity = file_set.get(entity.id)
         else:
             raise ValueError("reload_sample_entity doesn't work for a given entity_name")
         return reloaded_entity
@@ -394,7 +496,7 @@ class TestHashtagEntityManager(LabjournalTestMixin, TestCase):
         """
         hashtag_set = HashtagSet()
         hashtag_set.project = self.optical_imaging
-        hashtag_set.type = LabjournalHashtagType.record
+        hashtag_set.type = hashtag.type
         reloaded_hashtag = hashtag_set.get(hashtag.id)
         return reloaded_hashtag
 
@@ -403,10 +505,15 @@ class TestHashtagEntityManager(LabjournalTestMixin, TestCase):
         Returns so called 'default' hashtags that contained inside the entity before running the test case
 
         :param entity: the entity which hashtags must be computed
+        :param entity_name: type of the entity: 'record', 'descriptor' or 'file'
         :return: the set with expected hashtags
         """
+        if entity_name == 'file':
+            hashtag_collection = self.file_hashtag_collection
+        else:
+            hashtag_collection = self.hashtag_collection
         expected_hashtag_ids = set()
         for standard_hashtag_cue, standard_hashtag_entities in self.entity_id_collection[entity_name].items():
             if entity.id in standard_hashtag_entities:
-                expected_hashtag_ids.add(self.hashtag_collection[standard_hashtag_cue].id)
+                expected_hashtag_ids.add(hashtag_collection[standard_hashtag_cue].id)
         return expected_hashtag_ids

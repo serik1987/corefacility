@@ -65,8 +65,9 @@ class ProjectProvider(ModelProvider):
         """
         entity = super().wrap_entity(external_object)
         group_provider = GroupProvider()
-        entity._root_group = group_provider.wrap_entity(entity._root_group)
-        entity._governor = entity._root_group.governor
+        if entity._root_group is not None:
+            entity._root_group = group_provider.wrap_entity(entity._root_group)
+            entity._governor = entity._root_group.governor
         return entity
 
     def delete_entity(self, project):
