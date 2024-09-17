@@ -22,6 +22,7 @@ class ServiceRecord(Record):
 
     _public_field_description = Record._public_field_description.copy()
     del _public_field_description['alias']
+    del _public_field_description['path']
     _public_field_description['name'] = EntityField(
         str,
         max_length=256,

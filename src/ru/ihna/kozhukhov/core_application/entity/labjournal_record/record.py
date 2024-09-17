@@ -10,6 +10,7 @@ from .record_set import RecordSet
 from .record_provider import RecordProvider
 from .category_startdate_provider import CategoryStartdateProvider
 from .record_check_provider import RecordCheckProvider
+from .fields import RecordPathField
 
 
 class Record(Entity):
@@ -52,7 +53,7 @@ class Record(Entity):
             pattern=re.compile(r'^[A-Za-z0-9\-_]+$')
         ),
 
-        'path': ReadOnlyField(default=None, description="Full path to the laboratory record"),
+        'path': RecordPathField(description="Full path to the laboratory record"),
 
         'datetime': DateTimeField(datetime, description="Date and time of the record start"),
 

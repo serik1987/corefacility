@@ -283,9 +283,7 @@ class RecordReader(RawSqlQueryReader):
         project_emulator = ModelEmulator(
             id=project_id,
             alias=project_alias,
-            root_group=ModelEmulator(
-                id=root_group_id,
-            )
+            root_group=None,
         )
         emulator = ModelEmulator(
             id=record_id,

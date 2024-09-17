@@ -4,6 +4,8 @@ from django.template.exceptions import TemplateDoesNotExist
 from django.core.mail import EmailMultiAlternatives
 from django.utils.translation import gettext as _
 
+from .labjournal_cache import LabjournalCache
+
 
 KILOBYTE = 1024
 MEGABYTE = 1024 * KILOBYTE

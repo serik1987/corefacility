@@ -186,12 +186,15 @@ class RecordProvider(ModelProvider):
             entity._parent_category = CategoryRecord(
                 _src=entity._parent_category,
                 id=external_object.parent_category_id,
-                datetime=external_object.parent_category.datetime,
-                finish_time=external_object.parent_category.finish_time,
                 project=entity.project,
             )
+            if hasattr(external_object.parent_category, 'datetime'):
+                entity._parent_category._datetime = external_object.parent_category.datetime
+            if hasattr(external_object.parent_category, 'finish_time'):
+                entity._parent_category._finish_time = external_object.parent_category.finish_time
         if external_object.parent_category is not None and \
                 isinstance(external_object.parent_category, ModelEmulator) and \
+                hasattr(external_object.parent_category, 'datetime') and \
                 isinstance(external_object.parent_category.datetime, datetime) and \
                 isinstance(external_object.datetime, datetime):
             entity._relative_time = external_object.datetime - external_object.parent_category.datetime

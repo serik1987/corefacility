@@ -4,6 +4,7 @@ from ru.ihna.kozhukhov.core_application.models.enums.labjournal_record_type impo
 from ru.ihna.kozhukhov.core_application.exceptions.entity_exceptions import EntityNotFoundException
 
 from .record import Record
+from ...utils import LabjournalCache
 
 
 class CategoryRecord(Record):
@@ -22,6 +23,9 @@ class CategoryRecord(Record):
     If these fields are not filled by the server side's view layer the labjournal record can't be saved
     """
 
+    _old_alias = None
+    """ The alias at the moment of category create and/or its last update """
+
     _public_field_description = Record._public_field_description.copy()
     _public_field_description.update({
         'datetime': DateTimeReadOnlyField(description="Date and time of the very first record"),
@@ -33,6 +37,16 @@ class CategoryRecord(Record):
             description="Base directory (relatively to the base directory of the parent category)"
         )
     })
+
+    def __init__(self, **kwargs):
+        """
+        Initializes the category.
+
+        :param kwargs:
+        """
+        super().__init__(**kwargs)
+        if 'alias' in self._public_fields:
+            self._old_alias = self._public_fields['alias']
 
     @property
     def children(self):
@@ -53,6 +67,39 @@ class CategoryRecord(Record):
         descriptor_set = ParameterDescriptorSet()
         descriptor_set.category = self
         return descriptor_set
+
+    def create(self):
+        """
+        Creates the entity on the database and all its auxiliary sources
+
+        :return: nothing
+        """
+        super().create()
+        self._old_alias = self._public_fields['alias']
+
+    def update(self):
+        """
+        Updates the entity to the database and all its auxiliary sources
+
+        The update is not possible when the entity state is not 'changed'
+
+        :return: nothing
+        """
+        LabjournalCache().remove_category(self, self._old_alias)
+        super().update()
+        self._old_alias = self._public_fields['alias']
+
+    def delete(self):
+        """
+        Deletes the entity from the database and all its auxiliary sources
+
+        The entity can't be deleted when it still 'creating'
+
+        :return: nothing
+        """
+        LabjournalCache().remove_category(self, self._old_alias)
+        super().delete()
+        self._old_alias = None
 
     def get_viewed_parameters(self, context):
         """

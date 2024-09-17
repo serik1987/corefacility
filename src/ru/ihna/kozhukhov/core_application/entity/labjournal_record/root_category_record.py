@@ -1,7 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 
-from ru.ihna.kozhukhov.core_application.entity.fields.entity_field import EntityField
-from ru.ihna.kozhukhov.core_application.entity.fields.related_entity_field import RelatedEntityField
+from ru.ihna.kozhukhov.core_application.entity.fields import EntityField, RelatedEntityField, ReadOnlyField
 from ru.ihna.kozhukhov.core_application.exceptions.entity_exceptions import EntityOperationNotPermitted
 from .category_record import CategoryRecord
 from .root_record_provider import RootRecordProvider
@@ -38,6 +37,7 @@ class RootCategoryRecord(CategoryRecord):
         description="The base directory (absolute path only)",
         max_length=256,
     )
+    _public_field_description['path'] = ReadOnlyField(default="/", description="Full path to the laboratory record")
 
     @classmethod
     def get_entity_class_name(cls):

@@ -1,5 +1,4 @@
 from django.db import transaction
-from django.utils.module_loading import import_string
 
 from ..exceptions.entity_exceptions import EntityOperationNotPermitted, EntityProvidersNotDefined, EntityFieldInvalid, \
     EntityFieldRequiredException
@@ -286,6 +285,8 @@ class Entity:
         from .field_managers.entity_value_manager import EntityValueManager
         if name in self._public_fields:
             description = self._public_field_description[name]
+            if hasattr(description, 'entity'):
+                description.entity = self
             raw_value = self._public_fields[name]
             value = description.proofread(raw_value)
             if isinstance(value, EntityValueManager):
@@ -296,6 +297,8 @@ class Entity:
             return self._public_fields[name[1:]]
         elif name in self._public_field_description:
             description = self._public_field_description[name]
+            if hasattr(description, 'entity'):
+                description.entity = self
             value = description.default
             if isinstance(value, EntityValueManager):
                 value.entity = self
