@@ -1,9 +1,11 @@
-from collections import namedtuple, OrderedDict
+import json
+import re
+from collections import namedtuple, OrderedDict, deque
 from django.conf import settings
 from django.db import connection
 
-from ..models import LabjournalCache as CacheDatabaseModel
-from ..models.enums import LabjournalRecordType
+from ru.ihna.kozhukhov.core_application.models import LabjournalCache as CacheDatabaseModel
+from ru.ihna.kozhukhov.core_application.models.enums import LabjournalRecordType
 
 LABJOURNAL_CACHE_MAX_SIZE = 1000
 
@@ -15,13 +17,19 @@ class LabjournalCache:
     There are two caches. The cache 1 stores the data in the operating memory and resets everywhere when
     the Webserver or worker process restarts. The level 2 cache stores the data in the database and it doesn't restart.
     However, the cache 2 works more slowly than the level 1 cache.
+
+    IMMEDIATE WARNING! After change in category alias, descriptors, hashtag attachment to descriptors, values of
+    custom parameters the cache MUST BE CLEANED BY THE CONTROLLER.
     """
 
     CacheItem = namedtuple(
         "CategoryInfo",
         ['category', 'path', 'descriptors', 'custom_parameters', 'base_directory']
     )
-    """ Auxiliary objects used for information transmission between the record entity and the cache """
+    """
+    Cache item is a chunk of information that can be stored in cache or retrieved from cache during a single cache
+    operation
+    """
 
     _instance = None
     """ The only instance of the class """
@@ -31,6 +39,40 @@ class LabjournalCache:
 
     _category_path_cache = None
     """ Cache for category paths """
+
+    root_path_pattern = re.compile(r"^\d*:/$")
+
+    @classmethod
+    def create_cache_item(cls, related_category, category_chain, path):
+        """
+        Creates new cached item.
+        The method doesn't store the cached item on cache.
+
+        :param related_category: a category which cache item shall be created. All cache items inside the cache are
+            indexed by their categories.
+        :param category_chain: the deque that contains categories from the very first category
+        :param path: full path to the related category
+        """
+        from ru.ihna.kozhukhov.core_application.entity.labjournal_record import RootCategoryRecord
+        root_record = RootCategoryRecord(project=related_category.project)
+        if len(category_chain) == 0 or not category_chain[0].is_root_record:
+            category_chain.appendleft(root_record)
+
+        from ru.ihna.kozhukhov.core_application.entity.labjournal_parameter_descriptor import ParameterDescriptorSet
+        descriptor_set = ParameterDescriptorSet()
+        descriptor_set.category_list = category_chain
+        descriptors = OrderedDict()
+        for descriptor in descriptor_set:
+            descriptors[descriptor.identifier] = descriptor
+
+        cache_item = LabjournalCache.CacheItem(
+            category=related_category,
+            path="%d:%s" % (related_category.project.id, path),
+            descriptors=descriptors,
+            custom_parameters=None,
+            base_directory=None,
+        )
+        return cache_item
 
     def __new__(cls, *args, **kwargs):
         """
@@ -94,15 +136,17 @@ class LabjournalCache:
                 self._put_category_to_cache_1(cache_item)
         return cache_item
 
-    def remove_category(self, category, old_alias):
+    def clean_category(self, category, old_alias=None):
         """
         Removes category as well as all children categories from the cache.
         The category will be removed both from the level 1 cache and the level 2 cache.
 
         :param category: a category to remove
-        :param old_alias: old alias of the category
+        :param old_alias: old alias of the category if the category is not root. Useless if the category is root
         """
-        if category.parent_category.is_root_record:
+        if category.is_root_record:
+            old_path = "%d:/" % category.project.id
+        elif category.parent_category.is_root_record:
             old_path = "%d:/%s" % (category.project.id, old_alias)
         else:
             from ru.ihna.kozhukhov.core_application.entity.labjournal_record import RecordSet
@@ -116,6 +160,9 @@ class LabjournalCache:
         """
         Permanently removes all information about the level 1 and the level 2 categories from the cache.
         This function is used for simulation of Webserver restart during the cache tests execution.
+
+        IMMEDIATE WARNING! After change in category alias, descriptors, hashtag attachment to descriptors, values of
+        custom parameters the cache MUST BE CLEANED BY THE CONTROLLER.
         """
         if self._category_info_cache is not None:
             del self._category_info_cache
@@ -188,17 +235,20 @@ class LabjournalCache:
         :return: a CacheItem containing information about that category or None if the category is not present
             in the cache 2
         """
-        try:
-            cache_model = CacheDatabaseModel.objects.get(category_id=category.id)
-            cache_item = self.CacheItem(
-                category=category,
-                path=cache_model.path,
-                descriptors=cache_model.descriptors,
-                custom_parameters=cache_model.custom_parameters,
-                base_directory=cache_model.base_directory,
-            )
-        except CacheDatabaseModel.DoesNotExist:
+        if category.is_root_record: # Root record definitely doesn't exist in the cache 2
             cache_item = None
+        else:
+            try:
+                cache_model = CacheDatabaseModel.objects.get(category_id=category.id)
+                cache_item = self.CacheItem(
+                    category=category,
+                    path=cache_model.path,
+                    descriptors=self.__deserialize_descriptors(cache_model.descriptors),
+                    custom_parameters=cache_model.custom_parameters,
+                    base_directory=cache_model.base_directory,
+                )
+            except CacheDatabaseModel.DoesNotExist:
+                cache_item = None
         return cache_item
 
     def _retrieve_category_by_path_from_cache_2(self, path):
@@ -211,25 +261,10 @@ class LabjournalCache:
         """
         from ru.ihna.kozhukhov.core_application.entity.labjournal_record.record_provider import RecordProvider
         from ru.ihna.kozhukhov.core_application.entity.readers.model_emulators import ModelEmulator
-        from ru.ihna.kozhukhov.core_application.entity.readers.query_builders.data_source import SqlTable
-        from ru.ihna.kozhukhov.core_application.entity.readers.query_builders.query_filters import StringQueryFilter
-        cache_item_query_builder = settings.QUERY_BUILDER_CLASS() \
-            .add_select_expression('cache.category_id') \
-            .add_select_expression('cache.path') \
-            .add_select_expression('cache.descriptors') \
-            .add_select_expression('cache.custom_parameters') \
-            .add_select_expression('cache.base_directory') \
-            .add_select_expression('record.parent_category_id') \
-            .add_select_expression('record.project_id') \
-            .add_data_source(SqlTable('core_application_labjournalcache', 'cache')) \
-            .set_main_filter(StringQueryFilter('cache.path=%s', path))
-        cache_item_query_builder.data_source.add_join(
-            cache_item_query_builder.JoinType.INNER,
-            SqlTable("core_application_labjournalrecord", 'record'),
-            "ON (record.id = cache.category_id)"
-        )
+        if self.root_path_pattern.match(path) is not None: # Root record definitely doesn't exist in the cache 2
+            return None
+        cache_item_query = self.__get_find_by_cache_query(path)
         with connection.cursor() as cursor:
-            cache_item_query = cache_item_query_builder.build()
             cursor.execute(cache_item_query[0], cache_item_query[1:])
             fetch_result = cursor.fetchone()
         if fetch_result is not None:
@@ -250,7 +285,7 @@ class LabjournalCache:
                     ),
                 )),
                 path=path,
-                descriptors=descriptors,
+                descriptors=self.__deserialize_descriptors(descriptors),
                 custom_parameters=custom_parameters,
                 base_directory=base_directory,
             )
@@ -264,10 +299,12 @@ class LabjournalCache:
 
         :param category_info: information about the category to put to the cache 2
         """
+        if category_info.category.is_root_record:  # No root record can be stored in cache 2
+            return
         CacheDatabaseModel(
             category_id=category_info.category.id,
             path=category_info.path,
-            descriptors=category_info.descriptors,
+            descriptors=self.__serialize_descriptors(category_info.descriptors),
             custom_parameters=category_info.custom_parameters,
             base_directory=category_info.base_directory,
         ).save()
@@ -281,3 +318,58 @@ class LabjournalCache:
         CacheDatabaseModel.objects \
             .filter(path__startswith=old_path) \
             .delete()
+
+    def __get_find_by_cache_query(self, path):
+        from ru.ihna.kozhukhov.core_application.entity.readers.query_builders.data_source import SqlTable
+        from ru.ihna.kozhukhov.core_application.entity.readers.query_builders.query_filters import StringQueryFilter
+        cache_item_query_builder = settings.QUERY_BUILDER_CLASS() \
+            .add_select_expression('cache.category_id') \
+            .add_select_expression('cache.path') \
+            .add_select_expression('cache.descriptors') \
+            .add_select_expression('cache.custom_parameters') \
+            .add_select_expression('cache.base_directory') \
+            .add_select_expression('record.parent_category_id') \
+            .add_select_expression('record.project_id') \
+            .add_data_source(SqlTable('core_application_labjournalcache', 'cache')) \
+            .set_main_filter(StringQueryFilter('cache.path=%s', path))
+        cache_item_query_builder.data_source.add_join(
+            cache_item_query_builder.JoinType.INNER,
+            SqlTable("core_application_labjournalrecord", 'record'),
+            "ON (record.id = cache.category_id)"
+        )
+        cache_item_query = cache_item_query_builder.build()
+        return cache_item_query
+
+    def __serialize_descriptors(self, descriptors):
+        """
+        Serializes all descriptors inside the descriptor dictionary
+
+        :param descriptors: an identifier => descriptor dictionary
+        :return: an identifier => descriptor object dictionary
+        """
+        from ru.ihna.kozhukhov.core_application.entity.labjournal_parameter_descriptor.parameter_descriptor_provider \
+            import ParameterDescriptorProvider
+        provider = ParameterDescriptorProvider()
+        serialized_descriptors = OrderedDict([
+            (identifier, provider.serialize(descriptor))
+            for identifier, descriptor in descriptors.items()
+        ])
+        return serialized_descriptors
+
+    def __deserialize_descriptors(self, serialized_descriptors):
+        """
+        Deserializes all descriptors inside the descriptor dictionary
+
+        :param serialized_descriptors: an identifier => descriptor object dictionary
+        :return: an identifier => descriptor dictionary
+        """
+        from ru.ihna.kozhukhov.core_application.entity.labjournal_parameter_descriptor.parameter_descriptor_provider \
+            import ParameterDescriptorProvider
+        provider = ParameterDescriptorProvider()
+        if isinstance(serialized_descriptors, str):
+            serialized_descriptors = json.loads(serialized_descriptors)
+        descriptors = OrderedDict([
+            (identifier, provider.deserialize(serialized_descriptor))
+            for identifier, serialized_descriptor in serialized_descriptors.items()
+        ])
+        return descriptors

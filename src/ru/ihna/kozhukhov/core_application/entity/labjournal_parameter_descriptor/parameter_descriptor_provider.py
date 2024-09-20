@@ -2,7 +2,9 @@ from django.utils.module_loading import import_string
 
 from ru.ihna.kozhukhov.core_application.entity.providers.model_providers.model_provider import ModelProvider
 from ru.ihna.kozhukhov.core_application.entity.labjournal_hashtags.hashtag_provider import HashtagProvider
+from ru.ihna.kozhukhov.core_application.entity.readers.model_emulators import ModelEmulator
 from ru.ihna.kozhukhov.core_application.models import LabjournalParameterDescriptor
+from ru.ihna.kozhukhov.core_application.models.enums import LabjournalHashtagType
 from ru.ihna.kozhukhov.core_application.models.enums.labjournal_record_type import LabjournalRecordType
 from ru.ihna.kozhukhov.core_application.models.enums.labjournal_field_type import LabjournalFieldType
 from ru.ihna.kozhukhov.core_application.exceptions.entity_exceptions import EntityOperationNotPermitted
@@ -158,3 +160,75 @@ class ParameterDescriptorProvider(ModelProvider):
         if entity.type == LabjournalFieldType.number:
             external_object.units = entity._units
         return external_object
+
+    def serialize(self, descriptor):
+        """
+        Transforms the descriptor to Python primitive for storing in cache 2
+
+        :param descriptor: the ParameterDescriptor entity
+        :return: the Python primitive
+        """
+        data = {
+            'type': descriptor.type,
+            'id': descriptor.id,
+            'identifier': descriptor.identifier,
+            'index': descriptor.index,
+            'description': descriptor.description,
+            'required': descriptor.required,
+            'default': descriptor.default,
+            'record_type': [str(record_type) for record_type in descriptor.record_type],
+            'hashtags': [],
+            'category.id': descriptor.category.id,
+            'category.project.id': descriptor.category.project.id,
+        }
+        if descriptor.type == LabjournalFieldType.number:
+            data['units'] = descriptor.units
+        if descriptor.type == LabjournalFieldType.discrete:
+            data['values'] = list(descriptor.values)
+        for hashtag in descriptor.hashtags:
+            data['hashtags'].append({'id': hashtag.id, 'description': hashtag.description})
+        return data
+
+    def deserialize(self, data):
+        """
+        Transforms the Python primitive restores from the cache 2 to the descriptor
+
+        :param data: the Python primitive restored from the descriptor
+        :return the descriptor that has been restored
+        """
+        descriptor_model = ModelEmulator(
+            type=data['type'],
+            id=data['id'],
+            category=ModelEmulator(
+                id=data['category.id'],
+                project=ModelEmulator(
+                    id=data['category.project.id'],
+                    root_group=None,
+                )
+            ),
+            identifier=data['identifier'],
+            index=data['index'],
+            description=data['description'],
+            required=data['required'],
+            default=data['default'],
+            hashtags=[],
+        )
+        descriptor_model.add_field('for_data_record', 'D' in data['record_type'])
+        descriptor_model.add_field('for_service_record', 'S' in data['record_type'])
+        descriptor_model.add_field('for_category_record', 'C' in data['record_type'])
+        if LabjournalFieldType(data['type']) == LabjournalFieldType.number:
+            descriptor_model.add_field('units', data['units'])
+        if LabjournalFieldType(data['type']) == LabjournalFieldType.discrete:
+            descriptor_model.add_field('values', data['values'])
+        for hashtag_data in data['hashtags']:
+            descriptor_model.hashtags.append(ModelEmulator(
+                id=hashtag_data['id'],
+                description=hashtag_data['description'],
+                type=LabjournalHashtagType.record,
+                project=ModelEmulator(
+                    id=data['category.project.id'],
+                    root_group=None,
+                )
+            ))
+        descriptor = self.wrap_entity(descriptor_model)
+        return descriptor

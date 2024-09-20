@@ -1,3 +1,5 @@
+from collections import deque
+
 from django.db.models import F
 from django.utils.translation import gettext_lazy as _
 
@@ -21,7 +23,8 @@ class ParameterDescriptorSet(SwappableEntitySet):
     _alias_kwarg = 'identifier'
 
     _entity_filter_list = {
-        'category': (CategoryRecord, None)
+        'category': (CategoryRecord, None),
+        'category_list': (deque, None),
     }
 
     _index_offset = 1

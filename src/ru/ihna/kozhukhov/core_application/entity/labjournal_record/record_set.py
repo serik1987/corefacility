@@ -1,4 +1,5 @@
 import re
+from collections import deque
 from enum import Enum
 
 from django.utils.translation import gettext_lazy as _
@@ -112,27 +113,51 @@ class RecordSet(EntitySet):
             project, path = lookup
             if not isinstance(project, Project) or not isinstance(path, str):
                 raise ValueError("The record can be identified either by its ID or by its (project, lookup) pair")
-            if path == "/":
-                return self.get_root(project)
             root_child_match = self.root_child_path.match(path)
             general_path_match = self.general_path.match(path)
-            if root_child_match is not None:
-                from .root_category_record import RootCategoryRecord
-                parent_category = RootCategoryRecord(project=project)
+            if path == "/":
+                parent_category_path = "/"
+                alias = None
+            elif root_child_match is not None:
+                parent_category_path = "/"
                 alias = root_child_match[1]
             elif general_path_match is not None:
                 parent_category_path = general_path_match[self.general_path_parent_category_position]
                 alias = general_path_match[self.general_path_alias_position]
-                cache = LabjournalCache()
-                try:
-                    cache_item = cache.retrieve_category_by_path(project, parent_category_path)
-                except KeyError:
-                    cache_item = self._evaluate_category_by_path(project, parent_category_path)
-                    cache.put_category(cache_item)
-                parent_category = cache_item.category
             else:
                 raise EntityNotFoundException()
-            return self.get_by_parent_category_and_alias(parent_category, alias)
+            cache = LabjournalCache()
+            try:
+                cache_item = cache.retrieve_category_by_path(project, parent_category_path)
+            except KeyError:
+                cache_item = self._evaluate_category_by_path(project, parent_category_path)
+                cache.put_category(cache_item)
+            if path == "/":
+                record = self.get_root(project)
+            else:
+                record = self.get_by_parent_category_and_alias(cache_item.category, alias)
+            return record
+            # if path == "/":
+            #     return self.get_root(project)
+            # root_child_match = self.root_child_path.match(path)
+            # general_path_match = self.general_path.match(path)
+            # if root_child_match is not None:
+            #     from .root_category_record import RootCategoryRecord
+            #     parent_category = RootCategoryRecord(project=project)
+            #     alias = root_child_match[1]
+            # elif general_path_match is not None:
+            #     parent_category_path = general_path_match[self.general_path_parent_category_position]
+            #     alias = general_path_match[self.general_path_alias_position]
+            #     cache = LabjournalCache()
+            #     try:
+            #         cache_item = cache.retrieve_category_by_path(project, parent_category_path)
+            #     except KeyError:
+            #         cache_item = self._evaluate_category_by_path(project, parent_category_path)
+            #         cache.put_category(cache_item)
+            #     parent_category = cache_item.category
+            # else:
+            #     raise EntityNotFoundException()
+            # return self.get_by_parent_category_and_alias(parent_category, alias)
         else:
             return super().get(lookup)
 
@@ -165,11 +190,15 @@ class RecordSet(EntitySet):
         :return: the CacheItem related to the category
         """
         from ru.ihna.kozhukhov.core_application.entity.labjournal_record import RootCategoryRecord
-        path_terms = parent_category_path.split("/")
+        if parent_category_path == "/":
+            path_terms = ['']
+        else:
+            path_terms = parent_category_path.split("/")
         category = RootCategoryRecord(project=project)
         reader = self.entity_reader_class()
         provider = reader.get_entity_provider()
         provider.current_type = LabjournalRecordType.category
+        category_chain = deque()
         for path_term in path_terms[1:]:
             try:
                 category_model = LabjournalRecord.objects.get(
@@ -184,13 +213,15 @@ class RecordSet(EntitySet):
                     parent_category=category,
                     project=project,
                 ))
+                category_chain.append(category)
             except LabjournalRecord.DoesNotExist:
                 raise EntityNotFoundException()
-        cache_item = LabjournalCache.CacheItem(
-            category=category,
-            path="%d:%s" % (category.project.id, parent_category_path),
-            descriptors=None,
-            custom_parameters=None,
-            base_directory=None,
-        )
-        return cache_item
+        return LabjournalCache.create_cache_item(category, category_chain, parent_category_path)
+        # cache_item = LabjournalCache.CacheItem(
+        #     category=category,
+        #     path="%d:%s" % (category.project.id, parent_category_path),
+        #     descriptors=None,
+        #     custom_parameters=None,
+        #     base_directory=None,
+        # )
+        # return cache_item

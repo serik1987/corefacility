@@ -8,6 +8,7 @@ from ru.ihna.kozhukhov.core_application.entity.labjournal_hashtags import Descri
 from .parameter_descriptor_set import ParameterDescriptorSet
 from .parameter_descriptor_provider import ParameterDescriptorProvider
 from .record_type_field import RecordTypeField
+from ...utils import LabjournalCache
 
 
 class ParameterDescriptor(Entity):

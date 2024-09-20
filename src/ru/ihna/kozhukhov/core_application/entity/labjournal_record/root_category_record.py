@@ -37,7 +37,7 @@ class RootCategoryRecord(CategoryRecord):
         description="The base directory (absolute path only)",
         max_length=256,
     )
-    _public_field_description['path'] = ReadOnlyField(default="/", description="Full path to the laboratory record")
+    # _public_field_description['path'] = ReadOnlyField(default="/", description="Full path to the laboratory record")
 
     @classmethod
     def get_entity_class_name(cls):

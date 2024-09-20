@@ -1,8 +1,10 @@
 import json
+from collections import deque
 
 from ru.ihna.kozhukhov.core_application.entity.readers.query_builders.data_source import SqlTable
 from ru.ihna.kozhukhov.core_application.entity.readers.raw_sql_query_reader import RawSqlQueryReader
-from ru.ihna.kozhukhov.core_application.entity.readers.query_builders.query_filters import StringQueryFilter
+from ru.ihna.kozhukhov.core_application.entity.readers.query_builders.query_filters import StringQueryFilter, \
+    OrQueryFilter
 from ru.ihna.kozhukhov.core_application.entity.readers.model_emulators import ModelEmulator
 from ru.ihna.kozhukhov.core_application.models.enums import LabjournalHashtagType, LabjournalRecordType
 
@@ -28,6 +30,12 @@ class ParameterDescriptorReader(RawSqlQueryReader):
     """A reader where no category was selected is unsuitable
     """
 
+    _categories = None
+    """
+    For the very special case when 'category_list' filter was used instead of the 'category' filter',
+    this property equals to category_id => category dictionary
+    """
+
     _lookup_table_name = "descriptor"
     """ A table which IDs are uniquely relate to the whole entities """
 
@@ -39,6 +47,7 @@ class ParameterDescriptorReader(RawSqlQueryReader):
         :return: nothing
         """
         self.items_builder \
+            .add_select_expression('descriptor.category_id') \
             .add_select_expression('descriptor.type') \
             .add_select_expression('descriptor.id') \
             .add_select_expression('descriptor.identifier') \
@@ -103,8 +112,46 @@ class ParameterDescriptorReader(RawSqlQueryReader):
                 builder.main_filter &= StringQueryFilter("descriptor.category_id=%s", category.id)
             builder.main_filter &= StringQueryFilter("descriptor.project_id=%s", category.project.id)
         self._category = category
+        self._categories = None
+
+    def apply_category_list_filter(self, category_list):
+        """
+        Filters only those descriptors which category belongs to a given list.
+        The root category is implied to exist in such a list
+
+        :param category_list: list of all categories to seek
+        """
+        if len(category_list) == 0:
+            raise ValueError("The category list should contain at least root category")
+        project = category_list[0].project
+        root_category_included = False
+        non_root_category_ids = deque()
+        non_root_category_number = 0
+        self._category = None
+        self._categories = dict()
+        for category in category_list:
+            if category.is_root_record:
+                root_category_included = True
+            else:
+                non_root_category_ids.append(category.id)
+                non_root_category_number += 1
+            self._categories[category.id] = category
+        category_list_mask = ", ".join(["%s"] * non_root_category_number)
+        category_list_filter = StringQueryFilter(
+            "descriptor.category_id IN (%s)" % category_list_mask,
+            *non_root_category_ids
+        )
+        if root_category_included:
+            category_list_filter = OrQueryFilter(
+                StringQueryFilter("descriptor.category_id IS NULL"),
+                category_list_filter,
+            )
+        for builder in self.items_builder, self.count_builder:
+            builder.main_filter &= StringQueryFilter("descriptor.project_id=%s", project.id)
+            builder.main_filter &= category_list_filter
 
     def create_external_object(self,
+                               category_id,
                                descriptor_type,
                                descriptor_id,
                                identifier,
@@ -137,13 +184,18 @@ class ParameterDescriptorReader(RawSqlQueryReader):
             record_types.append(LabjournalRecordType.service)
         if for_category_record:
             record_types.append(LabjournalRecordType.category)
-        if self._category is None:
+
+        if self._categories is not None:
+            current_category = self._categories[category_id]
+        elif self._category is not None:
+            current_category = self._category
+        else:
             raise RuntimeError("The reader can't work when no category was selected")
 
         external_object = ModelEmulator(
             type=descriptor_type,
             id=descriptor_id,
-            category=self._category,
+            category=current_category,
             identifier=identifier,
             index=index,
             description=description,
@@ -184,7 +236,7 @@ class ParameterDescriptorReader(RawSqlQueryReader):
                 hashtag_list.append(ModelEmulator(
                     id=int(hashtag_id),
                     description=hashtag_description,
-                    project=self._category.project,
+                    project=current_category.project,
                     type=LabjournalHashtagType.record,
                 ))
             external_object.add_field('hashtags', hashtag_list)

@@ -10,7 +10,7 @@ from .record_set import RecordSet
 from .record_provider import RecordProvider
 from .category_startdate_provider import CategoryStartdateProvider
 from .record_check_provider import RecordCheckProvider
-from .fields import RecordPathField
+from .fields import RecordPathField, ComputedDescriptorsField
 
 
 class Record(Entity):
@@ -70,7 +70,9 @@ class Record(Entity):
 
         'hashtags': ManagedEntityField(RecordHashtagManager, description="Attached hashtags"),
 
-        'comments': EntityField(str, max_length=16_384, description="Extra record")
+        'comments': EntityField(str, max_length=16_384, description="Extra record"),
+
+        'computed_descriptors': ComputedDescriptorsField(description="All computed descriptors"),
     }
     """
     Describes all public fields within the model layer

@@ -1,9 +1,12 @@
+from collections import OrderedDict
+
+from ru.ihna.kozhukhov.core_application.models.enums import LabjournalRecordType
 from .cached_field import CachedField
 
 
-class RecordPathField(CachedField):
+class ComputedDescriptorsField(CachedField):
     """
-    Represents the record path, if necessary
+    A field that evaluates descriptors for custom parameters that can be adjusted for this particular record
     """
 
     @property
@@ -11,7 +14,7 @@ class RecordPathField(CachedField):
         """
         Category that must be looked for the cache
         """
-        if self.entity.is_root_record:
+        if self.entity.type == LabjournalRecordType.category:
             related_category = self.entity
         else:
             related_category = self.entity.parent_category
@@ -24,11 +27,8 @@ class RecordPathField(CachedField):
         :param cache_item: the cache item which value is needed to be extracted
         :return: the extracted value itself
         """
-        if self.entity.is_root_record:
-            path = "/"
-        elif self.entity.parent_category.is_root_record:
-            path = "/%s" % self.entity.alias
+        if cache_item.descriptors is None or len(cache_item.descriptors) == 0:
+            descriptors = OrderedDict()
         else:
-            _, related_category_path = cache_item.path.split(":")
-            path = "%s/%s" % (related_category_path, self.entity.alias)
-        return path
+            descriptors = cache_item.descriptors.copy()
+        return descriptors

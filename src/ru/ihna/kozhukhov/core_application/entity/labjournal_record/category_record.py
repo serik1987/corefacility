@@ -68,39 +68,6 @@ class CategoryRecord(Record):
         descriptor_set.category = self
         return descriptor_set
 
-    def create(self):
-        """
-        Creates the entity on the database and all its auxiliary sources
-
-        :return: nothing
-        """
-        super().create()
-        self._old_alias = self._public_fields['alias']
-
-    def update(self):
-        """
-        Updates the entity to the database and all its auxiliary sources
-
-        The update is not possible when the entity state is not 'changed'
-
-        :return: nothing
-        """
-        LabjournalCache().remove_category(self, self._old_alias)
-        super().update()
-        self._old_alias = self._public_fields['alias']
-
-    def delete(self):
-        """
-        Deletes the entity from the database and all its auxiliary sources
-
-        The entity can't be deleted when it still 'creating'
-
-        :return: nothing
-        """
-        LabjournalCache().remove_category(self, self._old_alias)
-        super().delete()
-        self._old_alias = None
-
     def get_viewed_parameters(self, context):
         """
         Returns list of all viewed parameters

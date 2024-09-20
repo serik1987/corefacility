@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import datetime
 from sys import getsizeof
 from time import time
@@ -6,32 +7,81 @@ from django.test import TestCase
 from parameterized import parameterized
 
 from ru.ihna.kozhukhov.core_application.entity.group import Group
-from ru.ihna.kozhukhov.core_application.entity.labjournal_record import RootCategoryRecord, DataRecord, CategoryRecord, \
-    ServiceRecord, RecordSet
+from ru.ihna.kozhukhov.core_application.entity.labjournal_hashtags import RecordHashtag
+from ru.ihna.kozhukhov.core_application.entity.labjournal_parameter_descriptor import NumberParameterDescriptor, \
+    DiscreteParameterDescriptor, BooleanParameterDescriptor, StringParameterDescriptor
+from ru.ihna.kozhukhov.core_application.entity.labjournal_record import RootCategoryRecord, DataRecord, \
+    CategoryRecord, ServiceRecord, RecordSet
 from ru.ihna.kozhukhov.core_application.entity.project import Project
 from ru.ihna.kozhukhov.core_application.entity.user import User
 from ru.ihna.kozhukhov.core_application.exceptions.entity_exceptions import EntityNotFoundException
+from ru.ihna.kozhukhov.core_application.models.enums import LabjournalRecordType, LabjournalFieldType
 from ru.ihna.kozhukhov.core_application.utils import LabjournalCache
 
-def path_category_change_provider():
-    data = [
+def general_data_provider():
+    return [
+        ('category', 0),
+        ('category', 1),
+        ('category', 2),
+        ('data', 1),
+        ('data', 2),
+        ('data', 3),
+    ]
+
+def general_data_with_path_provider():
+    return [
+        ('category', 0, '/'),
+        ('category', 1, '/adult'),
+        ('category', 2, '/adult/rab001'),
+        ('data', 1, '/disclaimer'),
+        ('data', 2, '/adult/disclaimer'),
+        ('data', 3, '/adult/rab001/rec001')
+    ]
+
+def base_data_change_provider():
+    return [
+        ('data', 1, 0, "/disclaimer"),
         ('data', 1, 1, "/disclaimer"),
         ('data', 1, 2, "/disclaimer"),
+        ('data', 2, 0, "/adult/disclaimer"),
         ('data', 2, 1, "/new/disclaimer"),
         ('data', 2, 2, "/adult/disclaimer"),
+        ('data', 3, 0, "/adult/rab001/rec001"),
         ('data', 3, 1, "/new/rab001/rec001"),
         ('data', 3, 2, "/adult/new/rec001"),
+        ('category', 2, 0, "/adult/rab001"),
         ('category', 2, 1, "/new/rab001"),
         ('category', 2, 2, "/adult/new"),
+        ('category', 1, 0, "/adult"),
         ('category', 1, 1, "/new"),
         ('category', 1, 2, "/adult"),
+        ('category', 0, 0, "/"),
         ('category', 0, 1, "/"),
         ('category', 0, 2, "/"),
     ]
+
+def path_category_change_provider():
     return [
         (record_type, record_index, change_category_index, expected_path, flush)
-        for (record_type, record_index, change_category_index, expected_path) in data
+        for (record_type, record_index, change_category_index, expected_path) in base_data_change_provider()
         for flush in (False, True)
+    ]
+
+def descriptor_category_change_provider():
+    return [
+        (record_type, record_index, change_category_index, change_mode,)
+        for record_type, record_index, change_category_index, _ in base_data_change_provider()
+        for change_mode in (
+            'add',
+            'modify',
+            'remove',
+            'available_value_add',
+            'available_value_remove',
+            'hashtag_add',
+            'hashtag_remove',
+            'hashtag_attach',
+            'hashtag_detach'
+        )
     ]
 
 def find_by_path_provider():
@@ -149,9 +199,124 @@ class TestLabjournalCache(TestCase):
             2: cls.subcategory,
         }
 
+        chess_hashtag = RecordHashtag(
+            description="chess",
+            project=cls.sample_project,
+        )
+        chess_hashtag.create()
+
+        seldom_hashtag = RecordHashtag(
+            description="seldom",
+            project=cls.sample_project,
+        )
+        seldom_hashtag.create()
+
+        most_seldom_hashtag = RecordHashtag(
+            description="most_seldom",
+            project=cls.sample_project,
+        )
+        most_seldom_hashtag.create()
+
+        record_types = [
+            [],
+            [LabjournalRecordType.data],
+            [LabjournalRecordType.service],
+            [LabjournalRecordType.category],
+            [LabjournalRecordType.data, LabjournalRecordType.service],
+            [LabjournalRecordType.data, LabjournalRecordType.category],
+            [LabjournalRecordType.service, LabjournalRecordType.category],
+            [LabjournalRecordType.data, LabjournalRecordType.service, LabjournalRecordType.category],
+        ]
+
+        cls.sample_category_descriptors = defaultdict(list)
+        for sample_category_index, sample_category in cls.sample_categories.items():
+            k = 0
+            for l in range(12):
+                sample_descriptor = NumberParameterDescriptor(
+                    category=sample_category,
+                    identifier="cat%d_param%d" % (sample_category_index, k),
+                    description="Тестовый дескриптор (числовой)",
+                    required=k % 7 == 0,
+                    record_type=record_types[k % 8],
+                    units="kg/am" if k % 5 == 0 else "amg",
+                    default=3.48*k,
+                )
+                sample_descriptor.create()
+                cls.sample_category_descriptors[sample_category_index].append(sample_descriptor)
+                k += 1
+            for l in range(12):
+                sample_descriptor = DiscreteParameterDescriptor(
+                    category=sample_category,
+                    identifier="cate%d_param%d" % (sample_category_index, k),
+                    description="Тестовый дескриптор (дискретный)",
+                    required=k % 7 == 0,
+                    record_type=record_types[k % 8],
+                )
+                sample_descriptor.create()
+                for m in range(5):
+                    sample_descriptor.values.add(str(m), "Тестовое значение")
+                sample_descriptor.default = "3"
+                sample_descriptor.update()
+                cls.sample_category_descriptors[sample_category_index].append(sample_descriptor)
+                k += 1
+            for l in range(12):
+                sample_descriptor = BooleanParameterDescriptor(
+                    category=sample_category,
+                    identifier="cat%d_param%d" % (sample_category_index, k),
+                    description="Тестовый дескриптор (булев)",
+                    required=k % 7 == 0,
+                    record_type= record_types[k % 8],
+                    default=k % 6 == 0,
+                )
+                sample_descriptor.create()
+                cls.sample_category_descriptors[sample_category_index].append(sample_descriptor)
+                k += 1
+            for l in range(12):
+                sample_descriptor = StringParameterDescriptor(
+                    category=sample_category,
+                    identifier="cat%d_param%d" % (sample_category_index, k),
+                    description="Тестовый дескриптор (строковой)",
+                    required=k % 7 == 0,
+                    record_type= record_types[k % 8],
+                    default=str(k),
+                )
+                sample_descriptor.create()
+                cls.sample_category_descriptors[sample_category_index].append(sample_descriptor)
+                k += 1
+            for k, sample_descriptor in enumerate(cls.sample_category_descriptors[sample_category_index]):
+                if k % 2 == 0:
+                    sample_descriptor.hashtags.add([chess_hashtag.id])
+                if k % 3 == 0:
+                    sample_descriptor.hashtags.add([seldom_hashtag.id])
+                if k % 4 == 0:
+                    sample_descriptor.hashtags.add([most_seldom_hashtag.id])
+
+        cls.expected_descriptors_for_record = {
+            'data': {
+                1: cls.sample_category_descriptors[0],
+                2: [*cls.sample_category_descriptors[0], *cls.sample_category_descriptors[1]],
+                3: [
+                    *cls.sample_category_descriptors[0],
+                    *cls.sample_category_descriptors[1],
+                    *cls.sample_category_descriptors[2]
+                ]
+            },
+            'category': {
+                0: cls.sample_category_descriptors[0],
+                1: [*cls.sample_category_descriptors[0], *cls.sample_category_descriptors[1]],
+                2: [
+                    *cls.sample_category_descriptors[0],
+                    *cls.sample_category_descriptors[1],
+                    *cls.sample_category_descriptors[2]
+                ]
+            }
+        }
+
     def setUp(self):
         super().setUp()
         self.sample_project = TestLabjournalCache.sample_project
+        self.sample_category_descriptors = TestLabjournalCache.sample_category_descriptors
+        self.expected_descriptors_for_record = TestLabjournalCache.expected_descriptors_for_record
 
     def test_is_cache_singleton(self):
         """
@@ -162,14 +327,7 @@ class TestLabjournalCache(TestCase):
         self.assertIs(cache1, cache2, "The LabjournalCache class is not singleton")
         self.assertIsNotNone(cache1, "The LabjournalCache class has not been created")
 
-    @parameterized.expand([
-        ('category', 0, "/"),
-        ('category', 1, "/adult"),
-        ('category', 2, "/adult/rab001"),
-        ('data', 1, "/disclaimer"),
-        ('data', 2, "/adult/disclaimer"),
-        ('data', 3, "/adult/rab001/rec001")
-    ])
+    @parameterized.expand(general_data_with_path_provider())
     def test_path_no_service_record(self, record_type, record_index, expected_path):
         """
         Tests for the path in case when the record is not service
@@ -183,7 +341,7 @@ class TestLabjournalCache(TestCase):
         path = sample_record.path
         t2 = time()
         self.assertEquals(path, expected_path, "The rabbit path has been badly evaluated")
-        self.assertLess(t2-t1, 0.05, "The category path retrieval is too slow")
+        self.assertLessEqual(t2-t1, 0.05, "The category path retrieval is too slow")
 
     def test_path_service_record(self):
         """
@@ -192,14 +350,7 @@ class TestLabjournalCache(TestCase):
         with self.assertRaises(AttributeError, msg="Service record has no path"):
             print(self.sample_service_record.path)
 
-    @parameterized.expand([
-        ('category', 0, "/"),
-        ('category', 1, "/adult"),
-        ('category', 2, "/adult/rab001"),
-        ('data', 1, "/disclaimer"),
-        ('data', 2, "/adult/disclaimer"),
-        ('data', 3, "/adult/rab001/rec001")
-    ])
+    @parameterized.expand(general_data_with_path_provider())
     def test_path_second_access(self, record_type, record_index, expected_path):
         """
         Tests whether the second access to the 'path' feature takes less time
@@ -214,34 +365,6 @@ class TestLabjournalCache(TestCase):
         with self.assertNumQueries(0):
             second_path = sample_record.path
         self.assertEquals(second_path, first_path, "The record path was damaged when passing through the cache")
-
-    @parameterized.expand(path_category_change_provider())
-    def test_path_parent_category_change(self, record_type, record_index, change_category_index, expected_path, flush):
-        """
-        Tests whether the cache is properly flushed when alias for the parent category changes
-
-        :param record_type: 'data' for data record, 'category' for category record
-        :param record_index: index of the data record to test
-        :param change_category_index: index of the category to change
-        :param expected_path: the resultant path to be expected
-        :param flush: True if the labjournal cache must be flushed before the category change, false otherwise
-        """
-        record = self._get_sample_record(record_type, record_index)
-        record.path
-        self.sample_categories[2].path
-
-        if flush:
-            LabjournalCache().flush()
-
-        category_to_change = self.sample_categories[change_category_index]
-        old_category_alias = category_to_change.alias
-        category_to_change.alias = 'new'
-        category_to_change.update()
-
-        self.assertEquals(record.path, expected_path, "No path is defined")
-
-        category_to_change.alias = old_category_alias
-        category_to_change.update()
 
     @parameterized.expand([
         ('category', 2, "/adult/rab001"),
@@ -348,50 +471,11 @@ class TestLabjournalCache(TestCase):
             self.assertEquals(actual_record.path, path, "Record path discrepancy")
             self.assertEquals(expected_record.path, path, "Record path discrepancy")
 
-    @parameterized.expand(find_by_path_after_category_change())
-    def test_find_by_path_change_and_find_by_path(self,
-                                                  category_to_change_index,
-                                                  path,
-                                                  exception_to_throw,
-                                                  expected_type,
-                                                  expected_record_index,
-                                                  flush
-                                                  ):
-        """
-        Tests whether the cache properly flushes after the category change.
-        The routine find some tested record, finds its parent category, changes the category itself and ensures
-        that the "find by category" function still works properly
-
-        :param category_to_change_index: index of the category you want to change
-        :param path: path to the record that shall be found after that
-        :exception_to_throw: an exception that shall be thrown during the record search or None if the record search
-            shall be completed without any exceptions
-        :param expected_type: type of record that is expected to find: 'data' or 'category'
-        :param expected_record_index: index of the record that is expected to find
-        :param flush: True to flush the cache 1 before making change to the category, False to don't do this
-        """
-        record_set = RecordSet()
-        record_set.get((self.sample_project, "/adult/rab001/rec001"))
-        record_set.get((self.sample_project, "/adult/rab001"))
-        if flush:
-            LabjournalCache().flush()
-        category_to_change = self.sample_categories[category_to_change_index]
-        category_to_change.alias = "new"
-        category_to_change.update()
-        if exception_to_throw is None:
-            actual_record = record_set.get((self.sample_project, path))
-            expected_record = self._get_sample_record(expected_type, expected_record_index)
-            self.assertEquals(actual_record.id, expected_record.id, "Bad record has been found")
-            self.assertEquals(actual_record.type, expected_record.type, "Record type mismatch")
-        else:
-            with self.assertRaises(exception_to_throw, msg="Exception to throw"):
-                record_set.get((self.sample_project, path))
-
     @parameterized.expand([
-        ("/", 'category', 0, 1),
-        ("/adult", 'category', 1, 1),
+        ("/", 'category', 0, 2),
+        ("/adult", 'category', 1, 2),
         ("/adult/rab001", 'category', 2, 2),
-        ("/disclaimer", 'data', 1, 1),
+        ("/disclaimer", 'data', 1, 2),
         ("/adult/disclaimer", 'data', 2, 2),
         ("/adult/rab001/rec001", 'data', 3, 2),
     ])
@@ -414,21 +498,260 @@ class TestLabjournalCache(TestCase):
             second_actual_record = record_set.get((self.sample_project, path))
         self.assertRecordEqual(second_actual_record, expected_record)
 
-    def _get_sample_record(self, record_type, record_index):
+    @parameterized.expand(general_data_provider())
+    def test_computed_descriptors_positive(self, record_type, record_index):
         """
-        Returns the data or category record that is suitable for particular test case
+        Tests that all descriptors are computed successfully.
 
-        :param record_type: 'data' for data record, 'category' for category record
-        :param record_index: index of the data record to test
-        :return: the record entity
+        :param record_type: what record type to test: 'data' for data record and 'category' for category
+        :param record_index: index of the testing record
         """
+        sample_record = self._get_sample_record(record_type, record_index)
+        t1 = time()
+        actual_descriptors = sample_record.computed_descriptors
+        t2 = time()
+        expected_descriptors = self.expected_descriptors_for_record[record_type][record_index]
+        self.assertDescriptorListEqual(actual_descriptors, expected_descriptors)
+        self.assertLessEqual(t2-t1, 1.0, "The descriptors computation process is too slow")
+
+    def test_computed_descriptors_service_record(self):
+        """
+        Tests that all descriptors are retrieved as well for a service record
+        """
+        t1 = time()
+        actual_descriptors = self.sample_service_record.computed_descriptors
+        t2 = time()
+        expected_descriptors = self.expected_descriptors_for_record['category'][1]
+        # There must be defined exactly the same descriptors for a service record as for its parent category
+        self.assertDescriptorListEqual(actual_descriptors, expected_descriptors)
+        self.assertLessEqual(t2-t1, 1.0, "The descriptor computation process is too slow")
+
+    @parameterized.expand(general_data_provider())
+    def test_computed_descriptors_twice(self, record_type, record_index):
+        """
+        Tests that the second descriptor computation doesn't require access to the database
+
+        :param record_type: what record type to test: 'data' for data record and 'category' for category
+        :param record_index: index of the testing record
+        """
+        sample_record = self._get_sample_record(record_type, record_index)
+        first_actual_descriptors = sample_record.computed_descriptors
+        expected_descriptors = self.expected_descriptors_for_record[record_type][record_index]
+        self.assertDescriptorListEqual(first_actual_descriptors, expected_descriptors)
+        with self.assertNumQueries(0):
+            second_actual_descriptors = sample_record.computed_descriptors
+        self.assertDescriptorListEqual(second_actual_descriptors, expected_descriptors)
+
+    def test_computed_descriptors_for_service_record_twice(self):
+        """
+        Tests that the second descriptor computation for service record doesn't require access to the database
+        """
+        first_actual_descriptors = self.sample_service_record.computed_descriptors
+        expected_descriptors = self.expected_descriptors_for_record['category'][1]
+        self.assertDescriptorListEqual(first_actual_descriptors, expected_descriptors)
+        with self.assertNumQueries(0):
+            second_actual_descriptors = self.sample_service_record.computed_descriptors
+        self.assertDescriptorListEqual(second_actual_descriptors, expected_descriptors)
+
+    @parameterized.expand(general_data_with_path_provider())
+    def test_path_then_computed_descriptors(self, record_type, record_index, expected_path):
+        """
+        Tests that the cache data put after accessing to the 'path' property is still valid when we access to
+        the 'computed_descriptors' property
+
+        :param record_type: what type of record you would like to test: 'data' or 'category'
+        :param record_index: index of a record to test index of the record to test
+        :param expected_path: the path to be expected
+        """
+        sample_record = self._get_sample_record(record_type, record_index)
+        self.assertEquals(sample_record.path, expected_path, "Record path mismatch")
         if record_type == 'data':
-            sample_record = self.sample_records[record_index]
-        elif record_type == 'category':
-            sample_record = self.sample_categories[record_index]
+            with self.assertNumQueries(0):
+                actual_descriptors = sample_record.computed_descriptors
         else:
-            raise ValueError("Unsupported record type")
-        return sample_record
+            actual_descriptors = sample_record.computed_descriptors
+        expected_descriptors = self.expected_descriptors_for_record[record_type][record_index]
+        self.assertDescriptorListEqual(actual_descriptors, expected_descriptors)
+
+    @parameterized.expand(find_by_path_provider())
+    def test_find_by_path_then_computed_descriptors(self, path, expected_record_type, expected_record_index):
+        """
+        Tests that the descriptors can still be found when the cache data are put by the find by path feature
+
+        :param path: path that will be used to find the records
+        :param expected_record_type: record type that is expected to achieve after parsing the path
+        :param expected_record_index: record index that is expected to achieve after parsing the path
+        """
+        expected_record = self._get_sample_record(expected_record_type, expected_record_index)
+        expected_descriptors = self.expected_descriptors_for_record[expected_record_type][expected_record_index]
+        record_set = RecordSet()
+        actual_record = record_set.get((self.sample_project, path))
+        self.assertRecordEqual(actual_record, expected_record)
+        if isinstance(actual_record, CategoryRecord):
+            actual_descriptors = actual_record.computed_descriptors
+        else:
+            with self.assertNumQueries(0):
+                actual_descriptors = actual_record.computed_descriptors
+        self.assertDescriptorListEqual(actual_descriptors, expected_descriptors)
+
+    @parameterized.expand(general_data_with_path_provider())
+    def test_computed_descriptors_then_path(self, record_type, record_index, expected_path):
+        """
+        Tests whether the 'path' property can still be accessed after the 'computed_descriptors' property has been
+        accessed.
+
+        :param record_type: type of the record to test
+        :param record_index: index of the record to test
+        :param expected_path: the path to be expected
+        """
+        sample_record = self._get_sample_record(record_type, record_index)
+        expected_descriptors = self.expected_descriptors_for_record[record_type][record_index]
+        actual_descriptors = sample_record.computed_descriptors
+        if record_type == 'category':
+            actual_path = sample_record.path
+        else:
+            with self.assertNumQueries(0):
+                actual_path = sample_record.path
+        self.assertEquals(actual_path, expected_path, "Record path mismatch")
+        self.assertDescriptorListEqual(actual_descriptors, expected_descriptors)
+
+    @parameterized.expand(general_data_with_path_provider())
+    def test_computed_descriptors_then_find_by_path(self, record_type, record_index, path):
+        """
+        Tests whether the find_by_path' feature can still be accessed after the 'computed_descriptors' property
+        has been accessed
+
+        :param record_type: type of the record to test
+        :param record_index: index of the record to test
+        :param path: path to test
+        """
+        sample_record = self._get_sample_record(record_type, record_index)
+        expected_descriptors = self.expected_descriptors_for_record[record_type][record_index]
+        actual_descriptors = sample_record.computed_descriptors
+        record_set = RecordSet()
+        if record_type == 'category':
+            actual_record = record_set.get((self.sample_project, path))
+        else:
+            with self.assertNumQueries(1):
+                actual_record = record_set.get((self.sample_project, path))
+        self.assertRecordEqual(actual_record, sample_record)
+        self.assertDescriptorListEqual(actual_descriptors, expected_descriptors)
+
+    @parameterized.expand(general_data_provider())
+    def test_computed_descriptors_twice_with_flush(self, record_type, record_index):
+        """
+        Tests whether the 'computed_descriptors' property still works after flushing cache 1 but not cache 2
+
+        :param record_type: type of the record
+        :param record_index: index of the record
+        """
+        sample_record = self._get_sample_record(record_type, record_index)
+        expected_descriptors = self.expected_descriptors_for_record[record_type][record_index]
+        actual_descriptors = sample_record.computed_descriptors
+        self.assertDescriptorListEqual(actual_descriptors, expected_descriptors)
+        LabjournalCache().flush()
+        with self.assertNumQueries(1):
+            second_actual_descriptors = sample_record.computed_descriptors
+        self.assertDescriptorListEqual(second_actual_descriptors, expected_descriptors)
+
+    def test_computed_descriptors_for_service_record_twice_with_flush(self):
+        """
+        Tests whether the 'computed_descriptors' feature still works for service records after cache 1 has been flushed
+        """
+        expected_descriptors = self.expected_descriptors_for_record['data'][2]
+        actual_descriptors = self.sample_service_record.computed_descriptors
+        self.assertDescriptorListEqual(actual_descriptors, expected_descriptors)
+        LabjournalCache().flush()
+        with self.assertNumQueries(1):
+            actual_descriptors = self.sample_service_record.computed_descriptors
+        self.assertDescriptorListEqual(actual_descriptors, expected_descriptors)
+
+    @parameterized.expand(general_data_with_path_provider())
+    def test_path_then_computed_descriptors_with_flush(self, record_type, record_index, expected_path):
+        """
+        Tests whether the 'computed_descriptors' still works when the 'path' property is extracted then
+        cache 1 flushed
+
+        :param record_type: type of the record
+        :param record_index: index of the record
+        :param expected_path: the path to be expected
+        """
+        sample_record = self._get_sample_record(record_type, record_index)
+        expected_descriptors = self.expected_descriptors_for_record[record_type][record_index]
+        self.assertEquals(sample_record.path, expected_path, "Record path mismatch")
+        LabjournalCache().flush()
+        if record_type == 'category':
+            actual_descriptors = sample_record.computed_descriptors
+        else:
+            with self.assertNumQueries(1):
+                actual_descriptors = sample_record.computed_descriptors
+        self.assertDescriptorListEqual(actual_descriptors, expected_descriptors)
+
+    @parameterized.expand(find_by_path_provider())
+    def test_find_by_path_then_computed_descriptors_with_flush(self, path, expected_record_type, expected_record_index):
+        """
+        Tests whether the 'computed_descriptors' feature still works after 'path' property is used
+        and cache 1 is flushed
+
+        :param path: the path to test
+        :param expected_record_type: record type that is expected to receive
+        :param expected_record_index: record index that is expected to receive
+        """
+        expected_record = self._get_sample_record(expected_record_type, expected_record_index)
+        expected_descriptors = self.expected_descriptors_for_record[expected_record_type][expected_record_index]
+        record_set = RecordSet()
+        actual_record = record_set.get((self.sample_project, path))
+        self.assertRecordEqual(actual_record, expected_record)
+        LabjournalCache().flush()
+        if actual_record.type == LabjournalRecordType.category:
+            actual_descriptors = actual_record.computed_descriptors
+        else:
+            with self.assertNumQueries(1):
+                actual_descriptors = actual_record.computed_descriptors
+        self.assertDescriptorListEqual(actual_descriptors, expected_descriptors)
+
+    @parameterized.expand(general_data_with_path_provider())
+    def test_computed_descriptors_then_path_flushed(self, record_type, record_index, expected_path):
+        """
+        Tests whether the 'path' feature still works after 'computed_descriptors' application and cache flushing
+
+        :param record_type: what record type you would like to test: 'category' or 'data'
+        :param record_index: index of the record to test
+        :param expected_path: the path that is expected to achieve by means of 'path' feature.
+        """
+        sample_record = self._get_sample_record(record_type, record_index)
+        expected_descriptors = self.expected_descriptors_for_record[record_type][record_index]
+        self.assertEquals(sample_record.path, expected_path, "Record path mismatch")
+        LabjournalCache().flush()
+        if record_type == 'category':
+            actual_descriptors = sample_record.computed_descriptors
+        else:
+            with self.assertNumQueries(1):
+                actual_descriptors = sample_record.computed_descriptors
+        self.assertDescriptorListEqual(actual_descriptors, expected_descriptors)
+
+    @parameterized.expand(general_data_with_path_provider())
+    def test_computed_descriptors_then_find_by_path_flushed(self, record_type, record_index, path):
+        """
+        Tests whether the 'find by path' feature still works after 'computed_descriptors' feature was applied then
+        cache was flushed.
+
+        :param record_type: what kind of record you would like to test: 'data' or 'category'
+        :param record_index: number of record to test
+        :param path: path of the selected record
+        """
+        sample_record = self._get_sample_record(record_type, record_index)
+        expected_descriptors = self.expected_descriptors_for_record[record_type][record_index]
+        actual_descriptors = sample_record.computed_descriptors
+        self.assertDescriptorListEqual(actual_descriptors, expected_descriptors)
+        LabjournalCache().flush()
+        record_set = RecordSet()
+        if record_type == 'category':
+            actual_record = record_set.get((self.sample_project, path))
+        else:
+            with self.assertNumQueries(2):
+                actual_record = record_set.get((self.sample_project, path))
+        self.assertRecordEqual(actual_record, sample_record)
 
     def assertRecordEqual(self, actual_record, expected_record):
         """
@@ -448,6 +771,70 @@ class TestLabjournalCache(TestCase):
             self.assertEqual(actual_record.alias, expected_record.alias, "The record alias is damaged")
             self.assertEqual(actual_record.datetime, expected_record.datetime, "The record datetime is damaged")
             self.assertEqual(actual_record.type, expected_record.type, "The record type is damaged")
+
+    def assertDescriptorListEqual(self, actual_descriptors, expected_descriptors):
+        """
+        Asserts that two descriptor sets are identical to each other
+        """
+        expected_descriptors = list(expected_descriptors)
+        for identifier, actual_descriptor in actual_descriptors.items():
+            for descriptor_index, expected_descriptor in enumerate(expected_descriptors):
+                if actual_descriptor.id == expected_descriptor.id:
+                    break
+            else:
+                print(actual_descriptor)
+                self.fail("Some extra descriptor were revealed during the descriptor computation")
+            del expected_descriptors[descriptor_index]
+            self.assertIsInstance(actual_descriptor, expected_descriptor.__class__, "Descriptor type mismatch")
+            self.assertEquals(actual_descriptor.identifier, expected_descriptor.identifier,
+                              "Descriptor identifier mismatch")
+            self.assertEquals(identifier, expected_descriptor.identifier,
+                              "The descriptor is present in cache under a bad key")
+            self.assertEquals(actual_descriptor.index, expected_descriptor.index, "Descriptor index mismatch")
+            self.assertEquals(actual_descriptor.description, expected_descriptor.description,
+                              "Descriptor description mismatch")
+            self.assertEquals(actual_descriptor.required, expected_descriptor.required,
+                              "Descriptor requiredness mismatch")
+            self.assertEquals(actual_descriptor.default, expected_descriptor.default,
+                              "Descriptor default value mismatch")
+            self.assertEquals(set(actual_descriptor.record_type), set(expected_descriptor.record_type),
+                              "Record type mismatch")
+            if isinstance(actual_descriptor, NumberParameterDescriptor):
+                self.assertEquals(actual_descriptor.units, expected_descriptor.units, "Descriptor units mismatch")
+            if isinstance(actual_descriptor, DiscreteParameterDescriptor):
+                actual_values = list(actual_descriptor.values)
+                expected_values = list(expected_descriptor.values)
+                sorted(actual_values, key=lambda value: value['id'])
+                sorted(expected_values, key=lambda value: value['id'])
+                self.assertEquals(actual_values, expected_values, "Available values mismatch")
+            actual_hashtags = list(actual_descriptor.hashtags)
+            expected_hashtags = list(expected_descriptor.hashtags)
+            for hashtag in actual_hashtags:
+                self.assertIsInstance(hashtag, RecordHashtag, "Bad class for the hashtag")
+            sorted(actual_hashtags, key=lambda hashtag: hashtag.id)
+            sorted(expected_hashtags, key=lambda hashtag: hashtag.id)
+            for hashtag_index, actual_hashtag in enumerate(actual_hashtags):
+                expected_hashtag = expected_hashtags[hashtag_index]
+                self.assertEquals(actual_hashtag.id, expected_hashtag.id, "Hashtag ID mismatch")
+        if len(expected_descriptors) > 0:
+            print(expected_descriptors)
+            self.fail("Some descriptors are missed during the descriptor computation")
+
+    def _get_sample_record(self, record_type, record_index):
+        """
+        Returns the data or category record that is suitable for particular test case
+
+        :param record_type: 'data' for data record, 'category' for category record
+        :param record_index: index of the data record to test
+        :return: the record entity
+        """
+        if record_type == 'data':
+            sample_record = self.sample_records[record_index]
+        elif record_type == 'category':
+            sample_record = self.sample_categories[record_index]
+        else:
+            raise ValueError("Unsupported record type")
+        return sample_record
 
     def tearDown(self):
         LabjournalCache().flush()
