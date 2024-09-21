@@ -37,7 +37,6 @@ class RootCategoryRecord(CategoryRecord):
         description="The base directory (absolute path only)",
         max_length=256,
     )
-    # _public_field_description['path'] = ReadOnlyField(default="/", description="Full path to the laboratory record")
 
     @classmethod
     def get_entity_class_name(cls):
@@ -114,6 +113,19 @@ class RootCategoryRecord(CategoryRecord):
         """
         raise EntityOperationNotPermitted(msg="The root record can't be deleted")
 
+    def __getattr__(self, name):
+        """
+        Gets the public field property.
+
+        If such property doesn't exist AttributeError will be thrown
+
+        :param name: property name
+        :return: property value
+        """
+        if name.startswith("custom_"):
+            raise AttributeError("Due to technical limitations the custom parameters can't be set for root records")
+        return super().__getattr__(name)
+
     def __setattr__(self, name, value):
         """
         Sets the public field property.
@@ -124,6 +136,8 @@ class RootCategoryRecord(CategoryRecord):
         :param value: the field value to set
         :return: nothing
         """
+        if name.startswith("custom_"):
+            raise AttributeError("Due to technical limitations the custom parameters can't be set for root records")
         previous_state = self.__root_category_state
         super().__setattr__(name, value)
         if name == 'project':

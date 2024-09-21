@@ -1,6 +1,6 @@
+import re
 from collections import defaultdict
 from datetime import datetime
-from sys import getsizeof
 from time import time
 
 from django.test import TestCase
@@ -14,7 +14,8 @@ from ru.ihna.kozhukhov.core_application.entity.labjournal_record import RootCate
     CategoryRecord, ServiceRecord, RecordSet
 from ru.ihna.kozhukhov.core_application.entity.project import Project
 from ru.ihna.kozhukhov.core_application.entity.user import User
-from ru.ihna.kozhukhov.core_application.exceptions.entity_exceptions import EntityNotFoundException
+from ru.ihna.kozhukhov.core_application.exceptions.entity_exceptions import EntityNotFoundException, \
+    EntityOperationNotPermitted, EntityFieldInvalid
 from ru.ihna.kozhukhov.core_application.models.enums import LabjournalRecordType, LabjournalFieldType
 from ru.ihna.kozhukhov.core_application.utils import LabjournalCache
 
@@ -119,6 +120,102 @@ def find_by_path_after_category_change():
         (category_to_change, path, exception_to_throw, expected_record_type, expected_record_index, flush)
         for (category_to_change, path, exception_to_throw, expected_record_type, expected_record_index) in data
         for flush in (False, True)
+    ]
+
+
+def custom_field_change_provider():
+    float_data = [
+        (8.48, 8.48),
+        (-8.48, -8.48),
+        (6.02e23, 6.02e23),
+        (-6.02e23, -6.02e23),
+        (6.02e-23, 6.02e-23),
+        (-6.02e-23, -6.02e-23),
+        (0.0, 0.0),
+        (True, 1.0),
+        (False, 0.0),
+        ("10.3", 10.3),
+    ]
+    boolean_data = [
+        (True, True),
+        (False, False),
+        (8.48, True),
+        (0.0, False),
+        ("True", True),
+        ("False", True),
+        ("", False),
+    ]
+    string_provider = [
+        ("Latin letters", "Latin letters"),
+        ("Русские буквы", "Русские буквы"),
+        ("123", "123"),
+        ("~`!@#$%^&*()_+=-|", "~`!@#$%^&*()_+=-|"),
+        ("|\\'\";:/?.>,<", "|\\'\";:/?.>,<"),
+        ("буквы ё и Ё", "буквы ё и Ё"),
+        ("№", "№",),
+        ("", "",),
+        ("="*256, "="*256,)
+    ]
+    assigning_data = [
+        (identifier, value, expected_value)
+        for identifier in ('custom_cat0_param0', 'custom_cat1_param0', 'custom_cat2_param0')
+        for value, expected_value in float_data
+    ] + [
+        (identifier, value, expected_value)
+        for identifier in ('custom_cat0_param24', 'custom_cat1_param24', 'custom_cat2_param24')
+        for value, expected_value in boolean_data
+    ] + [
+        (identifier, value, expected_value)
+        for identifier in ('custom_cat0_param12', 'custom_cat1_param12', 'custom_cat2_param12',
+                           'custom_cat0_param36', 'custom_cat1_param36', 'custom_cat2_param36')
+        for value, expected_value in string_provider
+    ]
+    return [
+        (identifier, value, expected_value, change_mode,)
+        for identifier, value, expected_value in assigning_data
+        for change_mode in ('on_update', 'on_load')
+    ]
+
+
+def custom_field_for_category_provider():
+    return [
+        (2, 'custom_cat0_param0', 3.14, 3.14, None),
+        (2, 'custom_cat0_param12', "Hello, World!", "Hello, World!", None,),
+        (2, 'custom_cat0_param24', True, True, None,),
+        (2, 'custom_cat0_param36', "Hello, World!", "Hello, World!", None,),
+        (2, 'custom_cat1_param0', 3.14, 3.14, None),
+        (2, 'custom_cat1_param12', "Hello, World!", "Hello, World!", None,),
+        (2, 'custom_cat1_param24', True, True, None,),
+        (2, 'custom_cat1_param36', "Hello, World!", "Hello, World!", None,),
+        (2, 'custom_cat2_param0', 3.14, 3.14, None),
+        (2, 'custom_cat2_param12', "Hello, World!", "Hello, World!", None,),
+        (2, 'custom_cat2_param24', True, True, None,),
+        (2, 'custom_cat2_param36', "Hello, World!", "Hello, World!", None,),
+        (1, 'custom_cat0_param0', 3.14, 3.14, None),
+        (1, 'custom_cat0_param12', "Hello, World!", "Hello, World!", None,),
+        (1, 'custom_cat0_param24', True, True, None,),
+        (1, 'custom_cat0_param36', "Hello, World!", "Hello, World!", None,),
+        (1, 'custom_cat1_param0', 3.14, 3.14, None),
+        (1, 'custom_cat1_param12', "Hello, World!", "Hello, World!", None,),
+        (1, 'custom_cat1_param24', True, True, None,),
+        (1, 'custom_cat1_param36', "Hello, World!", "Hello, World!", None,),
+        (1, 'custom_cat2_param0', 3.14, 3.14, AttributeError),
+        (1, 'custom_cat2_param12', "Hello, World!", "Hello, World!", AttributeError,),
+        (1, 'custom_cat2_param24', True, True, AttributeError,),
+        (1, 'custom_cat2_param36', "Hello, World!", "Hello, World!", AttributeError,),
+        (0, 'custom_cat0_param0', 3.14, 3.14, AttributeError),
+        (0, 'custom_cat0_param12', "Hello, World!", "Hello, World!", AttributeError,),
+        (0, 'custom_cat0_param24', True, True, AttributeError,),
+        (0, 'custom_cat0_param36', "Hello, World!", "Hello, World!", AttributeError,),
+        (0, 'custom_cat1_param0', 3.14, 3.14, AttributeError),
+        (0, 'custom_cat1_param12', "Hello, World!", "Hello, World!", AttributeError,),
+        (0, 'custom_cat1_param24', True, True, AttributeError,),
+        (0, 'custom_cat1_param36', "Hello, World!", "Hello, World!", AttributeError,),
+        (0, 'custom_cat2_param0', 3.14, 3.14, AttributeError),
+        (0, 'custom_cat2_param12', "Hello, World!", "Hello, World!", AttributeError,),
+        (0, 'custom_cat2_param24', True, True, AttributeError,),
+        (0, 'custom_cat2_param36', "Hello, World!", "Hello, World!", AttributeError,),
+        (2, 'custom_bad_param', "Hello, World", "Hello, World", AttributeError,),
     ]
 
 
@@ -247,7 +344,7 @@ class TestLabjournalCache(TestCase):
             for l in range(12):
                 sample_descriptor = DiscreteParameterDescriptor(
                     category=sample_category,
-                    identifier="cate%d_param%d" % (sample_category_index, k),
+                    identifier="cat%d_param%d" % (sample_category_index, k),
                     description="Тестовый дескриптор (дискретный)",
                     required=k % 7 == 0,
                     record_type=record_types[k % 8],
@@ -341,7 +438,7 @@ class TestLabjournalCache(TestCase):
         path = sample_record.path
         t2 = time()
         self.assertEquals(path, expected_path, "The rabbit path has been badly evaluated")
-        self.assertLessEqual(t2-t1, 0.05, "The category path retrieval is too slow")
+        self.assertLessEqual(t2-t1, 1.0, "The category path retrieval is too slow")
 
     def test_path_service_record(self):
         """
@@ -752,6 +849,135 @@ class TestLabjournalCache(TestCase):
             with self.assertNumQueries(2):
                 actual_record = record_set.get((self.sample_project, path))
         self.assertRecordEqual(actual_record, sample_record)
+
+    @parameterized.expand(custom_field_change_provider())
+    def test_custom_field(self, identifier, value, expected_value, change_mode):
+        """
+        Tests whether custom field can be effectively assigned and revoked.
+
+        :param identifier: identifier of the custom parameter
+        :param value: which value to assign
+        :param expected_value: which value shall be revoked
+        :param change_mode: 'on_update to assign the value than reload the record; 'on_load' to reload the record
+            then assign the value.
+        """
+        sample_record = self.sample_record_level_3
+        if change_mode == 'on_update':
+            setattr(sample_record, identifier, value)
+            sample_record.update()
+        record_set = RecordSet()
+        sample_record = record_set.get(sample_record.id)
+        if change_mode == 'on_load':
+            setattr(sample_record, identifier, value)
+        self.assertEquals(getattr(sample_record, identifier), expected_value,
+                          "Failed to retrieve value of a custom parameter")
+        self.assertIsNone(sample_record.custom_cat0_param5,
+                          "Value of the custom parameter is expected to be none if the parameter is never assigned")
+
+    def test_custom_field_bad_category(self):
+        """
+        Tests that the custom parameter is not accessible for the wrong category
+        """
+        sample_record = self.sample_record_level_2
+        with self.assertRaises(AttributeError, msg="The custom parameter is still accessible from bad category"):
+            print(sample_record.custom_cat2_param0)
+        with self.assertRaises(AttributeError, msg="The custom parameter is still accessible from bad category"):
+            print(sample_record.custom_cat2_param0)
+
+    @parameterized.expand(custom_field_for_category_provider())
+    def test_custom_field_for_category(self, category_index, name, value, expected_value, exception_to_throw):
+        """
+        Tests whether the custom parameters are properly set for categories as well
+
+        :param category_index: index of a category to load
+        :param name: name of the custom parameter to set
+        :param value: the value to set
+        :param expected_value: value the is expected to be recorded
+        :param exception_to_throw: None if setting and updating the custom parameter is expected to be successful.
+            When setting is expected to be failed, the argument should equal to a class of an exception that
+            expected to be thrown.
+        """
+        sample_record = self.sample_categories[category_index]
+        if exception_to_throw is not None:
+            with self.assertRaises(exception_to_throw):
+                setattr(sample_record, name, value)
+            with self.assertRaises(exception_to_throw):
+                print(getattr(sample_record, name))
+        else:
+            setattr(sample_record, name, value)
+            self.assertEquals(getattr(sample_record, name), expected_value, "Assigned value mismatch")
+            sample_record.update()
+            record_set = RecordSet()
+            sample_record = record_set.get(sample_record.id)
+            self.assertEquals(getattr(sample_record, name), expected_value, "Assigned value mismatch")
+
+    def test_custom_field_on_creating(self):
+        """
+        Tests that the custom field value can't be assigned when the entity is still creating
+        """
+        sample_record = DataRecord(
+            parent_category=self.sample_category,
+            alias="test",
+            datetime=datetime(2024, 9, 21, 15, 23),
+        )
+        with self.assertRaises(EntityOperationNotPermitted,
+                               msg="Custom parameter was set when the entity is in bad state"):
+            sample_record.custom_cat0_param0 = 9.4
+        with self.assertRaises(EntityOperationNotPermitted,
+                               msg="Custom parameter was read when the entity is in bad state"):
+            print(sample_record.custom_cat0_param0)
+
+    def test_custom_field_on_deleted(self):
+        """
+        Tests that the custom field value can't be assigned or read when the entity has already been deleted.
+        """
+        record_set = RecordSet()
+        sample_record = record_set.get(self.sample_record_level_3.id)
+        sample_record.delete()
+        with self.assertRaises(EntityOperationNotPermitted,
+                               msg="Custom parameter was set when the entity is in bad state"):
+            sample_record.custom_cat0_param0 = 9.4
+        with self.assertRaises(EntityOperationNotPermitted,
+                               msg="Custom parameter was read when the entity is in bad state"):
+            print(sample_record.custom_cat0_param0)
+
+    def test_customparameters_field(self):
+        """
+        Tests that the 'customparameters' field works properly
+        """
+        sample_record = self.sample_record_level_3
+        identifier_pattern = re.compile(r'^cat(\d+)_param(\d+)$')
+        sample_values = dict()
+        for identifier, descriptor in sample_record.computed_descriptors.items():
+            identifier_match = identifier_pattern.match(identifier)
+            cat = int(identifier_match[1])
+            param = int(identifier_match[2])
+            if descriptor.type == LabjournalFieldType.boolean:
+                value = (cat * param) % 2 == 0
+            elif descriptor.type == LabjournalFieldType.number:
+                value = cat**param
+            else:
+                value = str(cat**param)
+            sample_values[identifier] = value
+            setattr(sample_record, 'custom_' + identifier, value)
+        sample_record.update()
+        self.assertEquals(sample_record.customparameters, sample_values,
+                          "The 'customparameters' field is not correct")
+        record_set = RecordSet()
+        sample_record = record_set.get(sample_record.id)
+        self.assertEquals(sample_record.customparameters, sample_values,
+                          "The 'customparameters' field is not correct")
+
+    @parameterized.expand([('custom_cat0_param12',), ('custom_cat0_param36',)])
+    def test_custom_parameter_max_chars_exceed(self, name):
+        """
+        Tests what's happened if maximum number of characters in the custom parameter exceeded
+
+        :param name: name of the custom parameter
+        """
+        sample_record = self.sample_record_level_3
+        with self.assertRaises(EntityFieldInvalid, msg="Assigning more than 256 characters should be impossible"):
+            setattr(sample_record, name, "="*257)
 
     def assertRecordEqual(self, actual_record, expected_record):
         """

@@ -137,27 +137,6 @@ class RecordSet(EntitySet):
             else:
                 record = self.get_by_parent_category_and_alias(cache_item.category, alias)
             return record
-            # if path == "/":
-            #     return self.get_root(project)
-            # root_child_match = self.root_child_path.match(path)
-            # general_path_match = self.general_path.match(path)
-            # if root_child_match is not None:
-            #     from .root_category_record import RootCategoryRecord
-            #     parent_category = RootCategoryRecord(project=project)
-            #     alias = root_child_match[1]
-            # elif general_path_match is not None:
-            #     parent_category_path = general_path_match[self.general_path_parent_category_position]
-            #     alias = general_path_match[self.general_path_alias_position]
-            #     cache = LabjournalCache()
-            #     try:
-            #         cache_item = cache.retrieve_category_by_path(project, parent_category_path)
-            #     except KeyError:
-            #         cache_item = self._evaluate_category_by_path(project, parent_category_path)
-            #         cache.put_category(cache_item)
-            #     parent_category = cache_item.category
-            # else:
-            #     raise EntityNotFoundException()
-            # return self.get_by_parent_category_and_alias(parent_category, alias)
         else:
             return super().get(lookup)
 
@@ -217,11 +196,3 @@ class RecordSet(EntitySet):
             except LabjournalRecord.DoesNotExist:
                 raise EntityNotFoundException()
         return LabjournalCache.create_cache_item(category, category_chain, parent_category_path)
-        # cache_item = LabjournalCache.CacheItem(
-        #     category=category,
-        #     path="%d:%s" % (category.project.id, parent_category_path),
-        #     descriptors=None,
-        #     custom_parameters=None,
-        #     base_directory=None,
-        # )
-        # return cache_item

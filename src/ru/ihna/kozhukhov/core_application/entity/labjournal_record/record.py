@@ -11,11 +11,31 @@ from .record_provider import RecordProvider
 from .category_startdate_provider import CategoryStartdateProvider
 from .record_check_provider import RecordCheckProvider
 from .fields import RecordPathField, ComputedDescriptorsField
+from ...exceptions.entity_exceptions import EntityOperationNotPermitted, EntityFieldInvalid
 
 
 class Record(Entity):
     """
     This is the base class for all labjournal records
+    """
+
+    CUSTOM_PARAMETER_MAX_CHARACTERS = 256
+    """ Length of discrete and string custom parameter should not exceed this value """
+
+    custom_field_name_template = re.compile(r'^custom_([A-Za-z][A-Za-z0-9_]*)$')
+    """ Template for the custom field """
+
+    custom_field_name_position = 1
+    """ Number of group inside the custom field name template that relates to name of the custom field """
+
+    custom_parameter_converters = {
+        'N': float,
+        'D': str,
+        'B': bool,
+        'S': str,
+    }
+    """
+    Contains callable objects that are used value of custom parameter to the value of custom parameter in right type
     """
 
     _entity_set_class = RecordSet
@@ -97,6 +117,8 @@ class Record(Entity):
             raise NotImplementedError("This class is purely abstract: use one of its descendants")
         else:
             self._public_fields['type'] = self._default_record_type
+        if 'custom_parameters' not in self._public_fields:
+            self._public_fields['custom_parameters'] = dict()
 
     @classmethod
     def get_entity_class_name(cls):
@@ -114,6 +136,32 @@ class Record(Entity):
         """
         return False
 
+    def __getattr__(self, name):
+        """
+        Gets the public field property.
+
+        If such property doesn't exist AttributeError will be thrown
+
+        :param name: property name
+        :return: property value
+        """
+        custom_field_name_match = self.custom_field_name_template.match(name)
+        if custom_field_name_match is not None:
+            if self.state in ('creating', 'deleted'):
+                raise EntityOperationNotPermitted("Can't set the custom parameter because the record is in bad state")
+            custom_field_name = custom_field_name_match[self.custom_field_name_position]
+            if custom_field_name in self.computed_descriptors:
+                custom_fields = self._public_fields['custom_parameters']
+                value = custom_fields[custom_field_name] if custom_field_name in custom_fields else None
+            else:
+                raise AttributeError("Bad custom parameter: '%s'" % custom_field_name)
+        elif name == 'customparameters':  # Because custom_parameters has already been reserved for the custom
+                                          # parameter 'parameter'
+            value = self._public_fields['custom_parameters'].copy()
+        else:
+            value = super().__getattr__(name)
+        return value
+
     def __setattr__(self, name, value):
         """
         Sets the public field property.
@@ -124,13 +172,32 @@ class Record(Entity):
         :param value: the field value to set
         :return: nothing
         """
-        super().__setattr__(name, value)
-        if name == 'parent_category':
-            self._public_fields.update({
-                'project': value.project,
-                'level': value.level + 1,
-            })
-            self._edited_fields.add('project')
-            self._edited_fields.add('level')
-        if self._user is None and name in ('checked',):
-            raise RuntimeError("The field '%s' is not accessible outside the user context" % name)
+        custom_field_name_match = self.custom_field_name_template.match(name)
+        if custom_field_name_match is not None:
+            if self.state in ('creating', 'deleted'):
+                raise EntityOperationNotPermitted("Can't set the custom parameter because the record is in bad state")
+            custom_field_name = custom_field_name_match[self.custom_field_name_position]
+            try:
+                descriptor = self.computed_descriptors[custom_field_name]
+                parameter_type = str(descriptor.type)
+                converter = self.custom_parameter_converters[parameter_type]
+                converted_value = converter(value)
+                if isinstance(converted_value, str) and len(converted_value) > self.CUSTOM_PARAMETER_MAX_CHARACTERS:
+                    raise EntityFieldInvalid(name)
+                self._public_fields['custom_parameters'][custom_field_name] = converted_value
+                self.notify_field_changed('custom_parameters')
+            except KeyError:
+                raise AttributeError("Bad custom parameter: '%s'" % custom_field_name)
+        elif name == '_custom_parameters':
+            self._public_fields['custom_parameters'] = value
+        else:
+            super().__setattr__(name, value)
+            if name == 'parent_category':
+                self._public_fields.update({
+                    'project': value.project,
+                    'level': value.level + 1,
+                })
+                self._edited_fields.add('project')
+                self._edited_fields.add('level')
+            if self._user is None and name in ('checked',):
+                raise RuntimeError("The field '%s' is not accessible outside the user context" % name)

@@ -1,3 +1,4 @@
+from collections import deque
 from datetime import datetime
 
 from django.db import IntegrityError
@@ -7,11 +8,12 @@ from ru.ihna.kozhukhov.core_application.entity.providers.model_providers.project
 from ru.ihna.kozhukhov.core_application.entity.readers.model_emulators import ModelEmulator
 from ru.ihna.kozhukhov.core_application.exceptions.entity_exceptions import EntityDuplicatedException, \
     EntityFieldInvalid
-from ru.ihna.kozhukhov.core_application.models.labjournal_record import LabjournalRecord as RecordModel
+from ru.ihna.kozhukhov.core_application.models import LabjournalRecord as RecordModel, LabjournalParameterValue
 from ru.ihna.kozhukhov.core_application.models.enums.labjournal_record_type import LabjournalRecordType
 from ru.ihna.kozhukhov.core_application.entity.providers.model_providers.model_provider import ModelProvider
 
 from ..labjournal_hashtags.hashtag_provider import HashtagProvider
+from ...models.enums import LabjournalFieldType
 
 
 class RecordProvider(ModelProvider):
@@ -27,10 +29,10 @@ class RecordProvider(ModelProvider):
     """ Considering type of the entity """
 
     _model_fields_dictionary = {
-        'D': ['parent_category', 'project', 'level', 'alias', 'datetime', 'type', 'comments',],
-        'S': ['parent_category', 'project', 'level', 'datetime', 'type', 'comments', 'name',],
+        'D': ['parent_category', 'project', 'level', 'alias', 'datetime', 'type', 'comments', 'custom_parameters'],
+        'S': ['parent_category', 'project', 'level', 'datetime', 'type', 'comments', 'name', 'custom_parameters'],
         'C': ['parent_category', 'project', 'level', 'alias', 'datetime', 'type', 'comments',
-              'finish_time', 'base_directory'],
+              'finish_time', 'base_directory', 'custom_parameters'],
     }
     """ A dictionary where we shall put necessary model fields """
 
@@ -119,7 +121,7 @@ class RecordProvider(ModelProvider):
         try:
             self._current_type = entity.type
             entity_model = self.unwrap_entity(entity)
-            if self._duplicates_exists(entity):
+            if self._duplicates_exist(entity):
                 raise EntityDuplicatedException()
             entity_model.type = entity.type
             entity_model.save()
@@ -128,6 +130,8 @@ class RecordProvider(ModelProvider):
             self._current_type = None
         except IntegrityError:
             raise EntityDuplicatedException()
+        if 'custom_parameters' in entity._edited_fields:
+            self._index_custom_parameters(entity)
 
     def update_entity(self, entity):
         """
@@ -139,12 +143,14 @@ class RecordProvider(ModelProvider):
         try:
             self._current_type = str(entity.type)
             entity_model = self.unwrap_entity(entity)
-            if self._duplicates_exists(entity):
+            if self._duplicates_exist(entity):
                 raise EntityFieldInvalid('alias')
             entity_model.save()
             self._current_type = None
         except IntegrityError:
             raise EntityDuplicatedException()
+        if 'custom_parameters' in entity._edited_fields:
+            self._index_custom_parameters(entity)
 
     def delete_entity(self, entity):
         """
@@ -219,7 +225,7 @@ class RecordProvider(ModelProvider):
         super()._unwrap_entity_properties(external_object, entity)
         external_object.parent_category_id = entity.parent_category.id
 
-    def _duplicates_exists(self, entity):
+    def _duplicates_exist(self, entity):
         """
         Checks whether the parent category contains another entities with the same alias.
 
@@ -240,3 +246,33 @@ class RecordProvider(ModelProvider):
                     (len(lookup_objects) == 1 and lookup_objects[0].id != entity.id):
                 duplicates_exist = True
         return duplicates_exist
+
+    def _index_custom_parameters(self, entity):
+        """
+        Adds/Removes custom parameters to/from the LabjournalParameterValue model to facilitate the search on custom
+        parameters.
+
+        IMPLEMENTATION NOTES. We assume that the Record entity protects us enough from indexation of custom parameters
+             in creating note because such a situation will crash this particular method.
+
+        :param entity: entity which custom parameters should be modified.
+        """
+        custom_parameters = entity._public_fields['custom_parameters']
+        LabjournalParameterValue.objects \
+            .filter(record_id=entity.id) \
+            .delete()
+        custom_parameter_rows = deque()
+        for parameter_name, parameter_value in custom_parameters.items():
+            descriptor = entity.computed_descriptors[parameter_name]
+            parameter_row = LabjournalParameterValue(
+                descriptor_id=descriptor.id,
+                record_id=entity.id,
+            )
+            if descriptor.type == LabjournalFieldType.boolean:
+                parameter_row.float_value = float(parameter_value)
+            elif descriptor.type == LabjournalFieldType.number:
+                parameter_row.float_value = parameter_value
+            else:
+                parameter_row.string_value = parameter_value
+            custom_parameter_rows.append(parameter_row)
+        LabjournalParameterValue.objects.bulk_create(custom_parameter_rows)

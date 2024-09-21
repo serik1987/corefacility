@@ -74,6 +74,8 @@ class CachedField(ReadOnlyField):
         """
         if self.entity is None:
             raise ValueError("Please, specify the value of 'entity' public property")
+        if self.entity.state == 'creating' or self.entity.state == 'deleted':
+            return None  # We returned this value in order to print entities in 'creating' or 'deleted' state
         # Let's try to improve cache in such a way as loading the root record from cache is OK
         cache = LabjournalCache()
         related_category = self._related_category
@@ -82,15 +84,6 @@ class CachedField(ReadOnlyField):
         except KeyError:
             cache_item = self._generate_cache_item(related_category)
             cache.put_category(cache_item)
-        # if related_category.is_root_record:  # No root record can be stored in cache for technical reasons!
-        #     cache_item = self._get_cache_item_for_root(related_category)
-        # else:
-        #     cache = LabjournalCache()
-        #     try:
-        #         cache_item = cache.retrieve_category(related_category)
-        #     except KeyError:
-        #         cache_item = self._generate_cache_item(related_category)
-        #         cache.put_category(cache_item)
         value = self._get_value_from_cache_item(cache_item)
         return value
 
@@ -117,19 +110,3 @@ class CachedField(ReadOnlyField):
             category_path = "/"
 
         return LabjournalCache.create_cache_item(related_category, category_chain, category_path)
-
-    # def _get_cache_item_for_root(self, related_category):
-    #     """
-    #     Returns a special cache item for the root category
-    #     """
-    #     if related_category == self.entity:
-    #         path = "/"
-    #     else:
-    #         path = ""
-    #     return LabjournalCache.CacheItem(
-    #         category=related_category,
-    #         path="%d:%s" % (related_category.project.id, path),
-    #         descriptors={},
-    #         custom_parameters={},
-    #         base_directory=None,
-    #     )

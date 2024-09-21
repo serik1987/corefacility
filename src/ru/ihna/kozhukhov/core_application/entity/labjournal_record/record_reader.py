@@ -60,6 +60,7 @@ class RecordReader(RawSqlQueryReader):
             .add_select_expression('record.finish_time') \
             .add_select_expression('record.base_directory') \
             .add_select_expression('record.name') \
+            .add_select_expression('record.custom_parameters') \
             .add_select_expression(self.items_builder.json_object_aggregation('hashtag.id', 'hashtag.description')) \
             .add_data_source(SqlTable('core_application_labjournalrecord', 'record')) \
             .add_order_term('record.datetime',
@@ -276,10 +277,13 @@ class RecordReader(RawSqlQueryReader):
                                finish_time,
                                base_directory,
                                name,
+                               custom_parameters,
                                hashtag_info,
                                user_id=None
                                ):
         self._entity_provider.current_type = record_type
+        if isinstance(custom_parameters, str):
+            custom_parameters = json.loads(custom_parameters)
         project_emulator = ModelEmulator(
             id=project_id,
             alias=project_alias,
@@ -298,6 +302,7 @@ class RecordReader(RawSqlQueryReader):
             user=self._user_context,
             checked=user_id is not None,
             name=name,
+            custom_parameters=custom_parameters,
         )
 
         if parent_category_id is None:

@@ -369,7 +369,7 @@ class Entity:
         :return: nothing
         """
         self._edited_fields.add(field_name)
-        if self.__state != "creating":
+        if self.__state == "saved" or self.__state == "loaded":
             self.__state = "changed"
 
     def _get_transaction_mechanism(self):
