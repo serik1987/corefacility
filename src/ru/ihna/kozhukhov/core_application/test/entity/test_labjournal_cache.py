@@ -411,6 +411,8 @@ class TestLabjournalCache(TestCase):
 
     def setUp(self):
         super().setUp()
+        LabjournalCache().flush()
+
         self.sample_project = TestLabjournalCache.sample_project
         self.sample_category_descriptors = TestLabjournalCache.sample_category_descriptors
         self.expected_descriptors_for_record = TestLabjournalCache.expected_descriptors_for_record
@@ -1061,7 +1063,3 @@ class TestLabjournalCache(TestCase):
         else:
             raise ValueError("Unsupported record type")
         return sample_record
-
-    def tearDown(self):
-        LabjournalCache().flush()
-        super().tearDown()

@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+from ru.ihna.kozhukhov.core_application.entity.labjournal_record import RecordSet
 from ru.ihna.kozhukhov.core_application.entity.labjournal_record.category_record import CategoryRecord
 from ru.ihna.kozhukhov.core_application.entity.labjournal_record.data_record import DataRecord
 from ru.ihna.kozhukhov.core_application.entity.labjournal_record.record import Record
@@ -125,6 +126,10 @@ class RecordSetObject(EntitySetObject):
                     index += 1
 
     def sort(self):
+        """
+        Sorts all entities inside the entity container in the default order.
+        Remains all entities in the database unchanged.
+        """
         self._entities = sorted(self._entities,
                                 key=lambda record: record.datetime
                                 if record.datetime is not None
@@ -134,11 +139,18 @@ class RecordSetObject(EntitySetObject):
         return self.__class__(self._user_set_object, self._project_set_object, _entity_list=self._entities)
 
     def filter_by_parent_category(self, parent_category):
+        """
+        Applies the parent category filter.
+        Remains all entities in the database unchanged.
+
+        :param parent_category: remains only records with given parent category
+        """
         self._entities = list(filter(lambda record: record.parent_category.id == parent_category.id, self._entities))
 
     def filter_by_datetime(self, complex_interval):
         """
-        Applies filtration by the datetime
+        Applies filtration by the datetime.
+        Remains all entities in the database unchanged.
 
         :param complex_interval: an instance of the ComplexInterval value that denotes what to use
         """
@@ -148,7 +160,8 @@ class RecordSetObject(EntitySetObject):
 
     def filter_by_types(self, types):
         """
-        Apply filtration by possible types
+        Apply filtration by possible types.
+        Remains all entities in the database unchanged.
 
         :param types: an iterable object containing all valid types
         """
@@ -156,10 +169,52 @@ class RecordSetObject(EntitySetObject):
 
     def filter_by_name(self, name):
         """
-        Filter only those records which name starts from a given line
+        Filter only those records which name starts from a given line.
+        Remains all entities in the database unchanged.
 
         :param name: the record name
         """
         self._entities = list(filter(
             lambda record: record.type == LabjournalRecordType.service and record.name.startswith(name), self._entities
         ))
+
+    def filter_by_custom_parameters(self, custom_parameters):
+        """
+        Remains only such entities inside the entity container that have certain custom parameters.
+        Remains all entities in the database unchanged.
+
+        :param custom_parameters: a dictionary for all available custom parameters
+        """
+        if custom_parameters['_logic'] == RecordSet.LogicType.AND:
+            def filter_function(record):
+                record_shall_be_remained = True
+                for name, value in custom_parameters.items():
+                    if name[0] == '_':
+                        continue
+                    param_name = 'custom_%s' % name
+                    if getattr(record, param_name) != value:
+                        record_shall_be_remained = False
+                        break
+                return record_shall_be_remained
+        elif custom_parameters['_logic'] == RecordSet.LogicType.OR:
+            def filter_function(record):
+                record_shall_be_remained = False
+                for name, value in custom_parameters.items():
+                    if name[0] == '_':
+                        continue
+                    param_name = 'custom_%s'% name
+                    if getattr(record, param_name) == value:
+                        record_shall_be_remained = True
+                        break
+                return record_shall_be_remained
+        else:
+            raise ValueError("Unknown filter logic")
+        self._entities = list(filter(filter_function, self._entities))
+
+    def filter_by_project(self, project):
+        """
+        Remains only records that belong to a given project
+
+        :param project: A project that is used as filtration criterion
+        """
+        self._entities = list(filter(lambda record: record.project.id == project.id, self._entities))

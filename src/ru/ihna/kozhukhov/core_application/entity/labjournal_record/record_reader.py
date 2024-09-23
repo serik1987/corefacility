@@ -8,7 +8,8 @@ from ru.ihna.kozhukhov.core_application.entity.readers.model_emulators import Mo
 from ru.ihna.kozhukhov.core_application.entity.readers.query_builders.data_source import SqlTable, Subquery
 from ru.ihna.kozhukhov.core_application.entity.readers.query_builders.query_filters import \
     StringQueryFilter, OrQueryFilter, SearchQueryFilter, AndQueryFilter
-from ru.ihna.kozhukhov.core_application.models.enums import LabjournalHashtagType, LabjournalRecordType
+from ru.ihna.kozhukhov.core_application.models.enums import LabjournalHashtagType, LabjournalRecordType, \
+    LabjournalFieldType
 
 from ..labjournal_hashtags import RecordHashtag
 from .record_provider import RecordProvider
@@ -36,6 +37,12 @@ class RecordReader(RawSqlQueryReader):
 
     _hashtag_logic_filter = None
     """ Logic of the hashtag filter to apply """
+
+    _parent_category = None
+    """
+    If parent_category filter is selected, the property equals to the value of the parent category selected by the user.
+    Otherwise, the property is None.
+    """
 
     def initialize_query_builder(self):
         """
@@ -104,6 +111,7 @@ class RecordReader(RawSqlQueryReader):
 
         :param parent_category: the parent category to apply
         """
+        self._parent_category = parent_category
         for builder in self.items_builder, self.count_builder:
             builder.main_filter &= \
                 StringQueryFilter("record.project_id=%s", parent_category.project.id)
@@ -193,14 +201,11 @@ class RecordReader(RawSqlQueryReader):
 
         :param hashtags: list of hashtag entities or hashtag IDs
         """
+        hashtags = [hashtag.id if isinstance(hashtag, RecordHashtag) else hashtag for hashtag in hashtags]
         if self._hashtag_logic_filter is not None:
-            if len(hashtags) > 0:
-                if self._hashtag_logic_filter.value == "and":
-                    self.apply_hashtags_and_filter(hashtags)
-                elif self._hashtag_logic_filter.value == "or":
-                    self.apply_hashtags_or_filter(hashtags)
-            else:
-                self._hashtag_filter = hashtags
+            self._apply_custom_hashtag_filter(hashtags, self._hashtag_logic_filter)
+        else:
+            self._hashtag_filter = hashtags
 
     def apply_hashtag_logic_filter(self, hashtag_logic):
         """
@@ -209,56 +214,168 @@ class RecordReader(RawSqlQueryReader):
         :param hashtag_logic: one out of the predefined hashtag logic
         """
         if self._hashtag_filter is not None:
-            if len(self._hashtag_filter) > 0:
-                if hashtag_logic.value == "and":
-                    self.apply_hashtags_and_filter(self._hashtag_filter)
-                elif hashtag_logic.value == "or":
-                    self.apply_hashtags_or_filter(self._hashtag_filter)
+            self._apply_custom_hashtag_filter(self._hashtag_filter, hashtag_logic)
         else:
             self._hashtag_logic_filter = hashtag_logic
 
-    def apply_hashtags_and_filter(self, hashtags):
+    def _apply_custom_hashtag_filter(self, hashtag_id_list, hashtag_logic):
         """
-        Passes only records that contains all given hashtags
+        Applies a custom hashtag filter
 
-        :param hashtags: list of hashtag entities or IDs
+        :param hashtag_id_list: Records that have hashtags with IDs in the list will be remained
+        :param hashtag_logic: how presence of hashtags shall be considered
+            RecordSet.LogicType.AND - a record shall contain all hashtags present in the hashtag_id_list to remain it
+            RecordSet.LogicType.OR - a record shall contain at least one hashtag present in the hashtag_id_list
+                to remain it
         """
-        hashtags = [hashtag.id if isinstance(hashtag, RecordHashtag) else hashtag for hashtag in hashtags]
+        if len(hashtag_id_list) > 0:
+            child_entity_filter_options = {
+                'data_source': 'core_application_labjournalhashtagrecord',
+                'count_column': 'hashtag_id',
+                'child_values': hashtag_id_list,
+                'value_to_filter_converter': lambda hashtag_id: \
+                    StringQueryFilter("core_application_labjournalhashtagrecord.hashtag_id=%s", hashtag_id),
+                'subquery_alias': 'hashtag_stats',
+            }
+            if hashtag_logic.value == "and":
+                self.apply_child_entity_and_filter(**child_entity_filter_options)
+            elif hashtag_logic.value == "or":
+                self.apply_child_entity_or_filter(**child_entity_filter_options)
+            else:
+                print(hashtag_logic)
+                raise ValueError("Unsupported hashtag_logic")
+
+    def apply_custom_parameters_filter(self, custom_parameters):
+        """
+        Remains only such records that contains special values of custom parameters
+
+        :param custom_parameters: a dictionary identifier => value that defines such special values, where
+            identifier is an identifier of the custom parameter and value is its value
+        """
+        if self._parent_category is None:
+            raise ValueError("Please, select a parent category to successively apply this filter")
+        if len(custom_parameters) > 0:
+            computed_descriptors = self._parent_category.computed_descriptors
+            logic = custom_parameters['_logic']
+            derived_custom_parameters = dict()
+            for identifier, value in custom_parameters.items():
+                if identifier in computed_descriptors:
+                    descriptor = computed_descriptors[identifier]
+                    if descriptor.type == LabjournalFieldType.boolean:
+                        value = float(value)
+                    derived_custom_parameters[descriptor.id] = value
+            filter_options = {
+                'data_source': "core_application_labjournalparametervalue",
+                'count_column': "descriptor_id",
+                'child_values': derived_custom_parameters.items(),
+                'value_to_filter_converter': self._define_filter_for_value,
+                'subquery_alias': 'param_stats',
+            }
+            if logic.value == 'and':
+                self.apply_child_entity_and_filter(**filter_options)
+            elif logic.value == 'or':
+                self.apply_child_entity_or_filter(**filter_options)
+
+    def _define_filter_for_value(self, combined_value):
+        """
+        Defines an SQL filter for a given pair (parameter ID, parameter value)
+
+        :param combined_value: the value itself
+        """
+        param_id, param_value = combined_value
+        query_filter = StringQueryFilter("core_application_labjournalparametervalue.descriptor_id=%s", param_id)
+        if isinstance(param_value, str):
+            query_filter &= StringQueryFilter("core_application_labjournalparametervalue.string_value=%s", param_value)
+        elif isinstance(param_value, float):
+            query_filter &= StringQueryFilter("core_application_labjournalparametervalue.float_value=%s", param_value)
+        else:
+            raise ValueError("Unsupported type of the parameter value")
+        return query_filter
+
+    def apply_child_entity_and_filter(self,
+                                  data_source=None,
+                                  count_column=None,
+                                  child_values=None,
+                                  value_to_filter_converter=None,
+                                  subquery_alias=None,
+                                  ):
+        """
+        Passes only such records that have child entities satisfying the following condition: all entities within a
+        given entity list are child entities of a given record.
+
+        IMPORTANT NOTE!
+        All arguments below are mandatory. The method doesn't test them against SQL-injection. However, the
+        value_to_filter_converter shall test each of child_values against SQL-injection.
+
+        :param data_source: a data source (a subquery or SQL table) where information about child entity exists.
+            The data_source shall have a record_id column that is used to join the child entity to its parent record.
+        :param count_column: a column that is used to distinguish rows that are related to different child entities
+            inside the source data (usually, a column that contains primary key for a child entity)
+        :param child_values: List or other iterable object of values that shall be consecutively passed to the
+            filters. The record will pass through the filter if all entities which values are mentioned here
+            are present among the child entities. The 'value_to_filter_converter' argument defines what kind of
+            values we need
+        :param value_to_filter_converter: The value-to-filter converter is a special function or another callable object
+            that takes just one argument - value of a child entity from the 'child_values' array (see above). Its
+            output should be QueryFilter that will  be inserted into WHERE condition. Such a filter should select
+            only such rows from the 'data_source' (see above) that contains information about a child entity that have
+            a value given by the argument to this special function
+        :param subquery_alias: Selection of proper rows from an SQL table mentioned in the 'data_source' (see above)
+            will be putted into a special subquery which resultant table will be joined to the original table mentioned
+            in self.items_builder or self.count_builder. Such a special subquery shall have its alias. The alias should
+            be given here, in this argument
+        """
         subquery_builder = settings.QUERY_BUILDER_CLASS()
         subquery_builder \
             .add_select_expression("record_id") \
-            .add_select_expression(subquery_builder.select_total_count('hashtag_id'), alias="hashtag_count") \
-            .add_data_source("core_application_labjournalhashtagrecord") \
-            .set_main_filter(OrQueryFilter(*[
-                StringQueryFilter("hashtag_id=%s", hashtag_id) for hashtag_id in hashtags
-            ])) \
+            .add_select_expression(subquery_builder.select_total_count(count_column), alias="entity_count") \
+            .add_data_source(data_source) \
+            .set_main_filter(OrQueryFilter(*[value_to_filter_converter(value) for value in child_values])) \
             .add_group_term("record_id")
 
         for builder in self.items_builder, self.count_builder:
             builder.data_source.add_join(
-                self.items_builder.JoinType.INNER,
-                Subquery(subquery_builder, "hashtag_stats"),
-                "ON (hashtag_stats.record_id = record.id)"
+                builder.JoinType.INNER,
+                Subquery(subquery_builder, subquery_alias),
+                "ON (%s.record_id = record.id)" % subquery_alias
             )
-            builder.main_filter &= StringQueryFilter("hashtag_stats.hashtag_count=%s", len(hashtags))
+            builder.main_filter &= StringQueryFilter("%s.entity_count=%%s" % subquery_alias, len(child_values))
 
-    def apply_hashtags_or_filter(self, hashtags):
+    def apply_child_entity_or_filter(self,
+                                     data_source=None,
+                                     child_values=None,
+                                     value_to_filter_converter=None,
+                                     **kwargs
+                                     ):
         """
-        Passes only records that contain any of the given hashtag
+        Passes only such records that have child entities satisfying the following condition: at least one entity within
+        a given entity list is a child entity of a given record.
 
-        :param hashtags: list of hashtag entities of  IDs
+        IMPORTANT NOTE!
+        All arguments below are mandatory. The method doesn't test them against SQL-injection. However, the
+        value_to_filter_converter shall test each of child_values against SQL-injection.
+
+        :param data_source: a data source (a subquery or SQL table) where information about child entity exists.
+            The data_source shall have a record_id column that is used to join the child entity to its parent record.
+        :param child_values: List or other iterable object of values that shall be consecutively passed to the
+            filters. The record will pass through the filter if at least one entity inside the present list is present
+            among the child entities of the record. The 'value_to_filter_converter' argument defines what kind of
+            values we need
+        :param value_to_filter_converter: The value-to-filter converter is a special function or another callable object
+            that takes just one argument - value of a child entity from the 'child_values' array (see above). Its
+            output should be QueryFilter that will  be inserted into WHERE condition. Such a filter should select
+            only such rows from the 'data_source' (see above) that contains information about a child entity that have
+            a value given by the argument to this special function
+        :param kwargs: useless. The field has left just for compatibility reasons
         """
-        hashtags = [hashtag.id if isinstance(hashtag, RecordHashtag) else hashtag for hashtag in hashtags]
-        filter_condition = OrQueryFilter(*[
-            StringQueryFilter("hashtag_filter.hashtag_id=%s", hashtag_id) for hashtag_id in hashtags
-        ])
+        child_entity_or_filter = OrQueryFilter(*[value_to_filter_converter(value) for value in child_values])
         for builder in self.items_builder, self.count_builder:
             builder.data_source.add_join(
-                self.items_builder.JoinType.INNER,
-                SqlTable("core_application_labjournalhashtagrecord", "hashtag_filter"),
-                "ON (hashtag_filter.record_id = record.id)"
+                builder.JoinType.INNER,
+                data_source,
+                "ON (%s.record_id = record.id)" % data_source
             )
-            builder.main_filter &= filter_condition
+            builder.main_filter &= child_entity_or_filter
 
 
     def create_external_object(self,

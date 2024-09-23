@@ -149,6 +149,8 @@ class BaseTestClass(MediaFilesTestCase):
         entity_set = self.get_entity_set()
         index = 0
         for actual_entity in entity_set:
+            self.assertLessEqual(index+1, len(self.container),
+                                 "Number of entities retrieved is higher than expected")
             expected_entity = self.container[index]
             self.assertEntityFound(actual_entity, expected_entity,
                                    "Unexpected objects found during the object iteration")

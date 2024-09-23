@@ -62,6 +62,7 @@ class RecordSet(EntitySet):
         'name': (str, None),
         'hashtags': (list, None),
         'hashtag_logic': (LogicType, None),
+        'custom_parameters': (dict, None),
     }
     """ List of all entity filters """
 

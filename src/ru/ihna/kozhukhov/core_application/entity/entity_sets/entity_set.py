@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.utils.module_loading import import_string
 
 from ru.ihna.kozhukhov.core_application.exceptions.entity_exceptions import EntityOperationNotPermitted
@@ -81,7 +83,7 @@ class EntitySet:
         """
         Initializes the entity set
         """
-        self._entity_filters = dict()
+        self._entity_filters = OrderedDict()
     
     @property
     def ordered(self):
