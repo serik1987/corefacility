@@ -14,209 +14,10 @@ from ru.ihna.kozhukhov.core_application.entity.labjournal_record import RootCate
     CategoryRecord, ServiceRecord, RecordSet
 from ru.ihna.kozhukhov.core_application.entity.project import Project
 from ru.ihna.kozhukhov.core_application.entity.user import User
-from ru.ihna.kozhukhov.core_application.exceptions.entity_exceptions import EntityNotFoundException, \
-    EntityOperationNotPermitted, EntityFieldInvalid
 from ru.ihna.kozhukhov.core_application.models.enums import LabjournalRecordType, LabjournalFieldType
 from ru.ihna.kozhukhov.core_application.utils import LabjournalCache
 
-def general_data_provider():
-    return [
-        ('category', 0),
-        ('category', 1),
-        ('category', 2),
-        ('data', 1),
-        ('data', 2),
-        ('data', 3),
-    ]
-
-def general_data_with_path_provider():
-    return [
-        ('category', 0, '/'),
-        ('category', 1, '/adult'),
-        ('category', 2, '/adult/rab001'),
-        ('data', 1, '/disclaimer'),
-        ('data', 2, '/adult/disclaimer'),
-        ('data', 3, '/adult/rab001/rec001')
-    ]
-
-def base_data_change_provider():
-    return [
-        ('data', 1, 0, "/disclaimer"),
-        ('data', 1, 1, "/disclaimer"),
-        ('data', 1, 2, "/disclaimer"),
-        ('data', 2, 0, "/adult/disclaimer"),
-        ('data', 2, 1, "/new/disclaimer"),
-        ('data', 2, 2, "/adult/disclaimer"),
-        ('data', 3, 0, "/adult/rab001/rec001"),
-        ('data', 3, 1, "/new/rab001/rec001"),
-        ('data', 3, 2, "/adult/new/rec001"),
-        ('category', 2, 0, "/adult/rab001"),
-        ('category', 2, 1, "/new/rab001"),
-        ('category', 2, 2, "/adult/new"),
-        ('category', 1, 0, "/adult"),
-        ('category', 1, 1, "/new"),
-        ('category', 1, 2, "/adult"),
-        ('category', 0, 0, "/"),
-        ('category', 0, 1, "/"),
-        ('category', 0, 2, "/"),
-    ]
-
-def path_category_change_provider():
-    return [
-        (record_type, record_index, change_category_index, expected_path, flush)
-        for (record_type, record_index, change_category_index, expected_path) in base_data_change_provider()
-        for flush in (False, True)
-    ]
-
-def descriptor_category_change_provider():
-    return [
-        (record_type, record_index, change_category_index, change_mode,)
-        for record_type, record_index, change_category_index, _ in base_data_change_provider()
-        for change_mode in (
-            'add',
-            'modify',
-            'remove',
-            'available_value_add',
-            'available_value_remove',
-            'hashtag_add',
-            'hashtag_remove',
-            'hashtag_attach',
-            'hashtag_detach'
-        )
-    ]
-
-def find_by_path_provider():
-    return [
-        ("/", 'category', 0),
-        ("/adult", 'category', 1),
-        ("/adult/rab001", 'category', 2),
-        ("/disclaimer", 'data', 1),
-        ("/adult/disclaimer", 'data', 2),
-        ("/adult/rab001/rec001", 'data', 3),
-    ]
-
-def find_by_path_after_category_change():
-    data = [
-        (1, '/', None, 'category', 0),
-        (1, '/disclaimer', None, 'data', 1),
-        (1, '/new', None, 'category', 1),
-        (1, '/adult', EntityNotFoundException, None, None),
-        (1, '/new/disclaimer', None, 'data', 2),
-        (1, '/adult/disclaimer', EntityNotFoundException, None, None),
-        (1, '/new/rab001', None, 'category', 2),
-        (1, '/adult/rab001', EntityNotFoundException, None, None,),
-        (1, '/new/rab001/rec001', None, 'data', 3),
-        (1, '/adult/rab001/rec001', EntityNotFoundException, None, None),
-        (2, '/', None, 'category', 0),
-        (2, '/disclaimer', None, 'data', 1),
-        (2, '/adult', None, 'category', 1),
-        (2, '/adult/disclaimer', None, 'data', 2),
-        (2, '/adult/new', None, 'category', 2),
-        (2, '/adult/rab001', EntityNotFoundException, None, None),
-        (2, '/adult/new/rec001', None, 'data', 3),
-        (2, '/adult/rab001/rec001', EntityNotFoundException, None, None),
-    ]
-    return [
-        (category_to_change, path, exception_to_throw, expected_record_type, expected_record_index, flush)
-        for (category_to_change, path, exception_to_throw, expected_record_type, expected_record_index) in data
-        for flush in (False, True)
-    ]
-
-
-def custom_field_change_provider():
-    float_data = [
-        (8.48, 8.48),
-        (-8.48, -8.48),
-        (6.02e23, 6.02e23),
-        (-6.02e23, -6.02e23),
-        (6.02e-23, 6.02e-23),
-        (-6.02e-23, -6.02e-23),
-        (0.0, 0.0),
-        (True, 1.0),
-        (False, 0.0),
-        ("10.3", 10.3),
-    ]
-    boolean_data = [
-        (True, True),
-        (False, False),
-        (8.48, True),
-        (0.0, False),
-        ("True", True),
-        ("False", True),
-        ("", False),
-    ]
-    string_provider = [
-        ("Latin letters", "Latin letters"),
-        ("Русские буквы", "Русские буквы"),
-        ("123", "123"),
-        ("~`!@#$%^&*()_+=-|", "~`!@#$%^&*()_+=-|"),
-        ("|\\'\";:/?.>,<", "|\\'\";:/?.>,<"),
-        ("буквы ё и Ё", "буквы ё и Ё"),
-        ("№", "№",),
-        ("", "",),
-        ("="*256, "="*256,)
-    ]
-    assigning_data = [
-        (identifier, value, expected_value)
-        for identifier in ('custom_cat0_param0', 'custom_cat1_param0', 'custom_cat2_param0')
-        for value, expected_value in float_data
-    ] + [
-        (identifier, value, expected_value)
-        for identifier in ('custom_cat0_param24', 'custom_cat1_param24', 'custom_cat2_param24')
-        for value, expected_value in boolean_data
-    ] + [
-        (identifier, value, expected_value)
-        for identifier in ('custom_cat0_param12', 'custom_cat1_param12', 'custom_cat2_param12',
-                           'custom_cat0_param36', 'custom_cat1_param36', 'custom_cat2_param36')
-        for value, expected_value in string_provider
-    ]
-    return [
-        (identifier, value, expected_value, change_mode,)
-        for identifier, value, expected_value in assigning_data
-        for change_mode in ('on_update', 'on_load')
-    ]
-
-
-def custom_field_for_category_provider():
-    return [
-        (2, 'custom_cat0_param0', 3.14, 3.14, None),
-        (2, 'custom_cat0_param12', "Hello, World!", "Hello, World!", None,),
-        (2, 'custom_cat0_param24', True, True, None,),
-        (2, 'custom_cat0_param36', "Hello, World!", "Hello, World!", None,),
-        (2, 'custom_cat1_param0', 3.14, 3.14, None),
-        (2, 'custom_cat1_param12', "Hello, World!", "Hello, World!", None,),
-        (2, 'custom_cat1_param24', True, True, None,),
-        (2, 'custom_cat1_param36', "Hello, World!", "Hello, World!", None,),
-        (2, 'custom_cat2_param0', 3.14, 3.14, None),
-        (2, 'custom_cat2_param12', "Hello, World!", "Hello, World!", None,),
-        (2, 'custom_cat2_param24', True, True, None,),
-        (2, 'custom_cat2_param36', "Hello, World!", "Hello, World!", None,),
-        (1, 'custom_cat0_param0', 3.14, 3.14, None),
-        (1, 'custom_cat0_param12', "Hello, World!", "Hello, World!", None,),
-        (1, 'custom_cat0_param24', True, True, None,),
-        (1, 'custom_cat0_param36', "Hello, World!", "Hello, World!", None,),
-        (1, 'custom_cat1_param0', 3.14, 3.14, None),
-        (1, 'custom_cat1_param12', "Hello, World!", "Hello, World!", None,),
-        (1, 'custom_cat1_param24', True, True, None,),
-        (1, 'custom_cat1_param36', "Hello, World!", "Hello, World!", None,),
-        (1, 'custom_cat2_param0', 3.14, 3.14, AttributeError),
-        (1, 'custom_cat2_param12', "Hello, World!", "Hello, World!", AttributeError,),
-        (1, 'custom_cat2_param24', True, True, AttributeError,),
-        (1, 'custom_cat2_param36', "Hello, World!", "Hello, World!", AttributeError,),
-        (0, 'custom_cat0_param0', 3.14, 3.14, AttributeError),
-        (0, 'custom_cat0_param12', "Hello, World!", "Hello, World!", AttributeError,),
-        (0, 'custom_cat0_param24', True, True, AttributeError,),
-        (0, 'custom_cat0_param36', "Hello, World!", "Hello, World!", AttributeError,),
-        (0, 'custom_cat1_param0', 3.14, 3.14, AttributeError),
-        (0, 'custom_cat1_param12', "Hello, World!", "Hello, World!", AttributeError,),
-        (0, 'custom_cat1_param24', True, True, AttributeError,),
-        (0, 'custom_cat1_param36', "Hello, World!", "Hello, World!", AttributeError,),
-        (0, 'custom_cat2_param0', 3.14, 3.14, AttributeError),
-        (0, 'custom_cat2_param12', "Hello, World!", "Hello, World!", AttributeError,),
-        (0, 'custom_cat2_param24', True, True, AttributeError,),
-        (0, 'custom_cat2_param36', "Hello, World!", "Hello, World!", AttributeError,),
-        (2, 'custom_bad_param', "Hello, World", "Hello, World", AttributeError,),
-    ]
+from ..data_providers.labjournal_cache_test_providers import *
 
 
 class TestLabjournalCache(TestCase):
@@ -336,8 +137,9 @@ class TestLabjournalCache(TestCase):
                     required=k % 7 == 0,
                     record_type=record_types[k % 8],
                     units="kg/am" if k % 5 == 0 else "amg",
-                    default=3.48*k,
                 )
+                if l != 0:
+                    sample_descriptor.default = 3.48 * k
                 sample_descriptor.create()
                 cls.sample_category_descriptors[sample_category_index].append(sample_descriptor)
                 k += 1
@@ -352,8 +154,9 @@ class TestLabjournalCache(TestCase):
                 sample_descriptor.create()
                 for m in range(5):
                     sample_descriptor.values.add(str(m), "Тестовое значение")
-                sample_descriptor.default = "3"
-                sample_descriptor.update()
+                if l != 0:
+                    sample_descriptor.default = "3"
+                    sample_descriptor.update()
                 cls.sample_category_descriptors[sample_category_index].append(sample_descriptor)
                 k += 1
             for l in range(12):
@@ -363,8 +166,9 @@ class TestLabjournalCache(TestCase):
                     description="Тестовый дескриптор (булев)",
                     required=k % 7 == 0,
                     record_type= record_types[k % 8],
-                    default=k % 6 == 0,
                 )
+                if l != 0:
+                    sample_descriptor.default = k % 6 == 0
                 sample_descriptor.create()
                 cls.sample_category_descriptors[sample_category_index].append(sample_descriptor)
                 k += 1
@@ -375,8 +179,9 @@ class TestLabjournalCache(TestCase):
                     description="Тестовый дескриптор (строковой)",
                     required=k % 7 == 0,
                     record_type= record_types[k % 8],
-                    default=str(k),
                 )
+                if l != 0:
+                    sample_descriptor.default = str(k)
                 sample_descriptor.create()
                 cls.sample_category_descriptors[sample_category_index].append(sample_descriptor)
                 k += 1
@@ -980,6 +785,70 @@ class TestLabjournalCache(TestCase):
         sample_record = self.sample_record_level_3
         with self.assertRaises(EntityFieldInvalid, msg="Assigning more than 256 characters should be impossible"):
             setattr(sample_record, name, "="*257)
+
+    @parameterized.expand(default_field_test_provider())
+    def test_custom_parameter_default_value_positive(self,
+                                                     name,
+                                                     default_value,
+                                                     category1_value,
+                                                     category2_value,
+                                                     record_type,
+                                                     record_index,
+                                                     expected_value,
+                                                     ):
+        """
+        Tests the proper job of 'default_parameter_values' property
+
+        :param name: name of custom parameter to test
+        :param default_value: tests whether the default value of custom parameter was set or None if no value was set
+        :param category1_value: tests whether the parameter was set for the level 1 category or None if no value was set
+        :param category2_value: tests whether the parameter was set for the level 2 category or None if no value was set
+        :param record_type: type of the record to test: 'data', 'category' or 'service'
+        :param record_index: index of the record to test; useless for service records
+        :param expected_value: the default value for the record that is expected
+        """
+        descriptor = None
+        for current_descriptor in self.sample_category_descriptors[0]:
+            if current_descriptor.identifier == name:
+                descriptor = current_descriptor
+                break
+        else:
+            self.fail("Malformed test: incorrect name of the custom parameter")
+        record_set = RecordSet()
+        if default_value is not None:
+            descriptor = self.sample_categories[0].descriptors.get(descriptor.id)
+            if descriptor.type == LabjournalFieldType.discrete:
+                descriptor.values.add('grat', "Rectangular grating")
+                descriptor.values.add('reti', "Retinotopical stimulus")
+                descriptor.values.add('imag', "Natural images")
+                descriptor.values.add('figu', "Geometrical figures")
+            descriptor.default = default_value
+            descriptor.update()
+        if category1_value is not None:
+            category = record_set.get(self.sample_categories[1].id)
+            setattr(category, 'custom_%s' % name, category1_value)
+            category.update()
+        if category2_value is not None:
+            category = record_set.get(self.sample_categories[2].id)
+            setattr(category, 'custom_%s'% name, category2_value)
+            category.update()
+        if record_type == 'service':
+            sample_record = self.sample_service_record
+        else:
+            sample_record = self._get_sample_record(record_type, record_index)
+        LabjournalCache().clean_category(RootCategoryRecord(project=self.sample_project), None)
+        t1 = time()
+        actual_value = sample_record.default_values[name]
+        t2 = time()
+        self.assertEquals(actual_value, expected_value, "Bad value of the default value.")
+        self.assertLessEqual(t2-t1, 1.0, "The default values computation process is too slow.")
+        with self.assertNumQueries(0):
+            second_actual_value = sample_record.default_values[name]
+        self.assertEquals(second_actual_value, expected_value, "Bad value of the default value.")
+        LabjournalCache().flush()
+        with self.assertNumQueries(1):
+            third_actual_value = sample_record.default_values[name]
+        self.assertEquals(third_actual_value, expected_value, "Bad value of the default value.")
 
     def assertRecordEqual(self, actual_record, expected_record):
         """

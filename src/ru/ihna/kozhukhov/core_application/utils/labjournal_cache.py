@@ -23,7 +23,7 @@ class LabjournalCache:
     """
 
     CacheItem = namedtuple(
-        "CategoryInfo",
+        "CacheItem",
         ['category', 'path', 'descriptors', 'custom_parameters', 'base_directory']
     )
     """
@@ -62,14 +62,20 @@ class LabjournalCache:
         descriptor_set = ParameterDescriptorSet()
         descriptor_set.category_list = category_chain
         descriptors = OrderedDict()
+        default_values = dict()
         for descriptor in descriptor_set:
             descriptors[descriptor.identifier] = descriptor
+            default_values[descriptor.identifier] = descriptor.default
+
+        for category in category_chain:
+            if not category.is_root_record:
+                default_values.update(category.customparameters)
 
         cache_item = LabjournalCache.CacheItem(
             category=related_category,
             path="%d:%s" % (related_category.project.id, path),
             descriptors=descriptors,
-            custom_parameters=None,
+            custom_parameters=default_values,
             base_directory=None,
         )
         return cache_item

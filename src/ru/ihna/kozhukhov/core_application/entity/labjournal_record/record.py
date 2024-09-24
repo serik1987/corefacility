@@ -5,13 +5,14 @@ from ru.ihna.kozhukhov.core_application.entity.entity import Entity
 from ru.ihna.kozhukhov.core_application.entity.fields import \
     RelatedEntityField, ReadOnlyField, EntityAliasField, DateTimeField, BooleanField, EntityField, ManagedEntityField
 from ru.ihna.kozhukhov.core_application.entity.labjournal_hashtags import RecordHashtagManager
+from ru.ihna.kozhukhov.core_application.exceptions.entity_exceptions import \
+    EntityOperationNotPermitted, EntityFieldInvalid
 
 from .record_set import RecordSet
 from .record_provider import RecordProvider
 from .category_startdate_provider import CategoryStartdateProvider
 from .record_check_provider import RecordCheckProvider
-from .fields import RecordPathField, ComputedDescriptorsField
-from ...exceptions.entity_exceptions import EntityOperationNotPermitted, EntityFieldInvalid
+from .fields import RecordPathField, ComputedDescriptorsField, DefaultValuesField
 
 
 class Record(Entity):
@@ -93,6 +94,8 @@ class Record(Entity):
         'comments': EntityField(str, max_length=16_384, description="Extra record"),
 
         'computed_descriptors': ComputedDescriptorsField(description="All computed descriptors"),
+
+        'default_values': DefaultValuesField(description="Default values of custom parameters"),
     }
     """
     Describes all public fields within the model layer

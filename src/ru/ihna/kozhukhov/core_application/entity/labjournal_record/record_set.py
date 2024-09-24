@@ -192,6 +192,7 @@ class RecordSet(EntitySet):
                     parent_category_id=category.id,
                     parent_category=category,
                     project=project,
+                    custom_parameters=category_model.custom_parameters,
                 ))
                 category_chain.append(category)
             except LabjournalRecord.DoesNotExist:
