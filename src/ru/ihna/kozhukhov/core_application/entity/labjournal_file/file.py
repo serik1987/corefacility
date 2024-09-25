@@ -33,23 +33,33 @@ class File(Entity):
         'path': ReadOnlyField(description="Full path to a file"),
     }
 
-    def __setattr__(self, name, value):
+    def __getattr__(self, name):
         """
-        Assigns value to the entity field
+        Returns value of the field
 
-        :param name: name of the field to assign
-        :param value: new value of the field
+        :param name: name of the field
+        :return: value of the field
         """
-        super().__setattr__(name, value)
-        if name == 'record' or name == 'name':
+        if name == 'path' and self._path is None:
             self._update_path()
+        return super().__getattr__(name)
+
+    # def __setattr__(self, name, value):
+    #     """
+    #     Assigns value to the entity field
+    #
+    #     :param name: name of the field to assign
+    #     :param value: new value of the field
+    #     """
+    #     super().__setattr__(name, value)
+    #     if name == 'record' or name == 'name':
+    #         self._update_path()
 
     def _update_path(self):
         """
         Updates the value of the 'path' field
         """
-        if self._name is not None and self._record is not None \
-                and self._record.parent_category.base_directory is not None:
-            self._path = os.path.join(self._record.parent_category.base_directory, self._name)
+        if self._name is not None and self._record is not None:
+            self._path = os.path.join(self._record.parent_category.base_path, self._name)
         else:
             self._path = None

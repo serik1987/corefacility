@@ -4,7 +4,7 @@ from ru.ihna.kozhukhov.core_application.models.enums.labjournal_record_type impo
 from ru.ihna.kozhukhov.core_application.exceptions.entity_exceptions import EntityNotFoundException
 
 from .record import Record
-from ...utils import LabjournalCache
+from .fields import BasePathField
 
 
 class CategoryRecord(Record):
@@ -35,7 +35,8 @@ class CategoryRecord(Record):
             max_length=256,
             default='.',
             description="Base directory (relatively to the base directory of the parent category)"
-        )
+        ),
+        'base_path': BasePathField(description="Base directory (full canonical path)"),
     })
 
     def __init__(self, **kwargs):

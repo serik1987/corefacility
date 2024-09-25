@@ -18,6 +18,7 @@ from ru.ihna.kozhukhov.core_application.models.enums import LabjournalRecordType
 from ru.ihna.kozhukhov.core_application.utils import LabjournalCache
 
 from ..data_providers.labjournal_cache_test_providers import *
+from ...entity.labjournal_file import File
 
 
 class TestLabjournalCache(TestCase):
@@ -376,10 +377,10 @@ class TestLabjournalCache(TestCase):
             self.assertEquals(expected_record.path, path, "Record path discrepancy")
 
     @parameterized.expand([
-        ("/", 'category', 0, 2),
-        ("/adult", 'category', 1, 2),
+        ("/", 'category', 0, 3),
+        ("/adult", 'category', 1, 3),
         ("/adult/rab001", 'category', 2, 2),
-        ("/disclaimer", 'data', 1, 2),
+        ("/disclaimer", 'data', 1, 3),
         ("/adult/disclaimer", 'data', 2, 2),
         ("/adult/rab001/rec001", 'data', 3, 2),
     ])
@@ -554,8 +555,11 @@ class TestLabjournalCache(TestCase):
         actual_descriptors = sample_record.computed_descriptors
         self.assertDescriptorListEqual(actual_descriptors, expected_descriptors)
         LabjournalCache().flush()
-        with self.assertNumQueries(1):
+        if sample_record.is_root_record or sample_record.parent_category.is_root_record:
             second_actual_descriptors = sample_record.computed_descriptors
+        else:
+            with self.assertNumQueries(1):
+                second_actual_descriptors = sample_record.computed_descriptors
         self.assertDescriptorListEqual(second_actual_descriptors, expected_descriptors)
 
     def test_computed_descriptors_for_service_record_twice_with_flush(self):
@@ -584,7 +588,7 @@ class TestLabjournalCache(TestCase):
         expected_descriptors = self.expected_descriptors_for_record[record_type][record_index]
         self.assertEquals(sample_record.path, expected_path, "Record path mismatch")
         LabjournalCache().flush()
-        if record_type == 'category':
+        if record_type == 'category' or sample_record.parent_category.is_root_record:
             actual_descriptors = sample_record.computed_descriptors
         else:
             with self.assertNumQueries(1):
@@ -607,7 +611,7 @@ class TestLabjournalCache(TestCase):
         actual_record = record_set.get((self.sample_project, path))
         self.assertRecordEqual(actual_record, expected_record)
         LabjournalCache().flush()
-        if actual_record.type == LabjournalRecordType.category:
+        if actual_record.type == LabjournalRecordType.category or actual_record.parent_category.is_root_record:
             actual_descriptors = actual_record.computed_descriptors
         else:
             with self.assertNumQueries(1):
@@ -627,7 +631,7 @@ class TestLabjournalCache(TestCase):
         expected_descriptors = self.expected_descriptors_for_record[record_type][record_index]
         self.assertEquals(sample_record.path, expected_path, "Record path mismatch")
         LabjournalCache().flush()
-        if record_type == 'category':
+        if record_type == 'category' or sample_record.parent_category.is_root_record:
             actual_descriptors = sample_record.computed_descriptors
         else:
             with self.assertNumQueries(1):
@@ -650,7 +654,7 @@ class TestLabjournalCache(TestCase):
         self.assertDescriptorListEqual(actual_descriptors, expected_descriptors)
         LabjournalCache().flush()
         record_set = RecordSet()
-        if record_type == 'category':
+        if record_type == 'category' or sample_record.parent_category.is_root_record:
             actual_record = record_set.get((self.sample_project, path))
         else:
             with self.assertNumQueries(2):
@@ -846,9 +850,173 @@ class TestLabjournalCache(TestCase):
             second_actual_value = sample_record.default_values[name]
         self.assertEquals(second_actual_value, expected_value, "Bad value of the default value.")
         LabjournalCache().flush()
-        with self.assertNumQueries(1):
+        if sample_record.is_root_record or sample_record.parent_category.is_root_record:
             third_actual_value = sample_record.default_values[name]
+        else:
+            with self.assertNumQueries(1):
+                third_actual_value = sample_record.default_values[name]
         self.assertEquals(third_actual_value, expected_value, "Bad value of the default value.")
+
+    @parameterized.expand(default_base_directory_provider())
+    def test_base_path(self, root_basedir, category1_basedir, category2_basedir, category_index, expected_path):
+        """
+        Tests the 'base_path' field of the record
+
+        :param root_basedir: the base directory for the root record or None if it should be remained to be unset
+        :param category1_basedir: the base directory for the level 1 category or None if it should be remained to be
+            unset
+        :param category2_basedir: the base directory for the level 2 category or None if it should be remained to be
+            unset
+        :param category_index: index of a category to test
+        :param expected_path: value of the 'base_path' field that is expected
+        """
+        self._prepare_for_base_directory_test(root_basedir, category1_basedir, category2_basedir)
+        category = self.sample_categories[category_index]
+        t1 = time()
+        actual_path = category.base_path
+        t2 = time()
+        self.assertEquals(actual_path, expected_path, "Bad path revealed")
+        self.assertLessEqual(t2-t1, 1.0, "The base path computation process is too slow")
+        with self.assertNumQueries(0):
+            actual_path = category.base_path
+        self.assertEquals(actual_path, expected_path, "Bad path revealed")
+
+    @parameterized.expand(categories_with_base_path_provider())
+    def test_computed_descriptors_then_base_path(self, category_index, expected_base_path):
+        self._prepare_for_base_directory_test()
+        category = self.sample_categories[category_index]
+        expected_descriptors = self.expected_descriptors_for_record['category'][category_index]
+        actual_descriptors = category.computed_descriptors
+        self.assertDescriptorListEqual(actual_descriptors, expected_descriptors)
+        with self.assertNumQueries(0):
+            actual_base_path = category.base_path
+        self.assertEquals(actual_base_path, expected_base_path, "Base path mismatch")
+
+    @parameterized.expand(general_data_with_path_and_default_values_provider())
+    def test_path_then_default_values(self, record_type, record_index, expected_path, expected_default_value):
+        """
+        Reads the path field, then default_value field
+
+        :param record_type: the record type to consider: 'data', or 'category'
+        :param record_index: index of the record within the record dataset
+        :param expected_path: path to be expected
+        :param expected_default_value: default value for cat0_param0 custom parameter
+        """
+        self._prepare_for_custom_parameter_test()
+        sample_record = self._get_sample_record(record_type, record_index)
+        self.assertEquals(sample_record.path, expected_path, "Record path mismatch")
+        with self.assertNumQueries(0):
+            actual_default_value = sample_record.default_values['cat0_param0']
+        self.assertEquals(actual_default_value, expected_default_value, "Default value mismatch")
+
+    @parameterized.expand(find_by_path_then_default_value_provider())
+    def test_find_by_path_then_default_value(self,
+                                             path,
+                                             expected_record_type,
+                                             expected_record_number,
+                                             expected_default_value
+                                             ):
+        """
+        Tests whether the system will work correctly if we find the record by path then read its default value
+
+        :param path: the record path
+        :param expected_record_type: type of the record we are expected to find: 'category' or 'data'
+        :param expected_record_number: index of the record we are expected to find
+        :param expected_default_value: expected default value of a custom parameter 'cat0_param0' of the record
+        """
+        expected_record = self._get_sample_record(expected_record_type, expected_record_number)
+        self._prepare_for_custom_parameter_test()
+        actual_record = RecordSet().get((self.sample_project, path))
+        self.assertRecordEqual(actual_record, expected_record)
+        with self.assertNumQueries(0):
+            actual_default_value = actual_record.default_values['cat0_param0']
+        self.assertEquals(actual_default_value, expected_default_value, "Default value mismatch")
+
+    @parameterized.expand(data_records_with_default_values_provider())
+    def test_computed_descriptors_then_default_values(self, record_index, expected_default_value):
+        """
+        Tests whether the system will work if we load all custom descriptors and then try to load default values
+
+        :param record_index: index of the record to test
+        :param expected_default_value: the default value to be expected
+        """
+        sample_record = self.sample_records[record_index]
+        expected_descriptor_list = self.expected_descriptors_for_record['data'][record_index]
+        self._prepare_for_custom_parameter_test()
+        actual_descriptor_list = sample_record.computed_descriptors
+        self.assertDescriptorListEqual(actual_descriptor_list, expected_descriptor_list, test_for_default=False)
+        with self.assertNumQueries(0):
+            actual_default_value = sample_record.default_values['cat0_param0']
+        self.assertEquals(actual_default_value, expected_default_value, "Default values mismatch")
+
+    @parameterized.expand(general_data_with_path_and_default_values_provider())
+    def test_default_value_then_path(self, record_type, record_number, expected_path, expected_default_value):
+        """
+        Tests whether the system will work if we get the default value and then try to get the record path
+
+        :param record_type: what kind of the record would you like to test: 'data' or 'category'?
+        :param record_number: number of the record to test
+        :param expected_path: the expected value for the record path
+        :param expected_default_value: the expected default value of a custom parameter of the record
+        """
+        sample_record = self._get_sample_record(record_type, record_number)
+        self._prepare_for_custom_parameter_test()
+        actual_default_value = sample_record.default_values['cat0_param0']
+        self.assertEquals(actual_default_value, expected_default_value, "Default value mismatch")
+        with self.assertNumQueries(0):
+            actual_path = sample_record.path
+        self.assertEquals(actual_path, expected_path, "Record path mismatch")
+
+    @parameterized.expand(general_data_with_path_and_default_values_provider())
+    def test_default_value_then_find_by_path(self, record_type, record_number, path, expected_default_value):
+        """
+        tests whether the system will work if we get the default value then find the same record by path
+
+        :param record_type: type of the record to test
+        :param record_number: index of the record to test
+        :param path: path to test the 'find by path' feature
+        :param expected_default_value: default value of a 'cat0_param0' custom parameter that is expected to receive
+        """
+        sample_record = self._get_sample_record(record_type, record_number)
+        self._prepare_for_custom_parameter_test()
+        actual_default_value = sample_record.default_values['cat0_param0']
+        self.assertEquals(actual_default_value, expected_default_value, "Default value mismatch")
+        record_set = RecordSet()
+        with self.assertNumQueries(1):
+            actual_record = record_set.get((self.sample_project, path))
+        self.assertRecordEqual(actual_record, sample_record)
+
+    @parameterized.expand(categories_with_base_path_provider())
+    def test_base_path_twice_with_flush(self, category_index, expected_base_path):
+        """
+        Tests whether the base path will work if we flush the record
+
+        :param category_index: index of the category to test
+        :param expected_base_path: record path to be expected
+        """
+        self._prepare_for_base_directory_test()
+        sample_category = self.sample_categories[category_index]
+        self.assertEquals(sample_category.base_path, expected_base_path, "Base path mismatch")
+        LabjournalCache().flush()
+        if sample_category.is_root_record:
+            actual_base_path = sample_category.base_path
+        else:
+            with self.assertNumQueries(1):
+                actual_base_path = sample_category.base_path
+        self.assertEquals(actual_base_path, expected_base_path, "Base path mismatch")
+
+    @parameterized.expand(file_path_provider())
+    def test_full_file(self, record_index, expected_file_path):
+        """
+        Tests for the file path feature
+        """
+        self._prepare_for_base_directory_test()
+        record = RecordSet().get(self.sample_records[record_index].id)
+        file = File(
+            record=record,
+            name="neurons.dat",
+        )
+        self.assertEquals(file.path, expected_file_path, "File path mismatch")
 
     def assertRecordEqual(self, actual_record, expected_record):
         """
@@ -869,9 +1037,13 @@ class TestLabjournalCache(TestCase):
             self.assertEqual(actual_record.datetime, expected_record.datetime, "The record datetime is damaged")
             self.assertEqual(actual_record.type, expected_record.type, "The record type is damaged")
 
-    def assertDescriptorListEqual(self, actual_descriptors, expected_descriptors):
+    def assertDescriptorListEqual(self, actual_descriptors, expected_descriptors, test_for_default=True):
         """
         Asserts that two descriptor sets are identical to each other
+
+        :param actual_descriptors: descriptor list that has been computed using a 'computed_descriptors' field
+        :param expected_descriptors: desriptor list that is expected to see
+        :param test_for_default: True to provide the default value test for each descriptor, False not to do this
         """
         expected_descriptors = list(expected_descriptors)
         for identifier, actual_descriptor in actual_descriptors.items():
@@ -892,7 +1064,8 @@ class TestLabjournalCache(TestCase):
                               "Descriptor description mismatch")
             self.assertEquals(actual_descriptor.required, expected_descriptor.required,
                               "Descriptor requiredness mismatch")
-            self.assertEquals(actual_descriptor.default, expected_descriptor.default,
+            if test_for_default:
+                self.assertEquals(actual_descriptor.default, expected_descriptor.default,
                               "Descriptor default value mismatch")
             self.assertEquals(set(actual_descriptor.record_type), set(expected_descriptor.record_type),
                               "Record type mismatch")
@@ -916,6 +1089,47 @@ class TestLabjournalCache(TestCase):
         if len(expected_descriptors) > 0:
             print(expected_descriptors)
             self.fail("Some descriptors are missed during the descriptor computation")
+
+    def _prepare_for_custom_parameter_test(self):
+        """
+        Properly sets values of cat0_param0 custom parameter for all subsequent categories
+        """
+        descriptor = self.sample_categories[0].descriptors.get('cat0_param0')
+        descriptor.default = 0.0
+        descriptor.update()
+
+        record_set = RecordSet()
+        sample_category = record_set.get(self.sample_categories[1].id)
+        sample_category.custom_cat0_param0 = 2.0
+        sample_category.update()
+
+        sample_category = record_set.get(self.sample_categories[2].id)
+        sample_category.custom_cat0_param0 = 3.0
+        sample_category.update()
+
+        LabjournalCache().clean_category(self.sample_categories[0])
+
+    def _prepare_for_base_directory_test(self,
+                                         root_basedir='white-rabbit',
+                                         category1_basedir='adult',
+                                         category2_basedir='rab1'
+                                         ):
+        """
+        Properly sets base directories for all subsequent categories
+
+        :param root_basedir: base directory for the root category
+        :param category1_basedir: base directory for the category 1
+        :param category2_basedir: base directory for the category 2
+        """
+        for loop_index, category_base_directory in enumerate((root_basedir, category1_basedir, category2_basedir)):
+            if category_base_directory is None:
+                continue
+            if loop_index != 0:
+                working_category = RecordSet().get(self.sample_categories[loop_index].id)
+            else:
+                working_category = RecordSet().get_root(self.sample_project)
+            working_category.base_directory = category_base_directory
+            working_category.update()
 
     def _get_sample_record(self, record_type, record_index):
         """

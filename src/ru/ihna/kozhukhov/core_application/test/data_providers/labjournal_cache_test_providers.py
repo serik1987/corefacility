@@ -1,5 +1,6 @@
-from ru.ihna.kozhukhov.core_application.exceptions.entity_exceptions import *
+from pathlib import Path
 
+from ru.ihna.kozhukhov.core_application.exceptions.entity_exceptions import *
 
 def general_data_provider():
     return [
@@ -234,3 +235,70 @@ def default_field_test_provider():
         ('cat0_param12', 'grat', 'imag', 'figu',   'data',     1,    'grat'),
     ]
     return data
+
+def default_base_directory_provider():
+    base_path = Path(settings.LABJOURNAL_BASEDIR)
+    return [
+        # root base dir     cat.1 b/d   cat.2 b/d   test cat., expected path
+        ('../white-rabbit', '.',        None,       0, (base_path / '../white-rabbit').resolve().as_posix()),
+        ('.',               'adult',    '../rab1',  2, (base_path / 'rab1').resolve().as_posix()),
+        ('../white-rabbit', '../adult', '../rab1',  1, (base_path / '../adult').resolve().as_posix()),
+        ('../white-rabbit', None,       'rab1',     2, (base_path / '../white-rabbit/rab1').resolve().as_posix()),
+        ('.',               '../adult', 'rab1',     0, base_path.resolve().as_posix()),
+        ('.',               '.',        '.',        1, base_path.resolve().as_posix()),
+        ('white-rabbit',    '../adult', None,       2, (base_path / 'adult').resolve().as_posix()),
+        ('white-rabbit',    None,       '.',        0, (base_path / 'white-rabbit').resolve().as_posix()),
+        (None,              None,       None,       1, base_path.resolve().as_posix()),
+        ('white-rabbit',    'adult',    None,       1, (base_path / 'white-rabbit/adult').resolve().as_posix()),
+        (None,              'adult',    '../rab1',  0, base_path.resolve().as_posix()),
+        ('.',               None,       '../rab1',  2, (base_path / '../rab1').resolve().as_posix()),
+        ('.',               '.',        None,       2, base_path.resolve().as_posix()),
+        (None,              '.',        'rab1',     2, (base_path / 'rab1').resolve().as_posix()),
+        (None,              '../adult', '.',        2, (base_path / '../adult').resolve().as_posix()),
+        ('../white-rabbit', 'adult',    '.',        2, (base_path / '../white-rabbit/adult').resolve().as_posix()),
+        ('white-rabbit',    'adult',    'rab1',     1, (base_path / 'white-rabbit/adult').resolve().as_posix()),
+        ('white-rabbit',    '.',        '../adult', 0, (base_path / 'white-rabbit').resolve().as_posix()),
+    ]
+
+def categories_with_base_path_provider():
+    base_path = Path(settings.LABJOURNAL_BASEDIR)
+    return [
+        (0, (base_path / "white-rabbit").resolve().as_posix()),
+        (1, (base_path / "white-rabbit/adult").resolve().as_posix()),
+        (2, (base_path / "white-rabbit/adult/rab1").resolve().as_posix()),
+    ]
+
+def file_path_provider():
+    base_path = Path(settings.LABJOURNAL_BASEDIR)
+    return [
+        (1, (base_path / "white-rabbit/neurons.dat").resolve().as_posix()),
+        (2, (base_path / "white-rabbit/adult/neurons.dat").resolve().as_posix()),
+        (3, (base_path / "white-rabbit/adult/rab1/neurons.dat").resolve().as_posix()),
+    ]
+
+def general_data_with_path_and_default_values_provider():
+    return [
+        ('category', 0, "/",                    0.0,),
+        ('category', 1, "/adult",               0.0,),
+        ('category', 2, "/adult/rab001",        2.0,),
+        ('data',     1, "/disclaimer",          0.0,),
+        ('data',     2, "/adult/disclaimer",    2.0,),
+        ('data',     3, "/adult/rab001/rec001", 3.0,),
+    ]
+
+def find_by_path_then_default_value_provider():
+    return [
+        ("/",                    'category', 0, 0.0),
+        ("/adult",               'category', 1, 0.0),
+        ("/adult/rab001",        'category', 2, 2.0),
+        ("/disclaimer",          'data',     1, 0.0),
+        ("/adult/disclaimer",    'data',     2, 2.0),
+        ("/adult/rab001/rec001", 'data',     3, 3.0),
+    ]
+
+def data_records_with_default_values_provider():
+    return [
+        (1, 0.0,),
+        (2, 2.0,),
+        (3, 3.0,),
+    ]

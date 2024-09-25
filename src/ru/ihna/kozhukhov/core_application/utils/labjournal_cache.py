@@ -1,6 +1,8 @@
 import json
 import re
 from collections import namedtuple, OrderedDict, deque
+from pathlib import Path
+
 from django.conf import settings
 from django.db import connection
 
@@ -53,9 +55,9 @@ class LabjournalCache:
         :param category_chain: the deque that contains categories from the very first category
         :param path: full path to the related category
         """
-        from ru.ihna.kozhukhov.core_application.entity.labjournal_record import RootCategoryRecord
-        root_record = RootCategoryRecord(project=related_category.project)
         if len(category_chain) == 0 or not category_chain[0].is_root_record:
+            from ru.ihna.kozhukhov.core_application.entity.labjournal_record import RecordSet
+            root_record = RecordSet().get_root(related_category.project)
             category_chain.appendleft(root_record)
 
         from ru.ihna.kozhukhov.core_application.entity.labjournal_parameter_descriptor import ParameterDescriptorSet
@@ -66,8 +68,11 @@ class LabjournalCache:
         for descriptor in descriptor_set:
             descriptors[descriptor.identifier] = descriptor
             default_values[descriptor.identifier] = descriptor.default
+        base_path = Path(settings.LABJOURNAL_BASEDIR)
 
         for category in category_chain:
+            if category.base_directory is not None:
+                base_path /= category.base_directory
             if not category.is_root_record:
                 default_values.update(category.customparameters)
 
@@ -76,7 +81,7 @@ class LabjournalCache:
             path="%d:%s" % (related_category.project.id, path),
             descriptors=descriptors,
             custom_parameters=default_values,
-            base_directory=None,
+            base_directory=str(base_path.resolve()),
         )
         return cache_item
 

@@ -290,6 +290,9 @@ class CorefacilityConfiguration(Configuration):
     # URL of the application main page
     URL_BASE = values.Value("http://localhost:8000")
 
+    # Base directory where labjournal raw data are located. Nobody is allowed to go upper the base directory
+    LABJOURNAL_BASEDIR = values.Value("")
+
     if sys.platform.startswith("win32"):
         del LOGGING["handlers"]["syslog_handler"]
         LOGGING["loggers"]["django.corefacility"]["handlers"].remove("syslog_handler")

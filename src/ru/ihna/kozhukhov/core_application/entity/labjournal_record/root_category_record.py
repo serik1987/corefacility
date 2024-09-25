@@ -32,11 +32,6 @@ class RootCategoryRecord(CategoryRecord):
         description="Related project"
     )
     del _public_field_description['relative_time']
-    _public_field_description['base_directory'] = EntityField(
-        str,
-        description="The base directory (absolute path only)",
-        max_length=256,
-    )
 
     @classmethod
     def get_entity_class_name(cls):

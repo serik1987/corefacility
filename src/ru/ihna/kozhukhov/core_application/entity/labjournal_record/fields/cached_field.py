@@ -97,7 +97,8 @@ class CachedField(ReadOnlyField):
         category_chain = deque()
         iteration_category = related_category
         while not iteration_category.is_root_record:
-            if iteration_category.parent_category is None or iteration_category.alias is None:
+            if iteration_category.parent_category is None or iteration_category.alias is None or \
+                    iteration_category.base_directory is None:
                 iteration_category = self._record_set.get(iteration_category.id)
             category_chain.append(iteration_category)
             iteration_category = iteration_category.parent_category
