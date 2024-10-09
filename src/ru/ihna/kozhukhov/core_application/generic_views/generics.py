@@ -52,7 +52,7 @@ class EntityListCreateView(EntityViewMixin, ListCreateAPIView):
 
         :return: the list serializer class
         """
-        if self.request.method.lower() == "get":
+        if self.request.method.lower() == "post":
             return super().get_serializer_class()
         if self.list_serializer_class is None:
             raise ValueError("Please, define the list_serializer_class property")

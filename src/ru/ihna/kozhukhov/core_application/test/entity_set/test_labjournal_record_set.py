@@ -1,16 +1,17 @@
 from datetime import datetime
-
 from parameterized import parameterized
+
+from ru.ihna.kozhukhov.core_application.entity.labjournal_record.complex_interval import ComplexInterval
+from ru.ihna.kozhukhov.core_application.entity.labjournal_record import \
+    RecordSet, RootCategoryRecord
+from ru.ihna.kozhukhov.core_application.models.enums import LabjournalRecordType
 
 from .base_test_class import BaseTestClass
 from .entity_set_objects.group_set_object import GroupSetObject
 from .entity_set_objects.project_set_object import ProjectSetObject
 from .entity_set_objects.record_set_object import RecordSetObject
 from .entity_set_objects.user_set_object import UserSetObject
-from ...entity.labjournal_record.complex_interval import ComplexInterval
-from ...entity.labjournal_record.record_set import RecordSet
-from ...entity.labjournal_record.root_category_record import RootCategoryRecord
-from ...models.enums.labjournal_record_type import LabjournalRecordType
+from ..data_providers.labjournal_record_search_provider import name_provider
 
 
 class TestLabjournalRecordSet(BaseTestClass):
@@ -112,12 +113,7 @@ class TestLabjournalRecordSet(BaseTestClass):
         self._test_all_access_features(self.TEST_COUNT, None, self.POSITIVE_TEST_CASE)
         self._test_all_access_features(self.TEST_ITERATION, None, self.POSITIVE_TEST_CASE)
 
-    @parameterized.expand([
-        ("С",),
-        ("Служеб"),
-        ("Служб",),
-        ("Служебная запись 1"),
-    ])
+    @parameterized.expand(name_provider())
     def test_name_filter(self, name):
         self._apply_parent_category()
         self.apply_filter('name', name)

@@ -6,6 +6,7 @@ from ru.ihna.kozhukhov.core_application.views import View404, UserViewSet, Group
     PermissionViewSet, SynchronizationView, LogViewSet, LogRecordViewSet, WidgetsView, \
     ModuleSettingsViewSet, EntryPointListView, AuthorizationMethodSetupView, SystemInformationView, \
     OperatingSystemLogs, HealthCheck
+from ru.ihna.kozhukhov.core_application.views.labjournal import CategoryView
 from ru.ihna.kozhukhov.core_application.views import ProfileAvatarView
 from ru.ihna.kozhukhov.core_application.views.process_information import ProcessInformation
 
@@ -33,7 +34,15 @@ urlpatterns = [
     path(r'sysinfo/', SystemInformationView.as_view(), name='system-information'),
     path(r'procinfo/', ProcessInformation.as_view(), name="process-information"),
     path(r'health-check/<slug:category>/', HealthCheck.as_view(), name="health-check"),
-    path(r'os-logs/', OperatingSystemLogs.as_view(), name="os-logs")
+    path(r'os-logs/', OperatingSystemLogs.as_view(), name="os-logs"),
+
+    # Labjournal views
+    path(r'projects/<str:project_lookup>/labjournal/categories/',
+         CategoryView.as_view(parent_category_access='root_only'), name='category_view_root'),
+    path(r'projects/<str:project_lookup>/labjournal/categories/<int:category_id>/',
+         CategoryView.as_view(parent_category_access='by_id'), name='category_view_by_id'),
+    path(r'projects/<str:project_lookup>/labjournal/categories<path:category_path>/',
+         CategoryView.as_view(parent_category_access='by_path'), name='category_view_by_path'),
 
               ] + router.urls + [
 

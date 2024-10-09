@@ -57,7 +57,7 @@ class BaseTestClass(BaseViewTest):
             current_page -= 1
             request_path, query_params = self.parse_page_url(previous_link)
             previous_link, next_link = self._test_single_page(request_path, query_params, headers, current_page)
-        profile = query_params["profile"]
+        profile = query_params["profile"] if "profile" in query_params else "basic"
         page_size = self.pagination_class.PAGE_SIZES[profile]
         desired_page_number = ceil(len(self.container) / page_size)
         if len(self.container) > 0:
@@ -79,14 +79,15 @@ class BaseTestClass(BaseViewTest):
         self.assertEquals(response.status_code, expected_status_code, "The entity list response must be successful")
         if response.status_code >= status.HTTP_300_MULTIPLE_CHOICES:
             return None, None
-        self.assertEquals(response.data['count'], len(self.container), "Wrong number of items in the response")
-        actual_results = response.data["results"]
-        profile = query_params["profile"]
+        page_data = self._get_page_data(response)
+        self.assertEquals(page_data['count'], len(self.container), "Wrong number of items in the response")
+        actual_results = page_data["results"]
+        profile = query_params["profile"] if "profile" in query_params else "basic"
         page_size = self.pagination_class.PAGE_SIZES[profile]
         page_offset = (page_number-1) * page_size
         desired_results = self.container[page_offset:page_offset+page_size]
         self._compare_search_result(actual_results, desired_results)
-        return response.data['previous'], response.data['next']
+        return page_data['previous'], page_data['next']
 
     def _test_unpaginated_list(self, query_params, token_id: str, expected_status_code: int = status.HTTP_200_OK):
         """
@@ -138,6 +139,15 @@ class BaseTestClass(BaseViewTest):
         :return: nothing
         """
         raise NotImplementedError("assert_items_equal")
+
+    def _get_page_data(self, response):
+        """
+        Returns part of the response data that contains a single Django REST Framework page
+
+        :param response: the response
+        :return: value of a field that contains a single Django REST Framework page
+        """
+        return response.data
 
 
 del BaseViewTest

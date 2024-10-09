@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-13 05:12+0300\n"
+"POT-Creation-Date: 2024-10-09 22:57+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -57,7 +57,7 @@ msgstr "Проект"
 msgid "User"
 msgstr "Пользователь"
 
-#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_file/file_set.py:11
+#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_file/file_set.py:14
 msgid "File attached to the experimental data record"
 msgstr "Файл, прикреплённый к экспериментальной записи"
 
@@ -69,15 +69,15 @@ msgstr "Хештег"
 msgid "The descriptor value with similar ID was created"
 msgstr "Значение кастомного параметра с тем же самым ID уже создано"
 
-#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_parameter_descriptor/parameter_descriptor_set.py:16
+#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_parameter_descriptor/parameter_descriptor_set.py:18
 msgid "Custom parameter descriptor"
 msgstr "Дескриптор кастомного параметра"
 
-#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_record/record_set.py:32
+#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_record/record_set.py:42
 msgid "Laboratory journal record"
 msgstr "Запись в лабораторном журнале"
 
-#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_record/root_category_record.py:49
+#: src/ru/ihna/kozhukhov/core_application/entity/labjournal_record/root_category_record.py:43
 msgid "Root record"
 msgstr "Корневая запись"
 
@@ -499,23 +499,23 @@ msgstr ""
 "Ваше устройство имеет монитор со слишком малым разрешением. Пожалуйста, "
 "запустите это приложение на устройстве с большим разрешением"
 
-#: src/ru/ihna/kozhukhov/core_application/utils.py:12
+#: src/ru/ihna/kozhukhov/core_application/utils/__init__.py:14
 msgid "B"
 msgstr "байт"
 
-#: src/ru/ihna/kozhukhov/core_application/utils.py:13
+#: src/ru/ihna/kozhukhov/core_application/utils/__init__.py:15
 msgid "kB"
 msgstr "Кб"
 
-#: src/ru/ihna/kozhukhov/core_application/utils.py:14
+#: src/ru/ihna/kozhukhov/core_application/utils/__init__.py:16
 msgid "Mb"
 msgstr "Мб"
 
-#: src/ru/ihna/kozhukhov/core_application/utils.py:15
+#: src/ru/ihna/kozhukhov/core_application/utils/__init__.py:17
 msgid "Gb"
 msgstr "Гб"
 
-#: src/ru/ihna/kozhukhov/core_application/utils.py:16
+#: src/ru/ihna/kozhukhov/core_application/utils/__init__.py:18
 msgid "Tb"
 msgstr "Тб"
 
@@ -526,6 +526,15 @@ msgstr "Исходящий сетевой трафик"
 #: src/ru/ihna/kozhukhov/core_application/views/health_check.py:208
 msgid "Network input traffic"
 msgstr "Входящий сетевой трафик"
+
+#: src/ru/ihna/kozhukhov/core_application/views/labjournal/category.py:145
+#: src/ru/ihna/kozhukhov/core_application/views/labjournal/category.py:146
+msgid "The relative date search can't be applied for a given category"
+msgstr "Поиск по относительной дате не может быть применён для заданной категории"
+
+#: src/ru/ihna/kozhukhov/core_application/views/labjournal/category.py:256
+msgid "Too many tagged records."
+msgstr "Слишком много записей, отмеченных хештегом."
 
 #: src/ru/ihna/kozhukhov/core_application/views/login.py:37
 msgid "Incorrect credentials."

@@ -23,6 +23,9 @@ class ParameterDescriptorSetObject(EntitySetObject):
     _entity_class = BooleanParameterDescriptor
     """ Defines the entity class. The EntitySetObject will create entities belonging exactly to this class. """
 
+    _alias_field = 'identifier'
+    """ Need to search by alias """
+
     def __init__(self, record_set_object, _entity_list=None):
         """
         Initializes a set of certain custom entity objects and adds such objects to the database.
@@ -119,3 +122,223 @@ class ParameterDescriptorSetObject(EntitySetObject):
         )
         discrete_value_descriptor.create()
         self._entities.append(discrete_value_descriptor)
+
+    def set_custom_parameters(self):
+        """
+        Sets custom parameters for certain set of records
+
+        :return: a dictionary contains all categories which child records properly set their custom parameters
+        """
+        parent_categories = dict()
+
+        for record in self._record_set_object.entities:
+            if record.level == 1 and record.alias == 'a':
+                parent_categories['a'] = record
+            elif record.level == 1 and record.alias == 'b':
+                parent_categories['b'] = record
+            elif record.level == 2 and record.parent_category.alias == 'a':
+                if hasattr(record, 'alias') and record.alias == 'a1':
+                    record.custom_root_bool = False
+                    record.custom_root_num = 1
+                    record.custom_root_string = "Вася"
+                    record.custom_root_discrete = 'grat'
+                    record.custom_a_bool = False
+                    record.custom_a_num = 1
+                    record.custom_a_string = "Вася"
+                    record.custom_a_discrete = 'grat'
+                    record.update()
+                elif hasattr(record, 'alias') and record.alias == 'a2':
+                    record.custom_root_bool = True
+                    record.custom_root_num = 2
+                    record.custom_root_string = "Коля"
+                    record.custom_root_discrete = 'ret'
+                    record.update()
+                elif hasattr(record, 'alias') and record.alias == 'a3':
+                    record.custom_root_bool = False
+                    record.custom_root_num = 3
+                    record.custom_root_string = "Петя"
+                    record.custom_root_discrete = 'imag'
+                    record.custom_a_string = "Коля"
+                    record.custom_a_discrete = 'ret'
+                    record.update()
+                elif hasattr(record, 'alias') and record.alias == 'a4':
+                    record.custom_root_bool = True
+                    record.custom_root_num = 1
+                    record.custom_root_string = "Игорь"
+                    record.custom_root_discrete = 'squares'
+                    record.custom_a_bool = True
+                    record.custom_a_num = 2
+                    record.update()
+                elif hasattr(record, 'alias') and record.alias == 'a5':
+                    record.custom_root_bool = False
+                    record.custom_root_num = 2
+                    record.custom_root_string = "Вася"
+                    record.custom_root_discrete = 'triang'
+                    record.custom_a_string = "Петя"
+                    record.custom_a_discrete = 'imag'
+                    record.update()
+                elif hasattr(record, 'alias') and record.alias == 'a6':
+                    record.custom_root_bool = True
+                    record.custom_root_num = 3
+                    record.custom_root_string = "Коля"
+                    record.custom_root_discrete = 'grat'
+                    record.update()
+                elif hasattr(record, 'alias') and record.alias == 'a7':
+                    record.custom_root_bool = False
+                    record.custom_root_num = 1
+                    record.custom_root_string = "Петя"
+                    record.custom_root_discrete = 'ret'
+                    record.custom_a_bool = False
+                    record.custom_a_num = 3
+                    record.custom_a_string = "Игорь"
+                    record.custom_a_discrete = 'squares'
+                    record.update()
+                elif hasattr(record, 'name') and record.name == "Служебная запись 1":
+                    record.custom_root_bool = True
+                    record.custom_root_num = 2
+                    record.custom_root_string = "Игорь"
+                    record.custom_root_discrete = 'imag'
+                    record.custom_a_num = 1
+                    record.update()
+                elif hasattr(record, 'name') and record.name == "Служебная запись 2":
+                    record.custom_root_bool = False
+                    record.custom_root_num = 3
+                    record.custom_root_string = "Вася"
+                    record.custom_root_discrete = 'squares'
+                    record.custom_a_string = "Вася"
+                    record.custom_a_discrete = 'triang'
+                    record.update()
+                elif hasattr(record, 'name') and record.name == "Служебная запись 3":
+                    record.custom_root_bool = True
+                    record.custom_root_num = 1
+                    record.custom_root_string = "Коля"
+                    record.custom_root_discrete = 'triang'
+                    record.custom_a_bool = True
+                    record.custom_a_discrete = 'grat'
+                    record.update()
+                elif hasattr(record, 'name') and record.name == "Служебная запись 4":
+                    record.custom_root_bool = False
+                    record.custom_root_num = 2
+                    record.custom_root_string = "Петя"
+                    record.custom_root_discrete = 'grat'
+                    record.custom_a_num = 2
+                    record.custom_a_string = "Коля"
+                    record.update()
+                elif hasattr(record, 'name') and record.name == "Служебная запись 5":
+                    record.custom_root_bool = True
+                    record.custom_root_num = 3
+                    record.custom_root_string = "Игорь"
+                    record.custom_root_discrete = 'ret'
+                    record.update()
+                elif hasattr(record, 'alias') and record.alias == 'subcat':
+                    record.custom_root_bool = False
+                    record.custom_root_num = 1
+                    record.custom_root_string = "Вася"
+                    record.custom_root_discrete = 'imag'
+                    record.custom_a_bool = False
+                    record.custom_a_string = "Петя"
+                    record.update()
+            elif record.level == 2 and record.parent_category.alias == 'b':
+                if hasattr(record, 'alias') and record.alias == 'b1':
+                    record.custom_root_bool = False
+                    record.custom_root_num = 1
+                    record.custom_root_string = "Вася"
+                    record.custom_root_discrete = 'grat'
+                    record.custom_b_bool = False
+                    record.custom_b_num = 1
+                    record.custom_b_string = "Вася"
+                    record.custom_b_discrete = 'grat'
+                    record.update()
+                elif hasattr(record, 'alias') and record.alias == 'b2':
+                    record.custom_root_bool = True
+                    record.custom_root_num = 2
+                    record.custom_root_string = "Коля"
+                    record.custom_root_discrete = 'ret'
+                    record.update()
+                elif hasattr(record, 'alias') and record.alias == 'b3':
+                    record.custom_root_bool = False
+                    record.custom_root_num = 3
+                    record.custom_root_string = "Петя"
+                    record.custom_root_discrete = 'imag'
+                    record.custom_b_string = "Коля"
+                    record.custom_b_discrete = 'ret'
+                    record.update()
+                elif hasattr(record, 'alias') and record.alias == 'b4':
+                    record.custom_root_bool = True
+                    record.custom_root_num = 3
+                    record.custom_root_string = "Игорь"
+                    record.custom_root_discrete = 'squares'
+                    record.custom_b_bool = True
+                    record.custom_b_num = 2
+                    record.update()
+                elif hasattr(record, 'alias') and record.alias == 'b5':
+                    record.custom_root_bool = False
+                    record.custom_root_num = 2
+                    record.custom_root_string = "Вася"
+                    record.custom_root_discrete = 'triang'
+                    record.custom_b_string = "Петя"
+                    record.custom_b_discrete = 'imag'
+                    record.update()
+                elif hasattr(record, 'alias') and record.alias == 'b6':
+                    record.custom_root_bool = True
+                    record.custom_root_num = 3
+                    record.custom_root_string = "Коля"
+                    record.custom_root_discrete = 'grat'
+                    record.update()
+                elif hasattr(record, 'alias') and record.alias == 'b7':
+                    record.custom_root_bool = False
+                    record.custom_root_num = 1
+                    record.custom_root_string = "Петя"
+                    record.custom_root_discrete = 'ret'
+                    record.custom_b_bool = False
+                    record.custom_b_num = 3
+                    record.custom_b_string = "Игорь"
+                    record.custom_b_discrete = 'squares'
+                    record.update()
+                elif hasattr(record, 'name') and record.name == "Служебная запись 1":
+                    record.custom_root_bool = True
+                    record.custom_root_num = 2
+                    record.custom_root_string = "Игорь"
+                    record.custom_root_discrete = 'imag'
+                    record.custom_b_num = 1
+                    record.update()
+                elif hasattr(record, 'name') and record.name == "Служебная запись 2":
+                    record.custom_root_bool = False
+                    record.custom_root_num = 3
+                    record.custom_root_string = "Вася"
+                    record.custom_root_discrete = 'squares'
+                    record.custom_b_string = "Вася"
+                    record.custom_b_discrete = 'triang'
+                    record.update()
+                elif hasattr(record, 'name') and record.name == "Служебная запись 3":
+                    record.custom_root_bool = True
+                    record.custom_root_num = 1
+                    record.custom_root_string = "Коля"
+                    record.custom_root_discrete = 'triang'
+                    record.custom_b_bool = True
+                    record.custom_b_discrete = 'grat'
+                    record.update()
+                elif hasattr(record, 'name') and record.name == "Служебная запись 4":
+                    record.custom_root_bool = False
+                    record.custom_root_num = 2
+                    record.custom_root_string = "Петя"
+                    record.custom_root_discrete = 'grat'
+                    record.custom_b_num = 2
+                    record.custom_b_string = "Коля"
+                    record.update()
+                elif hasattr(record, 'name') and record.name == "Служебная запись 5":
+                    record.custom_root_bool = True
+                    record.custom_root_num = 3
+                    record.custom_root_string = "Игорь"
+                    record.custom_root_discrete = 'ret'
+                    record.update()
+                elif hasattr(record, 'alias') and record.alias == 'subcat':
+                    record.custom_root_bool = False
+                    record.custom_root_num = 1
+                    record.custom_root_string = "Вася"
+                    record.custom_root_discrete = 'imag'
+                    record.custom_b_bool = False
+                    record.custom_b_string = "Петя"
+                    record.update()
+
+        return parent_categories

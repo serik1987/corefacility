@@ -293,6 +293,9 @@ class CorefacilityConfiguration(Configuration):
     # Base directory where labjournal raw data are located. Nobody is allowed to go upper the base directory
     LABJOURNAL_BASEDIR = values.Value("")
 
+    # Maximum number of reference records to be used when applying 'date_from_hashtags' and 'date_to_hashtags' filter
+    LABJOURNAL_MAXIMUM_TAGGED_RECORDS = values.PositiveIntegerValue(default=20)
+
     if sys.platform.startswith("win32"):
         del LOGGING["handlers"]["syslog_handler"]
         LOGGING["loggers"]["django.corefacility"]["handlers"].remove("syslog_handler")

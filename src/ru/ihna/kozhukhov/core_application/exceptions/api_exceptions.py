@@ -105,6 +105,21 @@ class PasswordRecoverySwitchedOff(CorefacilityAPIException):
                          detail="The 'Password Recovery' authorization module was switched off")
 
 
+class EntitySetIsEmpty(Exception):
+    """
+    This is a special exception that should be risen when list() request action is executed and the resultant entity
+    list to output is always empty for a given combination of query parameters despite what actual information is stored
+    in the database.
+
+    Such a situation should not be treated as error that shall not be result in 4xx responses. However, the situation
+    implies that the HTTP request can be completed without the following querying to the database and thus the following
+    behavior of the list() method should be modified
+    """
+
+    def __init__(self):
+        super().__init__('')
+
+
 def exception_handler(exc, context):
     """
     Defines standard exception handler for all corefacility project.

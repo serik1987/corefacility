@@ -27,16 +27,27 @@ class RecordHashtagSetObject(EntitySetObject):
         self._record_set_object = record_set_object
         super().__init__(_entity_list=_entity_list)
         if _entity_list is None:  # if no cloning
-            records = list(filter(
-                lambda record: record.level == 2 and record.project.id == self._record_set_object.optical_imaging.id,
-                self._record_set_object.entities
-            ))
-            hashtag1 = self.get_by_alias("шахматный")
-            hashtag2 = self.get_by_alias("редкий")
-            hashtag3 = self.get_by_alias("редчайший")
-            [record.hashtags.add([hashtag1.id]) for record in records[::2]]
-            [record.hashtags.add([hashtag2.id]) for record in records[::3]]
-            [record.hashtags.add([hashtag3.id]) for record in records[::4]]
+            for project in self._record_set_object.optical_imaging, self._record_set_object.the_rabbit_project:
+                records = list(filter(
+                    lambda record: record.level == 2 and record.project.id == project.id,
+                    self._record_set_object.entities
+                ))
+                hashtag1 = None
+                hashtag2 = None
+                hashtag3 = None
+                for hashtag in self.entities:
+                    if hashtag.description == "шахматный" and hashtag.project.id == project.id:
+                        hashtag1 = hashtag
+                    if hashtag.description == "редкий" and hashtag.project.id == project.id:
+                        hashtag2 = hashtag
+                    if hashtag.description == "редчайший" and hashtag.project.id == project.id:
+                        hashtag3 = hashtag
+                # hashtag1 = self.get_by_alias("шахматный")
+                # hashtag2 = self.get_by_alias("редкий")
+                # hashtag3 = self.get_by_alias("редчайший")
+                [record.hashtags.add([hashtag1.id]) for record in records[::2]]
+                [record.hashtags.add([hashtag2.id]) for record in records[::3]]
+                [record.hashtags.add([hashtag3.id]) for record in records[::4]]
 
     def data_provider(self):
         """

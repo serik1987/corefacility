@@ -118,6 +118,7 @@ class RecordSetObject(EntitySetObject):
                     )
                     record.create()
                     self._entities.append(record)
+                    parent_category = RecordSet().get(parent_category.id)
                     self._entities.append(parent_category)
                     current_date += timedelta(days=1)
                     alias = alias[:-1] + chr(ord(alias[-1]) + 1)
@@ -136,7 +137,10 @@ class RecordSetObject(EntitySetObject):
                                 else datetime(1900, 1, 1))  # NULLS first!
 
     def clone(self):
-        return self.__class__(self._user_set_object, self._project_set_object, _entity_list=self._entities)
+        """
+        Returns an exact copy of the container
+        """
+        return self.__class__(self._user_set_object, self._project_set_object, _entity_list=list(self._entities))
 
     def filter_by_parent_category(self, parent_category):
         """
@@ -183,7 +187,8 @@ class RecordSetObject(EntitySetObject):
         Remains only such entities inside the entity container that have certain custom parameters.
         Remains all entities in the database unchanged.
 
-        :param custom_parameters: a dictionary for all available custom parameters
+        :param custom_parameters: a dictionary for all available custom parameters plus '_logic' hidden parameter for
+        representing the logic
         """
         if custom_parameters['_logic'] == RecordSet.LogicType.AND:
             def filter_function(record):
@@ -218,3 +223,72 @@ class RecordSetObject(EntitySetObject):
         :param project: A project that is used as filtration criterion
         """
         self._entities = list(filter(lambda record: record.project.id == project.id, self._entities))
+
+    def filter_by_hashtag_list(self, hashtag_list, hashtag_logic):
+        """
+        Filters all records using the hashtag list
+
+        :param hashtag_list: list of all hashtags
+        :param hashtag_logic: the applied logic
+        """
+        if hashtag_logic == 'and':
+            record_list = {record.id for record in self.entities}
+        elif hashtag_logic == 'or':
+            record_list = set()
+        else:
+            raise ValueError("Bad hashtag logic")
+        hashtag_dictionary = {
+            record.id: [hashtag.id for hashtag in record.hashtags]
+            for record in self.entities
+        }
+        for hashtag in hashtag_list:
+            local_record_list = {
+                record.id for record in self.entities
+                if hashtag.id in hashtag_dictionary[record.id]
+            }
+            if hashtag_logic == 'and':
+                record_list &= local_record_list
+            if hashtag_logic == 'or':
+                record_list |= local_record_list
+        if len(hashtag_list) == 0 and hashtag_logic == 'and':
+            record_list = set()
+        self._entities = list(filter(lambda record: record.id in record_list, self._entities))
+
+    def filter_by_date_from_records(self, reference_record_list, date_from, date_to):
+        """
+        Remains only such records that lies within a given time interval relatively to at least one record from the
+        record list
+
+        :param reference_record_list: list of reference records
+        :param date_from: the record start date
+        :param date_to: the record finish date
+        """
+        reference_times = [
+            reference_record.datetime
+            for reference_record in reference_record_list
+            if reference_record.datetime is not None
+        ]
+        def filter_function(record):
+            """
+            Defines whether a given record passes through the record list or not
+
+            :param record: the record to test
+            :return: True if the record passes through the record list, False otherwise
+            """
+            if record.datetime is None:
+                return False
+            relative_times = [
+                record.datetime - reference_time
+                for reference_time in reference_times
+                if record.datetime >= reference_time
+            ]
+            if len(relative_times) == 0:
+                return date_to is None  # Pass if cond. (2) is not applicable
+            minimum_relative_time = min(relative_times)
+            record_is_passed = True
+            if date_from is not None:
+                record_is_passed = record_is_passed and minimum_relative_time >= date_from
+            if date_to is not None:
+                record_is_passed = record_is_passed and minimum_relative_time < date_to
+            return record_is_passed
+        self._entities = list(filter(filter_function, self._entities))
