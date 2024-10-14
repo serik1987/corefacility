@@ -35,6 +35,11 @@ class RecordSerializer(EntitySerializer):
         choices=['data', 'service', 'category'],
     )
 
+    level = ReadOnlyField(
+        label="Record level",
+        help_text="Level of root record is zero, level for any other record is level for root record plus 1"
+    )
+
     alias = SlugField(
         required=False,
         label="Record alias",
@@ -114,7 +119,7 @@ class RecordSerializer(EntitySerializer):
         """
         error_list = OrderedDict()
         if self.instance is None:
-            record_type = LabjournalRecordType(data['type'])
+            record_type = getattr(LabjournalRecordType, data['type']['name'])
         else:
             record_type = self.instance.type
 
@@ -135,6 +140,11 @@ class RecordSerializer(EntitySerializer):
         :return: a dictionary of Python primitives
         """
         record_data = super().to_representation(record)
+        # Turning off the time zone support for all labjournal records
+        if record_data['datetime'] is not None:
+            record_data['datetime'] = record_data['datetime'].split('+')[0]
+        if 'finish_time' in record_data and record_data['finish_time'] is not None:
+            record_data['finish_time'] = record_data['finish_time'].split('+')[0]
         for parameter_name, parameter_value in record.customparameters.items():
             record_data['custom_%s' % parameter_name] = parameter_value
         return record_data
@@ -142,7 +152,11 @@ class RecordSerializer(EntitySerializer):
     def create(self, data):
         self.entity_class = self.entity_classes[data['type']['name']]
         del data['type']
-        data['parent_category'] = self.context['request'].parent_category
+        data = OrderedDict(
+            parent_category=self.context['request'].parent_category,
+            user=self.context['request'].user,
+            **data,
+        )
         record = super().create(data)
         self.entity_class = None
         return record

@@ -120,6 +120,20 @@ class EntitySetIsEmpty(Exception):
         super().__init__('')
 
 
+class BadExportFormatException(CorefacilityAPIException):
+    """
+    Raises when the user tries to export the labjournal data in unspecified format
+    """
+
+    status_code = status.HTTP_400_BAD_REQUEST
+
+    def __init__(self):
+        super().__init__(
+            code='bad_export_format',
+            detail="The export format is unrecognized or unsupported"
+        )
+
+
 def exception_handler(exc, context):
     """
     Defines standard exception handler for all corefacility project.

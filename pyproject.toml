@@ -20,7 +20,8 @@ dependencies=[
     "dateutils",
     "numpy",
     "matplotlib",
-    "scipy"
+    "scipy",
+    "pandas",
 ]
 
 [project.scripts]
