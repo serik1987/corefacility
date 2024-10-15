@@ -92,12 +92,8 @@ class PandasExporter(Exporter):
         for param in params:
             data[param] = []
             for record in record_list:
-                if param in record.customparameters:
-                    data[param].append(record.customparameters[param])
-                elif param in record.default_values:
-                    data[param].append(record.default_values[param])
-                else:
-                    data[param].append(None)
+                value = self.get_custom_parameter(record, param)
+                data[param].append(value)
         record_frame = pandas.DataFrame(
             data=data,
             index=[

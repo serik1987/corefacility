@@ -58,7 +58,8 @@ class Exporter:
 
         :param close_file_after_create: if True, the file will be immediately closed after create and name of the
         temporary file only will be returned. If False, the file will not be immediately closed after creation and
-        the return result will be
+        the return result will be a tuple containing first a file object to newly created temporary file and second
+        full absolute name of such a file.
         :param text: if close_file_after_create is False, specifies whether the file should be text or not
         :return: depends on value of the close_file_after_create (see above).
         """
@@ -82,3 +83,21 @@ class Exporter:
         else:
             mode = 'w' if text else 'wb'
             return os.fdopen(temporary_file_descriptor, mode), temporary_file_name
+
+    def get_custom_parameter(self, record, identifier):
+        """
+        Retrieves value of the custom parameter from a given record.
+        If the custom parameter is not defined for a given record, default value of the custom parameter will be
+        retrieved.
+
+        :param record: a Labjournal record which custom parameter should be retrieved
+        :param identifier: identifier of a custom parameter to retrieve
+        :return: value of the custom parameter that shall be retrieved or None if such a custom parameter is not defined
+        """
+        if identifier in record.customparameters:
+            value = record.customparameters[identifier]
+        elif identifier in record.default_values:
+            value = record.default_values[identifier]
+        else:
+            value = None
+        return value

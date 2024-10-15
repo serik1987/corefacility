@@ -1,9 +1,11 @@
 from ru.ihna.kozhukhov.core_application.exceptions.api_exceptions import BadExportFormatException
 
 from .pandas_exporter import PandasExporter
+from .csv_exporter import CsvExporter
 
 __all_exporters = {
-    'json': PandasExporter
+    'json': PandasExporter,
+    'csv': CsvExporter,
 }
 
 def find_exporter_for(view, request, export_format):
